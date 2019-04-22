@@ -1,0 +1,56 @@
+<!-- templates/course_search_auto.html -->
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+{% bootstrap_css %}
+{% load static %}
+
+{% block title %}Courses Search{% endblock %}
+
+{% block css %}
+<link href="{% static 'css/autocomplete.css' %}" rel="stylesheet">
+{% endblock %}
+
+
+{% block content %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<script src="{% static 'js/autocomplete.js' %}"></script>
+
+
+
+<form autocomplete="off">
+  <div class="container">
+    <!-- <div class = "justify-content-center"> -->
+    <br />
+    <div class="row">
+
+      <div class="col-6">
+        <h5> Add courses you've <b>taken</b> to your profile: &nbsp </h5>
+      </div>
+      <div class="col-6">
+        <div class="autocomplete" style="width:400px;">
+          <input id="myInput" type="text" name="class" placeholder="Search for a course" class="form-control mr-sm-2" type="search" aria-label="Search">
+        </div>
+      </div>
+    </div>
+
+    <br />
+
+    <div class="row">
+      <div class="col-6">
+        <h5> Add courses you're <b>currently taking</b> to your profile: &nbsp </h5>
+      </div>
+      <div class="col-6">
+        <div class="autocomplete" style="width:400px;">
+          <input id="myInput2" type="text" name="class" placeholder="Search for a course" class="form-control mr-sm-2" type="search" aria-label="Search">
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+
+<script>
+  autocomplete("#myInput", "{{user.username}}", "taken");
+  autocomplete("#myInput2", "{{user.username}}", "taking");
+</script>
+{% endblock %}

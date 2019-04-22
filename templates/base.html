@@ -1,0 +1,86 @@
+<!-- templates/base.html -->
+{% load bootstrap4 %}
+{% bootstrap_css %}
+{% load static %}
+{% load users_tags %}
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<meta http-equiv="x-ua-compatible" content="ie=edge">
+		<title>{% block title %}{% endblock %}</title>
+		<!-- Font Awesome -->
+		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css">
+		<!-- Bootstrap core CSS -->
+		<link href="/static/css/bootstrap.min.css" rel="stylesheet">
+		<!-- Material Design Bootstrap -->
+		<link href="/static/css/mdb.min.css" rel="stylesheet">
+		<!-- Your custom styles (optional) -->
+		<link href="/static/css/style.css" rel="stylesheet">
+
+    {% url 'home' as home %}
+    {% url 'profile' as profile %}
+    {% url 'match' as match %}
+    {% url 'course_search' as courses %}
+    {% url 'course_search_auto' as courses_auto %}
+    <link rel="shortcut icon" href="{%  static 'images/favicon.ico' %}">
+		{% block css %}
+		{% endblock %}
+	</head>
+<body>
+  <div id="navigation">
+    <nav class="navbar navbar-expand-lg navbar-light font-weight-light" >
+      <a class="navbar-brand" href="{{ home }}" style="padding:0px 0px 3px 0px; font-size: 20px;">
+        <img src="/static/images/brand.png" width="30" height="30" class="d-inline-block align-top" alt="">
+        Home
+      </a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".dual-collapse2" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-autox">
+          <li class="nav-item {% active request match %}">
+            <a class="nav-link" href="{{ match }}">Match</a>
+          </li>
+          <li class="nav-item {% active request courses_auto %}">
+            <a class="nav-link" href="{{ courses_auto }}">Courses</a>
+          </li>
+        </ul>
+      </div>
+
+      <div class="navbar-collapse collapse w-100 order-2 dual-collapse2">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true">
+              User
+            </a>
+            <div class="dropdown-menu w-100 order-3 dropdown-menu-right " aria-labelledby="navbarDropdown">
+              {% if request.user.is_authenticated %}
+              <a class="dropdown-item" href="{% url 'profile' request.user.username %}">Profile</a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="{% url 'update_profile' request.user.username %}">Edit Profile</a>
+              <a class="dropdown-item" href="{% url 'logout'%}">Log out</a>
+              {% else %}
+              <a class="dropdown-item" href="{% url 'login' %}">Sign in</a>
+              {% endif %}
+            </div>
+          </li>
+        </ul>
+      </div>
+
+    </nav>
+  </div>
+	<main>
+		{% block content %}
+		{% endblock %}
+	</main>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/static/js/popper.min.js"></script>
+  <!-- MDB core JavaScript -->
+  <script type="text/javascript" src="/static/js/mdb.js"></script>
+</body>
+</html>

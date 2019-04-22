@@ -1,0 +1,208 @@
+<!-- templates/profile.html -->
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+{% bootstrap_css %}
+{% load static %}
+
+{% load users_tags %}
+
+
+{% block title %}Profile{% endblock %}
+
+{% block css %}
+<link href="{% static 'css/userprofile.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="container mt-3 mb-5">
+  <div class="col-xs-12 col-sm-12 col-md-10 col-lg-8 col-xs-offset-0 col-sm-offset-0 toppad " style="width:100%; margin: 0 auto;">
+    <div class="card mt-3 mb-1">
+      <h4 class="card-header">{{ user.first_name }} {{ user.last_name }}</h4>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-3 col-lg-3 " align="center"> 
+              {% if user.profile.avatar %}
+              <img src="{{ user.profile.avatar.url }}" width="100px" class="img-circle img-responsive">
+              {% else %}
+              <img src="" alt="None" width="100px" class="img-circle img-responsive">
+              {% endif %}
+          </div>
+          <div class=" col-md-9 col-lg-9 "> 
+            <table class="table table-user-information">
+              <tbody>
+                <tr>
+                  <td>Email</td>
+                  <td>{{user.email}}</td>
+                </tr>
+                <tr>
+                  <td>Year</td>
+                  <td>{{user.profile.year}}</td>
+                </tr>
+                <tr>
+                  <td>Birth Date</td>
+                  <td>{{user.profile.birth_date}}</td>
+                </tr>
+                <tr>
+                  <td>Major</td>
+                  <td>{{user.profile.major}}</td>
+                </tr>
+                  <tr>
+                  <td>Major Two</td>
+                  <td>{{user.profile.major_two}}</td>
+                </tr>
+                <tr>
+                  <td>Minor</td>
+                  <td>{{user.profile.minor}}</td>
+                </tr>
+                  <td>Location</td>
+                  <td>{{user.profile.location}}</td>
+                </tr>
+                <tr>
+                  <td>Bio</td>
+                  <td>{{user.profile.bio}}</td>
+                </tr>
+              </tbody>
+						</table>
+						<div>
+							{% if editable is False %}
+								<div style="display:inline-block;overflow: auto;white-space: nowrap;margin:0px auto;width:100%;">
+									<div style="float:left;">
+											<input class="btn-outline-danger btn btn mt-0" type="button" onClick="javascript:history.go(-1);" value="Back">
+									</div>
+									<div style="float:right;">
+										{% if not to_username == request.user.username %}
+												{% if errors %}<p>{{ errors|join:", " }}</p>{% endif %}
+												{% if from_user not in friends and request_exist == None %}
+												<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#match_request">Match</button>
+												<div class="modal fade" id="match_request" tabindex="-1" role="dialog" aria-labelledby="match_request"
+															aria-hidden="true">
+													<form method="post">
+														{% csrf_token %}
+														<input type="hidden" name="match_request">
+															<div class="modal-dialog" role="document">
+																<div class="modal-content">
+																	<div class="modal-header text-center">
+																		<h4 class="modal-title w-100 font-weight-bold">Match Request</h4>
+																		<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+																			<span aria-hidden="true">&times;</span>
+																		</button>
+																	</div>
+																	<div class="modal-body mx-3">
+																		<div class="md-form mb-5">
+																			<i class="fas fa-user prefix grey-text"></i>
+																			<input type="text" id="form34" class="form-control" name="match_title">
+																			<label data-error="wrong" data-success="" for="form34">Title</label>
+																		</div>
+												
+																		<div class="md-form">
+																			<i class="fas fa-pencil prefix grey-text"></i>
+																			<textarea type="text" id="form8" class="md-textarea form-control" rows="4" name="match_reason"></textarea>
+																			<label data-error="wrong" data-success="" for="form8"> Reason </label>
+																		</div>
+																	</div>
+																	<div class="modal-footer d-flex justify-content-center">
+																		<button type="submit" class="btn btn-unique">Send <i class="fas fa-paper-plane-o ml-1"></i></button>
+																	</div>
+																</div>
+															</div>
+													</form>
+												</div>		
+												{% endif %}
+										{% endif %}
+									</div>
+								</div>
+							{% endif %}
+						</div>
+          </div>
+        </div>
+      </div>
+		</div>
+		
+		<div class="card mt-3 mb-0">
+			<a class="card-header" data-toggle="collapse" href="#cal" role="button" aria-expanded="false" aria-controls="cal">
+				<h4>Calendar</h4>
+			</a>
+			<div class="collapse" id="cal">
+				<div class="card-body">
+					{% if show_cal %}
+						<div>
+							<iframe src={{calendar_url}} style="border: 0" width="100%" height="600" frameborder="0" scrolling="no"></iframe>
+						</div>
+					{% else %}
+					<div>
+						<h5>You must be matched to view this person's calendar</h5>
+					</div>
+					{% endif %}
+				</div>
+			</div>
+		</div>
+			<div class="" style="width:50%; float:left; padding:2px 5px 10px 0px;">
+				<div class="card mt-3 mb-3">
+					<a class="card-header" data-toggle="collapse" href="#cs_taking" role="button" aria-expanded="false" aria-controls="cs_taking">
+						<h4>Courses Taking</h4>
+					</a>
+					<div class="collapse" id="cs_taking">
+						<div class="card-body">
+							{% for user_cs in user_taking_courses %}
+							<a href="{% url 'course' user_cs.course_number %}" class="list-group-item list-group-item-action">
+								<p class="mb-1">{{ user_cs.course_number }} {{ user_cs.course_name }}</p>
+							</a>
+							{% endfor %}
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="" style="margin-left:50%; padding:2px 0px 10px 5px;">
+					<div class="card mt-3 mb-3">
+							<a class="card-header" data-toggle="collapse" href="#cs_taken" role="button" aria-expanded="false" aria-controls="cs_taken">
+								<h4>Courses Taken</h4>
+							</a>
+						<div class="collapse" id="cs_taken">
+							<div class="card-body">
+									{% for user_cs in user_taken_courses %}
+									<a href="{% url 'course' user_cs.course_number %}" class="list-group-item list-group-item-action">
+										<p class="mb-1">{{ user_cs.course_number }} {{ user_cs.course_name }}</p>
+									</a>
+									{% endfor %}
+							</div>
+						</div>
+					</div>
+
+					<div class="card mt-3 mb-3">
+						<a class="card-header" data-toggle="collapse" href="#pr_match" role="button" aria-expanded="false" aria-controls="p_match">
+							<h4>Past Matches Received</h4>
+						</a>
+						<div class="collapse" id="pr_match">
+							<div class="card-body">
+								{% for pmr in past_matching_received %}
+								<a href="" class="list-group-item list-group-item-action" data-toggle="modal" data-target="#reviews_{{ pmr.pk }}">
+									<p class="mb-1">{% if editable %}{{ pmr.from_user.first_name }} {{ pmr.from_user.last_name }}{% else %}{{ pmr.display_name }}{% endif %}</p>
+								</a>
+								<div class="modal fade" id="reviews_{{ pmr.pk }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+											aria-hidden="true">
+										<div class="modal-dialog" role="document">
+											<div class="modal-content">
+												<div class="modal-header text-center">
+													<h4 class="modal-title w-100 font-weight-bold">Review</h4>
+													<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+														<span aria-hidden="true">&times;</span>
+													</button>
+												</div>
+												<div class="modal-body mx-3">
+													<h4 class="modal-title">Name: {{ pmr.display_name }}</h4>
+													<hr>
+													<p>{{ pmr.comment }}</p>
+													<hr>
+													<p>Rating: {{ pmr.rating }}</p>
+												</div>
+											</div>
+										</div>
+								</div>
+								{% endfor %}
+							</div>
+						</div>
+					</div>
+			</div>
+  </div>
+</div>
+{% endblock %}

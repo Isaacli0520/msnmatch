@@ -1,0 +1,16 @@
+Django==2.1.2
+gunicorn
+django-heroku
+django-bootstrap4
+social-auth-app-django
+django-widget-tweaks
+whitenoise
+django-friendship
+boto3
+django-storages
+Pillow
+channels
+channels_redis
+django-model-utils
+dj-database-url
+psycopg2-binary
