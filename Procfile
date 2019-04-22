@@ -1,2 +1,2 @@
 release: python manage.py migrate
-web: gunicorn mango.wsgi
+web: gunicorn msnmatch.wsgi
