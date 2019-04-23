@@ -47,6 +47,8 @@ INSTALLED_APPS = [
     'widget_tweaks',
     'friendship',
     'storages',
+    'taggit',
+    'skills',
 ]
 
 MIDDLEWARE = [

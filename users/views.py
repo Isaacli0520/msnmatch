@@ -51,6 +51,7 @@ def profile(request, username):
 	user = User.objects.get(username=username)
 	user_taking_courses = user.course_set.filter(relation__take="taking")
 	user_taken_courses = user.course_set.filter(relation__take="taken")
+	user_skills = user.skill_set.all()
 	# print(user_taken_courses)
 	friends = Friend.objects.friends(user)
 	friend_requests = FriendshipRequest.objects.filter(to_user=user)
@@ -116,6 +117,7 @@ def profile(request, username):
 		"to_username": username,
 		"user": user,
 		"editable": editable,
+		"user_skills":user_skills,
 		"user_taking_courses": user_taking_courses,
 		"user_taken_courses": user_taken_courses,
 		"friends": friends,
@@ -127,6 +129,7 @@ def profile(request, username):
 		"sent_matching":sent_matching,
 		"calendar_url": calendar_url,
 		"show_cal": show_cal,
+        "cal_act" : False,
 	}
 
 	return render(request, 'profile.html', ctx)
