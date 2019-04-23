@@ -13,6 +13,7 @@ from django.core.files.storage import default_storage as storage
 from django.utils import timezone
 from django.core.validators import MaxValueValidator, MinValueValidator
 from friendship.models import Friend, FriendshipRequest
+from taggit.managers import TaggableManager
 
 YEAR_CHOICES = (
 			('1st year', '1st year'),

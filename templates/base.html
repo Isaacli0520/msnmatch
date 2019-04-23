@@ -25,15 +25,16 @@
     {% url 'match' as match %}
     {% url 'course_search' as courses %}
     {% url 'course_search_auto' as courses_auto %}
+    {% url 'skill_search' as skill_search %}
     <link rel="shortcut icon" href="{%  static 'images/favicon.ico' %}">
-		{% block css %}
-		{% endblock %}
+    {% block css %}
+    {% endblock %}
 	</head>
 <body>
   <div id="navigation">
     <nav class="navbar navbar-expand-lg navbar-light font-weight-light" >
       <a class="navbar-brand" href="{{ home }}" style="padding:0px 0px 3px 0px; font-size: 20px;">
-        <img src="/static/images/brand.png" width="30" height="30" class="d-inline-block align-top" alt="">
+        <img src="/static/images/brand.jpg" width="30" height="30" class="d-inline-block align-top" alt="">
         Home
       </a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".dual-collapse2" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -46,6 +47,9 @@
           </li>
           <li class="nav-item {% active request courses_auto %}">
             <a class="nav-link" href="{{ courses_auto }}">Courses</a>
+          </li>
+          <li class="nav-item {% active request skill_search %}">
+            <a class="nav-link" href="{{ skill_search }}">Skills</a>
           </li>
         </ul>
       </div>

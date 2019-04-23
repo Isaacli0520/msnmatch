@@ -62,62 +62,63 @@
                   <td>{{user.profile.bio}}</td>
                 </tr>
               </tbody>
-						</table>
-						<div>
-							{% if editable is False %}
-								<div style="display:inline-block;overflow: auto;white-space: nowrap;margin:0px auto;width:100%;">
-									<div style="float:left;">
-											<input class="btn-outline-danger btn btn mt-0" type="button" onClick="javascript:history.go(-1);" value="Back">
-									</div>
-									<div style="float:right;">
-										{% if not to_username == request.user.username %}
-												{% if errors %}<p>{{ errors|join:", " }}</p>{% endif %}
-												{% if from_user not in friends and request_exist == None %}
-												<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#match_request">Match</button>
-												<div class="modal fade" id="match_request" tabindex="-1" role="dialog" aria-labelledby="match_request"
-															aria-hidden="true">
-													<form method="post">
-														{% csrf_token %}
-														<input type="hidden" name="match_request">
-															<div class="modal-dialog" role="document">
-																<div class="modal-content">
-																	<div class="modal-header text-center">
-																		<h4 class="modal-title w-100 font-weight-bold">Match Request</h4>
-																		<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-																			<span aria-hidden="true">&times;</span>
-																		</button>
-																	</div>
-																	<div class="modal-body mx-3">
-																		<div class="md-form mb-5">
-																			<i class="fas fa-user prefix grey-text"></i>
-																			<input type="text" id="form34" class="form-control" name="match_title">
-																			<label data-error="wrong" data-success="" for="form34">Title</label>
-																		</div>
-												
-																		<div class="md-form">
-																			<i class="fas fa-pencil prefix grey-text"></i>
-																			<textarea type="text" id="form8" class="md-textarea form-control" rows="4" name="match_reason"></textarea>
-																			<label data-error="wrong" data-success="" for="form8"> Reason </label>
-																		</div>
-																	</div>
-																	<div class="modal-footer d-flex justify-content-center">
-																		<button type="submit" class="btn btn-unique">Send <i class="fas fa-paper-plane-o ml-1"></i></button>
-																	</div>
-																</div>
-															</div>
-													</form>
-												</div>		
-												{% endif %}
-										{% endif %}
-									</div>
-								</div>
-							{% endif %}
-						</div>
+            </table>
+            <div>
+                {% if editable is False %}
+                    <div style="display:inline-block;overflow: auto;white-space: nowrap;margin:0px auto;width:100%;">
+                        <div style="float:left;">
+                                <input class="btn-outline-danger btn btn mt-0" type="button" onClick="javascript:history.go(-1);" value="Back">
+                        </div>
+                        <div style="float:right;">
+                            {% if not to_username == request.user.username %}
+                                    {% if errors %}<p>{{ errors|join:", " }}</p>{% endif %}
+                                    {% if from_user not in friends and request_exist == None %}
+                                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#match_request">Match</button>
+                                    <div class="modal fade" id="match_request" tabindex="-1" role="dialog" aria-labelledby="match_request"
+                                                aria-hidden="true">
+                                        <form method="post">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="match_request">
+                                                <div class="modal-dialog" role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header text-center">
+                                                            <h4 class="modal-title w-100 font-weight-bold">Match Request</h4>
+                                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                <span aria-hidden="true">&times;</span>
+                                                            </button>
+                                                        </div>
+                                                        <div class="modal-body mx-3">
+                                                            <div class="md-form mb-5">
+                                                                <i class="fas fa-user prefix grey-text"></i>
+                                                                <input type="text" id="form34" class="form-control" name="match_title">
+                                                                <label data-error="wrong" data-success="" for="form34">Title</label>
+                                                            </div>
+                                    
+                                                            <div class="md-form">
+                                                                <i class="fas fa-pencil prefix grey-text"></i>
+                                                                <textarea type="text" id="form8" class="md-textarea form-control" rows="4" name="match_reason"></textarea>
+                                                                <label data-error="wrong" data-success="" for="form8"> Reason </label>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer d-flex justify-content-center">
+                                                            <button type="submit" class="btn btn-unique">Send <i class="fas fa-paper-plane-o ml-1"></i></button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                        </form>
+                                    </div>		
+                                    {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
           </div>
         </div>
       </div>
 		</div>
-		
+        
+        {% if cal_act %}
 		<div class="card mt-3 mb-0">
 			<a class="card-header" data-toggle="collapse" href="#cal" role="button" aria-expanded="false" aria-controls="cal">
 				<h4>Calendar</h4>
@@ -135,74 +136,51 @@
 					{% endif %}
 				</div>
 			</div>
-		</div>
-			<div class="" style="width:50%; float:left; padding:2px 5px 10px 0px;">
-				<div class="card mt-3 mb-3">
-					<a class="card-header" data-toggle="collapse" href="#cs_taking" role="button" aria-expanded="false" aria-controls="cs_taking">
-						<h4>Courses Taking</h4>
-					</a>
-					<div class="collapse" id="cs_taking">
-						<div class="card-body">
-							{% for user_cs in user_taking_courses %}
-							<a href="{% url 'course' user_cs.course_number %}" class="list-group-item list-group-item-action">
-								<p class="mb-1">{{ user_cs.course_number }} {{ user_cs.course_name }}</p>
-							</a>
-							{% endfor %}
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="" style="margin-left:50%; padding:2px 0px 10px 5px;">
-					<div class="card mt-3 mb-3">
-							<a class="card-header" data-toggle="collapse" href="#cs_taken" role="button" aria-expanded="false" aria-controls="cs_taken">
-								<h4>Courses Taken</h4>
-							</a>
-						<div class="collapse" id="cs_taken">
-							<div class="card-body">
-									{% for user_cs in user_taken_courses %}
-									<a href="{% url 'course' user_cs.course_number %}" class="list-group-item list-group-item-action">
-										<p class="mb-1">{{ user_cs.course_number }} {{ user_cs.course_name }}</p>
-									</a>
-									{% endfor %}
-							</div>
-						</div>
-					</div>
-
-					<div class="card mt-3 mb-3">
-						<a class="card-header" data-toggle="collapse" href="#pr_match" role="button" aria-expanded="false" aria-controls="p_match">
-							<h4>Past Matches Received</h4>
-						</a>
-						<div class="collapse" id="pr_match">
-							<div class="card-body">
-								{% for pmr in past_matching_received %}
-								<a href="" class="list-group-item list-group-item-action" data-toggle="modal" data-target="#reviews_{{ pmr.pk }}">
-									<p class="mb-1">{% if editable %}{{ pmr.from_user.first_name }} {{ pmr.from_user.last_name }}{% else %}{{ pmr.display_name }}{% endif %}</p>
-								</a>
-								<div class="modal fade" id="reviews_{{ pmr.pk }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
-											aria-hidden="true">
-										<div class="modal-dialog" role="document">
-											<div class="modal-content">
-												<div class="modal-header text-center">
-													<h4 class="modal-title w-100 font-weight-bold">Review</h4>
-													<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-														<span aria-hidden="true">&times;</span>
-													</button>
-												</div>
-												<div class="modal-body mx-3">
-													<h4 class="modal-title">Name: {{ pmr.display_name }}</h4>
-													<hr>
-													<p>{{ pmr.comment }}</p>
-													<hr>
-													<p>Rating: {{ pmr.rating }}</p>
-												</div>
-											</div>
-										</div>
-								</div>
-								{% endfor %}
-							</div>
-						</div>
-					</div>
-			</div>
+        </div>
+        {% endif %}
+        <div class="card mt-3 mb-3">
+            <a class="card-header" data-toggle="collapse" href="#user_skills" role="button" aria-expanded="{% if user_skills %}true{% else %}false{% endif %}" aria-controls="user_skills">
+                <h4>Skills</h4>
+            </a>
+            <div class="collapse {% if user_skills %}show{% endif %}" id="user_skills">
+                <div class="card-body">
+                    {% for skill in user_skills %}
+                    <a href="{% url 'skill' skill.pk %}" class="list-group-item list-group-item-action">
+                        <p class="mb-1">{{ skill.skill_name }}</p>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="card mt-3 mb-3">
+            <a class="card-header" data-toggle="collapse" href="#cs_taking" role="button" aria-expanded="{% if user_taking_courses %}true{% else %}false{% endif %}" aria-controls="cs_taking">
+                <h4>Courses Taking</h4>
+            </a>
+            <div class="collapse {% if user_taking_courses %}show{% endif %}" id="cs_taking">
+                <div class="card-body">
+                    {% for user_cs in user_taking_courses %}
+                    <a href="{% url 'course' user_cs.course_number %}" class="list-group-item list-group-item-action">
+                        <p class="mb-1">{{ user_cs.course_number }} {{ user_cs.course_name }}</p>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-3 mb-3">
+            <a class="card-header" data-toggle="collapse" href="#cs_taken" role="button" aria-expanded="{% if user_taken_courses %}true{% else %}false{% endif %}" aria-controls="cs_taken">
+                <h4>Courses Taken</h4>
+            </a>
+            <div class="collapse {% if user_taken_courses %}show{% endif %}" id="cs_taken">
+                <div class="card-body">
+                        {% for user_cs in user_taken_courses %}
+                        <a href="{% url 'course' user_cs.course_number %}" class="list-group-item list-group-item-action">
+                            <p class="mb-1">{{ user_cs.course_number }} {{ user_cs.course_name }}</p>
+                        </a>
+                        {% endfor %}
+                </div>
+            </div>
+        </div>
   </div>
 </div>
 {% endblock %}

@@ -36,5 +36,6 @@ urlpatterns = [
 	path('auth/', include('social_django.urls', namespace='social')),
 	path('login/', auth_views.LoginView.as_view(), name='login'),
 	path('courses/', include('courses.urls')),
+    path('skills/', include('skills.urls')),
     path('friendship/', include('friendship.urls')),
 ]
