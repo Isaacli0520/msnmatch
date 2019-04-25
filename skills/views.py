@@ -86,8 +86,13 @@ def get_user_json(all_users):
 			"picture": picture_url,
 			"first_name": user.first_name,
 			"last_name": user.last_name,
+			"email": user.email,
+			"bio": user.profile.bio,
+			"birth_date": user.profile.birth_date,
+			"location": user.profile.location,
 			"year": user.profile.year,
 			"major": user.profile.major,
+			"skills":[{"skill_name":tmp_skill.skill_name, "skill_type":tmp_skill.skill_type,} for tmp_skill in user.skill_set.all()],
 		}
 		all_users_list.append(new_user)
 	return JsonResponse({
