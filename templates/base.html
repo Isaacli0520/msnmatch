@@ -45,9 +45,6 @@
           <li class="nav-item {% active request match %}">
             <a class="nav-link" href="{{ match }}">Match</a>
           </li>
-          <li class="nav-item {% active request courses_auto %}">
-            <a class="nav-link" href="{{ courses_auto }}">Courses</a>
-          </li>
           <li class="nav-item {% active request skill_search %}">
             <a class="nav-link" href="{{ skill_search }}">Skills</a>
           </li>
@@ -58,7 +55,7 @@
         <ul class="navbar-nav ml-auto">
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true">
-              User
+              {{request.user.username}}
             </a>
             <div class="dropdown-menu w-100 order-3 dropdown-menu-right " aria-labelledby="navbarDropdown">
               {% if request.user.is_authenticated %}

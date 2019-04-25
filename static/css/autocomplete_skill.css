@@ -51,3 +51,20 @@
     background-color: DodgerBlue !important; 
     color: #ffffff; 
   }
+
+  .skill-tags{
+    display: flex;
+    flex-flow: row wrap;
+    width:100%;
+    margin: 5px 0px 20px 0px;
+  }
+
+  .skill-tag{
+    border: 1px solid #d4d4d4;
+    padding: 5px 5px 5px 9px;
+    border-radius: 5px;
+    margin: 5px 7px 5px 0px;
+  }
+  .skill-tag-remove{
+    margin:1px 3px 1px 1px;
+  }

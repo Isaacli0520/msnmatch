@@ -19,7 +19,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
 
 
-<form autocomplete="off">
   <div class="container">
     <!-- <div class = "justify-content-center"> -->
     <br />
@@ -39,26 +38,22 @@
     <br />
 
   </div>
-</form>
 
 <script>
     Vue.component('autocomplete-comp', {
         template: `
         <div>
-            <input v-on:keyup="autocomplete_func" v-model="searchquery" id="myInput" type="text" name="class" placeholder="Search for a skill" class="form-control mr-sm-2" aria-label="Search">
+            <div class="skill-tags">
+                <span v-for="skill in skills"
+                    class="skill-tag">
+                    <span>\{\{skill.skill_name\}\}</span>
+                    <span class="skill-tag-remove"><i v-on:click="del_skill(skill)" class="fas fa-times"></i></span>
+                </span>
+            </div>
+            <input v-on:keyup="autocomplete_func" autocomplete="off" v-model="searchquery" id="myInput" type="text" name="class" placeholder="Search for a skill" class="form-control mr-sm-2" aria-label="Search">
             <div class="autocomplete-items">
-                <div class="autocomplete-item" v-for="skill in skill_results">
-                    <table style="width:100%;">
-                        <tr>
-                            <td class="autocomplete-skr" style="width:80%;" :value="skill.skill_pk" v-on:click="go_to_skill(skill)">
-                                \{\{skill.skill_name\}\}
-                            </td>
-                            <td style="width:7%;">
-                                <span class="fas fa-plus-square" v-if="!skill.skill_exist" v-on:click="add_del_skill(skill)" :value="skill.skill_pk"></span>
-                                <span class="fas fa-trash-alt" v-if="skill.skill_exist" v-on:click="add_del_skill(skill)" :value="skill.skill_pk"></span>
-                            </td>
-                        </tr>
-                    </table>
+                <div class="autocomplete-item" v-for="skill in skill_results" v-on:click="add_skill(skill)" :value="skill.skill_pk">
+                    \{\{skill.skill_name\}\}
                 </div>
             </div>
         </div>
@@ -66,29 +61,47 @@
         data: function () {
             return {
             searchquery: '',
-            skill_results: null,
+            skill_results: [],
+            skills:[],
             }
         },
         methods:{
+            get_all_skills(){
+                axios.get('/skills/ajax/get_all_skills/',{params: {}}).then(response => {
+                    this.skills = response.data.all_skills;
+                });
+            },
             autocomplete_func(){
                 axios.get('/skills/ajax/result/',{params: {searchquery: this.searchquery}}).then(response => {
                     this.skill_results = [];
                     this.skill_results = response.data.skill_list;
                     });
             },
-            add_del_skill(skill){
-                axios.get('/skills/ajax/add_del_skill/',{params: {skill_pk: skill.skill_pk}}).then(response => {
+            add_skill(skill){
+                axios.get('/skills/ajax/add_del_skill/',{params: {skill_pk: skill.skill_pk, add_del:"add"}}).then(response => {
+                    if (skill.skill_exist == false){
+                        skill.skill_exist = true;
+                        this.skills.push(skill);
+                    }
                     });
-                if (skill.skill_exist){
-                    skill.skill_exist = false
-                }
-                else{
-                    skill.skill_exist = true
-                }
+            },
+            del_skill(skill){
+                axios.get('/skills/ajax/add_del_skill/',{params: {skill_pk: skill.skill_pk, add_del:"del"}}).then(response => {
+                    console.log("delete a skill");  
+                    if (skill.skill_exist == true){
+                        console.log("I'm in");
+                        skill.skill_exist = false;
+                        console.log(this.skills.indexOf(skill));
+                        this.skills.splice(this.skills.indexOf(skill), 1);
+                    }
+                    });
             },
             go_to_skill(skill){
                 window.location.href = "/skills/"+ skill.skill_pk;
             },
+        },
+        mounted(){
+            this.get_all_skills();
         },
         })
         

@@ -1,0 +1,57 @@
+*{
+  box-sizing: border-box;
+}
+
+
+.user-card {
+  margin:10px;
+  flex: 1 0 auto;
+  overflow:hidden;
+  /* width: 30%; */
+}
+
+.card-body {
+  padding:10px;
+}
+
+.card-title{
+  margin:0px;
+}
+.user-card-inner:hover .card-img-top {
+  opacity: 0.3;
+}
+
+.card-img-top{
+  opacity: 1;
+  transition: .5s ease;
+}
+
+.card-columns {
+  @include media-breakpoint-only(lg) {
+    column-count: 3;
+  }
+  @include media-breakpoint-only(xl) {
+    column-count: 4;
+  }
+}
+
+.search-container{
+  width:100%;
+}
+
+.search-tags{
+  display: flex;
+  flex-flow: row wrap;
+  width:100%;
+  margin: 5px 0px 20px 0px;
+}
+
+.search-tag{
+  border: 1px solid #d4d4d4;
+  padding: 5px 5px 5px 9px;
+  border-radius: 5px;
+  margin: 5px 7px 5px 0px;
+}
+.search-tag-remove{
+  margin:1px 3px 1px 1px;
+}
