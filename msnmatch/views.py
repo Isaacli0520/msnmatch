@@ -25,17 +25,20 @@ def csrf_failure(request, reason=""):
 
 @login_required
 def home(request):
-	query_string = ''
+	all_users = User.objects.all().exclude(username=request.user.username)
+	return render(request, 'home.html', {
+		"all_users":all_users,
+	})
 
-	if 'q' in request.GET:
-		field = request.GET.get('f')
-		query_string = request.GET['q'].strip()
-		retrieved_people = people_retrieve(field, query_string)
+	# if 'q' in request.GET:
+	# 	field = request.GET.get('f')
+	# 	query_string = request.GET['q'].strip()
+	# 	retrieved_people = people_retrieve(field, query_string)
 
-		return render(request, 'home.html', {"retrieved_people": retrieved_people, "query_string": query_string})
-	else:
+	# 	return render(request, 'home.html', {"retrieved_people": retrieved_people, "query_string": query_string})
+	# else:
 
-		return render(request, 'home.html', {"retrieved_people": None, "query_string": query_string})
+	# 	return render(request, 'home.html', {"retrieved_people": None, "query_string": query_string})
 
 
 def people_retrieve(field, query_string):
