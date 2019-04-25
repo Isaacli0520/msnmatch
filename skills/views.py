@@ -67,7 +67,7 @@ def retrieve_users(request):
 	return get_user_json(re_users)
 	
 def get_all_users(request):
-	all_users = User.objects.all().exclude(username=request.user.username)
+	all_users = User.objects.all().exclude(pk=request.user.pk)
 	return get_user_json(all_users)
 
 def get_user_json(all_users):
