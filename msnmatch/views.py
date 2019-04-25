@@ -25,10 +25,7 @@ def csrf_failure(request, reason=""):
 
 @login_required
 def home(request):
-	all_users = User.objects.all().exclude(username=request.user.username)
-	return render(request, 'home.html', {
-		"all_users":all_users,
-	})
+	return render(request, 'home.html')
 
 	# if 'q' in request.GET:
 	# 	field = request.GET.get('f')

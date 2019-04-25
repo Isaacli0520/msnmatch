@@ -7,9 +7,9 @@ class Command(BaseCommand):
 	def handle(self, *args, **kwargs):
 		for skr in Skill.objects.all():
 			skr.delete()
-		skills_csv = pd.read_csv("skills.csv")
+		skills_csv = pd.read_csv("skills.csv", sep="\t")
 		for index, row in skills_csv.iterrows():
-			# print(row["Name"],row["Introduction"],row["Type"])
+			print(row["Name"],row["Introduction"],row["Type"])
 			try:
 				Skill.objects.create(skill_name=row["Name"], skill_intro=row["Introduction"], skill_type=row["Type"])
 			except:

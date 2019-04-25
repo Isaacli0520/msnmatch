@@ -33,13 +33,13 @@
     Vue.component('user-list-comp', {
         template: `
         <div>
-            <div class="tag" style="width:100%;">
+            <div class="tag mb-5" style="width:100%;">
                 <search-tag-comp @updateUserList="update_user_list"></search-tag-comp>
             </div>
             <div class="card-columns" id="users_container">
                 <div class="card user-card" v-for="user in all_users">
                     <div class="user-card-inner">
-                    <a href="{% url 'profile' user.username %}">
+                    <a :href="user.user_url">
                     <img v-if="user.picture" :src="user.picture" class="card-img-top" alt="None">
                     <img v-else src="" class="card-img-top" alt="None">
                     </a>
@@ -72,6 +72,7 @@
         },
         mounted(){
             axios.get('/skills/ajax/get_all_users/',{params: {}}).then(response => {
+                console.log(response.data.all_users);
                 this.all_users = response.data.all_users;
             });
         },
@@ -87,7 +88,7 @@
                     <span class="search-tag-remove"><i v-on:click="del_tag(tag)" class="fas fa-times"></i></span>
                 </span>
             </div>
-            <input @keydown="onKeydown" v-model="searchquery" autocomplete="off" id="myInput" type="text" name="class" placeholder="Add a skill" class="form-control mr-sm-2" aria-label="Search">
+            <input @keydown="onKeydown" v-model="searchquery" autocomplete="off" id="myInput" type="text" name="class" placeholder="Add a filter tag" class="form-control mr-sm-2" aria-label="Search">
         </div>
         `,
         data: function () {

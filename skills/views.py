@@ -63,6 +63,8 @@ def retrieve_users(request):
 	all_tags = request.GET.get("all_tags")
 	print("all_tags", all_tags.split('`'))
 	all_users = User.objects.all().exclude(username=request.user.username)
+	if(all_tags == ""):
+		return get_user_json(all_users)
 	re_users = user_retrieve(all_tags.split('`'), all_users)
 	return get_user_json(re_users)
 	
@@ -80,7 +82,7 @@ def get_user_json(all_users):
 			picture_url = "/static/images/brand.jpg"
 		new_user = {
 			"pk": user.pk,
-			"username": user.username,
+			"user_url": "/users/"+user.username+"/",
 			"picture": picture_url,
 			"first_name": user.first_name,
 			"last_name": user.last_name,
@@ -104,15 +106,16 @@ def skill_search_result(request):
 	query_string = request.GET.get("searchquery").strip()
 	retrieved_skills = skill_retrieve(query_string)
 	print("debuggggg:",query_string)
-	for skill in retrieved_skills:
-		new_skill = {
-			"skill_pk": skill.pk,
-			"skill_name": skill.skill_name,
-			"skill_intro": skill.skill_intro,
-			"skill_type": skill.skill_type,
-			"skill_exist": SkillRelation.objects.filter(user=user, skill=skill).exists()
-		}
-		skill_list.append(new_skill)
+	if retrieved_skills != None:
+		for skill in retrieved_skills:
+			new_skill = {
+				"skill_pk": skill.pk,
+				"skill_name": skill.skill_name,
+				"skill_intro": skill.skill_intro,
+				"skill_type": skill.skill_type,
+				"skill_exist": SkillRelation.objects.filter(user=user, skill=skill).exists()
+			}
+			skill_list.append(new_skill)
 	return JsonResponse({
 		"skill_list":skill_list,
 		})
