@@ -72,7 +72,12 @@ def get_all_users(request):
 
 def get_user_json(all_users):
 	all_users_list = []
+	
 	for user in all_users:
+		if user.profile.picture:
+			picture_url = user.profile.picture.url
+		else:
+			picture_url = "/static/images/brand.jpg"
 		new_user = {
 			"pk": user.pk,
 			"username": user.username,
