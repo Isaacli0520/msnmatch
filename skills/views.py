@@ -81,7 +81,7 @@ def get_user_json(all_users):
 		new_user = {
 			"pk": user.pk,
 			"username": user.username,
-			"picture": user.profile.picture.url,
+			"picture": picture_url,
 			"first_name": user.first_name,
 			"last_name": user.last_name,
 			"year": user.profile.year,
