@@ -43,6 +43,9 @@ def skill(request, skill_pk):
 		"users_with_skill":tmp_skill.skill_users.all(),
 		})
 
+def add_to_list(request):
+	pass
+
 def get_all_skills(request):
 	all_skills = Skill.objects.all()
 	# skill_list = []

@@ -51,11 +51,21 @@ def profile(request, username):
 	user = User.objects.get(username=username)
 	user_taking_courses = user.course_set.filter(relation__take="taking")
 	user_taken_courses = user.course_set.filter(relation__take="taken")
-	user_skills = user.skill_set.all()
 	# print(user_taken_courses)
 	friends = Friend.objects.friends(user)
 	friend_requests = FriendshipRequest.objects.filter(to_user=user)
 	from_user = request.user
+
+	all_skills = user.skill_set.all()
+
+	skill_set = {}
+	skill_list = []
+	for skill in all_skills:
+		if skill.skill_type not in skill_set:
+			skill_set[skill.skill_type] = []
+		skill_set[skill.skill_type].append(skill)
+	for k in skill_set:
+		skill_list += skill_set[k]
 
 	current_matching = user.matching_requests_received.filter(finished=False)
 	past_matching_received = user.matching_requests_received.filter(finished=True).order_by("created").reverse()
@@ -117,7 +127,7 @@ def profile(request, username):
 		"to_username": username,
 		"user": user,
 		"editable": editable,
-		"user_skills":user_skills,
+		"user_skills":skill_list,
 		"user_taking_courses": user_taking_courses,
 		"user_taken_courses": user_taken_courses,
 		"friends": friends,
@@ -129,7 +139,7 @@ def profile(request, username):
 		"sent_matching":sent_matching,
 		"calendar_url": calendar_url,
 		"show_cal": show_cal,
-        "cal_act" : False,
+			"cal_act" : False,
 	}
 
 	return render(request, 'profile.html', ctx)

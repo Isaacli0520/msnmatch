@@ -9,6 +9,7 @@ urlpatterns = [
   path('ajax/add_del_skill/', views.add_del_skill, name="add_del_skill"),
   path('ajax/get_all_user_skills/', views.get_all_user_skills, name="get_all_user_skills"),
   path('ajax/get_all_skills/', views.get_all_skills, name="get_all_skills"),
+  path('ajax/add_to_list/', views.add_to_list, name="add_to_list"),
   path('ajax/get_all_users/', views.get_all_users, name="get_all_users"),
   path('ajax/retrieve_users/', views.retrieve_users, name="retrieve_users"),
 #   path('ajax/course_taking_add_delete/', views.course_taking_add_delete, name='course_taking_add_delete'),
