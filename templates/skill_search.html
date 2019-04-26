@@ -28,8 +28,8 @@
             <h5>Search for hundreds of blahblah</h5>
         </div>
     </div>
-    <div class="col-xs-12 col-sm-12 col-md-10 col-lg-8 col-xs-offset-0 col-sm-offset-0" style="width:100%; margin: 0 auto;">
-        <div class="autocomplete" id = "skill-list-app" style="width:100%;">
+    <div class="col-xs-12 col-sm-12 col-md-10 col-lg-8 col-xs-offset-0 col-sm-offset-0" id = "skill-list-app" style="width:100%; margin: 0 auto;">
+        <div class="autocomplete mb-4" style="width:100%;">
             <autocomplete-comp></autocomplete-comp>
         </div>
     </div>
@@ -43,19 +43,28 @@
     Vue.component('autocomplete-comp', {
         template: `
         <div>
-            <div class="skill-tags">
-                <span v-for="skill in skills"
-                    class="skill-tag"
-                    v-bind:class="skill.skill_type">
-                    <span>\{\{skill.skill_name\}\}</span>
-                    <span class="skill-tag-remove"><i v-on:click="del_skill(skill)" class="fas fa-times"></i></span>
-                </span>
-            </div>
-            <input v-on:keyup="autocomplete_func" autocomplete="off" v-model="searchquery" id="myInput" type="text" name="class" placeholder="Search for a skill" class="form-control mr-sm-2" aria-label="Search">
-            <div class="autocomplete-items">
-                <div class="autocomplete-item" v-for="skill in skill_results" v-on:click="add_skill(skill)" :value="skill.skill_pk">
-                    \{\{skill.skill_name\}\}
+            <div class="mt-2 mb-2">
+                <div class="skill-user-tags">
+                    <span class="skill-user-span" v-for="(skills_of_type, skills_type_name) in skills">
+                        <span v-for="skill in skills_of_type"
+                            class="skill-user-tag"
+                            v-bind:class="skill.skill_type">
+                            <span>\{\{skill.skill_name\}\}</span>
+                            <span class="skill-tag-remove"><i v-on:click="del_skill(skill, skills_type_name)" class="fas fa-times"></i></span>
+                        </span>
+                    </span>
                 </div>
+                <div>
+                    <input v-on:keyup="autocomplete_func" autocomplete="off" v-model="searchquery" id="myInput" type="text" name="class" placeholder="Search for a skill" class="form-control mr-sm-2" aria-label="Search">
+                    <div class="autocomplete-items">
+                        <div class="autocomplete-item" v-for="skill in skill_results" v-on:click="add_skill(skill)" :value="skill.skill_pk">
+                            \{\{skill.skill_name\}\}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <tags-comp :all_skills="all_skills" @update_skills_add="child_add_skill"></tags-comp>
             </div>
         </div>
         `,
@@ -64,15 +73,24 @@
                 searchquery: '',
                 skill_results: [],
                 skills:[],
+                all_skills:[],
             }
         },
         methods:{
             get_all_skills(){
                 axios.get('/skills/ajax/get_all_skills/',{params: {}}).then(response => {
+                    this.all_skills = response.data.all_skills;
+                });
+            },
+            get_all_user_skills(){
+                axios.get('/skills/ajax/get_all_user_skills/',{params: {}}).then(response => {
                     this.skills = response.data.all_skills;
                 });
             },
             autocomplete_func(){
+                if (this.searchquery.length == 0){
+                    this.skill_results = [];
+                }
                 axios.get('/skills/ajax/result/',{params: {searchquery: this.searchquery}}).then(response => {
                     this.skill_results = [];
                     this.skill_results = response.data.skill_list;
@@ -82,30 +100,63 @@
                 axios.get('/skills/ajax/add_del_skill/',{params: {skill_pk: skill.skill_pk, add_del:"add"}}).then(response => {
                     if (skill.skill_exist == false){
                         skill.skill_exist = true;
-                        this.skills.push(skill);
+                        // this.skills.push(skill);
+                        this.skills[skill.skill_type].splice(this.skills[skill.skill_type].indexOf(skill), 0, skill);
                     }
                     });
             },
-            del_skill(skill){
+            del_skill(skill, skills_type_name){
                 axios.get('/skills/ajax/add_del_skill/',{params: {skill_pk: skill.skill_pk, add_del:"del"}}).then(response => {
                     console.log("delete a skill");  
                     if (skill.skill_exist == true){
                         console.log("I'm in");
                         skill.skill_exist = false;
-                        console.log(this.skills.indexOf(skill));
-                        this.skills.splice(this.skills.indexOf(skill), 1);
+                        // this.skills.splice(this.skills.indexOf(skill), 1);
+                        this.skills[skills_type_name].splice(this.skills[skills_type_name].indexOf(skill), 1);
+                        this.all_skills[skills_type_name].push(skill);
                     }
                     });
+            },
+            child_add_skill(skill){
+                this.add_skill(skill);
             },
             go_to_skill(skill){
                 window.location.href = "/skills/"+ skill.skill_pk;
             },
         },
         mounted(){
+            this.get_all_user_skills();
             this.get_all_skills();
         },
         })
         
+    Vue.component('tags-comp', {
+        props:['all_skills'],
+        template: `
+        <div>
+            <div v-for="(skills_of_type, skills_type_name) in all_skills">
+                <h4>\{\{skills_type_name\}\}</h4>
+                <div class="skill-tags">
+                    <span v-for="skill in skills_of_type"
+                        class="skill-tag"
+                        v-bind:class="skill.skill_type"
+                        @click="add_skill(skill,skills_type_name)">
+                        <span>\{\{skill.skill_name\}\}</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+        `,
+        methods:{
+            add_skill(skill, skills_type_name){
+                this.$emit('update_skills_add', skill);
+                this.all_skills[skills_type_name].splice(this.all_skills[skills_type_name].indexOf(skill), 1);
+            },
+        },
+        mounted(){
+        },
+        })
+
     var skill_list_app = new Vue({
         el: "#skill-list-app",
     })

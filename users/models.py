@@ -21,7 +21,12 @@ YEAR_CHOICES = (
 			('3rd year', '3rd year'),
 			('4th year', '4th year'),
 		)
+SEX_CHOICES = (
+			('Male', 'Male'),
+			('Female', 'Female'),
+		)
 MAJOR_CHOICES = (
+			('undecided', 'undecided'),
 			('African American & African Studies', 'African American & African Studies'),
 			('American Studies', 'American Studies'),
 			('Anthropology', 'Anthropology'),
@@ -120,6 +125,7 @@ class MatchRequest(models.Model):
 
 class Profile(models.Model):
 	user = models.OneToOneField(User, on_delete=models.CASCADE)
+	sex = models.CharField(max_length=20, choices = SEX_CHOICES, blank=True)
 	bio = models.TextField(max_length=500, blank=True)
 	location = models.CharField(max_length=30, blank=True)
 	birth_date = models.DateField(null=True, blank=True)

@@ -44,19 +44,44 @@ def skill(request, skill_pk):
 		})
 
 def get_all_skills(request):
+	all_skills = Skill.objects.all()
+	# skill_list = []
+	skill_set = {}
+	for skill in all_skills:
+		if skill.skill_type not in skill_set:
+			skill_set[skill.skill_type] = []
+		if not SkillRelation.objects.filter(user=request.user, skill=skill).exists():
+			new_skill = {
+				"skill_pk": skill.pk,
+				"skill_name": skill.skill_name,
+				"skill_intro": skill.skill_intro,
+				"skill_type": skill.skill_type,
+				"skill_exist": False,
+			}
+			skill_set[skill.skill_type].append(new_skill)
+
+	return JsonResponse({
+		"all_skills":skill_set,
+		})
+
+def get_all_user_skills(request):
 	all_skills = request.user.skill_set.all()
-	skill_list = []
+
+	skill_set = {}
+	for skill in Skill.objects.all():
+		if skill.skill_type not in skill_set:
+			skill_set[skill.skill_type] = []
 	for skill in all_skills:
 		new_skill = {
 			"skill_pk": skill.pk,
 			"skill_name": skill.skill_name,
 			"skill_intro": skill.skill_intro,
 			"skill_type": skill.skill_type,
-			"skill_exist": SkillRelation.objects.filter(user=request.user, skill=skill).exists()
+			"skill_exist": SkillRelation.objects.filter(user=request.user, skill=skill).exists(),
 		}
-		skill_list.append(new_skill)
+		skill_set[skill.skill_type].append(new_skill)
 	return JsonResponse({
-		"all_skills":skill_list,
+		"all_skills":skill_set,
 		})
 
 def retrieve_users(request):
@@ -92,6 +117,7 @@ def get_user_json(all_users):
 			"location": user.profile.location,
 			"year": user.profile.year,
 			"major": user.profile.major,
+			"sex":user.profile.sex,
 			"skills":[{"skill_name":tmp_skill.skill_name, "skill_type":tmp_skill.skill_type,} for tmp_skill in user.skill_set.all()],
 		}
 		all_users_list.append(new_user)
@@ -121,6 +147,7 @@ def skill_search_result(request):
 				"skill_exist": SkillRelation.objects.filter(user=user, skill=skill).exists()
 			}
 			skill_list.append(new_skill)
+	print("skill_search_result", skill_list)
 	return JsonResponse({
 		"skill_list":skill_list,
 		})
