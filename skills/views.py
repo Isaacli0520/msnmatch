@@ -203,7 +203,7 @@ def skill_search_result(request):
 def user_retrieve(tags, all_users):
 	tmp_queryset = []
 	field_queryset = all_users
-	field_tags = [(tag[:tag.find(":")], tag[(tag.find(":") + 1):]) for tag in tags if tag.find(":") != -1]
+	field_tags = [(tag[:tag.find(":")].lower(), tag[(tag.find(":") + 1):]) for tag in tags if tag.find(":") != -1]
 	model_fields = [sth.name for sth in User._meta.get_fields()] + [sth.name for sth in Profile._meta.get_fields()]
 	for field_tag, field_query in field_tags:
 		if field_tag in model_fields:
