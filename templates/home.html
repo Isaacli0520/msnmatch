@@ -67,11 +67,13 @@
                     <div class="modal-body">
                         <img :src="modal_user.picture" class="card-img-top" alt="None">
                         <div class="skill-tags">
-                            <span v-for="modal_skill in modal_skills"
-                                class="skill-tag"
-                                v-bind:class="modal_skill.skill_type">
-                                <span>\{\{modal_skill.skill_name\}\}</span>
-                            </span>
+                            <template v-for="(skills_of_type, skills_type_name) in modal_skills">
+                                <span v-for="skill in skills_of_type"
+                                    class="skill-tag"
+                                    v-bind:class="skill.skill_type">
+                                    <span>\{\{skill.skill_name\}\}</span>
+                                </span>
+                            </template>
                         </div>
                             <table class="table table-user-information">
                                 <tbody>
@@ -108,7 +110,7 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                            <button type="button" class="btn btn-Primary" @click="addToFav(modal_user)">Add to Favorite</button>
+                            <button type="button" v-if="{{request.user.pk}} != modal_user.pk" class="btn btn-Primary" @click="addToFav(modal_user)">Add to Favorite</button>
                         </div>
                     </div>
                 </div>
@@ -148,7 +150,8 @@
                 $('.modal').modal('show');
             },
             addToFav(user){
-                axios.get('/skills/ajax/add_to_list/',{params: {user:user}}).then(response => {
+                axios.get('/skills/ajax/add_to_list/',{params: {user_pk:user.pk}}).then(response => {
+                    $('.modal').modal('hide');
                 });
             },
             

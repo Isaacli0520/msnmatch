@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.contrib.auth.models import User
+from users.models import Profile
 from .models import Skill, SkillRelation
 from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector, TrigramSimilarity
 from django.db.models import Q, F
@@ -12,6 +13,7 @@ from django.db.models.functions import Lower, Substr, Length
 from django.http import JsonResponse
 from django.core import serializers
 from django.core.serializers.json import DjangoJSONEncoder
+from friendship.models import Follow
 import re
 import json
 
@@ -44,7 +46,40 @@ def skill(request, skill_pk):
 		})
 
 def add_to_list(request):
-	pass
+	to_user = User.objects.get(pk=request.GET.get("user_pk"))
+	if not Follow.objects.filter(follower=request.user, followee=to_user).exists():
+		Follow.objects.add_follower(request.user, to_user)
+
+	return JsonResponse({
+	})
+
+def get_follow_list(request):
+	following = Follow.objects.following(request.user)
+	print("following", following)
+	flw_ret = []
+	for flw in following:
+		new_flw = {
+			"pk": flw.pk,
+			"user_url": "/users/"+flw.username+"/",
+			"first_name": flw.first_name,
+			"last_name": flw.last_name,
+		}
+		flw_ret.append(new_flw)
+	return JsonResponse({
+		"following":flw_ret,
+	})
+
+def del_fav(request):
+	to_user = User.objects.get(pk = request.GET.get("user_pk"))
+	print("from_user", request.user.username, "to_user", to_user.username, Follow.objects.filter(follower=request.user, followee=to_user).exists())
+	print("before delete", Follow.objects.following(request.user), Follow.objects.all()),
+	if Follow.objects.filter(follower=request.user, followee=to_user).exists():
+		Follow.objects.remove_follower(follower=request.user, followee=to_user)
+		print("after delete", Follow.objects.following(request.user), Follow.objects.all())
+	return JsonResponse({
+		
+	})
+
 
 def get_all_skills(request):
 	all_skills = Skill.objects.all()
@@ -90,20 +125,30 @@ def get_all_user_skills(request):
 def retrieve_users(request):
 	all_tags = request.GET.get("all_tags")
 	print("all_tags", all_tags.split('`'))
-	all_users = User.objects.all().exclude(username=request.user.username)
+	all_users = User.objects.all()
 	if(all_tags == ""):
 		return get_user_json(all_users)
 	re_users = user_retrieve(all_tags.split('`'), all_users)
 	return get_user_json(re_users)
 	
 def get_all_users(request):
-	all_users = User.objects.all().exclude(pk=request.user.pk)
+	# all_users = User.objects.all().exclude(pk=request.user.pk)
+	all_users = User.objects.all()
 	return get_user_json(all_users)
 
 def get_user_json(all_users):
 	all_users_list = []
-	
+
 	for user in all_users:
+		skill_set = {}
+		for skill in user.skill_set.all():
+			if skill.skill_type not in skill_set:
+				skill_set[skill.skill_type] = []
+			new_skill = {
+				"skill_name": skill.skill_name,
+				"skill_type": skill.skill_type,
+			}
+			skill_set[skill.skill_type].append(new_skill)
 		if user.profile.picture:
 			picture_url = user.profile.picture.url
 		else:
@@ -121,7 +166,7 @@ def get_user_json(all_users):
 			"year": user.profile.year,
 			"major": user.profile.major,
 			"sex":user.profile.sex,
-			"skills":[{"skill_name":tmp_skill.skill_name, "skill_type":tmp_skill.skill_type,} for tmp_skill in user.skill_set.all()],
+			"skills": skill_set,
 		}
 		all_users_list.append(new_user)
 	return JsonResponse({
@@ -157,15 +202,28 @@ def skill_search_result(request):
 
 def user_retrieve(tags, all_users):
 	tmp_queryset = []
-	for user in all_users:
+	field_queryset = all_users
+	field_tags = [(tag[:tag.find(":")], tag[(tag.find(":") + 1):]) for tag in tags if tag.find(":") != -1]
+	model_fields = [sth.name for sth in User._meta.get_fields()] + [sth.name for sth in Profile._meta.get_fields()]
+	for field_tag, field_query in field_tags:
+		if field_tag in model_fields:
+			field_queryset = field_queryset.annotate(
+				sth = TrigramSimilarity("profile__"+field_tag, field_query)).filter(sth__gt=0.1)
+			print("field_queryset",field_queryset)
+		# retrieved_people=sorted(tmp_queryset, key = lambda c: (-c.similarity_firstname, -c.similarity_lastname, -c.similarity_major, -c.similarity_major_two, -c.similarity_minor, -c.similarity_year))
+	for user in field_queryset:
 		similar_tags = []
 		for tag in tags:
-			tmp_tag = skill_retrieve_new(user.pk, tag)
-			if tmp_tag != None:
-				similar_tags.append(tmp_tag)
+			if tag.find(":") == -1:
+				tmp_tag = skill_retrieve_new(user.pk, tag)
+				if tmp_tag != None:
+					similar_tags.append(tmp_tag)
+
 		tmp_queryset.append((user.pk, len(similar_tags)))
 	
-	tmp_queryset = [some_user for some_user in tmp_queryset if some_user[1] >= 1]
+	if len(field_tags) != len(tags):
+		tmp_queryset = [some_user for some_user in tmp_queryset if some_user[1] >= 1]
+
 	print("user_retrieve",tmp_queryset)
 	return [User.objects.get(pk=k) for k, v in sorted(tmp_queryset, key=lambda tp: tp[1], reverse = True)]
 

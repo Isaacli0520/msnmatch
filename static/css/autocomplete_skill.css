@@ -65,6 +65,8 @@
     margin: 5px 7px 5px 0px;
     opacity: 1;
     transition: .5s ease;
+    /* font-family: Georgia, serif; */
+    font-family: Gill Sans, sans-serif;
   }
 
   .skill-tag:hover{
@@ -88,6 +90,8 @@
     padding: 5px 5px 5px 9px;
     border-radius: 5px;
     margin: 5px 7px 5px 0px;
+    /* font-family: Georgia, serif; */
+    font-family: Gill Sans, sans-serif;
   }
   .skill-tag-remove{
     margin:1px 3px 1px 1px;

@@ -1,3 +1,11 @@
+a { color: inherit; } 
+
+a:hover 
+{
+     color:#00A0C6; 
+     cursor:pointer;  
+}
+
 .user-row {
     margin-bottom: 14px;
 }
@@ -44,48 +52,7 @@
     padding: 5px 9px 5px 9px;
     border-radius: 5px;
     margin: 5px 7px 5px 0px;
+    font-family: Gill Sans, sans-serif;
+    /* font-family: Georgia, serif; */
     }
-.Music{
-    color: #ffffff;
-    background-color: #dd1f68;
-}
-      
-.Sport{
-    color: #ffffff;
-    background-color: #20c1f1;
-}
-    
-.Game{
-    color: #ffffff;
-    background-color: #ebdd1b;
-}
 
-.Hobby{
-    color: #ffffff;
-    background-color: #f15120;
-}
-
-.Movies{
-    color: #ffffff;
-    background-color: #4620f1;
-}
-
-.Anime{
-    color: #ffffff;
-    background-color: #20f177;
-}
-
-.Series{
-    color: #ffffff;
-    background-color: #f1af20;
-}
-
-.Shows{
-    color: #ffffff;
-    background-color: #f1209a;
-}
-      
-.Lifestyle{
-    color: #ffffff;
-    background-color: #af20f1;
-  }
