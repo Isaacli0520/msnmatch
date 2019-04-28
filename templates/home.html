@@ -109,8 +109,7 @@
                                 </tbody>
                             </table>
                             <div v-if="modal_user.video.length">
-                                <video width="100%" controls>
-                                    <source :src="modal_user.video" type="video/mp4">
+                                <video width="100%" controls :src="modal_user.video">
                                     Your Browser does not support video tags lol
                                 </video>
                             </div>

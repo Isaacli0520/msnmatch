@@ -63,9 +63,8 @@
             </tbody>
         </table>
         {% if user.profile.video %}
-          <video width="100%" controls>
-            <source src="{{ user.profile.video.url }}" type="video/mp4">
-          Your Browser does not support the video tag lol
+          <video width="100%" controls src="{{ user.profile.video.url }}">
+            Your Browser does not support the video tag lol
           </video>
         {% endif %}
       </div>
