@@ -136,16 +136,19 @@ class Profile(models.Model):
 	picture = models.ImageField(upload_to="msn/image/",blank=True)
 	avatar = models.ImageField(upload_to="msn/image/avatar/",blank=True)
 	online = models.IntegerField(default = 0)
+	video = models.FileField(upload_to="msn/video/", blank=True)
 
 	def save(self, *args, **kwargs):
 		# delete old file when replacing by updating the file
 		try:
 			this = Profile.objects.get(pk=self.pk)
-			if this.picture != self.picture:
-				this.picture.delete(save=False)
 			if self.picture and this.picture != self.picture:
+				this.picture.delete(save=False)
 				self.picture = self.compressImage(self.picture, False, 0, 0, 70)
 				self.avatar = self.compressImage(self.picture, True, 100, 100, 99)
+			if self.video and this.video != self.video:
+				this.video.delete(save=False)
+				self.video.name = str(uuid.uuid4())
 		except: pass # when new photo then we do nothing, normal case
 		super(Profile, self).save(*args, **kwargs)
 
@@ -165,9 +168,11 @@ class Profile(models.Model):
 
 @receiver(models.signals.post_delete, sender=Profile)
 def auto_delete_file_on_delete(sender, instance, **kwargs):
-    this = instance
-    if this.picture:
-    	this.picture.delete(save=False)
+	this = instance
+	if this.picture:
+		this.picture.delete(save=False)
+	if this.video:
+		this.video.delete(save=False)
 
 @receiver(post_save, sender=FriendshipRequest)
 def create_match_request(sender, instance, created, **kwargs):

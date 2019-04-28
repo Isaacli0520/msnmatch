@@ -24,7 +24,7 @@ a:hover
     cursor: pointer;
 }
 
-.table-user-information > tbody > tr {
+/* .table-user-information > tbody > tr {
     border-top: 1px solid rgb(221, 221, 221);
 }
 
@@ -35,7 +35,7 @@ a:hover
 
 .table-user-information > tbody > tr > td {
     border-top: 0;
-}
+} */
 .toppad
 {margin-top:20px;
 }

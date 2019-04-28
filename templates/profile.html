@@ -62,10 +62,22 @@
                 </tr>
             </tbody>
         </table>
+        {% if user.profile.video %}
+          <video width="100%" controls>
+            <source src="{{ user.profile.video.url }}" type="video/mp4">
+          Your Browser does not support the video tag lol
+          </video>
+        {% endif %}
       </div>
       <div class="card-footer">
-          <button class="btn-danger btn" type="button" onClick="javascript:history.go(-1);" style="float:right; padding:7px 10px 7px 10px;"><i class="fas fa-arrow-left"></i></button>
-      </div>
+      {% if editable == False %}
+        <button class="btn-danger btn" type="button" onClick="javascript:history.go(-1);" style="float:right; padding:7px 10px 7px 10px;"><i class="fas fa-arrow-left"></i></button>
+      {% else %}
+       <a href="{% url 'update_profile' request.user.username %}">
+        <button class="btn-primary btn" style="float:right;">Edit Profile</button>
+      </a>
+      {% endif %}
+      </div>    
 		</div>
   </div>
 </div>

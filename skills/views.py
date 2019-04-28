@@ -36,6 +36,7 @@ def add_del_skill(request):
 		"exist":SkillRelation.objects.filter(user=user, skill=skill).exists(),
 	})
 
+@login_required
 def skill(request, skill_pk):
 	user = User.objects.get(username = request.user.username)
 	tmp_skill = Skill.objects.get(pk = skill_pk)
@@ -153,6 +154,10 @@ def get_user_json(all_users):
 			picture_url = user.profile.picture.url
 		else:
 			picture_url = "/static/images/brand.jpg"
+		if user.profile.video:
+			video_url = user.profile.video.url
+		else:
+			video_url = ""
 		new_user = {
 			"pk": user.pk,
 			"user_url": "/users/"+user.username+"/",
@@ -167,6 +172,7 @@ def get_user_json(all_users):
 			"major": user.profile.major,
 			"sex":user.profile.sex,
 			"skills": skill_set,
+			"video": video_url,
 		}
 		all_users_list.append(new_user)
 	return JsonResponse({
@@ -208,7 +214,10 @@ def user_retrieve(tags, all_users):
 	for field_tag, field_query in field_tags:
 		if field_tag in model_fields:
 			field_queryset = field_queryset.annotate(
-				sth = TrigramSimilarity("profile__"+field_tag, field_query)).filter(sth__gt=0.1)
+				sth = TrigramSimilarity("profile__"+field_tag, field_query)).filter(sth__gt=0.2)
+			tmp_list = [item.sth for item in field_queryset]
+			if len(tmp_list) > 0 and max(tmp_list) >= 0.9:
+				field_queryset = field_queryset.filter(sth__gt=0.9)
 			print("field_queryset",field_queryset)
 		# retrieved_people=sorted(tmp_queryset, key = lambda c: (-c.similarity_firstname, -c.similarity_lastname, -c.similarity_major, -c.similarity_major_two, -c.similarity_minor, -c.similarity_year))
 	for user in field_queryset:

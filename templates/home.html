@@ -108,6 +108,12 @@
                                     </tr>
                                 </tbody>
                             </table>
+                            <div v-if="modal_user.video.length">
+                                <video width="100%" controls>
+                                    <source :src="modal_user.video" type="video/mp4">
+                                    Your Browser does not support video tags lol
+                                </video>
+                            </div>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -135,6 +141,7 @@
                 "year": "",
                 "major": "",
                 "skills":"",
+                "video":"",
             },
             modal_skills: null,
             }
