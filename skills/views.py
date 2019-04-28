@@ -22,18 +22,29 @@ DEBUGGG = False
 
 
 def add_del_skill(request):
-	user = User.objects.get(username=request.user.username)
-	skill = Skill.objects.get(pk = request.GET.get("skill_pk"))
+	user = request.user
 	add_del = request.GET.get("add_del")
-	print("add_del", add_del)
-
-	if SkillRelation.objects.filter(user=user, skill=skill).exists() and add_del == "del":
-		SkillRelation.objects.get(user=user,skill=skill).delete()
-	elif not SkillRelation.objects.filter(user=user, skill=skill).exists() and add_del == "add":
-		SkillRelation.objects.create(user=user,skill=skill)
+	if not Skill.objects.filter(pk = request.GET.get("skill_pk")).exists() and add_del == "add":
+		exist = False
+		if not Skill.objects.filter(skill_name = request.GET.get("skill_name")).exists():
+			skill = Skill.objects.create(skill_name=request.GET.get("skill_name"), skill_intro="", skill_type="Custom")
+			SkillRelation.objects.create(user=user,skill=skill)
+			exist = True
+			origin_exist = False
+		else:
+			origin_exist = True
+	else:
+		skill = Skill.objects.get(pk = request.GET.get("skill_pk"))
+		origin_exist = SkillRelation.objects.filter(user=user, skill=skill).exists()
+		if SkillRelation.objects.filter(user=user, skill=skill).exists() and add_del == "del":
+			SkillRelation.objects.get(user=user,skill=skill).delete()
+		elif not SkillRelation.objects.filter(user=user, skill=skill).exists() and add_del == "add":
+			SkillRelation.objects.create(user=user,skill=skill)
+		exist = SkillRelation.objects.filter(user=user, skill=skill).exists()
 
 	return JsonResponse({
-		"exist":SkillRelation.objects.filter(user=user, skill=skill).exists(),
+		"exist": exist,
+		"origin_exist":origin_exist,
 	})
 
 @login_required
@@ -86,8 +97,8 @@ def get_all_skills(request):
 	all_skills = Skill.objects.all()
 	# skill_list = []
 	skill_set = {}
-	for skill in all_skills:
-		if skill.skill_type not in skill_set:
+	for skill in all_skills.exclude(skill_type="Custom"):
+		if skill.skill_type not in skill_set and skill.skill_type != "Custom":
 			skill_set[skill.skill_type] = []
 		if not SkillRelation.objects.filter(user=request.user, skill=skill).exists():
 			new_skill = {
@@ -126,7 +137,7 @@ def get_all_user_skills(request):
 def retrieve_users(request):
 	all_tags = request.GET.get("all_tags")
 	print("all_tags", all_tags.split('`'))
-	all_users = User.objects.all()
+	all_users = User.objects.all().exclude(username="admin")
 	if(all_tags == ""):
 		return get_user_json(all_users)
 	re_users = user_retrieve(all_tags.split('`'), all_users)
@@ -134,7 +145,7 @@ def retrieve_users(request):
 	
 def get_all_users(request):
 	# all_users = User.objects.all().exclude(pk=request.user.pk)
-	all_users = User.objects.all()
+	all_users = User.objects.all().exclude(username="admin")
 	return get_user_json(all_users)
 
 def get_user_json(all_users):
@@ -173,6 +184,9 @@ def get_user_json(all_users):
 			"sex":user.profile.sex,
 			"skills": skill_set,
 			"video": video_url,
+			"role":user.profile.role,
+			"major_two":user.profile.major_two,
+			"minor":user.profile.minor,
 		}
 		all_users_list.append(new_user)
 	return JsonResponse({
@@ -198,7 +212,8 @@ def skill_search_result(request):
 				"skill_name": skill.skill_name,
 				"skill_intro": skill.skill_intro,
 				"skill_type": skill.skill_type,
-				"skill_exist": SkillRelation.objects.filter(user=user, skill=skill).exists()
+				"skill_exist": SkillRelation.objects.filter(user=user, skill=skill).exists(),
+				"skill_cus": False,
 			}
 			skill_list.append(new_skill)
 	print("skill_search_result", skill_list)
@@ -214,7 +229,7 @@ def user_retrieve(tags, all_users):
 	for field_tag, field_query in field_tags:
 		if field_tag in model_fields:
 			field_queryset = field_queryset.annotate(
-				sth = TrigramSimilarity("profile__"+field_tag, field_query)).filter(sth__gt=0.2)
+				sth = TrigramSimilarity("profile__"+field_tag, field_query)).filter(sth__gt=0.1)
 			tmp_list = [item.sth for item in field_queryset]
 			if len(tmp_list) > 0 and max(tmp_list) >= 0.9:
 				field_queryset = field_queryset.filter(sth__gt=0.9)
@@ -244,7 +259,8 @@ def skill_retrieve(query_string):
 	if tmp_queryset.first() == None:
 		return None
 	retrieved_skills = sorted(tmp_queryset, key=lambda c: (-c.similarity_name,-c.similarity_type, -c.similarity_intro))
-
+	if len(retrieved_skills) > 6:
+		retrieved_skills = retrieved_skills[:6]
 	return retrieved_skills
 
 def skill_retrieve_new(pk, query_string):

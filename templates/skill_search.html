@@ -16,7 +16,7 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 <script src="{% static 'js/autocomplete.js' %}"></script>
-<script src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
 
 
@@ -59,7 +59,9 @@
                     <input v-on:keyup="autocomplete_func" autocomplete="off" v-model="searchquery" id="myInput" type="text" name="class" placeholder="Search for a skill" class="form-control mr-sm-2" aria-label="Search">
                     <div class="autocomplete-items">
                         <div class="autocomplete-item" v-for="skill in skill_results" v-on:click="add_skill(skill)" :value="skill.skill_pk">
-                            \{\{skill.skill_name\}\}
+                            <span>\{\{ skill.skill_name \}\}</span>
+                            <span style="float:right; font-family: Gill Sans, sans-serif;" v-if="skill.skill_cus">Enter a customized tag</span>
+                            <span style="float:right; font-family: Gill Sans, sans-serif;" v-if="!skill.skill_cus">Enter an existing tag</span>
                         </div>
                     </div>
                 </div>
@@ -95,26 +97,41 @@
                 axios.get('/skills/ajax/result/',{params: {searchquery: this.searchquery}}).then(response => {
                     this.skill_results = [];
                     this.skill_results = response.data.skill_list;
+                    if (this.searchquery.length > 0){
+                        var user_enter_skill = {
+                            "skill_pk": 0,
+                            "skill_name": this.searchquery,
+                            "skill_intro": "",
+                            "skill_type": "Custom",
+                            "skill_exist": false,
+                            "skill_cus":true,
+                        };
+                        this.skill_results.push(user_enter_skill);
+                    }
                     });
             },
             add_skill(skill){
-                axios.get('/skills/ajax/add_del_skill/',{params: {skill_pk: skill.skill_pk, add_del:"add"}}).then(response => {
+                axios.get('/skills/ajax/add_del_skill/',{params: {skill_pk: skill.skill_pk, add_del:"add", skill_cus:skill.skill_cus, skill_name:skill.skill_name}}).then(response => {
                     if (skill.skill_exist == false){
                         skill.skill_exist = true;
                         // this.skills.push(skill);
-                        this.skills[skill.skill_type].splice(this.skills[skill.skill_type].indexOf(skill), 0, skill);
+                        if (!response.data.origin_exist){
+                            this.skills[skill.skill_type].splice(this.skills[skill.skill_type].indexOf(skill), 0, skill);
+                        }
                     }
                     });
             },
             del_skill(skill, skills_type_name){
                 axios.get('/skills/ajax/add_del_skill/',{params: {skill_pk: skill.skill_pk, add_del:"del"}}).then(response => {
-                    console.log("delete a skill");  
+                    // console.log("delete a skill");  
                     if (skill.skill_exist == true){
-                        console.log("I'm in");
+                        // console.log("I'm in");
                         skill.skill_exist = false;
                         // this.skills.splice(this.skills.indexOf(skill), 1);
                         this.skills[skills_type_name].splice(this.skills[skills_type_name].indexOf(skill), 1);
-                        this.all_skills[skills_type_name].push(skill);
+                        if (skill.skill_type != "Custom"){
+                            this.all_skills[skills_type_name].push(skill);
+                        }
                     }
                     });
             },

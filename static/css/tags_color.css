@@ -1,44 +1,24 @@
-.Music{
+.Entertainment{
     color: #ffffff;
-    background-color: #dd1f68;
+    background-color: #f1b9a6e7;
 }
       
 .Sport{
     color: #ffffff;
-    background-color: #20c1f1;
+    background-color: #88c8db;
 }
     
 .Game{
     color: #ffffff;
-    background-color: #ebdd1b;
+    background-color: #93a2f8;
 }
-
-.Hobby{
+ 
+.Life{
     color: #ffffff;
-    background-color: #f15120;
-}
-
-.Movies{
-    color: #ffffff;
-    background-color: #4620f1;
-}
-
-.Anime{
-    color: #ffffff;
-    background-color: #2eda17;
-}
-
-.Series{
-    color: #ffffff;
-    background-color: #f1af20;
-}
-
-.Shows{
-    color: #ffffff;
-    background-color: #f1209a;
-}
-      
-.Lifestyle{
-    color: #ffffff;
-    background-color: #af20f1;
+    background-color: #d075faab;
   }
+
+.Custom{
+    color: #ffffff;
+    background-color: #ff0800;
+}

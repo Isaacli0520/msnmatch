@@ -13,7 +13,7 @@
 
 {% block content %}
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
 
 <div class="col-12 mb-5" style = "width:100%; margin: 0 auto;">
@@ -90,6 +90,18 @@
                                         <td>Major</td>
                                         <td>\{\{modal_user.major\}\}</td>
                                     </tr>
+                                    <tr v-if="modal_user.major_two">
+                                        <td>Second Major</td>
+                                        <td>\{\{modal_user.major_two\}\}</td>
+                                    </tr>
+                                    <tr v-if="modal_user.minor">
+                                        <td>Minor</td>
+                                        <td>\{\{modal_user.minor\}\}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Role</td>
+                                        <td>\{\{modal_user.role\}\}</td>
+                                    </tr>
                                     <tr>
                                         <td>Birth Date</td>
                                         <td>\{\{modal_user.birth_date\}\}</td>
@@ -147,12 +159,12 @@
         },
         methods:{
             update_user_list(new_users){
-                console.log("update_user_list", new_users);
+                // console.log("update_user_list", new_users);
                 this.all_users = new_users; 
             },
             openModal(user, user_skills){
                 this.modal_user = user;
-                console.log("all_skill_names", user_skills);
+                // console.log("all_skill_names", user_skills);
                 this.modal_skills = user_skills;
                 $('.modal').modal('show');
             },
@@ -165,7 +177,7 @@
         },
         mounted(){
             axios.get('/skills/ajax/get_all_users/',{params: {}}).then(response => {
-                console.log(response.data.all_users);
+                // console.log(response.data.all_users);
                 this.all_users = response.data.all_users;
             });
         },
@@ -193,9 +205,9 @@
         methods:{
             add_tag(tag){
                 this.tags.push(tag);
-                console.log("all_tags", this.tags);
+                // console.log("all_tags", this.tags);
                 axios.get('/skills/ajax/retrieve_users/',{params: {all_tags: this.tags.join('`'),}}).then(response => {
-                    console.log("get update users", response.data.all_users)
+                    // console.log("get update users", response.data.all_users)
                     this.$emit('updateUserList', response.data.all_users);
                 });
                 
@@ -203,7 +215,7 @@
             del_tag(tag){
                 this.tags.splice(this.tags.indexOf(tag), 1);
                 axios.get('/skills/ajax/retrieve_users/',{params: {all_tags: this.tags.join('`'),}}).then(response => {
-                    console.log("get update users", response.data.all_users)
+                    // console.log("get update users", response.data.all_users)
                     this.$emit('updateUserList', response.data.all_users);
                 });
             },
