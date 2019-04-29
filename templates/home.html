@@ -58,7 +58,7 @@
                             </div>
                         </div>
                     </template>
-                    <div class="card user-card" :id="index" v-if="usersToShow>1 && (i-1)*(Math.floor((all_users.length%15)/3)+1)+(usersToShow-1)*15<=index && index < (i)*(Math.floor((all_users.length%15)/3)+1)+(usersToShow-1)*15 " v-for="(user, index) in all_users">
+                    <div class="card user-card" :id="index" v-if="usersToShow>1 && (i-1)*(Math.ceil((all_users.length%15)/3))+(usersToShow-1)*15<=index && index < (i)*(Math.ceil((all_users.length%15)/3))+(usersToShow-1)*15 " v-for="(user, index) in all_users">
                         <div class="user-card-inner">
                             <div id="show-modal" @click="openModal(user, user.skills)">
                                 <img v-if="user.picture" :src="user.picture" class="card-img-top" alt="None">
