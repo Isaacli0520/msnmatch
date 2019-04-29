@@ -15,3 +15,5 @@ class Command(BaseCommand):
 					Skill.objects.create(skill_name=row["Name"], skill_intro=row["Introduction"], skill_type=row["Type"])
 			except:
 				print ("Sth is wrong")
+		if not Skill.objects.filter(skill_name="dummy").exists():
+			Skill.objects.create(skill_name="dummy", skill_intro="", skill_type="Custom")
