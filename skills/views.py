@@ -34,7 +34,7 @@ def add_del_skill(request):
 		else:
 			origin_exist = True
 	else:
-		skill = Skill.objects.get(pk = request.GET.get("skill_pk"))
+		skill = Skill.objects.get(skill_name = request.GET.get("skill_name"))
 		origin_exist = SkillRelation.objects.filter(user=user, skill=skill).exists()
 		if SkillRelation.objects.filter(user=user, skill=skill).exists() and add_del == "del":
 			SkillRelation.objects.get(user=user,skill=skill).delete()

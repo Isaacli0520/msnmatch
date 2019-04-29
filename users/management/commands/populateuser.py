@@ -15,6 +15,9 @@ class Command(BaseCommand):
 		# for l in ascii_lowercase:
 		# 	tmp_user = User.objects.create_user(username=l,first_name=l, last_name='test',
 		# 						 email=l+'@virginia.edu')
+		for i in range(26):
+			tmp_user = User.objects.create_user(username=str(i) ,first_name=i, last_name='test',
+								 email=str(i)+'@virginia.edu')
 		# 	tmp_year = randint(1,3)
 		# 	tmp_user.profile.year = YEAR_CHOICES[tmp_year][0]
 		# 	tmp_user.save()

@@ -122,7 +122,7 @@
                     });
             },
             del_skill(skill, skills_type_name){
-                axios.get('/skills/ajax/add_del_skill/',{params: {skill_pk: skill.skill_pk, add_del:"del"}}).then(response => {
+                axios.get('/skills/ajax/add_del_skill/',{params: {skill_pk: skill.skill_pk, add_del:"del", skill_name:skill.skill_name}}).then(response => {
                     // console.log("delete a skill");  
                     if (skill.skill_exist == true){
                         // console.log("I'm in");
