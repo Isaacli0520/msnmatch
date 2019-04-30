@@ -53,6 +53,7 @@ MAJOR_CHOICES = (
 ('Civil Engineering', 'Civil Engineering'),
 ('Classics', 'Classics'),
 ('Cognitive Science', 'Cognitive Science'),
+('Commerce', 'Commerce'),
 ('Comparative Literature', 'Comparative Literature'),
 ('Computer Engineering', 'Computer Engineering'),
 ('Computer Science', 'Computer Science'),

@@ -16,6 +16,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from friendship.models import Follow
 import re
 import json
+import random
 
 MAXIMUM_COURSES = 12
 DEBUGGG = False
@@ -148,8 +149,9 @@ def retrieve_users(request):
 	
 def get_all_users(request):
 	# all_users = User.objects.all().exclude(pk=request.user.pk)
-	all_users = User.objects.all().exclude(username="admin")
-	return get_user_json(all_users)
+	all_users_list = sorted(User.objects.all().exclude(username="admin"), key=lambda x: random.random())
+	# all_users = User.objects.all().exclude(username="admin")
+	return get_user_json(all_users_list)
 
 def get_user_json(all_users):
 	all_users_list = []
