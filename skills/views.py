@@ -40,7 +40,7 @@ def add_del_skill(request):
 		if SkillRelation.objects.filter(user=user, skill=skill).exists() and add_del == "del":
 			SkillRelation.objects.get(user=user,skill=skill).delete()
 			print("Skill",skill.skill_name, " Count", skill.skill_users.count())
-			if skill.skill_users.count() == 0:
+			if skill.skill_users.count() == 0 and skill.skill_type == "Custom":
 				skill.delete()
 		elif not SkillRelation.objects.filter(user=user, skill=skill).exists() and add_del == "add":
 			SkillRelation.objects.create(user=user,skill=skill)
@@ -279,7 +279,7 @@ def skill_retrieve(query_string):
 def skill_retrieve_new(pk, query_string):
 	user = User.objects.get(pk=pk)
 	tmp_queryset = user.skill_set.all().annotate(
-		similarity_name=TrigramSimilarity('skill_name',query_string)).filter(Q(similarity_name__gt=0.3))
+		similarity_name=TrigramSimilarity('skill_name',query_string)).filter(Q(similarity_name__gt=0.45))
 	if tmp_queryset.first() == None:
 		return None
 	retrieved_skills = sorted(tmp_queryset, key=lambda c: (-c.similarity_name))
