@@ -38,6 +38,9 @@ def add_del_skill(request):
 		origin_exist = SkillRelation.objects.filter(user=user, skill=skill).exists()
 		if SkillRelation.objects.filter(user=user, skill=skill).exists() and add_del == "del":
 			SkillRelation.objects.get(user=user,skill=skill).delete()
+			print("Skill",skill.skill_name, " Count", skill.skill_users.count())
+			if skill.skill_users.count() == 0:
+				skill.delete()
 		elif not SkillRelation.objects.filter(user=user, skill=skill).exists() and add_del == "add":
 			SkillRelation.objects.create(user=user,skill=skill)
 		exist = SkillRelation.objects.filter(user=user, skill=skill).exists()

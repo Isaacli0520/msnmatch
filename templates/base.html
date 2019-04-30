@@ -61,7 +61,7 @@
                 Sign In
               {% endif %}
             </a>
-            <div class="dropdown-menu dropdown-menu-right " aria-labelledby="navbarDropdown">
+            <div class="dropdown-menu w-100 order-4 dropdown-menu-right" aria-labelledby="navbarDropdown">
               {% if request.user.is_authenticated %}
               <a class="dropdown-item" href="{% url 'profile' request.user.username %}">Profile</a>
               <div class="dropdown-divider"></div>
@@ -92,7 +92,7 @@
   <script>
     Vue.component('nav-list-comp', {
         template: `
-        <li class="nav-item dropdown">
+        <li class="nav-item dropdown"  v-if="on_off == 1">
           <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" @click="getFollowList" role="button" data-toggle="dropdown" aria-haspopup="true">
             Favorites
           </a>
@@ -112,6 +112,7 @@
         data: function () {
             return {
             following:[],
+            on_off:0,
             }
         },
         methods:{

@@ -5,7 +5,7 @@ import pandas as pd
 
 class Command(BaseCommand):
 	def handle(self, *args, **kwargs):
-		for skr in Skill.objects.all():
+		for skr in Skill.objects.all().exclude(skill_name="dummy"):
 			skr.delete()
 		skills_csv = pd.read_csv("skills.csv", sep=",")
 		for index, row in skills_csv.iterrows():

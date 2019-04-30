@@ -26,18 +26,21 @@
   transition: .5s ease;
 }
 
-.card-columns {
+/* .card-columns {
   @include media-breakpoint-only(lg) {
     column-count: 3;
   }
   @include media-breakpoint-only(xl) {
     column-count: 4;
   }
-}
+} */
 
 .search-container{
   width:100%;
 }
+
+
+
 
 .search-tags{
   display: flex;
@@ -54,4 +57,20 @@
 }
 .search-tag-remove{
   margin:1px 3px 1px 1px;
+}
+
+.skill-tags{
+  display: flex;
+  flex-flow: row wrap;
+  width:100%;
+  margin: 5px 0px 20px 0px;
+}
+
+.skill-tag{
+  border: 1px solid #d4d4d4;
+  padding: 5px 9px 5px 9px;
+  border-radius: 5px;
+  margin: 5px 4px 5px 0px;
+  /* font-family: Georgia, serif; */
+  font-family: Gill Sans, sans-serif;
 }
