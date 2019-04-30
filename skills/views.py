@@ -230,9 +230,17 @@ def user_retrieve(tags, all_users):
 	tmp_queryset = []
 	field_queryset = all_users
 	field_tags = [(tag[:tag.find(":")].lower(), tag[(tag.find(":") + 1):]) for tag in tags if tag.find(":") != -1]
-	model_fields = [sth.name for sth in User._meta.get_fields()] + [sth.name for sth in Profile._meta.get_fields()]
+	user_fields = [sth.name for sth in User._meta.get_fields()]
+	profile_fields = [sth.name for sth in Profile._meta.get_fields()]
 	for field_tag, field_query in field_tags:
-		if field_tag in model_fields:
+		if field_tag in user_fields:
+			field_queryset = field_queryset.annotate(
+				sth = TrigramSimilarity(field_tag, field_query)).filter(sth__gt=0.1)
+			tmp_list = [item.sth for item in field_queryset]
+			if len(tmp_list) > 0 and max(tmp_list) >= 0.9:
+				field_queryset = field_queryset.filter(sth__gt=0.9)
+			print("field_queryset",field_queryset)
+		if field_tag in profile_fields:
 			field_queryset = field_queryset.annotate(
 				sth = TrigramSimilarity("profile__"+field_tag, field_query)).filter(sth__gt=0.1)
 			tmp_list = [item.sth for item in field_queryset]
@@ -271,12 +279,10 @@ def skill_retrieve(query_string):
 def skill_retrieve_new(pk, query_string):
 	user = User.objects.get(pk=pk)
 	tmp_queryset = user.skill_set.all().annotate(
-		similarity_name=TrigramSimilarity('skill_name',query_string),
-		similarity_type=TrigramSimilarity('skill_type',query_string),
-		similarity_intro=TrigramSimilarity('skill_intro', query_string)).filter(Q(similarity_name__gt=0.3)|Q(similarity_type__gt=0.3)|Q(similarity_intro__gt=0.22))
+		similarity_name=TrigramSimilarity('skill_name',query_string)).filter(Q(similarity_name__gt=0.3))
 	if tmp_queryset.first() == None:
 		return None
-	retrieved_skills = sorted(tmp_queryset, key=lambda c: (-c.similarity_name,-c.similarity_type, -c.similarity_intro))
+	retrieved_skills = sorted(tmp_queryset, key=lambda c: (-c.similarity_name))
 
 	return retrieved_skills
 
