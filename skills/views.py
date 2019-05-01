@@ -17,6 +17,7 @@ from friendship.models import Follow
 import re
 import json
 import random
+from fuzzywuzzy import fuzz, process
 
 MAXIMUM_COURSES = 12
 DEBUGGG = False
@@ -164,6 +165,7 @@ def get_user_json(all_users):
 			new_skill = {
 				"skill_name": skill.skill_name,
 				"skill_type": skill.skill_type,
+				"skill_url":"/skills/"+str(skill.pk)+"/",
 			}
 			skill_set[skill.skill_type].append(new_skill)
 		if user.profile.picture:
@@ -233,28 +235,28 @@ def user_retrieve(tags, all_users):
 	user_fields = [sth.name for sth in User._meta.get_fields()]
 	profile_fields = [sth.name for sth in Profile._meta.get_fields()]
 	for field_tag, field_query in field_tags:
-		if field_tag in user_fields:
+		if field_tag == "name":
 			field_queryset = field_queryset.annotate(
-				sth = TrigramSimilarity(field_tag, field_query)).filter(sth__gt=0.1)
-			tmp_list = [item.sth for item in field_queryset]
-			if len(tmp_list) > 0 and max(tmp_list) >= 0.9:
-				field_queryset = field_queryset.filter(sth__gt=0.9)
-			print("field_queryset",field_queryset)
-		if field_tag in profile_fields:
+				sim_firstname=TrigramSimilarity('first_name', field_query),
+				sim_lastname=TrigramSimilarity('last_name', field_query)).filter(Q(sim_firstname__gt=.3) | Q(sim_lastname__gt=.3) )
+			field_queryset = sorted(field_queryset, key=lambda c: (-c.sim_firstname, -c.sim_lastname))
+		elif field_tag == "major":
 			field_queryset = field_queryset.annotate(
-				sth = TrigramSimilarity("profile__"+field_tag, field_query)).filter(sth__gt=0.1)
-			tmp_list = [item.sth for item in field_queryset]
-			if len(tmp_list) > 0 and max(tmp_list) >= 0.9:
-				field_queryset = field_queryset.filter(sth__gt=0.9)
-			print("field_queryset",field_queryset)
-		# retrieved_people=sorted(tmp_queryset, key = lambda c: (-c.similarity_firstname, -c.similarity_lastname, -c.similarity_major, -c.similarity_major_two, -c.similarity_minor, -c.similarity_year))
+				sim_mj1=TrigramSimilarity('profile__major', field_query),
+				sim_mj3=TrigramSimilarity('profile__minor', field_query),
+				sim_mj2=TrigramSimilarity('profile__major_two', field_query)).filter(Q(sim_mj1__gt=.3) | Q(sim_mj2__gt=.3) | Q(sim_mj3__gt=.3) )
+			field_queryset = sorted(field_queryset, key=lambda c: (-c.sim_mj1, -c.sim_mj2, -c.sim_mj3))
+		elif field_tag in user_fields:
+			field_queryset = filter_by_field(field_queryset, "", field_tag, field_query)
+		elif field_tag in profile_fields:
+			field_queryset = filter_by_field(field_queryset, "profile__", field_tag, field_query)
 	for user in field_queryset:
-		similar_tags = []
+		similar_tags = set()
 		for tag in tags:
 			if tag.find(":") == -1:
 				tmp_tag = skill_retrieve_new(user.pk, tag)
 				if tmp_tag != None:
-					similar_tags.append(tmp_tag)
+					similar_tags.add(tmp_tag)
 
 		tmp_queryset.append((user.pk, len(similar_tags)))
 	
@@ -278,13 +280,33 @@ def skill_retrieve(query_string):
 
 def skill_retrieve_new(pk, query_string):
 	user = User.objects.get(pk=pk)
-	tmp_queryset = user.skill_set.all().annotate(
-		similarity_name=TrigramSimilarity('skill_name',query_string)).filter(Q(similarity_name__gt=0.45))
-	if tmp_queryset.first() == None:
+	all_user_skills = user.skill_set.all()
+	if user.skill_set.all().count() == 0:
 		return None
-	retrieved_skills = sorted(tmp_queryset, key=lambda c: (-c.similarity_name))
+	tmp_queryset = {sk.pk:sk.skill_name for sk in all_user_skills}
 
-	return retrieved_skills
+	best_match = process.extractOne(query_string,tmp_queryset,scorer=fuzz.partial_ratio, score_cutoff=80)
+
+	print("extract one",best_match)
+	# retrieved_skills = [Skill.objects.get(pk=sk_pk) for sk_name, sk_pk in sims]
+	# tmp_queryset = user.skill_set.all().annotate(
+	# 	similarity_name=TrigramSimilarity('skill_name',query_string)).filter(Q(similarity_name__gt=0.45))
+	# if tmp_queryset.first() == None:
+	# 	return None
+	# retrieved_skills = sorted(tmp_queryset, key=lambda c: (-c.similarity_name))
+	if best_match != None:
+		return Skill.objects.get(pk=best_match[2])
+	else:
+		return None
+
+def filter_by_field(field_queryset, prefix, field_tag, field_query):
+	field_queryset = field_queryset.annotate(
+				sth = TrigramSimilarity(prefix+field_tag, field_query)).filter(sth__gt=0.1)
+	tmp_list = [item.sth for item in field_queryset]
+	if len(tmp_list) > 0 and max(tmp_list) >= 0.9:
+		field_queryset = field_queryset.filter(sth__gt=0.9)
+	
+	return field_queryset
 
 def lcs(s1, s2):
 	l1, l2 = len(s1), len(s2)

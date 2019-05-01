@@ -153,7 +153,7 @@
         template: `
         <div>
             <div v-for="(skills_of_type, skills_type_name) in all_skills">
-                <h4>\{\{skills_type_name\}\}</h4>
+                <h4>\{\{skill_type_names[skills_type_name]\}\}</h4>
                 <div class="skill-tags">
                     <span v-for="skill in skills_of_type"
                         class="skill-tag"
@@ -165,6 +165,20 @@
             </div>
         </div>
         `,
+        data: function () {
+            return {
+                skill_type_names: {
+                    "Game":"Game",
+                    "Academic":"Academic Interests",
+                    "Film and TV":"Film and TV",
+                    "Sport":"Sport",
+                    "Music":"Music",
+                    "Language":"Language",
+                    "General":"General",
+                    "Books":"Books",
+                },
+            }
+        },
         methods:{
             add_skill(skill, skills_type_name){
                 this.$emit('update_skills_add', skill);

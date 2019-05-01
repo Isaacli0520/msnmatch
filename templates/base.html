@@ -18,7 +18,8 @@
 		<!-- Material Design Bootstrap -->
 		<link href="/static/css/mdb.min.css" rel="stylesheet">
 		<!-- Your custom styles (optional) -->
-		<link href="/static/css/style.css" rel="stylesheet">
+    <link href="/static/css/style.css" rel="stylesheet">
+    <link href="/static/css/base.css" rel="stylesheet">
 
     {% url 'home' as home %}
     {% url 'profile' as profile %}
@@ -32,16 +33,16 @@
 	</head>
 <body>
   <div id="navigation">
-    <nav class="navbar navbar-expand-lg navbar-light font-weight-light" >
+    <nav class="navbar navbar-expand-md navbar-light font-weight-light" >
       <a class="navbar-brand" href="{{ home }}" style="padding:0px 0px 3px 0px; font-size: 20px;">
-        <img src="/static/images/brand.jpg" width="30" height="30" class="d-inline-block align-top" alt="">
+        <img src="/static/images/brand.png" width="30" height="30" class="d-inline-block align-top" alt="">
         Home
       </a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".dual-collapse2" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-autox">
+        <ul class="topBotomBordersOut navbar-nav mr-autox">
           <li class="nav-item {% active request skill_search %}">
             <a class="nav-link" href="{{ skill_search }}">Tags</a>
           </li>

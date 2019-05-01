@@ -16,16 +16,18 @@
 <script src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
 
-<div class="col-12 mb-5" style = "width:100%; margin: 0 auto;">
-	<div class="container mt-5 mb-4 text-center">
-        <h1 style="font-size:65px">Welcome to MSN Match </h1>
-        <h6 class="text-muted">Use tags such as<span style="font-family: Gill Sans, sans-serif; font-weight: bold;"> "Basketball", "major:Econ"</span> to customize your search</h6>
+<div class="main">
+    <div class="col-12 mb-5" style = "width:100%; margin: 0 auto;">
+        <div class="container mt-5 mb-4 text-center">
+            <h1 style="font-size:65px" class="main-title">Welcome to MSN Match </h1>
+            <h6 class="text-muted sub-title">Use tags such as<span style="font-family: Gill Sans, sans-serif; font-weight: bold;"> "Basketball", "major:Econ"</span> to customize your search</h6>
+        </div>
     </div>
-</div>
 
-<div id = "home-page-app">
-    <div class="col-xs-12 col-sm-12 col-md-10 col-lg-8 col-xs-offset-0 col-sm-offset-0 mb-5" style="width:100%; margin: 0 auto;">
-        <user-list-comp></user-list-comp>
+    <div id = "home-page-app">
+        <div class="col-xs-12 col-sm-12 col-md-10 col-lg-8 col-xs-offset-0 col-sm-offset-0 mb-5" style="width:100%; margin: 0 auto;">
+            <user-list-comp></user-list-comp>
+        </div>
     </div>
 </div>
 
@@ -33,7 +35,7 @@
     Vue.component('user-list-comp', {
         template: `
         <div>
-            <div class="tag mb-5" style="width:100%;">
+            <div class="tag mb-3" style="width:100%;">
                 <search-tag-comp @updateUserList="update_user_list"></search-tag-comp>
             </div>
             <div class="card-columns" id="users_container">
@@ -69,11 +71,12 @@
                         <img :src="modal_user.picture" class="card-img-top" alt="None">
                         <div class="skill-tags">
                             <template v-for="(skills_of_type, skills_type_name) in modal_skills">
-                                <span v-for="skill in skills_of_type"
+                                <a v-for="skill in skills_of_type"
                                     class="skill-tag"
+                                    :href="skill.skill_url"
                                     v-bind:class="skill.skill_type">
                                     <span>\{\{skill.skill_name\}\}</span>
-                                </span>
+                                </a>
                             </template>
                         </div>
                             <table class="table table-user-information">
@@ -187,14 +190,16 @@
     Vue.component('search-tag-comp', {
         template: `
         <div>
-            <div class="search-tags">
+            <div class="search-tags mb-5">
                 <span v-for="tag in tags"
                     class="search-tag">
                     <span>\{\{tag\}\}</span>
                     <span class="search-tag-remove"><i v-on:click="del_tag(tag)" class="fas fa-times"></i></span>
                 </span>
             </div>
-            <input @keydown="onKeydown" v-model="searchquery" autocomplete="off" id="myInput" type="text" name="class" placeholder="Add a filter tag" class="form-control searchInput" aria-label="Search">
+            <div class="search-form mt-3">
+                <input @keydown="onKeydown" v-model="searchquery" autocomplete="off" id="myInput" type="text" name="class" placeholder="Add a filter tag" class=" search-input" aria-label="Search">
+            </div>
         </div>
         `,
         data: function () {
