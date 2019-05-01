@@ -43,14 +43,6 @@
   /* background-color: transparent; */
 }
 
-body{
-  width:100%;
-  height: 100%;
-  background: url('/static/images/bg_14_01.jpg') no-repeat;
-  background-attachment: fixed;
-  background-position: center center;
-  background-size: cover;
-}
 
 .search-form {
   position: relative;
@@ -100,7 +92,7 @@ body{
 
 .search-tag{
   color:#6e4141;
-  background-color: #24e7d7;
+  background-color: #24e79c;
   box-shadow: 0 6px 8px rgba(0, 0, 0, 0.295);
   padding: 5px 5px 5px 9px;
   border-radius: 5px;
