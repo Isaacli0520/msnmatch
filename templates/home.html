@@ -52,7 +52,10 @@
                                 </h5>
                                 <small style="float:right;">\{\{ user.year \}\}</small>
                             </div>
-                            <small v-if="user.major" class="text-muted">Major: \{\{ user.major \}\}</small>
+                            <div class="title d-flex w-100 justify-content-between">
+                                <small v-if="user.major" class="text-muted">Major: \{\{ user.major \}\}</small>
+                            </div>
+                            <small v-if="user.score && user.score > 0" class="score-text">Similarity: \{\{ user.score \}\}%</small>
                         </div>
                     </div>
                 </div>
@@ -197,8 +200,14 @@
                     <span class="search-tag-remove"><i v-on:click="del_tag(tag)" class="fas fa-times"></i></span>
                 </span>
             </div>
-            <div class="search-form mt-3">
+            <div class="search-form mt-1">
+                <div class="search-icon">
+                    <i class="fas fa-search"></i>
+                </div>
                 <input @keydown="onKeydown" v-model="searchquery" autocomplete="off" id="myInput" type="text" name="class" placeholder="Add a filter tag" class=" search-input" aria-label="Search">
+            </div>
+            <div class="all-buttons">
+                <button @click="getUsersBySim" class="btn btn-show-me">Who can be my best Match?</button>
             </div>
         </div>
         `,
@@ -233,6 +242,12 @@
                     
                     // });
                 }
+            },
+            getUsersBySim(e){
+                axios.get('/skills/ajax/get_users_by_sim/',{params: {}}).then(response => {
+                    // console.log("get update users", response.data.all_users)
+                    this.$emit('updateUserList', response.data.all_users);
+                });
             },
         },
         mounted(){

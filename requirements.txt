@@ -18,3 +18,5 @@ django-taggit
 pandas
 fuzzywuzzy
 python-Levenshtein
+numpy
+scipy

@@ -14,6 +14,8 @@ urlpatterns = [
   path('ajax/retrieve_users/', views.retrieve_users, name="retrieve_users"),
   path('ajax/get_follow_list/', views.get_follow_list, name="get_follow_list"),
   path('ajax/del_fav/', views.del_fav, name="del_fav"),
+  path('ajax/get_users_by_sim/', views.get_users_by_sim, name="get_users_by_sim"),
+  
 #   path('ajax/course_taking_add_delete/', views.course_taking_add_delete, name='course_taking_add_delete'),
 #   path('ajax/course_taken_add_delete/', views.course_taken_add_delete, name='course_taken_add_delete'),
 #   path('ajax/course_search_result/', views.course_search_result, name='course_search_result'),

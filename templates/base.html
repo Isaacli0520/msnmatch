@@ -75,13 +75,47 @@
           </li>
         </ul>
       </div>
-
     </nav>
   </div>
-	<main>
-		{% block content %}
-		{% endblock %}
-	</main>
+  <div id="wrap">
+    <div id="main">
+      <main>
+        {% block content %}
+        {% endblock %}
+      </main>
+    </div>
+  </div>
+  <footer>
+    <section id="footer">
+      <div class="container">
+        <div class="row text-center text-xs-center text-sm-left text-md-left">
+          <div class="col-xs-12 col-sm-6 col-md-4">
+              <h5 style="font-weight: 400;">Quick links</h5>
+              <ul class="list-unstyled quick-links">
+                <li><a href="{% url 'home' %}"><i class="fa fa-angle-double-right"></i>Home</a></li>
+                {% if user.is_authenticated %}
+                  <li><a href="{% url 'skill_search' %}"><i class="fa fa-angle-double-right"></i>Tags</a></li>
+                  <li><a href="{% url 'profile' request.user.username %}"><i class="fa fa-angle-double-right"></i>Profile</a></li>
+                {% endif %}
+              </ul>
+          </div>
+          <div class="col-xs-12 col-sm-6 col-md-6">
+            <h5 style="font-weight: 400;">Get In Touch</h5>
+            <ul class="list-unstyled quick-links">
+              <li><span><i class="fa fa-angle-double-right"></i>Mentor Program Chair WeChat ID: zgt19991026</span></li>
+              <li><span><i class="fa fa-angle-double-right"></i>Email: <a href="mailto:msnatuva@gmail.com">msnatuva@gmail.com</a></span></li>
+            </ul>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-xs-12 col-sm-12 col-md-12 mt-2 mt-sm-2 text-center text-white">
+            <p class="h6">&copy <a class="text-green ml-2" href="https://www.msnatuva.org" target="_blank">2019 Mainland Student Network.</a> All right Reversed.</p>
+          </div>
+          </hr>
+        </div>	
+      </div>
+    </section>
+  </footer>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
 	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
