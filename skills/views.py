@@ -67,9 +67,9 @@ def skill(request, skill_pk):
 def get_users_by_sim(request):
 
 	all_tags = request.GET.get("all_tags")
-	all_users = User.objects.all().exclude(username="admin")
+	all_users = User.objects.all().exclude(username="admin").exclude(pk=request.user.pk)
 	if(all_tags != ""):
-		all_users = user_retrieve(all_tags.split('`'), all_users.exclude(pk=request.user.pk))
+		all_users = user_retrieve(all_tags.split('`'), all_users)
 
 	user_skills = get_format_skills(User.objects.get(pk=request.user.pk).skill_set.all())
 	all_user_skills = get_skills_of_users(queryset = all_users)
