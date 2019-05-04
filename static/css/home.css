@@ -45,6 +45,7 @@
 
 
 .search-form {
+  /* border:1px solid #728181; */
   position: relative;
   top: 50%;
   left: 50%;
@@ -129,8 +130,9 @@
 
 .btn-show-me{
   border:none;
+  /* border:1px solid #999a9b; */
   color:#6e4141;
-  background: -webkit-linear-gradient(to right, #74fcce, #40ee7a);  /* Chrome 10-25, Safari 5.1-6 */
+  background: -webkit-linear-gradient(to right, #74fcce, #40ee7a);  
   background: linear-gradient(to right, #74fcce, #40ee7a);
   box-shadow: 0 6px 8px rgba(0, 0, 0, 0.295);
   padding: 5px 15px 5px 15px;

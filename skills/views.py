@@ -65,8 +65,14 @@ def skill(request, skill_pk):
 		})
 
 def get_users_by_sim(request):
+
+	all_tags = request.GET.get("all_tags")
+	all_users = User.objects.all().exclude(username="admin")
+	if(all_tags != ""):
+		all_users = user_retrieve(all_tags.split('`'), all_users.exclude(pk=request.user.pk))
+
 	user_skills = get_format_skills(User.objects.get(pk=request.user.pk).skill_set.all())
-	all_user_skills = get_skills_of_users(queryset = User.objects.all().exclude(username="admin"), except_pk = request.user.pk)
+	all_user_skills = get_skills_of_users(queryset = all_users)
 	# print("debug:::",all_user_skills)
 	sims = {u2_pk:similarity_between(user_skills, u2_skills) for u2_pk, u2_skills in all_user_skills.items()}
 	sorted_sims = sorted(sims.items(), key = lambda c:c[1], reverse=True)
@@ -97,9 +103,9 @@ def similarity_between(u1, u2):
 def scaler(x):
 	return (x+1)**(2/3.0)-(x+1)**(-1/8.0)
 
-def get_skills_of_users(queryset,except_pk = -1):
+def get_skills_of_users(queryset):
 	all_user_skills = {}
-	for user in queryset.exclude(pk=except_pk):
+	for user in queryset:
 		all_user_skills[user.pk] = get_format_skills(User.objects.get(pk=user.pk).skill_set.all())
 	return all_user_skills
 		
@@ -245,6 +251,7 @@ def get_user_json_sim(all_users):
 			"major_two":user.profile.major_two,
 			"minor":user.profile.minor,
 			"score":score,
+			"wechat":user.profile.wechat,
 		}
 		all_users_list.append(new_user)
 	return JsonResponse({
@@ -291,6 +298,7 @@ def get_user_json(all_users):
 			"role":user.profile.role,
 			"major_two":user.profile.major_two,
 			"minor":user.profile.minor,
+			"wechat":user.profile.wechat,
 		}
 		all_users_list.append(new_user)
 	return JsonResponse({

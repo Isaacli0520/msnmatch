@@ -20,6 +20,7 @@
     <div class="col-12 mb-5" style = "width:100%; margin: 0 auto;">
         <div class="container mt-5 mb-4 text-center">
             <h1 style="font-size:65px" class="main-title">Welcome to MSN Match </h1>
+            <h6 class="text-muted">设计师请假了，敬请谅解</h6>
             <h6 class="text-muted sub-title">Use tags such as<span style="font-family: Gill Sans, sans-serif; font-weight: bold;"> "Basketball", "major:Econ"</span> to customize your search</h6>
         </div>
     </div>
@@ -107,6 +108,10 @@
                                     <tr>
                                         <td>Role</td>
                                         <td>\{\{modal_user.role\}\}</td>
+                                    </tr>
+                                    <tr v-if="modal_user.wechat">
+                                        <td>WeChat ID</td>
+                                        <td>\{\{modal_user.wechat\}\}</td>
                                     </tr>
                                     <tr>
                                         <td>Birth Date</td>
@@ -244,7 +249,7 @@
                 }
             },
             getUsersBySim(e){
-                axios.get('/skills/ajax/get_users_by_sim/',{params: {}}).then(response => {
+                axios.get('/skills/ajax/get_users_by_sim/',{params: {all_tags: this.tags.join('`'),}}).then(response => {
                     // console.log("get update users", response.data.all_users)
                     this.$emit('updateUserList', response.data.all_users);
                 });

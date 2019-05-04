@@ -11,9 +11,10 @@ class UserForm(forms.ModelForm):
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
-        fields = ('location','bio','year','sex', 'major', 'major_two', 'minor', 'birth_date','picture', 'video')
+        fields = ('location','bio','year','sex', 'major', 'major_two', 'minor', 'birth_date','wechat','picture', 'video')
         labels = {
         	'birth_date' : 'Birth Date',
+            'wechat':'WeChat ID',
         }
        	help_texts = {
             'birth_date': 'Format: mm/dd/yyyy',
