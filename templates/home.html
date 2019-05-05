@@ -12,9 +12,9 @@
 {% endblock %}
 
 {% block content %}
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios@0.18.0/dist/axios.js"></script>
 
 <div class="main">
     <div class="col-12 mb-5" style = "width:100%; margin: 0 auto;">
@@ -225,9 +225,7 @@
         methods:{
             add_tag(tag){
                 this.tags.push(tag);
-                // console.log("all_tags", this.tags);
                 axios.get('/skills/ajax/retrieve_users/',{params: {all_tags: this.tags.join('`'),}}).then(response => {
-                    // console.log("get update users", response.data.all_users)
                     this.$emit('updateUserList', response.data.all_users);
                 });
                 
@@ -235,22 +233,17 @@
             del_tag(tag){
                 this.tags.splice(this.tags.indexOf(tag), 1);
                 axios.get('/skills/ajax/retrieve_users/',{params: {all_tags: this.tags.join('`'),}}).then(response => {
-                    // console.log("get update users", response.data.all_users)
                     this.$emit('updateUserList', response.data.all_users);
                 });
             },
             onKeydown(e) {
                 if(e.keyCode == 13 && this.searchquery.length > 1){
                     this.add_tag(this.searchquery);
-                    this.searchquery = "";
-                    // axios.get('/skills/ajax/add_del_skill/',{params: {skill_pk: skill.skill_pk, add_del:"del"}}).then(response => {
-                    
-                    // });
+                    this.searchquery = ""
                 }
             },
             getUsersBySim(e){
                 axios.get('/skills/ajax/get_users_by_sim/',{params: {all_tags: this.tags.join('`'),}}).then(response => {
-                    // console.log("get update users", response.data.all_users)
                     this.$emit('updateUserList', response.data.all_users);
                 });
             },
