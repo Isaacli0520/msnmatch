@@ -30,6 +30,7 @@ DEBUG = False
 
 ALLOWED_HOSTS = []
 
+BUILD_VERSION = "msnmatch-1.0"
 
 # Application definition
 
@@ -60,7 +61,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'social_django.middleware.SocialAuthExceptionMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
+    # 'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'msnmatch.urls'
@@ -118,7 +119,6 @@ LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = '/'
 
 
-
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
 
@@ -156,26 +156,33 @@ DATE_INPUT_FORMATS = ['%m/%d/%Y']
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATIC_URL = '/static/'
-STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'static'),
-)
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+# STATIC_URL = '/static/'
 
 
 AWS_ACCESS_KEY_ID = 'AKIAS2S3QXP6X5BJWVNA'
 AWS_SECRET_ACCESS_KEY = '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'
 AWS_STORAGE_BUCKET_NAME = 'mango-orange'
-AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+AWS_CLOUDFRONT_DOMAIN = 'drx0170jym8dn.cloudfront.net'
+# AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
 
 AWS_S3_OBJECT_PARAMETERS = {
     'CacheControl': 'max-age=86400',
 }
 
-DEFAULT_FILE_STORAGE = 'msnmatch.storage_backends.MediaStorage'  # <-- here is where we reference it
 
-django_heroku.settings(locals())
+# STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+AWS_LOCATION = 'static'
+STATICFILES_STORAGE = 'msnmatch.storage_backends.StaticStorage'
+# STATIC_URL = 'https://' + AWS_S3_CUSTOM_DOMAIN + '/' + AWS_LOCATION + '/'
+STATIC_URL = 'https://' + AWS_CLOUDFRONT_DOMAIN + '/' + BUILD_VERSION + '/' + AWS_LOCATION + '/'
+DEFAULT_FILE_STORAGE = 'msnmatch.storage_backends.MediaStorage' 
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
+
+django_heroku.settings(locals(), staticfiles=False)
 
 db_config = dj_database_url.config()
 if db_config:

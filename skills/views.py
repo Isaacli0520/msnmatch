@@ -20,6 +20,7 @@ import random
 import numpy as np
 from scipy.spatial import distance
 from fuzzywuzzy import fuzz, process
+from msnmatch import settings
 
 MAXIMUM_COURSES = 12
 DEBUGGG = False
@@ -227,7 +228,7 @@ def get_user_json_sim(all_users):
 		if user.profile.picture:
 			picture_url = user.profile.picture.url
 		else:
-			picture_url = "/static/images/brand.jpg"
+			picture_url = settings.STATIC_URL + "images/brand.jpg"
 		if user.profile.video:
 			video_url = user.profile.video.url
 		else:
@@ -275,7 +276,7 @@ def get_user_json(all_users):
 		if user.profile.picture:
 			picture_url = user.profile.picture.url
 		else:
-			picture_url = "/static/images/brand.jpg"
+			picture_url = settings.STATIC_URL + "images/brand.jpg"
 		if user.profile.video:
 			video_url = user.profile.video.url
 		else:

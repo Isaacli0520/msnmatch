@@ -20,7 +20,7 @@
       {% if user.profile.picture %}
         <img src="{{ user.profile.picture.url }}" class="card-img-top" >
       {% else %}
-        <img src="/static/images/brand.jpg" alt="None" class="card-img-top">
+        <img src="{% static 'images/brand.jpg' %}" alt="None" class="card-img-top">
       {% endif %}
       <div class="skill-tags">
           {% for skill in user_skills%}
