@@ -30,7 +30,7 @@ DEBUG = False
 
 ALLOWED_HOSTS = []
 
-BUILD_VERSION = "msnmatch-1.0"
+BUILD_VERSION = "msnmatch-1.01"
 
 # Application definition
 
@@ -173,9 +173,10 @@ AWS_S3_OBJECT_PARAMETERS = {
 
 # STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 AWS_LOCATION = 'static'
-STATICFILES_STORAGE = 'msnmatch.storage_backends.StaticStorage'
+
 # STATIC_URL = 'https://' + AWS_S3_CUSTOM_DOMAIN + '/' + AWS_LOCATION + '/'
 STATIC_URL = 'https://' + AWS_CLOUDFRONT_DOMAIN + '/' + BUILD_VERSION + '/' + AWS_LOCATION + '/'
+STATICFILES_STORAGE = 'msnmatch.storage_backends.StaticStorage'
 DEFAULT_FILE_STORAGE = 'msnmatch.storage_backends.MediaStorage' 
 
 STATICFILES_DIRS = [

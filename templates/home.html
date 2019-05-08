@@ -86,47 +86,47 @@
                             <table class="table table-user-information">
                                 <tbody>
                                     <tr>
-                                        <td>Email</td>
+                                        <td class="field-title">Email</td>
                                         <td>\{\{modal_user.email\}\}</td>
                                     </tr>
                                     <tr>
-                                        <td>Year</td>
+                                        <td class="field-title">Year</td>
                                         <td>\{\{modal_user.year\}\}</td>
                                     </tr>
-                                    <tr>
-                                        <td>Major</td>
+                                    <tr v-if="modal_user.major">
+                                        <td class="field-title">Major</td>
                                         <td>\{\{modal_user.major\}\}</td>
                                     </tr>
                                     <tr v-if="modal_user.major_two">
-                                        <td>Second Major</td>
+                                        <td class="field-title">Second Major</td>
                                         <td>\{\{modal_user.major_two\}\}</td>
                                     </tr>
                                     <tr v-if="modal_user.minor">
-                                        <td>Minor</td>
+                                        <td class="field-title">Minor</td>
                                         <td>\{\{modal_user.minor\}\}</td>
                                     </tr>
-                                    <tr>
-                                        <td>Role</td>
+                                    <tr v-if="modal_user.role">
+                                        <td class="field-title">Role</td>
                                         <td>\{\{modal_user.role\}\}</td>
                                     </tr>
                                     <tr v-if="modal_user.wechat">
-                                        <td>WeChat ID</td>
+                                        <td class="field-title">WeChat ID</td>
                                         <td>\{\{modal_user.wechat\}\}</td>
                                     </tr>
-                                    <tr>
-                                        <td>Birth Date</td>
+                                    <tr v-if="modal_user.birth_date">
+                                        <td class="field-title">Birth Date</td>
                                         <td>\{\{modal_user.birth_date\}\}</td>
                                     </tr>
-                                    <tr>
-                                        <td>Sex</td>
+                                    <tr v-if="modal_user.sex">
+                                        <td class="field-title">Gender</td>
                                         <td>\{\{modal_user.sex\}\}</td>
                                     </tr>
-                                    <tr>
-                                        <td>Location</td>
+                                    <tr v-if="modal_user.location">
+                                        <td class="field-title">Location</td>
                                         <td>\{\{modal_user.location\}\}</td>
                                     </tr>
-                                    <tr>
-                                        <td>Bio</td>
+                                    <tr v-if="modal_user.bio">
+                                        <td class="field-title">Bio</td>
                                         <td>\{\{modal_user.bio\}\}</td>
                                     </tr>
                                 </tbody>

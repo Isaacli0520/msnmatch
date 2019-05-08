@@ -88,6 +88,13 @@
   color:#ffffff;
 }
 
+.modal-body{
+  padding: 16px 16px 0px 16px;
+}
+
+.field-title{
+  font-weight: 670;
+}
 
 .search-tags{
   display: flex;

@@ -13,6 +13,7 @@ class ProfileForm(forms.ModelForm):
         model = Profile
         fields = ('location','bio','year','sex', 'major', 'major_two', 'minor', 'birth_date','wechat','picture', 'video')
         labels = {
+            'sex':'Gender',
         	'birth_date' : 'Birth Date',
             'wechat':'WeChat ID',
         }
