@@ -7,27 +7,14 @@
     font-family: Baskerville, "Baskerville Old Face", sans-serif;
 } */
 
-body{
-    /* width:100%;
+/* body{
+    width:100%;
     height: 100%;
     background: url('/static/images/bg_14_03.jpg') no-repeat;
     background-attachment: fixed;
     background-position: center center;
-    background-size: cover; */
-    position: relative;
-    background-image: url("images/header.svg");
-    background-image: url("images/header.svg"), -moz-linear-gradient(75deg, #FF7088 15%, #F2B69D 55%);
-    background-image: url("images/header.svg"), -webkit-linear-gradient(75deg, #FF7088 15%, #F2B69D 55%);
-    background-image: url("images/header.svg"), -ms-linear-gradient(75deg, #FF7088 15%, #F2B69D 55%);
-    background-image: url("images/header.svg"), linear-gradient(75deg, #FF7088 15%, #F2B69D 55%);
-    background-color: #ffffff;
-    /* background-size: 100% 100%;
-    background-size: 128px 128px, 100% 100%, auto; */
-    background-repeat: repeat, no-repeat, no-repeat;
-    background-attachment: fixed;
-    background-position: center center;
     background-size: cover;
-  }
+  } */
 
   body:before {
     content: "";

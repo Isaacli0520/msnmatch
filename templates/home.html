@@ -1,262 +1,372 @@
 <!-- templates/home.html -->
-{% extends 'base.html' %}
 {% load bootstrap4 %}
 {% load static %}
 {% bootstrap_css %}
+{% load users_tags %}
 
-{% block title %}Home{% endblock %}
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
 
-{% block css %}
-<link href="{% static 'css/home.css' %}" rel="stylesheet">
-<link href="{% static 'css/tags_color.css' %}" rel="stylesheet">
-{% endblock %}
+        <title>Home</title>
 
-{% block content %}
-<script src="https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/axios@0.18.0/dist/axios.js"></script>
+        <link href="{% static 'css/base_home.css' %}" rel="stylesheet">
+        <link href="{% static 'css/home.css' %}" rel="stylesheet">
+        <link href="{% static 'css/tags_color.css' %}" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.8.0/css/mdb.min.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/FortAwesome/Font-Awesome@5.8.1/css/all.min.css">
+        <link rel="shortcut icon" href="{% static 'css/images/favicon.ico' %}">
 
-<div class="main">
-    <div class="col-12 mb-5" style = "width:100%; margin: 0 auto;">
-        <div class="container mt-5 mb-4 text-center">
-            <h1 style="font-size:65px" class="main-title">Welcome to MSN Match </h1>
-            <h6 class="text-muted">设计师请假了，敬请谅解</h6>
-            <h6 class="text-muted sub-title">Use tags such as<span style="font-family: Gill Sans, sans-serif; font-weight: bold;"> "Basketball", "major:Econ"</span> to customize your search</h6>
-        </div>
-    </div>
+        {% url 'home' as home %}
+        {% url 'profile' as profile %}
+        {% url 'match' as match %}
+        {% url 'course_search' as courses %}
+        {% url 'course_search_auto' as courses_auto %}
+        {% url 'skill_search' as skill_search %}
+	</head>
 
-    <div id = "home-page-app">
-        <div class="col-xs-12 col-sm-12 col-md-10 col-lg-8 col-xs-offset-0 col-sm-offset-0 mb-5" style="width:100%; margin: 0 auto;">
-            <user-list-comp></user-list-comp>
-        </div>
-    </div>
-</div>
-
-<script>
-    Vue.component('user-list-comp', {
-        template: `
-        <div>
-            <div class="tag mb-3" style="width:100%;">
-                <search-tag-comp @updateUserList="update_user_list"></search-tag-comp>
-            </div>
-            <div class="card-columns" id="users_container">
-                <div class="card user-card" v-for="user in all_users">
-                    <div class="user-card-inner">
-                        <div id="show-modal" @click="openModal(user, user.skills)">
-                            <img v-if="user.picture" :src="user.picture" class="card-img-top" alt="None">
-                            <img v-else src="" class="card-img-top" alt="None">
-                        </div>
-                        <div class="card-body">
-                            <div class="title d-flex w-100 justify-content-between">
-                                <h5 class="mb-1 font-weight-bold">
-                                    \{\{user.first_name\}\} \{\{user.last_name\}\}
-                                </h5>
-                                <small style="float:right;">\{\{ user.year \}\}</small>
-                            </div>
-                            <div class="title d-flex w-100 justify-content-between">
-                                <small v-if="user.major" class="text-muted">Major: \{\{ user.major \}\}</small>
-                            </div>
-                            <small v-if="user.score && user.score > 0" class="score-text">Similarity: \{\{ user.score \}\}%</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">\{\{modal_user.first_name\}\} \{\{modal_user.last_name\}\}</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
+<body>
+    <div id="wrap">
+        <main>
+        <div class="main" id = "home-page-app">
+            <div class="col-12 mb-5" style = "width:100%; margin: 0px 0px 0px 0px;" id="header-wrapper">
+                <div id="navigation">
+                    <nav class="navbar navbar-expand-md navbar-light font-weight-light" >
+                        <a class="navbar-brand" href="{{ home }}" style="padding:0px 0px 3px 0px; font-size: 20px;">
+                            <img src="{% static 'css/images/brand.png' %}" width="30" height="30" class="d-inline-block align-top" alt="">
+                            Home
+                        </a>
+                        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".dual-collapse2" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                            <span class="navbar-toggler-icon"></span>
                         </button>
-                    </div>
-                    <div class="modal-body">
-                        <img :src="modal_user.picture" class="card-img-top" alt="None">
-                        <div class="skill-tags">
-                            <template v-for="(skills_of_type, skills_type_name) in modal_skills">
-                                <a v-for="skill in skills_of_type"
-                                    class="skill-tag"
-                                    :href="skill.skill_url"
-                                    v-bind:class="skill.skill_type">
-                                    <span>\{\{skill.skill_name\}\}</span>
-                                </a>
-                            </template>
+                        <div class="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2" id="navbarSupportedContent">
+                            <ul class="topBotomBordersOut navbar-nav mr-autox">
+                            <li class="nav-item {% active request skill_search %}">
+                                <a class="nav-link" href="{{ skill_search }}">Tags</a>
+                            </li>
+                            </ul>
                         </div>
-                            <table class="table table-user-information">
-                                <tbody>
-                                    <tr>
-                                        <td class="field-title">Email</td>
-                                        <td>\{\{modal_user.email\}\}</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="field-title">Year</td>
-                                        <td>\{\{modal_user.year\}\}</td>
-                                    </tr>
-                                    <tr v-if="modal_user.major">
-                                        <td class="field-title">Major</td>
-                                        <td>\{\{modal_user.major\}\}</td>
-                                    </tr>
-                                    <tr v-if="modal_user.major_two">
-                                        <td class="field-title">Second Major</td>
-                                        <td>\{\{modal_user.major_two\}\}</td>
-                                    </tr>
-                                    <tr v-if="modal_user.minor">
-                                        <td class="field-title">Minor</td>
-                                        <td>\{\{modal_user.minor\}\}</td>
-                                    </tr>
-                                    <tr v-if="modal_user.role">
-                                        <td class="field-title">Role</td>
-                                        <td>\{\{modal_user.role\}\}</td>
-                                    </tr>
-                                    <tr v-if="modal_user.wechat">
-                                        <td class="field-title">WeChat ID</td>
-                                        <td>\{\{modal_user.wechat\}\}</td>
-                                    </tr>
-                                    <tr v-if="modal_user.birth_date">
-                                        <td class="field-title">Birth Date</td>
-                                        <td>\{\{modal_user.birth_date\}\}</td>
-                                    </tr>
-                                    <tr v-if="modal_user.sex">
-                                        <td class="field-title">Gender</td>
-                                        <td>\{\{modal_user.sex\}\}</td>
-                                    </tr>
-                                    <tr v-if="modal_user.location">
-                                        <td class="field-title">Location</td>
-                                        <td>\{\{modal_user.location\}\}</td>
-                                    </tr>
-                                    <tr v-if="modal_user.bio">
-                                        <td class="field-title">Bio</td>
-                                        <td>\{\{modal_user.bio\}\}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <div v-if="modal_user.video.length">
-                                <video width="100%" controls :src="modal_user.video">
-                                    Your Browser does not support video tags lol
-                                </video>
+                    
+                        <div class="navbar-collapse collapse w-100 order-2 dual-collapse2" id="base-app">
+                            <ul class="navbar-nav ml-auto">
+                            {% if request.user.is_authenticated %}
+                                <nav-list-comp></nav-list-comp>
+                            {% endif %}
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true">
+                                {% if user.is_authenticated %}
+                                    {{request.user.username}}
+                                {% else%}
+                                    Sign In
+                                {% endif %}
+                                </a>
+                                <div class="dropdown-menu w-100 order-4 dropdown-menu-right" aria-labelledby="navbarDropdown">
+                                {% if request.user.is_authenticated %}
+                                <a class="dropdown-item" href="{% url 'profile' request.user.username %}">Profile</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="{% url 'update_profile' request.user.username %}">Edit Profile</a>
+                                <a class="dropdown-item" href="{% url 'logout'%}">Log out</a>
+                                {% else %}
+                                <a class="dropdown-item" href="{% url 'login' %}">Sign in</a>
+                                {% endif %}
+                                </div>
+                            </li>
+                            </ul>
+                        </div>
+                    </nav>
+                </div>
+                <div class="container mt-5 mb-4 text-center">
+                    <h1 style="font-size:65px" class="main-title">Welcome to MSN Match </h1>
+                    <h5 class="text-muted">气死你的设计师朋友</h5>
+                </div>
+                <div class="tag mb-3" style="width:100%;">
+                    <search-tag-comp @update-user-list="update_user_list"></search-tag-comp>
+                </div>
+            </div>
+            <div style="margin: 0px 0px 35px 0px;">
+                <h3 class="line-break"><span>Human Beings</span></h3>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-10 col-lg-10 col-xs-offset-0 col-sm-offset-0 mb-5" style="width:100%; margin: 0 auto;">
+                <user-list-comp 
+                    v-bind:all_users="all_users"
+                    ></user-list-comp>
+            </div>
+
+        </div>
+        </main>
+    </div>
+    <footer>
+        <section id="footer">
+            <div class="container">
+            <div class="row text-center text-xs-center text-sm-left text-md-left">
+                <div class="col-xs-12 col-sm-6 col-md-4">
+                    <h5 style="font-weight: 400;">Quick links</h5>
+                    <ul class="list-unstyled quick-links">
+                    <li><a href="{% url 'home' %}"><i class="fa fa-angle-double-right"></i>Home</a></li>
+                    {% if user.is_authenticated %}
+                        <li><a href="{% url 'skill_search' %}"><i class="fa fa-angle-double-right"></i>Tags</a></li>
+                        <li><a href="{% url 'profile' request.user.username %}"><i class="fa fa-angle-double-right"></i>Profile</a></li>
+                    {% endif %}
+                    </ul>
+                </div>
+                <div class="col-xs-12 col-sm-6 col-md-6">
+                <h5 style="font-weight: 400;">Get In Touch</h5>
+                <ul class="list-unstyled quick-links">
+                    <li><span><i class="fa fa-angle-double-right"></i>Mentor Program Chair WeChat ID: zgt19991026</span></li>
+                    <li><span><i class="fa fa-angle-double-right"></i>Email: <a href="mailto:msnatuva@gmail.com">msnatuva@gmail.com</a></span></li>
+                </ul>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12 col-sm-12 col-md-12 mt-2 mt-sm-2 text-center text-white">
+                <p class="h6">&copy <a class="text-green ml-2" href="https://www.msnatuva.org" target="_blank">2019 Mainland Student Network.</a> All Rights Reserved.</p>
+                </div>
+                </hr>
+            </div>	
+            </div>
+        </section>
+    </footer>
+    
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/popper.js@1.14.4/dist/umd/popper.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.8.0/js/mdb.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/axios@0.18.0/dist/axios.js"></script>
+
+    <script>
+        Vue.component('user-list-comp', {
+            props:{
+                all_users:Array,
+            },
+            template: `
+            <div>
+                <div class="card-columns" id="users_container">
+                    <div class="card user-card" v-for="user in all_users">
+                        <div class="user-card-inner">
+                            <div id="show-modal" @click="openModal(user, user.skills)">
+                                <img v-if="user.picture" :src="user.picture" class="card-img-top" alt="None">
+                                <img v-else src="" class="card-img-top" alt="None">
+                            </div>
+                            <div class="card-body">
+                                <div class="title d-flex w-100 justify-content-between">
+                                    <h5 class="mb-1 font-weight-bold">
+                                        \{\{user.first_name\}\} \{\{user.last_name\}\}
+                                    </h5>
+                                    <small style="float:right;">\{\{ user.year \}\}</small>
+                                </div>
+                                <div class="title d-flex w-100 justify-content-between">
+                                    <small v-if="user.major" class="text-muted">Major: \{\{ user.major \}\}</small>
+                                </div>
+                                <small v-if="user.score && user.score > 0" class="score-text">Similarity: \{\{ user.score \}\}%</small>
                             </div>
                         </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                            <button type="button" v-if="{{request.user.pk}} != modal_user.pk && on_off==1" class="btn btn-Primary" @click="addToFav(modal_user)">Add to Favorite</button>
+                    </div>
+                </div>
+                
+                <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">\{\{modal_user.first_name\}\} \{\{modal_user.last_name\}\}</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <img :src="modal_user.picture" class="card-img-top" alt="None">
+                            <div class="skill-tags">
+                                <template v-for="(skills_of_type, skills_type_name) in modal_skills">
+                                    <a v-for="skill in skills_of_type"
+                                        class="skill-tag"
+                                        :href="skill.skill_url"
+                                        v-bind:class="skill.skill_type">
+                                        <span>\{\{skill.skill_name\}\}</span>
+                                    </a>
+                                </template>
+                            </div>
+                                <table class="table table-user-information">
+                                    <tbody>
+                                        <tr>
+                                            <td class="field-title">Email</td>
+                                            <td>\{\{modal_user.email\}\}</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="field-title">Year</td>
+                                            <td>\{\{modal_user.year\}\}</td>
+                                        </tr>
+                                        <tr v-if="modal_user.major">
+                                            <td class="field-title">Major</td>
+                                            <td>\{\{modal_user.major\}\}</td>
+                                        </tr>
+                                        <tr v-if="modal_user.major_two">
+                                            <td class="field-title">Second Major</td>
+                                            <td>\{\{modal_user.major_two\}\}</td>
+                                        </tr>
+                                        <tr v-if="modal_user.minor">
+                                            <td class="field-title">Minor</td>
+                                            <td>\{\{modal_user.minor\}\}</td>
+                                        </tr>
+                                        <tr v-if="modal_user.role">
+                                            <td class="field-title">Role</td>
+                                            <td>\{\{modal_user.role\}\}</td>
+                                        </tr>
+                                        <tr v-if="modal_user.wechat">
+                                            <td class="field-title">WeChat ID</td>
+                                            <td>\{\{modal_user.wechat\}\}</td>
+                                        </tr>
+                                        <tr v-if="modal_user.birth_date">
+                                            <td class="field-title">Birth Date</td>
+                                            <td>\{\{modal_user.birth_date\}\}</td>
+                                        </tr>
+                                        <tr v-if="modal_user.sex">
+                                            <td class="field-title">Gender</td>
+                                            <td>\{\{modal_user.sex\}\}</td>
+                                        </tr>
+                                        <tr v-if="modal_user.location">
+                                            <td class="field-title">Location</td>
+                                            <td>\{\{modal_user.location\}\}</td>
+                                        </tr>
+                                        <tr v-if="modal_user.bio">
+                                            <td class="field-title">Bio</td>
+                                            <td>\{\{modal_user.bio\}\}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div v-if="modal_user.video.length">
+                                    <video width="100%" controls :src="modal_user.video">
+                                        Your Browser does not support video tags lol
+                                    </video>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <button type="button" v-if="{{request.user.pk}} != modal_user.pk && on_off==1" class="btn btn-Primary" @click="addToFav(modal_user)">Add to Favorite</button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-        `,
-        data: function () {
-            return {
-            all_users: [],
-            tags: [],
-            on_off: 0,
-            modal_user: {
-                "pk": "",
-                "user_url": "",
-                "picture": "",
-                "first_name": "",
-                "last_name": "",
-                "email": "",
-                "bio": "",
-                "birth_date": "",
-                "location": "",
-                "year": "",
-                "major": "",
-                "skills":"",
-                "video":"",
-            },
-            modal_skills: null,
-            }
-        },
-        methods:{
-            update_user_list(new_users){
-                // console.log("update_user_list", new_users);
-                this.all_users = new_users; 
-            },
-            openModal(user, user_skills){
-                this.modal_user = user;
-                // console.log("all_skill_names", user_skills);
-                this.modal_skills = user_skills;
-                $('.modal').modal('show');
-            },
-            addToFav(user){
-                axios.get('/skills/ajax/add_to_list/',{params: {user_pk:user.pk}}).then(response => {
-                    $('.modal').modal('hide');
-                });
-            },
-            
-        },
-        mounted(){
-            axios.get('/skills/ajax/get_all_users/',{params: {}}).then(response => {
-                // console.log(response.data.all_users);
-                this.all_users = response.data.all_users;
-            });
-        },
-        })
-
-    Vue.component('search-tag-comp', {
-        template: `
-        <div>
-            <div class="search-tags mb-5">
-                <span v-for="tag in tags"
-                    class="search-tag">
-                    <span>\{\{tag\}\}</span>
-                    <span class="search-tag-remove"><i v-on:click="del_tag(tag)" class="fas fa-times"></i></span>
-                </span>
-            </div>
-            <div class="search-form mt-1">
-                <div class="search-icon">
-                    <i class="fas fa-search"></i>
-                </div>
-                <input @keydown="onKeydown" v-model="searchquery" autocomplete="off" id="myInput" type="text" name="class" placeholder="Add a filter tag" class=" search-input" aria-label="Search">
-            </div>
-            <div class="all-buttons">
-                <button @click="getUsersBySim" class="btn btn-show-me">Who can be my best Match?</button>
-            </div>
-        </div>
-        `,
-        data: function () {
-            return {
-            searchquery: '',
-            tags: [],
-            }
-        },
-        methods:{
-            add_tag(tag){
-                this.tags.push(tag);
-                axios.get('/skills/ajax/retrieve_users/',{params: {all_tags: this.tags.join('`'),}}).then(response => {
-                    this.$emit('updateUserList', response.data.all_users);
-                });
-                
-            },
-            del_tag(tag){
-                this.tags.splice(this.tags.indexOf(tag), 1);
-                axios.get('/skills/ajax/retrieve_users/',{params: {all_tags: this.tags.join('`'),}}).then(response => {
-                    this.$emit('updateUserList', response.data.all_users);
-                });
-            },
-            onKeydown(e) {
-                if(e.keyCode == 13 && this.searchquery.length > 1){
-                    this.add_tag(this.searchquery);
-                    this.searchquery = ""
+            `,
+            data: function () {
+                return {          
+                tags: [],
+                on_off: 0,
+                modal_user: {
+                    "pk": "",
+                    "user_url": "",
+                    "picture": "",
+                    "first_name": "",
+                    "last_name": "",
+                    "email": "",
+                    "bio": "",
+                    "birth_date": "",
+                    "location": "",
+                    "year": "",
+                    "major": "",
+                    "skills":"",
+                    "video":"",
+                },
+                modal_skills: null,
                 }
             },
-            getUsersBySim(e){
-                axios.get('/skills/ajax/get_users_by_sim/',{params: {all_tags: this.tags.join('`'),}}).then(response => {
-                    this.$emit('updateUserList', response.data.all_users);
+            methods:{
+                openModal(user, user_skills){
+                    this.modal_user = user;
+                    // console.log("all_skill_names", user_skills);
+                    this.modal_skills = user_skills;
+                    $('.modal').modal('show');
+                },
+                addToFav(user){
+                    axios.get('/skills/ajax/add_to_list/',{params: {user_pk:user.pk}}).then(response => {
+                        $('.modal').modal('hide');
+                    });
+                },
+                
+            },
+            })
+
+        Vue.component('search-tag-comp', {
+            template: `
+            <div>
+                <div class="search-tags mb-5">
+                    <span v-for="tag in tags"
+                        class="search-tag">
+                        <span>\{\{tag\}\}</span>
+                        <span class="search-tag-remove"><i v-on:click="del_tag(tag)" class="fas fa-times"></i></span>
+                    </span>
+                </div>
+                <div class="search-form mt-1">
+                    <div class="search-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <input @keydown="onKeydown" v-model="searchquery" autocomplete="off" id="myInput" type="text" name="class" placeholder=" &quot;Basketball&quot;, &quot;major:Econ&quot; " class=" search-input" aria-label="Search">
+                </div>
+                <div class="all-buttons">
+                    <button @click="getUsersBySim" class="btn btn-show-me">Click Me</button>
+                </div>
+            </div>
+            `,
+            data: function () {
+                return {
+                searchquery: '',
+                tags: [],
+                }
+            },
+            methods:{
+                add_tag(tag){
+                    this.tags.push(tag);
+                    axios.get('/skills/ajax/retrieve_users/',{params: {all_tags: this.tags.join('`'),}}).then(response => {
+                        this.$emit('update-user-list', response.data.all_users);
+                    });
+                    
+                },
+                del_tag(tag){
+                    this.tags.splice(this.tags.indexOf(tag), 1);
+                    axios.get('/skills/ajax/retrieve_users/',{params: {all_tags: this.tags.join('`'),}}).then(response => {
+                        this.$emit('update-user-list', response.data.all_users);
+                    });
+                },
+                onKeydown(e) {
+                    if(e.keyCode == 13 && this.searchquery.length > 1){
+                        this.add_tag(this.searchquery);
+                        this.searchquery = ""
+                    }
+                },
+                getUsersBySim(e){
+                    axios.get('/skills/ajax/get_users_by_sim/',{params: {all_tags: this.tags.join('`'),}}).then(response => {
+                        this.$emit('update-user-list', response.data.all_users);
+                    });
+                },
+            },
+            mounted(){
+                
+            },
+            })
+            
+        var home_page_app = new Vue({
+            el: "#home-page-app",
+            data: {
+                all_users:[],
+            },
+            methods:{
+                update_user_list(new_users){
+                    this.all_users = new_users; 
+                    console.log("update user list");
+                },
+            },
+            mounted(){
+                axios.get('/skills/ajax/get_all_users/',{params: {}}).then(response => {
+                    console.log(response.data.all_users);
+                    this.all_users = response.data.all_users;
                 });
             },
-        },
-        mounted(){
-            
-        },
         })
-        
-    var home_page_app = new Vue({
-        el: "#home-page-app",
-        data: {
-        }
-    })
-</script>
-{% endblock %}
+    </script>
+</body>
+
+</html>

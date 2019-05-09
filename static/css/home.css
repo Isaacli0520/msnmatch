@@ -4,7 +4,8 @@
 
 
 .user-card {
-  margin:10px;
+  /* margin:10px; */
+  margin: 5px 0px 0px 0px;
   flex: 1 0 auto;
   overflow:hidden;
   /* width: 30%; */
@@ -26,15 +27,6 @@
   transition: .5s ease;
 }
 
-/* .card-columns {
-  @include media-breakpoint-only(lg) {
-    column-count: 3;
-  }
-  @include media-breakpoint-only(xl) {
-    column-count: 4;
-  }
-} */
-
 .search-container{
   width:80%;
 }
@@ -43,14 +35,46 @@
   /* background-color: transparent; */
 }
 
+.line-break {
+  width: 80%; 
+  text-align: center; 
+  border-bottom: 1px solid rgb(134, 130, 130); 
+  line-height: 0.1em;
+  margin: 0 auto; 
+} 
+
+.line-break span { 
+  color:#000000;
+  font-weight: 350;
+  font-family: Baskerville, "Baskerville Old Face", sans-serif;
+   background:#fff; 
+   padding:0 20px; 
+   margin: 5px 0px 2px 0px;
+}
+
+#header-wrapper {
+  position: relative;
+  padding: 0px 0px 120px 0px;
+  background-image: url("images/header.svg");
+  background-image: url("images/overlay.png"), url("images/header.svg"),  -moz-linear-gradient(75deg, #FF7088 15%, #F2B69D 55%);
+  background-image: url("images/overlay.png"), url("images/header.svg"), -webkit-linear-gradient(75deg, #FF7088 15%, #F2B69D 55%);
+  background-image: url("images/overlay.png"), url("images/header.svg"), -ms-linear-gradient(75deg, #FF7088 15%, #F2B69D 55%);
+  background-image: url("images/overlay.png"), url("images/header.svg"), linear-gradient(75deg, #FF7088 15%, #F2B69D 55%);
+  background-color: #ffffff;
+  background-size: 100% 620%;
+  background-size: 128px 128px, 100% 100%, auto;
+  background-repeat: repeat, no-repeat, no-repeat;
+}
+
 
 .search-form {
   /* border:1px solid #728181; */
   position: relative;
   top: 50%;
   left: 50%;
-  margin: 0px 0px 0px 0px;
+  margin: 0px 0px 20px 0px;
   width: 80%;
+  max-width: 600px;
   height: 40px;
   border-radius: 5px;
   box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
@@ -79,7 +103,7 @@
 }
 
 .main-title{
-  color:#1b5557;
+  color:#ffffff;
   font-weight: 350;
   font-family: Baskerville, "Baskerville Old Face", sans-serif;
 }
@@ -100,12 +124,13 @@
   display: flex;
   flex-flow: row wrap;
   width:80%;
+  max-width: 600px;
   margin: 0 auto;
 }
 
 .search-tag{
   color:#6e4141;
-  background-color: #24e79c;
+  background-color: #F2B69D 55%;
   box-shadow: 0 6px 8px rgba(0, 0, 0, 0.295);
   padding: 5px 5px 5px 9px;
   border-radius: 5px;
@@ -136,21 +161,97 @@
 }
 
 .btn-show-me{
-  border:none;
-  /* border:1px solid #999a9b; */
-  color:#6e4141;
-  background: -webkit-linear-gradient(to right, #74fcce, #40ee7a);  
-  background: linear-gradient(to right, #74fcce, #40ee7a);
-  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.295);
-  padding: 5px 15px 5px 15px;
-  border-radius: 25px;
-  font-family: Baskerville, "Baskerville Old Face", sans-serif;
-  text-transform: none;
+  font-size: 17px !important;
+  border:solid 1px #ffffff !important;
+  padding: 5px 30px 5px 30px !important;
+  text-transform: none !important;
+  color:#ffffff !important;
+  transition: color 0.2s ease-in-out, border-color 0.2s ease-in-out, background-color 0.2s ease-in-out;
+  /* background: -webkit-linear-gradient(to right, #FF7088 15%, #F2B69D);  
+  background: linear-gradient(to right, #FF7088 15%, #F2B69D); */
+  background: none !important;
+  /* box-shadow: 0 6px 8px rgba(0, 0, 0, 0.295); */
+  border-radius: 5px !important;
+  /* font-family: Baskerville, "Baskerville Old Face", sans-serif; */
+  font-family: Optima, sans-serif;
   font-size:17px;
   margin: 5px 5px 5px 5px;
+  transition: color .3s ease-in-out,background-color .3s ease-in-out,border-color .3s ease-in-out,box-shadow .3s ease-in-out,-webkit-box-shadow .3s ease-in-out !important;
+
+  
+}
+
+.btn-show-me:hover {
+  color: #FF7088 !important;
+  background: #ffffff !important;
 }
 
 .score-text{
   color:#2b9761;
   font-weight: 550;
+}
+
+/* 
+  ##Device = Desktops
+  ##Screen = 1281px to higher resolution desktops
+*/
+@media (min-width: 1281px) { 
+  .card-columns{
+    column-count: 5 !important; 
+  }
+}
+
+/* 
+  ##Device = Laptops, Desktops
+  ##Screen = B/w 1025px to 1280px
+*/
+@media (min-width: 1025px) and (max-width: 1280px) {
+  .card-columns{
+    column-count: 4 !important;
+  }
+}
+
+/* 
+  ##Device = Tablets, Ipads (portrait)
+  ##Screen = B/w 768px to 1024px
+*/
+
+@media (min-width: 768px) and (max-width: 1024px) {
+  .card-columns{
+    column-count: 3 !important;
+  }
+}
+
+/* 
+  ##Device = Tablets, Ipads (landscape)
+  ##Screen = B/w 768px to 1024px
+*/
+
+@media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
+  .card-columns{
+    column-count: 3 !important;
+  }
+}
+
+/* 
+  ##Device = Low Resolution Tablets, Mobiles (Landscape)
+  ##Screen = B/w 481px to 767px
+*/
+
+@media (min-width: 481px) and (max-width: 767px) {
+  .card-columns{
+    column-count: 2 !important;
+  }
+}
+
+/* 
+  ##Device = Most of the Smartphones Mobiles (Portrait)
+  ##Screen = B/w 320px to 479px
+*/
+
+@media (min-width: 320px) and (max-width: 480px) {
+  .card-columns{
+    column-count: 1 !important;
+  }
+  
 }

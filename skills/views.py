@@ -17,6 +17,7 @@ from friendship.models import Follow
 import re
 import json
 import random
+import operator
 import numpy as np
 from scipy.spatial import distance
 from fuzzywuzzy import fuzz, process
@@ -228,7 +229,7 @@ def get_user_json_sim(all_users):
 		if user.profile.picture:
 			picture_url = user.profile.picture.url
 		else:
-			picture_url = settings.STATIC_URL + "images/brand.jpg"
+			picture_url = settings.STATIC_URL + "css/images/brand.jpg"
 		if user.profile.video:
 			video_url = user.profile.video.url
 		else:
@@ -276,7 +277,7 @@ def get_user_json(all_users):
 		if user.profile.picture:
 			picture_url = user.profile.picture.url
 		else:
-			picture_url = settings.STATIC_URL + "images/brand.jpg"
+			picture_url = settings.STATIC_URL + "css/images/brand.jpg"
 		if user.profile.video:
 			video_url = user.profile.video.url
 		else:
@@ -334,28 +335,41 @@ def skill_search_result(request):
 		"skill_list":skill_list,
 		})
 
+def sort_by(list_of_fields):
+	return tuple(list_of_fields)
+
 def user_retrieve(tags, all_users):
 	tmp_queryset = []
 	field_queryset = all_users
 	field_tags = [(tag[:tag.find(":")].lower(), tag[(tag.find(":") + 1):]) for tag in tags if tag.find(":") != -1]
 	user_fields = [sth.name for sth in User._meta.get_fields()]
 	profile_fields = [sth.name for sth in Profile._meta.get_fields()]
+	list_of_field_tags = []
 	for field_tag, field_query in field_tags:
 		if field_tag == "name":
 			field_queryset = field_queryset.annotate(
 				sim_firstname=TrigramSimilarity('first_name', field_query),
 				sim_lastname=TrigramSimilarity('last_name', field_query)).filter(Q(sim_firstname__gt=.3) | Q(sim_lastname__gt=.3) )
-			field_queryset = sorted(field_queryset, key=lambda c: (-c.sim_firstname, -c.sim_lastname))
+			list_of_field_tags += ["sim_firstname", "sim_lastname"]
+		elif field_tag == "gender":
+			field_queryset = field_queryset.annotate(
+				sim_sex=TrigramSimilarity('profile__sex', field_query),).filter(Q(sim_sex__gt=.8))
+			list_of_field_tags += ["sim_sex"]
 		elif field_tag == "major":
 			field_queryset = field_queryset.annotate(
 				sim_mj1=TrigramSimilarity('profile__major', field_query),
 				sim_mj3=TrigramSimilarity('profile__minor', field_query),
 				sim_mj2=TrigramSimilarity('profile__major_two', field_query)).filter(Q(sim_mj1__gt=.3) | Q(sim_mj2__gt=.3) | Q(sim_mj3__gt=.3) )
-			field_queryset = sorted(field_queryset, key=lambda c: (-c.sim_mj1, -c.sim_mj2, -c.sim_mj3))
+			list_of_field_tags += ["sim_mj1", "sim_mj2", "sim_mj3"]
+			# field_queryset = sorted(field_queryset, key=lambda c: (-c.sim_mj1, -c.sim_mj2, -c.sim_mj3))
 		elif field_tag in user_fields:
 			field_queryset = filter_by_field(field_queryset, "", field_tag, field_query)
 		elif field_tag in profile_fields:
 			field_queryset = filter_by_field(field_queryset, "profile__", field_tag, field_query)
+
+	if len(list_of_field_tags) > 0:
+		field_queryset = sorted(field_queryset, key=operator.attrgetter(*list_of_field_tags))
+
 	for user in field_queryset:
 		similar_tags = set()
 		for tag in tags:
