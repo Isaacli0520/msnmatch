@@ -44,7 +44,7 @@ def add_del_skill(request):
 		origin_exist = SkillRelation.objects.filter(user=user, skill=skill).exists()
 		if SkillRelation.objects.filter(user=user, skill=skill).exists() and add_del == "del":
 			SkillRelation.objects.get(user=user,skill=skill).delete()
-			print("Skill",skill.skill_name, " Count", skill.skill_users.count())
+			# print("Skill",skill.skill_name, " Count", skill.skill_users.count())
 			if skill.skill_users.count() == 0 and skill.skill_type == "Custom":
 				skill.delete()
 		elif not SkillRelation.objects.filter(user=user, skill=skill).exists() and add_del == "add":
@@ -78,8 +78,8 @@ def get_users_by_sim(request):
 	# print("debug:::",all_user_skills)
 	sims = {u2_pk:similarity_between(user_skills, u2_skills) for u2_pk, u2_skills in all_user_skills.items()}
 	sorted_sims = sorted(sims.items(), key = lambda c:c[1], reverse=True)
-	print("all_similarities:", sorted_sims)
-	print("all_users_sorted:",[User.objects.get(pk = user_pk).username for user_pk, score in sorted_sims])
+	# print("all_similarities:", sorted_sims)
+	# print("all_users_sorted:",[User.objects.get(pk = user_pk).username for user_pk, score in sorted_sims])
 	return get_user_json_sim(request,[(User.objects.get(pk = user_pk),'{0:.3g}'.format(score*100)) for user_pk, score in sorted_sims])
 
 
@@ -97,7 +97,7 @@ def similarity_between(u1, u2):
 			u2_vec.append([int(sk in u2[sk_type]) for sk in tmp_skill_ls])
 			# print("u1",u1_vec,"u2",u2_vec)
 			sims.append(1 - distance.cosine(u1_vec[-1], u2_vec[-1]))
-			print("similarity:",sims[-1])
+			# print("similarity:",sims[-1])
 			sims_weight.append(sims[-1]*scaler(len(u1[sk_type]))/u1_length)
 	return sum(sims_weight)
 	
@@ -130,7 +130,7 @@ def add_to_list(request):
 
 def get_follow_list(request):
 	following = Follow.objects.following(request.user)
-	print("following", following)
+	# print("following", following)
 	flw_ret = []
 	for flw in following:
 		new_flw = {
@@ -147,11 +147,11 @@ def get_follow_list(request):
 
 def del_fav(request):
 	to_user = User.objects.get(pk = request.GET.get("user_pk"))
-	print("from_user", request.user.username, "to_user", to_user.username, Follow.objects.filter(follower=request.user, followee=to_user).exists())
-	print("before delete", Follow.objects.following(request.user), Follow.objects.all()),
+	# print("from_user", request.user.username, "to_user", to_user.username, Follow.objects.filter(follower=request.user, followee=to_user).exists())
+	# print("before delete", Follow.objects.following(request.user), Follow.objects.all()),
 	if Follow.objects.filter(follower=request.user, followee=to_user).exists():
 		Follow.objects.remove_follower(follower=request.user, followee=to_user)
-		print("after delete", Follow.objects.following(request.user), Follow.objects.all())
+		# print("after delete", Follow.objects.following(request.user), Follow.objects.all())
 	return JsonResponse({
 		
 	})
@@ -200,7 +200,7 @@ def get_all_user_skills(request):
 
 def retrieve_users(request):
 	all_tags = request.GET.get("all_tags")
-	print("all_tags", all_tags.split('`'))
+	# print("all_tags", all_tags.split('`'))
 	all_users = User.objects.all().exclude(username="admin")
 	if(all_tags == ""):
 		return get_user_json(request, all_users)
@@ -323,7 +323,7 @@ def skill_search_result(request):
 	skill_list = []
 	query_string = request.GET.get("searchquery").strip()
 	retrieved_skills = skill_retrieve(query_string)
-	print("debuggggg:",query_string)
+	# print("debuggggg:",query_string)
 	if retrieved_skills != None:
 		for skill in retrieved_skills:
 			new_skill = {
@@ -335,7 +335,7 @@ def skill_search_result(request):
 				"skill_cus": False,
 			}
 			skill_list.append(new_skill)
-	print("skill_search_result", skill_list)
+	# print("skill_search_result", skill_list)
 	return JsonResponse({
 		"skill_list":skill_list,
 		})
@@ -392,7 +392,7 @@ def user_retrieve(tags, all_users):
 	if len(field_tags) != len(tags):
 		tmp_queryset = [some_user for some_user in tmp_queryset if some_user[1] >= 1]
 
-	print("user_retrieve",tmp_queryset)
+	# print("user_retrieve",tmp_queryset)
 	return [User.objects.get(pk=k) for k, v in sorted(tmp_queryset, key=lambda tp: tp[1], reverse = True)]
 
 def skill_retrieve(query_string):
@@ -416,7 +416,7 @@ def skill_retrieve_new(pk, query_string):
 
 	best_match = process.extractOne(query_string,tmp_queryset,scorer=fuzz.partial_ratio, score_cutoff=80)
 
-	print("extract one",best_match)
+	# print("extract one",best_match)
 	# retrieved_skills = [Skill.objects.get(pk=sk_pk) for sk_name, sk_pk in sims]
 	# tmp_queryset = user.skill_set.all().annotate(
 	# 	similarity_name=TrigramSimilarity('skill_name',query_string)).filter(Q(similarity_name__gt=0.45))
@@ -432,7 +432,7 @@ def filter_by_field(field_queryset, prefix, field_tag, field_query):
 	field_queryset = field_queryset.annotate(
 				sth = TrigramSimilarity(prefix+field_tag, field_query)).filter(sth__gt=0.6)
 	tmp_list = [item.sth for item in field_queryset]
-	print("filter_by_field",field_tag,"sims",tmp_list)
+	# print("filter_by_field",field_tag,"sims",tmp_list)
 	if len(tmp_list) > 0 and max(tmp_list) >= 0.9:
 		field_queryset = field_queryset.filter(sth__gt=0.9)
 	

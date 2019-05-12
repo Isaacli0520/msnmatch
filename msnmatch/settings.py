@@ -26,11 +26,11 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'f@hcb!l&kpn_4u+iz)6j4w(5j4$b2!)-=*j(9&(x_0a-j8o6)5'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = []
 
-BUILD_VERSION = "msnmatch-1.0301"
+BUILD_VERSION = "msnmatch-1.0303"
 
 # Application definition
 
@@ -159,6 +159,7 @@ DATE_INPUT_FORMATS = ['%m/%d/%Y']
 # STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # STATIC_URL = '/static/'
 
+# AWS_DEFAULT_ACL = None
 
 AWS_ACCESS_KEY_ID = 'AKIAS2S3QXP6X5BJWVNA'
 AWS_SECRET_ACCESS_KEY = '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'
@@ -167,7 +168,7 @@ AWS_CLOUDFRONT_DOMAIN = 'drx0170jym8dn.cloudfront.net'
 # AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
 
 AWS_S3_OBJECT_PARAMETERS = {
-    'CacheControl': 'max-age=86400',
+    'CacheControl': 'max-age=31536000',
 }
 
 

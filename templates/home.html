@@ -83,26 +83,26 @@
                         </div>
                     </nav>
                 </div>
-                <div class="container mt-5 mb-4 text-center">
-                    <h1 class="main-title">Welcome to MSN Match </h1>
-                    <h6 class="text-muted">设计师持续休假~</h6>
+                <div class="container mt-5 mb-1 text-center">
+                    <h1 class="main-title">MSN Match</h1>
                 </div>
                 <div class="tag mb-3" style="width:100%;">
                     <search-tag-comp v-bind:request_user="request_user" @update-user-list="update_user_list"></search-tag-comp>
                 </div>
             </div>
-            <div style="margin: 0px 0px 35px 0px;">
-                <h3 class="line-break"><span>Human Beings</span></h3>
+            <div class="user-list-div">
+                <div style="margin: 0px 0px 35px 0px;">
+                    <h3 class="line-break"><span>UVA Students</span></h3>
+                </div>
+                <div class="col-xs-12 col-sm-12 col-md-10 col-lg-10 col-xs-offset-0 col-sm-offset-0 mb-5" style="width:100%; margin: 0 auto;">
+                    <user-list-comp 
+                        v-bind:all_users="all_users"
+                        v-bind:request_user="request_user"
+                        v-bind:following="following"
+                        @update-following-list="update_following_list"
+                        ></user-list-comp>
+                </div>
             </div>
-            <div class="col-xs-12 col-sm-12 col-md-10 col-lg-10 col-xs-offset-0 col-sm-offset-0 mb-5" style="width:100%; margin: 0 auto;">
-                <user-list-comp 
-                    v-bind:all_users="all_users"
-                    v-bind:request_user="request_user"
-                    v-bind:following="following"
-                    @update-following-list="update_following_list"
-                    ></user-list-comp>
-            </div>
-
         </div>
         </main>
     </div>
@@ -151,7 +151,7 @@
             template: `
             <div>
                 <div class="card-columns" id="users_container">
-                    <div class="card user-card" v-for="user in all_users">
+                    <div class="card user-card" v-if="user.role != '' " v-for="user in all_users">
                         <div class="user-card-inner">
                             <div id="show-modal" @click="openModal(user, user.skills)">
                                 <img v-if="user.picture" :src="user.picture" class="card-img-top" alt="None">
@@ -255,6 +255,7 @@
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                                 <button type="button" id="follow-btn" v-if="request_user.role != '' 
+                                && modal_user.role != ''
                                 && !modal_user.follow 
                                 && modal_user.role != request_user.role 
                                 && request_user.pk != modal_user.pk " 
@@ -332,26 +333,28 @@
             props:['request_user'],
             template: `
             <div>
-                <div class="search-tags mb-5">
+                <div class="search-tags mb-3">
                     <span v-for="tag in tags"
                         class="search-tag">
                         <span>\{\{tag\}\}</span>
                         <span class="search-tag-remove"><i v-on:click="del_tag(tag)" class="fas fa-times"></i></span>
                     </span>
                 </div>
-                <div class="search-form mt-1">
-                    <div class="search-icon">
-                        <i class="fas fa-search"></i>
+                <div>
+                    <div class="search-form mt-1">
+                        <div class="search-icon">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <input @keydown="onKeydown" v-model="searchquery" autocomplete="off" id="myInput" type="text" name="class" placeholder=" &quot;Basketball&quot;, &quot;major:Econ&quot; " class=" search-input" aria-label="Search">
                     </div>
-                    <input @keydown="onKeydown" v-model="searchquery" autocomplete="off" id="myInput" type="text" name="class" placeholder=" &quot;Basketball&quot;, &quot;major:Econ&quot; " class=" search-input" aria-label="Search">
-                    <div class="d-flex w-100">
+                    <div class="d-flex checkbox-div">
                         <div class="custom-control custom-checkbox checkboxx">
                             <input type="checkbox" class="custom-control-input" id="mentor" value="role:Mentor" v-model="tags">
-                            <label class="custom-control-label" for="mentor">Mentor</label>
+                            <label class="custom-control-label role-label" for="mentor">Mentor</label>
                         </div>
                         <div class="custom-control custom-checkbox checkboxx">
                             <input type="checkbox" class="custom-control-input" id="mentee" value="role:Mentee" v-model="tags">
-                            <label class="custom-control-label" for="mentee">Mentee</label>
+                            <label class="custom-control-label role-label" for="mentee">Mentee</label>
                         </div>
                     </div>
                 </div>
@@ -373,7 +376,8 @@
                                     </button>
                                 </div>
                                 <div class="modal-body">
-                                    <p class="">Do you really want to be a <strong>\{\{modal_role\}\}</strong>?</p>
+                                    <p class="role-confirm-text">Do you really want to be a <strong>\{\{modal_role\}\}</strong>?</p>
+                                    <small class="text-muted">*Note that your role can only be changed by the mentor program chair once you've made your choice.</small>
                                 </div>
                                 <div class="modal-footer">
                                     <input type="submit" class="btn btn-primary" :name="modal_role" value="Yes">
