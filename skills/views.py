@@ -80,7 +80,7 @@ def get_users_by_sim(request):
 	sorted_sims = sorted(sims.items(), key = lambda c:c[1], reverse=True)
 	print("all_similarities:", sorted_sims)
 	print("all_users_sorted:",[User.objects.get(pk = user_pk).username for user_pk, score in sorted_sims])
-	return get_user_json_sim([(User.objects.get(pk = user_pk),'{0:.3g}'.format(score*100)) for user_pk, score in sorted_sims])
+	return get_user_json_sim(request,[(User.objects.get(pk = user_pk),'{0:.3g}'.format(score*100)) for user_pk, score in sorted_sims])
 
 
 def similarity_between(u1, u2):
@@ -138,6 +138,7 @@ def get_follow_list(request):
 			"user_url": "/users/"+flw.username+"/",
 			"first_name": flw.first_name,
 			"last_name": flw.last_name,
+			
 		}
 		flw_ret.append(new_flw)
 	return JsonResponse({
@@ -202,17 +203,17 @@ def retrieve_users(request):
 	print("all_tags", all_tags.split('`'))
 	all_users = User.objects.all().exclude(username="admin")
 	if(all_tags == ""):
-		return get_user_json(all_users)
+		return get_user_json(request, all_users)
 	re_users = user_retrieve(all_tags.split('`'), all_users)
-	return get_user_json(re_users)
+	return get_user_json(request, re_users)
 	
 def get_all_users(request):
 	# all_users = User.objects.all().exclude(pk=request.user.pk)
 	all_users_list = sorted(User.objects.all().exclude(username="admin"), key=lambda x: random.random())
 	# all_users = User.objects.all().exclude(username="admin")
-	return get_user_json(all_users_list)
+	return get_user_json(request,all_users_list)
 
-def get_user_json_sim(all_users):
+def get_user_json_sim(request,all_users):
 	all_users_list = []
 
 	for user, score in all_users:
@@ -254,13 +255,15 @@ def get_user_json_sim(all_users):
 			"minor":user.profile.minor,
 			"score":score,
 			"wechat":user.profile.wechat,
+			"role":user.profile.role,
+			"follow": Follow.objects.filter(follower=request.user, followee=user).exists(),
 		}
 		all_users_list.append(new_user)
 	return JsonResponse({
 		"all_users":all_users_list,
 	})
 
-def get_user_json(all_users):
+def get_user_json(request, all_users):
 	all_users_list = []
 
 	for user in all_users:
@@ -301,6 +304,8 @@ def get_user_json(all_users):
 			"major_two":user.profile.major_two,
 			"minor":user.profile.minor,
 			"wechat":user.profile.wechat,
+			"role":user.profile.role,
+			"follow": Follow.objects.filter(follower=request.user, followee=user).exists(),
 		}
 		all_users_list.append(new_user)
 	return JsonResponse({
@@ -361,6 +366,10 @@ def user_retrieve(tags, all_users):
 				sim_mj3=TrigramSimilarity('profile__minor', field_query),
 				sim_mj2=TrigramSimilarity('profile__major_two', field_query)).filter(Q(sim_mj1__gt=.3) | Q(sim_mj2__gt=.3) | Q(sim_mj3__gt=.3) )
 			list_of_field_tags += ["sim_mj1", "sim_mj2", "sim_mj3"]
+		elif field_tag == "year":
+			field_queryset = field_queryset.annotate(
+				sim_yr=TrigramSimilarity('profile__year', field_query)).filter(Q(sim_yr__gt=.1))
+			list_of_field_tags += ["sim_yr"]
 			# field_queryset = sorted(field_queryset, key=lambda c: (-c.sim_mj1, -c.sim_mj2, -c.sim_mj3))
 		elif field_tag in user_fields:
 			field_queryset = filter_by_field(field_queryset, "", field_tag, field_query)
@@ -421,8 +430,9 @@ def skill_retrieve_new(pk, query_string):
 
 def filter_by_field(field_queryset, prefix, field_tag, field_query):
 	field_queryset = field_queryset.annotate(
-				sth = TrigramSimilarity(prefix+field_tag, field_query)).filter(sth__gt=0.1)
+				sth = TrigramSimilarity(prefix+field_tag, field_query)).filter(sth__gt=0.6)
 	tmp_list = [item.sth for item in field_queryset]
+	print("filter_by_field",field_tag,"sims",tmp_list)
 	if len(tmp_list) > 0 and max(tmp_list) >= 0.9:
 		field_queryset = field_queryset.filter(sth__gt=0.9)
 	

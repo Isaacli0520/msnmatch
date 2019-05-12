@@ -47,9 +47,6 @@
 
       <div class="navbar-collapse collapse w-100 order-2 dual-collapse2" id="base-app">
         <ul class="navbar-nav ml-auto">
-          {% if request.user.is_authenticated %}
-            <nav-list-comp></nav-list-comp>
-          {% endif %}
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true">
               {% if user.is_authenticated %}
@@ -121,72 +118,5 @@
 
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.min.js"></script>
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/axios@0.18.0/dist/axios.js"></script>
-  <script>
-    Vue.component('nav-list-comp', {
-        template: `
-        <li class="nav-item dropdown"  v-if="on_off == 1">
-          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" @click="getFollowList" role="button" data-toggle="dropdown" aria-haspopup="true">
-            Favorites
-          </a>
-          <div class="dropdown-menu dropdown-menu-right " @click.stop="" aria-labelledby="navbarDropdown">
-            {% if request.user.is_authenticated %}
-              <span class="dropdown-item" v-if="following.length == 0">No Favorite Users</span>
-              <div class="dropdown-item d-flex w-100 justify-content-between" v-for="following_user in following">
-                  <a :href="following_user.user_url"><span>\{\{ following_user.first_name \}\} \{\{ following_user.last_name \}\}</span></a>
-                  <span style="padding:12px 4px 8px 4px" @click="del_fav(following_user)"><i class="fas fa-trash-alt"></i></span>
-              </div>
-            {% else %}
-              <a class="dropdown-item" href="{% url 'login' %}">Sign in</a>
-            {% endif %}
-          </div>
-        </li>
-        `,
-        data: function () {
-            return {
-            following:[],
-            on_off:0,
-            }
-        },
-        methods:{
-            getFollowList(){
-              axios.get('/skills/ajax/get_follow_list/',{params: {}}).then(response => {
-                  // console.log("get update users", response.data.following);
-                  this.following = response.data.following;
-              });
-            },
-            del_fav(following_user){
-              axios.get('/skills/ajax/del_fav/',{params: {user_pk:following_user.pk}}).then(response => {
-                this.following.splice(this.following.indexOf(following_user), 1);
-              });
-            },
-            // add_tag(tag){
-            //     this.tags.push(tag);
-            //     console.log("all_tags", this.tags);
-            //     axios.get('/skills/ajax/retrieve_users/',{params: {all_tags: this.tags.join('`'),}}).then(response => {
-            //         console.log("get update users", response.data.all_users)
-            //         this.$emit('updateUserList', response.data.all_users);
-            //     });
-                
-            // },
-            // del_tag(tag){
-            //     this.tags.splice(this.tags.indexOf(tag), 1);
-            //     axios.get('/skills/ajax/retrieve_users/',{params: {all_tags: this.tags.join('`'),}}).then(response => {
-            //         console.log("get update users", response.data.all_users)
-            //         this.$emit('updateUserList', response.data.all_users);
-            //     });
-            // },
-            
-        },
-        mounted(){
-            // console.log("base");
-            this.getFollowList();
-        },
-        })
-      var base_app = new Vue({
-        el: "#base-app",
-        data: {
-        }
-      })
-  </script>
 </body>
 </html>
