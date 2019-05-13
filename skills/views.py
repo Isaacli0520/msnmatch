@@ -84,7 +84,7 @@ def get_users_by_sim(request):
 
 
 def similarity_between(u1, u2):
-	u1_length = sum([scaler(len(v)) for k,v in u1.items()])
+	u1_length = sum([scaler(len(v), len(u2[k])) for k,v in u1.items() if k in u2])
 	u1_vec = []
 	u2_vec = []
 	sims = []
@@ -98,12 +98,12 @@ def similarity_between(u1, u2):
 			# print("u1",u1_vec,"u2",u2_vec)
 			sims.append(1 - distance.cosine(u1_vec[-1], u2_vec[-1]))
 			# print("similarity:",sims[-1])
-			sims_weight.append(sims[-1]*scaler(len(u1[sk_type]))/u1_length)
+			sims_weight.append(sims[-1]*scaler(len(u1[sk_type]),len(u2[sk_type]))/u1_length)
 	return sum(sims_weight)
 	
 
-def scaler(x):
-	return (x+1)**(2/3.0)-(x+1)**(-1/8.0)
+def scaler(x, y):
+	return ((2*x*y)/((x+y))+1.0)**(2/3.0)-((2*x*y)/((x+y))+1.0)**(-1/8.0)
 
 def get_skills_of_users(queryset):
 	all_user_skills = {}

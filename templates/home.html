@@ -87,7 +87,10 @@
                     <h1 class="main-title">MSN Mentor-Mentee Match</h1>
                 </div>
                 <div class="tag mb-3" style="width:100%;">
-                    <search-tag-comp v-bind:request_user="request_user" @update-user-list="update_user_list"></search-tag-comp>
+                    <search-tag-comp 
+                    v-bind:checkbox_on="checkbox_on"
+                    v-bind:request_user="request_user" 
+                    @update-user-list="update_user_list"></search-tag-comp>
                 </div>
             </div>
             <div class="user-list-div">
@@ -147,7 +150,7 @@
 
     <script>
         Vue.component('user-list-comp', {
-            props:["all_users","request_user","following"],
+            props:["all_users","request_user","following",],
             template: `
             <div>
                 <div class="card-columns" id="users_container">
@@ -157,9 +160,8 @@
                                 <progressive-img v-if="user.picture" 
                                     :src="user.picture" 
                                     :placeholder="user.avatar"
-                                    :blur="30"
+                                    :blur="10"
                                     />
-                                <img v-else src="" class="card-img-top" alt="None">
                             </div>
                             <div class="card-body">
                                 <div class="title d-flex w-100 justify-content-between">
@@ -334,7 +336,7 @@
             })
 
         Vue.component('search-tag-comp', {
-            props:['request_user'],
+            props:['request_user','checkbox_on'],
             template: `
             <div>
                 <div class="search-tags mb-3">
@@ -351,7 +353,7 @@
                         </div>
                         <input @keydown="onKeydown" v-model="searchquery" autocomplete="off" id="myInput" type="text" name="class" placeholder=" &quot;Basketball&quot;, &quot;major:Econ&quot;, &quot;birth:2001&quot; " class=" search-input" aria-label="Search">
                     </div>
-                    <div class="d-flex checkbox-div">
+                    <div v-if="checkbox_on" class="d-flex checkbox-div">
                         <div class="custom-control custom-checkbox checkboxx">
                             <input type="checkbox" class="custom-control-input" id="mentor" value="role:Mentor" v-model="tags">
                             <label class="custom-control-label role-label" for="mentor">Mentor</label>
@@ -797,6 +799,7 @@
             data: {
                 all_users:[],
                 following:[],
+                checkbox_on: 0,
                 request_user:{
                     "username":"{{request.user.username}}",
                     "pk":"{{request.user.pk}}",
@@ -822,6 +825,7 @@
                 axios.get('/skills/ajax/get_all_users/',{params: {}}).then(response => {
                     // console.log(response.data.all_users);
                     this.all_users = response.data.all_users;
+                    this.checkbox_on = 1
                 });
 
                 axios.get('/skills/ajax/get_follow_list/',{params: {}}).then(response => {
