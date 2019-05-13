@@ -15,6 +15,8 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from friendship.models import Friend, FriendshipRequest
 from taggit.managers import TaggableManager
 from PIL import ImageFilter
+from friendship.models import Follow
+from django.contrib import admin
 
 YEAR_CHOICES = (
 			('1st year', '1st year'),
@@ -129,9 +131,11 @@ class MatchRequest(models.Model):
 	reason = models.TextField(max_length = 300, blank=True)
 
 def get_name(self):
-    return self.first_name + " " + self.last_name
+	return self.first_name + " " + self.last_name
 
 User.add_to_class("__str__", get_name)
+
+
 
 class Profile(models.Model):
 	user = models.OneToOneField(User, on_delete=models.CASCADE)

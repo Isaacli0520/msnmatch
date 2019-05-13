@@ -368,10 +368,17 @@ def user_retrieve(tags, all_users):
 				sim_firstname=TrigramSimilarity('first_name', field_query),
 				sim_lastname=TrigramSimilarity('last_name', field_query)).filter(Q(sim_firstname__gt=.3) | Q(sim_lastname__gt=.3) )
 			list_of_field_tags += ["sim_firstname", "sim_lastname"]
-		elif field_tag == "gender":
+		elif field_tag in ["gender","sex"]:
 			field_queryset = field_queryset.annotate(
 				sim_sex=TrigramSimilarity('profile__sex', field_query),).filter(Q(sim_sex__gt=.8))
 			list_of_field_tags += ["sim_sex"]
+		elif field_tag in ["birth date", "birth_date", "birthdate","birth","date"]:
+			pk_birth_date_queryset = {fq.pk:str(fq.profile.birth_date) for fq in field_queryset if fq.profile.birth_date}
+			if len(pk_birth_date_queryset) > 0:
+				all_pks = process.extractBests(field_query, pk_birth_date_queryset,scorer=fuzz.partial_ratio, score_cutoff=80)
+				print("all_pks:", all_pks)
+				all_pks = [item[2] for item in all_pks]
+				field_queryset = User.objects.filter(pk__in=all_pks)
 		elif field_tag == "major":
 			field_queryset = field_queryset.annotate(
 				sim_mj1=TrigramSimilarity('profile__major', field_query),

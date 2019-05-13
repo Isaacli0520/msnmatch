@@ -25,7 +25,7 @@
     <br />
     <div class="col-12 mb-5" style = "width:100%; margin: 0 auto;">
         <div class="container mt-5 mb-4 text-center">
-            <h1 class="display-4" style="font-family: Palatino, URW Palladio L, serif;">Add Your Interests</h1>
+            <h1 class="display-4 skill-main-title" >Add Your Interests</h1>
             <h6 class="text-muted">Search for existing tags or Add your own tags</h6>
         </div>
     </div>
@@ -158,7 +158,7 @@
         template: `
         <div>
             <div v-for="(skills_of_type, skills_type_name) in all_skills">
-                <h4>\{\{skill_type_names[skills_type_name]\}\}</h4>
+                <h4 class="skill-type-text">\{\{skill_type_names[skills_type_name]\}\}</h4>
                 <div class="skill-tags">
                     <span v-for="skill in skills_of_type"
                         class="skill-tag"

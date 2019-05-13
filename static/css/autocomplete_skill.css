@@ -4,6 +4,16 @@
     display: inline-block;
   }
 
+  .skill-type-text{
+    color: #000000;
+    font-family: Palatino, URW Palladio L, serif;
+  }
+
+  .skill-main-title{
+    color:#000000; 
+    font-family: Palatino, URW Palladio L, serif;
+  }
+
   .search-form {
     position: relative;
     /* top: 50%;
@@ -85,7 +95,8 @@
   }
 
   .skill-tag:hover{
-    opacity: 0.57;
+    /* opacity: 0.7; */
+    color:#000000;
   }
   
   .skill-user-tags{
