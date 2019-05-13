@@ -11,9 +11,14 @@ from io import BytesIO
 import os, sys
 import uuid
 from django.core.files.uploadedfile import InMemoryUploadedFile
+from friendship.models import Follow
 
 class SkillRelationInline(admin.TabularInline):
     model = Skill.skill_users.through
+
+class FollowRelationInline(admin.TabularInline):
+    model = Follow
+    fk_name = 'follower'
 
 class ProfileInline(admin.StackedInline):
     model = Profile
@@ -75,7 +80,7 @@ def export_users(modeladmin, request, queryset):
 export_users.short_description = 'Export to csv'
 
 class CustomUserAdmin(UserAdmin):
-    inlines = (ProfileInline, SkillRelationInline)
+    inlines = (ProfileInline, SkillRelationInline, FollowRelationInline)
     list_display = ('username','get_sex', 'email', 'first_name', 'last_name', 'is_staff', 'get_location', 'get_role','get_year','get_birth_date','get_major')
     list_filter = ('is_staff', 'profile__sex','profile__role','profile__year')
     list_select_related = ('profile', )

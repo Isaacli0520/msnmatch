@@ -128,6 +128,11 @@ class MatchRequest(models.Model):
 	title = models.CharField(max_length=50, default="Match Request")
 	reason = models.TextField(max_length = 300, blank=True)
 
+def get_name(self):
+    return self.first_name + " " + self.last_name
+
+User.add_to_class("__str__", get_name)
+
 class Profile(models.Model):
 	user = models.OneToOneField(User, on_delete=models.CASCADE)
 	sex = models.CharField(max_length=20, choices = SEX_CHOICES, blank=True)
