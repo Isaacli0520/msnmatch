@@ -375,7 +375,7 @@ def user_retrieve(tags, all_users):
 		elif field_tag in ["birth date", "birth_date", "birthdate","birth","date"]:
 			pk_birth_date_queryset = {fq.pk:str(fq.profile.birth_date) for fq in field_queryset if fq.profile.birth_date}
 			if len(pk_birth_date_queryset) > 0:
-				all_pks = process.extractBests(field_query, pk_birth_date_queryset,scorer=fuzz.partial_ratio, score_cutoff=80)
+				all_pks = process.extractBests(field_query, pk_birth_date_queryset,scorer=fuzz.partial_ratio, score_cutoff=80, limit=None)
 				print("all_pks:", all_pks)
 				all_pks = [item[2] for item in all_pks]
 				field_queryset = User.objects.filter(pk__in=all_pks)
