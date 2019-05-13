@@ -33,7 +33,7 @@
     <div id="wrap">
         <main>
         <div class="main" id = "home-page-app">
-            <div class="col-12 mb-3" style = "width:100%; margin: 0 auto;" id="header-wrapper">
+            <div class="col-12 mb-5" style = "width:100%; margin: 0 auto;" id="header-wrapper">
                 <div id="navigation">
                         <nav class="navbar navbar-expand-md navbar-light font-weight-light" >
                             <a class="navbar-brand" href="{{ home }}" style="padding:0px 0px 3px 0px; font-size: 20px;">
@@ -84,13 +84,16 @@
                         </nav>
                 </div>
                 <div class="container mt-5 mb-1 text-center">
-                    <h1 class="main-title">MSN Match</h1>
+                    <h1 class="main-title">MSN Mentor-Mentee Match</h1>
                 </div>
                 <div class="tag mb-3" style="width:100%;">
                     <search-tag-comp v-bind:request_user="request_user" @update-user-list="update_user_list"></search-tag-comp>
                 </div>
             </div>
             <div class="user-list-div">
+                <div style="margin: 0px 0px 35px 0px;">
+                    <h3 class="line-break"><span>Hoo's My Match</span></h3>
+                </div>
                 <div class="col-xs-12 col-sm-12 col-md-10 col-lg-10 col-xs-offset-0 col-sm-offset-0 mb-5" style="width:100%; margin: 0 auto;">
                     <user-list-comp 
                         v-bind:all_users="all_users"
@@ -360,7 +363,7 @@
                     </div>
                 </div>
                 <div class="all-buttons">
-                        <button @click="getUsersBySim" class="btn btn-show-me">Click Me</button>
+                        <button @click="getUsersBySim" class="btn btn-show-me">Best Match</button>
                         <button v-if="request_user.role == '' " @click="openModal('Mentor')" class="btn btn-show-me">Be A Mentor</button>
                         <button v-if="request_user.role == '' " @click="openModal('Mentee')" class="btn btn-show-me">Be A Mentee</button>
                 </div>
