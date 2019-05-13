@@ -85,7 +85,7 @@ section .section-title {
     text-transform: uppercase;
 }
 #footer {
-    background: #0f9273 !important;
+    background: rgba(255, 112, 136, 0.747) !important;
     position: relative;
     /* margin-top: -180px;
     height: 180px; */
