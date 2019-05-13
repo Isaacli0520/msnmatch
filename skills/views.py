@@ -231,6 +231,12 @@ def get_user_json_sim(request,all_users):
 			picture_url = user.profile.picture.url
 		else:
 			picture_url = settings.STATIC_URL + "css/images/brand.jpg"
+
+		if user.profile.avatar:
+			avatar_url = user.profile.avatar.url
+		else:
+			avatar_url = settings.STATIC_URL + "css/images/brand_blur.jpg"
+
 		if user.profile.video:
 			video_url = user.profile.video.url
 		else:
@@ -255,8 +261,8 @@ def get_user_json_sim(request,all_users):
 			"minor":user.profile.minor,
 			"score":score,
 			"wechat":user.profile.wechat,
-			"role":user.profile.role,
 			"follow": Follow.objects.filter(follower=request.user, followee=user).exists(),
+			"avatar":avatar_url
 		}
 		all_users_list.append(new_user)
 	return JsonResponse({
@@ -281,6 +287,12 @@ def get_user_json(request, all_users):
 			picture_url = user.profile.picture.url
 		else:
 			picture_url = settings.STATIC_URL + "css/images/brand.jpg"
+
+		if user.profile.avatar:
+			avatar_url = user.profile.avatar.url
+		else:
+			avatar_url = settings.STATIC_URL + "css/images/brand_blur.jpg"
+
 		if user.profile.video:
 			video_url = user.profile.video.url
 		else:
@@ -304,8 +316,8 @@ def get_user_json(request, all_users):
 			"major_two":user.profile.major_two,
 			"minor":user.profile.minor,
 			"wechat":user.profile.wechat,
-			"role":user.profile.role,
 			"follow": Follow.objects.filter(follower=request.user, followee=user).exists(),
+			"avatar":avatar_url,
 		}
 		all_users_list.append(new_user)
 	return JsonResponse({

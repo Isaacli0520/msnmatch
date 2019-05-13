@@ -14,6 +14,7 @@ from django.utils import timezone
 from django.core.validators import MaxValueValidator, MinValueValidator
 from friendship.models import Friend, FriendshipRequest
 from taggit.managers import TaggableManager
+from PIL import ImageFilter
 
 YEAR_CHOICES = (
 			('1st year', '1st year'),
@@ -150,8 +151,9 @@ class Profile(models.Model):
 			this = Profile.objects.get(pk=self.pk)
 			if self.picture and this.picture != self.picture:
 				# this.picture.delete(save=False)
-				self.picture = self.compressImage(self.picture, False, 0, 0, 70)
-				self.avatar = self.compressImage(self.picture, True, 100, 100, 99)
+				tmp_picture = self.picture
+				self.picture = self.compressImage(tmp_picture, False, 0, 0, 70)
+				self.avatar = self.compressImage_new(tmp_picture, True, 60)
 			if self.video and this.video != self.video:
 				# this.video.delete(save=False)
 				self.video.name = str(uuid.uuid4())
@@ -164,6 +166,20 @@ class Profile(models.Model):
 		outputIoStream = BytesIO()
 		if resize_bool:
 			imageTemporary = imageTemporary.resize((w,h))
+		print("debug picture format:",imageTemporary.format)
+		if imageTemporary.format == "PNG":
+			imageTemporary = imageTemporary.convert("RGB")
+		imageTemporary.save(outputIoStream , format='JPEG', quality=quality)
+		outputIoStream.seek(0)
+		uploadedImage = InMemoryUploadedFile(outputIoStream,'ImageField', "%s.jpg" % str(uuid.uuid4()), 'image/jpeg', sys.getsizeof(outputIoStream), None)
+		return uploadedImage
+
+	def compressImage_new(self,uploadedImage, resize_bool, quality):
+		imageTemporary = Image.open(uploadedImage)
+		outputIoStream = BytesIO()
+		if resize_bool:
+			imageTemporary = imageTemporary.resize((int(imageTemporary.size[0]/10), int(imageTemporary.size[1]/10)), Image.LANCZOS)
+		imageTemporary = imageTemporary.filter(ImageFilter.GaussianBlur(radius=10))
 		print("debug picture format:",imageTemporary.format)
 		if imageTemporary.format == "PNG":
 			imageTemporary = imageTemporary.convert("RGB")
