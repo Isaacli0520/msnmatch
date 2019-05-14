@@ -48,7 +48,7 @@ def add_del_skill(request):
 		else:
 			origin_exist = True
 	else:
-		skill = Skill.objects.get(skill_name = request.GET.get("skill_name"))
+		skill = Skill.objects.filter(skill_name = request.GET.get("skill_name")).first()
 		origin_exist = SkillRelation.objects.filter(user=user, skill=skill).exists()
 		if SkillRelation.objects.filter(user=user, skill=skill).exists() and add_del == "del":
 			SkillRelation.objects.get(user=user,skill=skill).delete()
@@ -90,21 +90,28 @@ def get_users_by_sim(request):
 
 
 def similarity_between(u1, u2):
-	tot_scale_length = sum([scaler(len(v)) for k,v in u1.items() if k in u2])
+	# tot_scale_length = sum([scaler(len(v)) for k,v in u1.items() if k in u2])
+	tot_scale_length = sum([scaler(len(v)) for k,v in u1.items()])
 	u1_length = sum([len(v) for k,v in u1.items()])
 	u2_length = sum([len(v) for k,v in u2.items()])
 	u1_vec = []
 	u2_vec = []
 	sims = []
 	sims_weight = []
+	# print("another one")
 	for sk_type, skills in u1.items():
 		if sk_type in u2:
 			tmp_skill_ls = list(set(u1[sk_type]+u2[sk_type]))
 			u1_vec.append([int(sk in u1[sk_type]) for sk in tmp_skill_ls])
 			u2_vec.append([int(sk in u2[sk_type]) for sk in tmp_skill_ls])
 			sims.append(1 - distance.cosine(u1_vec[-1], u2_vec[-1]))
-			tmp_cos_scaler = 1 - arith_mean((abs((len(u1[sk_type])/u1_length)-(len(u2[sk_type])/u2_length))),abs(len(u1[sk_type]) - len(u2[sk_type]))/len(tmp_skill_ls) )
+			tmp_cos_scaler = 1 - arith_mean((abs((len(u1[sk_type])/u1_length)-(len(u2[sk_type])/u2_length))),abs(len(u1[sk_type]) - len(u2[sk_type]))/len(tmp_skill_ls))
+			# print("u1 vec", u1_vec, "u2_vec", u2_vec )
+			# print("sims", sims[-1])
+			# print("tmp_cos_scaler", tmp_cos_scaler)
 			sims_weight.append(sims[-1]*tmp_cos_scaler*scaler(len(u1[sk_type]))/tot_scale_length)
+			# print("tot scaler", scaler(len(u1[sk_type]))/tot_scale_length)
+			# print("sims_weight",sims_weight[-1])
 	return sum(sims_weight)
 	
 def scaler(x):
@@ -369,6 +376,20 @@ def skill_search_result(request):
 def sort_by(list_of_fields):
 	return tuple(list_of_fields)
 
+def field_fuzzy_search(field_queryset, field_query, attr, profile_bool = False, score_cutoff = 80, limit=None):
+	if profile_bool:
+		pk_queryset = {fq.pk:str(getattr(fq.profile, attr)) for fq in field_queryset if hasattr(fq.profile, attr)}
+	else:
+		pk_queryset = {fq.pk:str(getattr(fq, attr)) for fq in field_queryset if hasattr(fq, attr)}
+	print(pk_queryset)
+	if len(pk_queryset) > 0:
+		all_pks = process.extractBests(field_query, pk_queryset,scorer=fuzz.partial_ratio, score_cutoff=score_cutoff, limit=limit)
+		all_pks = [item[2] for item in all_pks]
+		field_queryset = User.objects.filter(pk__in=all_pks)
+	else:
+		field_queryset = None
+	return field_queryset
+
 def user_retrieve(tags, all_users):
 	tmp_queryset = []
 	field_queryset = all_users
@@ -378,21 +399,20 @@ def user_retrieve(tags, all_users):
 	list_of_field_tags = []
 	for field_tag, field_query in field_tags:
 		if field_tag == "name":
-			field_queryset = field_queryset.annotate(
-				sim_firstname=TrigramSimilarity('first_name', field_query),
-				sim_lastname=TrigramSimilarity('last_name', field_query)).filter(Q(sim_firstname__gt=.3) | Q(sim_lastname__gt=.3) )
-			list_of_field_tags += ["sim_firstname", "sim_lastname"]
+			name_users_set = set([user.pk for user in field_fuzzy_search(field_queryset, field_query, "first_name")] + [user.pk for user in field_fuzzy_search(field_queryset, field_query, "last_name")])
+			field_queryset = User.objects.filter(pk__in=name_users_set)
+		elif field_tag in ["first", "first_name", "first name"]:
+			field_queryset = field_fuzzy_search(field_queryset, field_query, "first_name")
+		elif field_tag in ["last", "last_name", "last name"]:
+			field_queryset = field_fuzzy_search(field_queryset, field_query, "last_name")
 		elif field_tag in ["gender","sex"]:
 			field_queryset = field_queryset.annotate(
 				sim_sex=TrigramSimilarity('profile__sex', field_query),).filter(Q(sim_sex__gt=.8))
 			list_of_field_tags += ["sim_sex"]
 		elif field_tag in ["birth date", "birth_date", "birthdate","birth","date"]:
-			pk_birth_date_queryset = {fq.pk:str(fq.profile.birth_date) for fq in field_queryset if fq.profile.birth_date}
-			if len(pk_birth_date_queryset) > 0:
-				all_pks = process.extractBests(field_query, pk_birth_date_queryset,scorer=fuzz.partial_ratio, score_cutoff=80, limit=None)
-				print("all_pks:", all_pks)
-				all_pks = [item[2] for item in all_pks]
-				field_queryset = User.objects.filter(pk__in=all_pks)
+			field_queryset = field_fuzzy_search(field_queryset, field_query, "birth_date", profile_bool=True)
+		elif field_tag in ["loc", "location"]:
+			field_queryset = field_fuzzy_search(field_queryset, field_query, "location", profile_bool=True)
 		elif field_tag == "major":
 			field_queryset = field_queryset.annotate(
 				sim_mj1=TrigramSimilarity('profile__major', field_query),

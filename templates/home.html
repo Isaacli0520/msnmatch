@@ -179,6 +179,7 @@
                                 </div>
                                 <div class="user-id-tags">
                                     <span v-if="user.role" class="user-id-tag" :class="user.role">\{\{ user.role \}\}</span>
+                                    <span v-if="user.video.length" class="user-id-tag user-id-tag-video">Video</span>
                                     <span v-if="user.follow" class="user-id-tag fav-user">Like</span>
                                 </div>
                                 <small v-if="user.score && user.score > 0" class="score-text">Similarity: \{\{ user.score \}\}%</small>
