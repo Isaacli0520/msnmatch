@@ -103,7 +103,7 @@ def similarity_between(u1, u2):
 			u1_vec.append([int(sk in u1[sk_type]) for sk in tmp_skill_ls])
 			u2_vec.append([int(sk in u2[sk_type]) for sk in tmp_skill_ls])
 			sims.append(1 - distance.cosine(u1_vec[-1], u2_vec[-1]))
-			tmp_cos_scaler = 1 - harmonic_mean((abs((len(u1[sk_type])/u1_length)-(len(u2[sk_type])/u2_length))),abs(len(u1[sk_type]) - len(u2[sk_type]))/len(tmp_skill_ls) )
+			tmp_cos_scaler = 1 - geometric_mean((abs((len(u1[sk_type])/u1_length)-(len(u2[sk_type])/u2_length))),abs(len(u1[sk_type]) - len(u2[sk_type]))/len(tmp_skill_ls) )
 			sims_weight.append(sims[-1]*tmp_cos_scaler*scaler(len(u1[sk_type]))/tot_scale_length)
 	return sum(sims_weight)
 	
@@ -112,6 +112,9 @@ def scaler(x):
 
 def harmonic_mean(x,y):
 	return 2.0/(1/x+1/y)
+
+def geometric_mean(x,y):
+	return (1.0*x*y)**(1/2)
 
 def get_skills_of_users(queryset):
 	all_user_skills = {}
