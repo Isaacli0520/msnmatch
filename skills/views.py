@@ -29,7 +29,10 @@ DEBUGGG = False
 
 @login_required
 def skill_rank(request):
-	all_skills = Skill.objects.all().annotate(num_users=Count('skill_users')).order_by('-num_users')[:15]
+	if Skill.objects.count() >= 50:
+		all_skills = Skill.objects.all().annotate(num_users=Count('skill_users')).order_by('-num_users')[:50]
+	else:
+		all_skills = Skill.objects.all().annotate(num_users=Count('skill_users')).order_by('-num_users')
 	return render(request, 'skill_rank.html',{
 		"all_skills":all_skills,
 		})
