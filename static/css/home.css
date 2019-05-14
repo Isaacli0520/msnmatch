@@ -57,6 +57,7 @@ body{
   /* background-color: transparent; */
 }
 
+
 .line-break {
   width: 80%; 
   text-align: center; 
@@ -148,6 +149,17 @@ body{
 
 .field-title{
   font-weight: 670;
+  width:30%;
+}
+
+.table-user-information{
+  table-layout: fixed;
+  
+}
+
+td{
+  word-wrap:break-word;
+  white-space: pre-line;
 }
 
 .search-tags{
@@ -240,6 +252,11 @@ body{
 .user-id-tag-video{
   color:#ffffff;
   background: #de21f0;
+}
+
+.user-id-tag-bio{
+  color:#ffffff;
+  background: #f0d121;
 }
 
 .role-label{
