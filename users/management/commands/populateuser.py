@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from string import ascii_lowercase
 from random import shuffle, random, randint
 from courses.models import Relation, Course
-from users.models import MAJOR_CHOICES, YEAR_CHOICES
+from users.models import MAJOR_CHOICES, YEAR_CHOICES, ROLE_CHOICES
 
 class Command(BaseCommand):
 	def handle(self, *args, **kwargs):
@@ -15,9 +15,12 @@ class Command(BaseCommand):
 		# for l in ascii_lowercase:
 		# 	tmp_user = User.objects.create_user(username=l,first_name=l, last_name='test',
 		# 						 email=l+'@virginia.edu')
-		for i in range(26):
+		for i in range(130):
 			tmp_user = User.objects.create_user(username=str(i) ,first_name=i, last_name='test',
 								 email=str(i)+'@virginia.edu')
+			tmp_role = randint(0,1)
+			tmp_user.profile.role = ROLE_CHOICES[tmp_role][0]
+			tmp_user.save()
 		# 	tmp_year = randint(1,3)
 		# 	tmp_user.profile.year = YEAR_CHOICES[tmp_year][0]
 		# 	tmp_user.save()

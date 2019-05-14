@@ -22,6 +22,7 @@ import numpy as np
 from scipy.spatial import distance
 from fuzzywuzzy import fuzz, process
 from msnmatch import settings
+import time
 
 MAXIMUM_COURSES = 12
 DEBUGGG = False
@@ -235,6 +236,7 @@ def get_all_users(request):
 	# all_users = User.objects.all().exclude(pk=request.user.pk)
 	all_users_list = sorted(User.objects.all().exclude(username="admin"), key=lambda x: random.random())
 	# all_users = User.objects.all().exclude(username="admin")
+	
 	return get_user_json(request,all_users_list)
 
 def get_user_json_sim(request,all_users):
@@ -295,7 +297,7 @@ def get_user_json_sim(request,all_users):
 
 def get_user_json(request, all_users):
 	all_users_list = []
-
+	start_time = time.time()
 	for user in all_users:
 		skill_set = {}
 		for skill in user.skill_set.all():
@@ -344,6 +346,7 @@ def get_user_json(request, all_users):
 			"avatar":avatar_url,
 		}
 		all_users_list.append(new_user)
+	print("--- %s seconds ---" % (time.time() - start_time))
 	return JsonResponse({
 		"all_users":all_users_list,
 	})
