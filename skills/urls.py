@@ -4,6 +4,7 @@ from django.contrib.auth import logout, login
 
 urlpatterns = [
   path('search/', views.skill_search, name='skill_search'),
+  path('rank/', views.skill_rank, name='skill_rank'),
   path('<skill_pk>/', views.skill, name='skill'),
   path('ajax/result/', views.skill_search_result, name="skill_search_result"),
   path('ajax/add_del_skill/', views.add_del_skill, name="add_del_skill"),

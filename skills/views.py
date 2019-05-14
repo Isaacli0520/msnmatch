@@ -8,7 +8,7 @@ from django.contrib.auth.models import User
 from users.models import Profile
 from .models import Skill, SkillRelation
 from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector, TrigramSimilarity
-from django.db.models import Q, F
+from django.db.models import Q, F, Count
 from django.db.models.functions import Lower, Substr, Length
 from django.http import JsonResponse
 from django.core import serializers
@@ -25,6 +25,14 @@ from msnmatch import settings
 
 MAXIMUM_COURSES = 12
 DEBUGGG = False
+
+
+@login_required
+def skill_rank(request):
+	all_skills = Skill.objects.all().annotate(num_users=Count('skill_users')).order_by('-num_users')[:15]
+	return render(request, 'skill_rank.html',{
+		"all_skills":all_skills,
+		})
 
 
 def add_del_skill(request):
@@ -58,10 +66,8 @@ def add_del_skill(request):
 
 @login_required
 def skill(request, skill_pk):
-	user = User.objects.get(username = request.user.username)
 	tmp_skill = Skill.objects.get(pk = skill_pk)
 	return render(request, 'skill.html', {
-		"user":user,
 		"tmp_skill":tmp_skill,
 		"users_with_skill":tmp_skill.skill_users.all(),
 		})
@@ -84,7 +90,7 @@ def get_users_by_sim(request):
 
 
 def similarity_between(u1, u2):
-	tot_length = sum([scaler(len(v)) for k,v in u1.items() if k in u2])
+	tot_scale_length = sum([scaler(len(v)) for k,v in u1.items() if k in u2])
 	u1_length = sum([len(v) for k,v in u1.items()])
 	u2_length = sum([len(v) for k,v in u2.items()])
 	u1_vec = []
@@ -94,18 +100,18 @@ def similarity_between(u1, u2):
 	for sk_type, skills in u1.items():
 		if sk_type in u2:
 			tmp_skill_ls = list(set(u1[sk_type]+u2[sk_type]))
-			# print("skill ls",[Skill.objects.get(pk=tmp_pk).skill_name for tmp_pk in tmp_skill_ls])
 			u1_vec.append([int(sk in u1[sk_type]) for sk in tmp_skill_ls])
 			u2_vec.append([int(sk in u2[sk_type]) for sk in tmp_skill_ls])
-			# print("u1",u1_vec,"u2",u2_vec)
 			sims.append(1 - distance.cosine(u1_vec[-1], u2_vec[-1]))
-			# print("similarity:",sims[-1])
-			sims_weight.append(sims[-1]*(1-abs((len(u1[sk_type])/u1_length)-(len(u2[sk_type])/u2_length)))*scaler(len(u1[sk_type]))/tot_length)
+			tmp_cos_scaler = 1 - harmonic_mean((abs((len(u1[sk_type])/u1_length)-(len(u2[sk_type])/u2_length))),abs(len(u1[sk_type]) - len(u2[sk_type]))/len(tmp_skill_ls) )
+			sims_weight.append(sims[-1]*tmp_cos_scaler*scaler(len(u1[sk_type]))/tot_scale_length)
 	return sum(sims_weight)
 	
-
 def scaler(x):
 	return (x+1)**(2/3.0)-(x+1)**(-1/8.0)
+
+def harmonic_mean(x,y):
+	return 2.0/(1/x+1/y)
 
 def get_skills_of_users(queryset):
 	all_user_skills = {}

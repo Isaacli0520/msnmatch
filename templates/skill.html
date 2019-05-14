@@ -2,34 +2,36 @@
 {% extends 'base.html' %}
 {% load bootstrap4 %}
 {% bootstrap_css %}
+{% load static %}
 
-{% block title %}{{tmp_skill.skill_name}}{% endblock %}
+{% block title %}{{ tmp_skill.skill_name }}{% endblock %}
 
-
+{% block css %}
+    <link href="{% static 'css/skill.css' %}" rel="stylesheet">
+{% endblock %}
 
 {% block content %}
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js"></script>
-<div class="container">
-	<div class="card mt-3 mb-3 col-xs-12 col-sm-12 col-md-10 col-lg-8 col-xs-offset-0 col-sm-offset-0" style="width:100%; margin: 0 auto; padding:0px 0px 10px 0px;">
-	<div class="card-header" style="display:inline-block;overflow: auto;white-space: nowrap;margin:0px auto;width:100%;">
-		<h2 id="skill_name" class="" style="float: left;">{{tmp_skill.skill_name}}</h2>
-		<button class="btn-danger btn" type="button" onClick="javascript:history.go(-1);" style="float:right; padding:7px 10px 7px 10px;"><i class="fas fa-arrow-left"></i></button>
-	</div>
-        <div class="card-body">
-            {% for person in users_with_skill %}
-            <a href="{% url 'profile' person.username %}" class="list-group-item list-group-item-action">
-                <div class="d-flex w-100 justify-content-between">
-                    <h5 class="mb-1 font-weight-bold">{{ person.first_name }} {{ person.last_name }}</h5>
-                    <small>{{ person.profile.year }}</small>
-                </div>
-                {% if person.profile.major %}
-                    <p class="mb-1">Major: {{ person.profile.major }}</p>
-                {% endif %}
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js"></script>
+<div class="mt-3 mb-3 col-xs-12 col-sm-12 col-md-10 col-lg-8 col-xs-offset-0 col-sm-offset-0 container" style="width:100%; margin: 0 auto;">
+    <div class="big-title text-center mt-3 mb-3">
+        <span>{{ tmp_skill.skill_name }}</span>
+    </div>
+	<div class="all-users">
+        {% for user in users_with_skill %}
+        <div class="user-div">
+            <a href="{% url 'profile' user.username %}" class="user-main">
+                <span class="font-weight-bold">{{ user.first_name }} {{ user.last_name }}</span>
             </a>
-            {% endfor %}
+            {% if user.profile.role %}
+                <span class="user-role {{user.profile.role}}">{{ user.profile.role }}</span> 
+            {% endif %}
+            {% if user.profile.year %}
+                <span class="user-year">{{ user.profile.year }}</span>
+            {% endif %}
         </div>
+        {% endfor %}
+    </div>
+    <button class="btn-danger btn back-btn" type="button" onClick="javascript:history.go(-1);"><i class="fas fa-arrow-left"></i></button>
 </div>
-
-
-
 {% endblock %}
