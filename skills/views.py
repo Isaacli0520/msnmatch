@@ -85,8 +85,8 @@ def get_users_by_sim(request):
 
 def similarity_between(u1, u2):
 	tot_length = sum([scaler(len(v), len(u2[k])) for k,v in u1.items() if k in u2])
-	u1_length = sum([len(v) for k,v in u1.items() if k in u2])
-	u2_length = sum([len(u2[k]) for k,v in u1.items() if k in u2])
+	u1_length = sum([len(v) for k,v in u1.items()])
+	u2_length = sum([len(v) for k,v in u2.items()])
 	u1_vec = []
 	u2_vec = []
 	sims = []
