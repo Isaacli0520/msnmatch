@@ -14,7 +14,6 @@ channels_redis
 django-model-utils
 dj-database-url
 psycopg2-binary
-django-taggit
 pandas
 fuzzywuzzy
 python-Levenshtein
