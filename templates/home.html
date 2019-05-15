@@ -34,18 +34,20 @@
     <div id="wrap">
         <main>
         <div class="main" id = "home-page-app">
-            <div class="col-12 mb-5" style = "width:100%; margin: 0 auto;" id="header-wrapper">
+            <div class="col-12" style = "width:100%; margin: 0 auto;" id="header-wrapper">
                 <div id="navigation">
-                        <nav class="navbar navbar-expand-md navbar-light font-weight-light" >
+                        <nav class="navbar navbar-expand-md navbar-msn" >
                             <a class="navbar-brand" href="{{ home }}" style="padding:0px 0px 3px 0px; font-size: 20px;">
                                 <img src="{% static 'css/images/brand.png' %}" width="30" height="30" class="d-inline-block align-top" alt="">
-                                Home
                             </a>
                             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".dual-collapse2" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                                <span class="navbar-toggler-icon"></span>
+                                <i class="fas fa-bars"></i>
                             </button>
-                            <div class="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2" id="navbarSupportedContent">
-                                <ul class="topBotomBordersOut navbar-nav mr-autox">
+                            <div class="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2 " id="navbar-left-div">
+                                <ul class="topBotomBordersOut navbar-nav mr-auto">
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="{{ home }}">Home</a>
+                                    </li>
                                     <li class="nav-item {% active request skill_search %}">
                                         <a class="nav-link" href="{{ skill_search }}">Tags</a>
                                     </li>
@@ -67,7 +69,7 @@
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true">
                                     {% if user.is_authenticated %}
-                                        {{request.user.username}}
+                                        <i class="fas fa-user"></i>
                                     {% else%}
                                         Sign In
                                     {% endif %}
@@ -87,7 +89,7 @@
                             </div>
                         </nav>
                 </div>
-                <div class="container mt-5 mb-1 text-center">
+                <div class="container mb-1 text-center">
                     <h1 class="main-title">MSN Mentor-Mentee Match</h1>
                 </div>
                 <div class="tag mb-3" style="width:100%;">
@@ -152,7 +154,7 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/popper.js@1.14.4/dist/umd/popper.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.8.0/js/mdb.min.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/axios@0.18.0/dist/axios.js"></script>
     <script type="text/javascript" charset="UTF-8" src="https://cdn.jsdelivr.net/npm/fuzzball@1.2.2/dist/fuzzball.umd.min.js"></script>
 
@@ -350,11 +352,13 @@
                             $('#userProfileModal').modal('hide');
                             var tmp_fav = {
                                 "pk": user.pk,
-                                "user_url": "/users/"+user.username+"/",
+                                "user_url": user.user_url,
                                 "first_name": user.first_name,
                                 "last_name": user.last_name,
                             }
-                            this.$emit('update-following-list', tmp_fav ,1); 
+                            if(response.data.success == 1){
+                                this.$emit('update-following-list', tmp_fav ,1); 
+                            }
                         });
                     }
                 },
@@ -381,7 +385,7 @@
                         <div class="search-icon">
                             <i class="fas fa-search"></i>
                         </div>
-                        <input @keydown="onKeydown" v-model="searchquery" autocomplete="off" id="myInput" type="text" name="class" placeholder=" &quot;Basketball&quot;, &quot;major:Econ&quot;, &quot;birth:2001&quot; " class=" search-input" aria-label="Search">
+                        <input @keydown="onKeydown" v-model="searchquery" autocomplete="off" id="myInput" type="text" name="class" placeholder=" &quot;Marvel&quot;, &quot;major:Math&quot;, &quot;birth:2000&quot; " class=" search-input" aria-label="Search">
                     </div>
                     <div v-if="checkbox_on" class="d-flex checkbox-div">
                         <div class="custom-control custom-checkbox checkboxx">
@@ -480,20 +484,20 @@
             props:["following",],
             template: `
             <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" @click="" role="button" data-toggle="dropdown" aria-haspopup="true">
-                Favorites
-            </a>
-            <div class="dropdown-menu dropdown-menu-right " @click.stop="" aria-labelledby="navbarDropdown">
-                {% if request.user.is_authenticated %}
-                <span class="dropdown-item" v-if="following.length == 0">No Favorite Users</span>
-                <div class="dropdown-item d-flex w-100 justify-content-between" v-for="following_user in following">
-                    <a :href="following_user.user_url"><span>\{\{ following_user.first_name \}\} \{\{ following_user.last_name \}\}</span></a>
-                    <span style="padding:12px 4px 8px 4px" @click="del_fav(following_user)"><i class="fas fa-trash-alt"></i></span>
+                <a class="nav-link dropdown-toggle" href="#" id="fav-dropdown" @click="" role="button" data-toggle="dropdown" aria-haspopup="true">
+                    <i class="fas fa-heart"></i>
+                </a>
+                <div class="dropdown-menu dropdown-menu-right" @click.stop="" aria-labelledby="navbarDropdown">
+                    {% if request.user.is_authenticated %}
+                    <a class="dropdown-item" v-if="following.length == 0">No Favorites</a>
+                    <div class="dropdown-item d-flex w-100 justify-content-between" v-for="following_user in following">
+                        <a :href="following_user.user_url"><span>\{\{ following_user.first_name \}\} \{\{ following_user.last_name \}\}</span></a>
+                        <span style="padding:12px 4px 8px 4px" @click="del_fav(following_user)"><i class="fas fa-trash-alt"></i></span>
+                    </div>
+                    {% else %}
+                    <a class="dropdown-item" href="{% url 'login' %}">Sign in</a>
+                    {% endif %}
                 </div>
-                {% else %}
-                <a class="dropdown-item" href="{% url 'login' %}">Sign in</a>
-                {% endif %}
-            </div>
             </li>
             `,
             data: function () {
@@ -978,7 +982,10 @@
                                 tmp_all_users = ref.fuzzy_search(tmp_all_users, ['location'], field_query);
                             }
                             else if(["major"].indexOf(field_tag) != -1){
+                                let tmp_cutoff = ref.options.cutoff;
+                                ref.options.cutoff = 40;
                                 tmp_all_users = ref.fuzzy_search(tmp_all_users, ['major', 'major_two', 'minor'], field_query);
+                                ref.options.cutoff = tmp_cutoff;
                             }
                             else if(["year"].indexOf(field_tag) != -1){
                                 tmp_all_users = ref.fuzzy_search(tmp_all_users, ['year'], field_query);

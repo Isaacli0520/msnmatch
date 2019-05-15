@@ -30,24 +30,26 @@
 	</head>
 <body>
   <div id="navigation">
-    <nav class="navbar navbar-expand-md navbar-light font-weight-light" >
-      <a class="navbar-brand" href="{{ home }}" style="padding:0px 0px 3px 0px; font-size: 20px;">
-        <img src="{% static 'css/images/brand.png' %}" width="30" height="30" class="d-inline-block align-top" alt="">
-        Home
-      </a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".dual-collapse2" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2" id="navbarSupportedContent">
-        <ul class="topBotomBordersOut navbar-nav mr-autox">
-          <li class="nav-item {% active request skill_search %}">
-            <a class="nav-link" href="{{ skill_search }}">Tags</a>
-          </li>
-          <li class="nav-item {% active request skill_rank %}">
-            <a class="nav-link" href="{{ skill_rank }}">Trending Tags</a>
-          </li>
-        </ul>
-      </div>
+    <nav class="navbar navbar-expand-md navbar-msn" >
+        <a class="navbar-brand" href="{{ home }}" style="padding:0px 0px 3px 0px; font-size: 20px;">
+            <img src="{% static 'css/images/brand.png' %}" width="30" height="30" class="d-inline-block align-top" alt="">
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".dual-collapse2" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2 " id="navbar-left-div">
+            <ul class="topBotomBordersOut navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ home }}">Home</a>
+                </li>
+                <li class="nav-item {% active request skill_search %}">
+                    <a class="nav-link" href="{{ skill_search }}">Tags</a>
+                </li>
+                <li class="nav-item {% active request skill_rank %}">
+                    <a class="nav-link" href="{{ skill_rank }}">Trending Tags</a>
+                </li>
+            </ul>
+        </div>
 
       <div class="navbar-collapse collapse w-100 order-2 dual-collapse2" id="base-app">
         <ul class="navbar-nav ml-auto">

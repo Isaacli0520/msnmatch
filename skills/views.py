@@ -22,6 +22,7 @@ import numpy as np
 from scipy.spatial import distance
 from fuzzywuzzy import fuzz, process
 from msnmatch import settings
+from django.shortcuts import get_object_or_404
 import time
 
 MAXIMUM_COURSES = 12
@@ -147,10 +148,13 @@ def get_format_skills(queryset):
 
 def add_to_list(request):
 	to_user = User.objects.get(pk=request.GET.get("user_pk"))
-	if not Follow.objects.filter(follower=request.user, followee=to_user).exists():
+	success = 0
+	if not Follow.objects.filter(follower=request.user, followee=to_user).exists() and Follow.objects.filter(follower=request.user).count() < 3:
 		Follow.objects.add_follower(request.user, to_user)
+		success = 1
 
 	return JsonResponse({
+		"success": success,
 	})
 
 def get_follow_list(request):
@@ -171,7 +175,8 @@ def get_follow_list(request):
 	})
 
 def del_fav(request):
-	to_user = User.objects.get(pk = request.GET.get("user_pk"))
+	to_user = get_object_or_404(User, pk=request.GET.get("user_pk"))
+	# to_user = User.objects.get(pk = request.GET.get("user_pk"))
 	# print("from_user", request.user.username, "to_user", to_user.username, Follow.objects.filter(follower=request.user, followee=to_user).exists())
 	# print("before delete", Follow.objects.following(request.user), Follow.objects.all()),
 	if Follow.objects.filter(follower=request.user, followee=to_user).exists():

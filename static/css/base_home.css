@@ -33,7 +33,7 @@
   
 
 /* Top & Bottom Borders Out */
-.topBotomBordersOut a:before, .topBotomBordersOut a:after {
+/* .topBotomBordersOut a:before, .topBotomBordersOut a:after {
     position: absolute;
     left: 0px;
     width: 100%;
@@ -55,7 +55,7 @@
 .topBotomBordersOut a:hover:before, .topBotomBordersOut a:hover:after {
     opacity: 1;
     transform: translateY(0px);
-}
+} */
 
 section {
     padding: 60px 0;
@@ -68,7 +68,7 @@ section .section-title {
     text-transform: uppercase;
 }
 #footer {
-    background: rgba(255, 112, 136, 0.747) !important;
+    background: rgb(0, 200, 250) !important;
     position: relative;
     clear: both;
     bottom: 0;
