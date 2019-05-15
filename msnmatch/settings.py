@@ -30,7 +30,7 @@ DEBUG = False
 
 ALLOWED_HOSTS = []
 
-BUILD_VERSION = "msnmatch-1.0501"
+BUILD_VERSION = "msnmatch-1.0502"
 
 # Application definition
 
