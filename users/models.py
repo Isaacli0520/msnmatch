@@ -13,7 +13,6 @@ from django.core.files.storage import default_storage as storage
 from django.utils import timezone
 from django.core.validators import MaxValueValidator, MinValueValidator
 from friendship.models import Friend, FriendshipRequest
-from taggit.managers import TaggableManager
 from PIL import ImageFilter
 from friendship.models import Follow
 from django.contrib import admin

@@ -379,9 +379,6 @@ def skill_search_result(request):
 		"skill_list":skill_list,
 		})
 
-def sort_by(list_of_fields):
-	return tuple(list_of_fields)
-
 def field_fuzzy_search(field_queryset, field_query, attr, profile_bool = False, score_cutoff = 80, limit=None):
 	if profile_bool:
 		pk_queryset = {fq.pk:str(getattr(fq.profile, attr)) for fq in field_queryset if hasattr(fq.profile, attr)}
