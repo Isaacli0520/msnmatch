@@ -36,6 +36,10 @@
     margin: 5px 9px 0px 0px;
 }
 
+.user-card{
+    margin: 5px 3px 2px 3px;
+}
+
 .user-year{
     font-size: 15px !important;
     float:right;

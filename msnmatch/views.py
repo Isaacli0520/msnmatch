@@ -59,6 +59,7 @@ def get_all_ranked_users(request):
 			"minor":user.profile.minor,
 			"wechat":user.profile.wechat,
 			"follow": [flw.follower.pk for flw in Follow.objects.filter(followee=user)],
+			"followee": [flw.followee.pk for flw in Follow.objects.filter(follower=user)],
 			"avatar":avatar_url,
 		}
 	print("Get all ranked users --- %s seconds ---" % (time.time() - start_time))

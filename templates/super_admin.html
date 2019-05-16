@@ -55,11 +55,21 @@
                         </div>
                         <div class="collapse multi-collapse" :id="user.pk">
                             <div class="card card-body w-100">
+                                <span class="text-center">Followed by</span>
                                 <div class=" card-columns">
                                     <user-rank-comp
                                     v-for="user_flw_pk in user.follow"
                                     v-bind:key="user_flw_pk"
                                     v-bind:tmp_user="all_users[user_flw_pk]"
+                                    ></user-rank-comp>
+                                </div>
+                                <hr>
+                                <span class="text-center">Followed</span>
+                                <div class=" card-columns">
+                                    <user-rank-comp
+                                    v-for="user_flwee_pk in user.followee"
+                                    v-bind:key="user_flwee_pk"
+                                    v-bind:tmp_user="all_users[user_flwee_pk]"
                                     ></user-rank-comp>
                                 </div>
                             </div>
