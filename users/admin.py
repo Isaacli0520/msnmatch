@@ -70,8 +70,8 @@ def export_users(modeladmin, request, queryset):
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="users_list.csv"'
     writer = csv.writer(response)
-    writer.writerow(['username','sex', 'email', 'first_name', 'last_name', 'is_staff', 'location', 'role','year','birth_date','major','skills'])
-    all_users = queryset.values_list('username','profile__sex', 'email', 'first_name', 'last_name', 'is_staff', 'profile__location', 'profile__role','profile__year','profile__birth_date','profile__major')
+    writer.writerow(['username','sex', 'matched', 'email', 'first_name', 'last_name', 'is_staff', 'location', 'role','year','birth_date','major','skills'])
+    all_users = queryset.values_list('username','profile__sex', 'profile__matched', 'email', 'first_name', 'last_name', 'is_staff', 'profile__location', 'profile__role','profile__year','profile__birth_date','profile__major')
     for user in all_users:
         # print(user)
         writer.writerow(list(user) + [" ".join([skr.skill_name for skr in User.objects.get(username=user[0]).skill_set.all()])])
@@ -81,8 +81,8 @@ export_users.short_description = 'Export to csv'
 
 class CustomUserAdmin(UserAdmin):
     inlines = (ProfileInline, SkillRelationInline, FollowRelationInline)
-    list_display = ('username','get_sex', 'email', 'first_name', 'last_name', 'is_staff', 'get_location', 'get_role','get_year','get_birth_date','get_major')
-    list_filter = ('is_staff', 'profile__sex','profile__role','profile__year')
+    list_display = ('username','get_sex', 'email', 'first_name', 'last_name', 'is_staff', 'get_location','get_matched', 'get_role','get_year','get_birth_date','get_major')
+    list_filter = ('is_staff', 'profile__sex','profile__role','profile__year', 'profile__matched')
     list_select_related = ('profile', )
     actions = [change_role_mentor, change_role_mentee, export_users, update_avatar]  # <-- Add the list action function here
 
@@ -109,7 +109,11 @@ class CustomUserAdmin(UserAdmin):
 
     def get_birth_date(self, instance):
         return instance.profile.birth_date
-    get_birth_date.short_description = 'birth_date'
+    get_birth_date.short_description = 'Birth Date'
+
+    def get_matched(self, instance):
+        return instance.profile.matched
+    get_matched.short_description = 'Matched'
 
     def get_major(self, instance):
         return instance.profile.major

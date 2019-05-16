@@ -38,4 +38,7 @@ urlpatterns = [
 	path('courses/', include('courses.urls')),
     path('skills/', include('skills.urls')),
     path('friendship/', include('friendship.urls')),
+	path('superadmin/', views.super_admin, name="super_admin"),
+	path('ajax/get_all_ranked_users/', views.get_all_ranked_users, name="get_all_ranked_users"),
+
 ]

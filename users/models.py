@@ -152,6 +152,7 @@ class Profile(models.Model):
 	video = models.FileField(upload_to="msn/video/", blank=True)
 	role = models.CharField(max_length=255, choices=ROLE_CHOICES, blank=True)
 	wechat = models.CharField(max_length=255, blank=True)
+	matched = models.BooleanField(default=False)
 
 	def save(self, *args, **kwargs):
 		# delete old file when replacing by updating the file

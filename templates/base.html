@@ -56,7 +56,7 @@
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true">
               {% if user.is_authenticated %}
-                {{request.user.username}}
+              <i class="fas fa-user"></i>
               {% else%}
                 Sign In
               {% endif %}

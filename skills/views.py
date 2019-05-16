@@ -293,7 +293,8 @@ def get_user_json_sim(request,all_users):
 			"score":score,
 			"wechat":user.profile.wechat,
 			"follow": Follow.objects.filter(follower=request.user, followee=user).exists(),
-			"avatar":avatar_url
+			"avatar":avatar_url,
+			"matched":user.profile.matched,
 		}
 		all_users_list.append(new_user)
 	return JsonResponse({
@@ -349,6 +350,7 @@ def get_user_json(request, all_users):
 			"wechat":user.profile.wechat,
 			"follow": Follow.objects.filter(follower=request.user, followee=user).exists(),
 			"avatar":avatar_url,
+			"matched":user.profile.matched,
 		}
 		all_users_list.append(new_user)
 	print("--- %s seconds ---" % (time.time() - start_time))

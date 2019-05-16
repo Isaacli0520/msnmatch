@@ -188,6 +188,7 @@
                                     <span v-if="user.video.length" class="user-id-tag user-id-tag-video">Video</span>
                                     <span v-if="user.bio && wordCount(user.bio) > 100" class="user-id-tag user-id-tag-bio">百字Bio</span>
                                     <span v-if="user.follow" class="user-id-tag fav-user">Like</span>
+                                    <span v-if="user.matched" class="user-id-tag user-id-tag-match">Matched</span>
                                 </div>
                                 <small v-if="user.score && user.score > 0" class="score-text">Similarity: \{\{ user.score \}\}%</small>
                             </div>
