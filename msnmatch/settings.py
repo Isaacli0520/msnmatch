@@ -160,8 +160,7 @@ DATE_INPUT_FORMATS = ['%m/%d/%Y']
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 # STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATIC_URL = '/static/'
-STATIC_URL = 'http://127.0.0.1:8080/'
+# STATIC_URL = '/static/'
 
 # AWS_DEFAULT_ACL = None
 
