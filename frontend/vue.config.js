@@ -9,9 +9,9 @@ module.exports = {
           // entry for the page
           entry: 'src/home/main.js',
           // the source template
-          template: './templates/home.html',
+          template: '../templates/home.html',
           // output as dist/home.html
-          filename: 'index.html',
+          filename: 'home.html',
           // when using title option,
           // template title tag needs to be <title><%= htmlWebpackPlugin.options.title %></title>
         //   title: 'Index Page',
@@ -27,7 +27,7 @@ module.exports = {
             // entry for the page
             entry: 'src/superadmin/main.js',
             // the source template
-            template: './templates/superadmin.html',
+            template: '../templates/superadmin.html',
             // output as dist/superadmin.html
             filename: 'superadmin.html',
         }
@@ -53,5 +53,6 @@ module.exports = {
             .watchOptions({poll: 1000})
             .https(false)
             .headers({"Access-Control-Allow-Origin": ["\*"]})
+            .clientLogLevel('info')
             }
     };

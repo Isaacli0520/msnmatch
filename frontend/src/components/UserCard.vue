@@ -46,7 +46,7 @@ export default {
             let sLen = 0;
             try{
                 //先将回车换行符做特殊处理
-                tmpstr = str.replace(/(\r\n+|\s+|　+)/g,"龘");
+                let tmpstr = str.replace(/(\r\n+|\s+|　+)/g,"龘");
                 //处理英文字符数字，连续字母、数字、英文符号视为一个单词
                 tmpstr = tmpstr.replace(/[\x00-\xff]/g,"m");
                 //合并字符m，连续字母、数字、英文符号视为一个单词
@@ -74,7 +74,7 @@ export default {
     }
     .user-card {
         /* margin:10px; */
-        margin: 5px 3px 2px 3px;
+        margin: 3px 3px 0.75em 3px;
         flex: 1 0 auto;
         overflow:hidden;
         /* width: 30%; */

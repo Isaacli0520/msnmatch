@@ -144,4 +144,54 @@ export default {
     .modal-body{
         padding: 16px 16px 0px 16px;
     }
+
+.Entertainment{
+    color: #ffffff;
+    background-color: #f1b9a6e7;
+}
+      
+.Sport{
+    color: #ffffff;
+    background-color: #80b6e2;
+}
+    
+.Game{
+    color: #ffffff;
+    background-color: #8a1ae6;
+}
+
+.Film{
+    color:#ffffff;
+    background-color:#4cb41b;
+}
+
+.Music{
+    color:#ffffff;
+    background-color:#3915db;
+}
+
+.General{
+    color:#ffffff;
+    background-color:#88999c;
+}
+
+.Language{
+    color: #ffffff;
+    background-color: #af51db;
+  }
+
+.Books{
+    color:#ffffff;
+    background-color:#ff9900;
+}
+
+.Academic{
+    color:#ffffff;
+    background-color:#5bd4b6;
+}
+
+.Custom{
+    color: #ffffff;
+    background-color: #ff0800;
+}
 </style>

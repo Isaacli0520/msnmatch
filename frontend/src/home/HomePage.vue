@@ -1,74 +1,81 @@
 <template>
-    <div class="main">
-        <div class="col-12" style = "width:100%; margin: 0 auto;" id="header-wrapper">
-            <div id="navigation">
-                <nav class="navbar navbar-expand-md navbar-msn" >
-                    <a class="navbar-brand" href="{% url 'home' %}">
-                        <img :src="brand_pic" width="30" height="30" class="d-inline-block align-top" alt="">
-                    </a>
-                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".dual-collapse2" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                    <div class="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2 " id="navbar-left-div">
-                        <ul class="topBotomBordersOut navbar-nav mr-auto">
-                            <li class="nav-item">
-                                <a class="nav-link" :href="home_url">Home</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" :href="tags_url">Tags</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" :href="trending_tags_url">Trending Tags</a>
-                            </li>
-                        </ul>
+    <div>
+        <div id="wrap">
+            <main>
+                <div class="main">
+                    <div class="col-12" style = "width:100%; margin: 0 auto;" id="header-wrapper">
+                        <div id="navigation">
+                            <nav class="navbar navbar-expand-md navbar-msn" >
+                                <a class="navbar-brand" href="{% url 'home' %}">
+                                    <img :src="brand_pic" width="30" height="30" class="d-inline-block align-top" alt="">
+                                </a>
+                                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".dual-collapse2" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                                    <i class="fas fa-bars"></i>
+                                </button>
+                                <div class="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2 " id="navbar-left-div">
+                                    <ul class="topBotomBordersOut navbar-nav mr-auto">
+                                        <li class="nav-item">
+                                            <a class="nav-link" :href="home_url">Home</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" :href="tags_url">Tags</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" :href="trending_tags_url">Trending Tags</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            
+                                <div class="navbar-collapse collapse w-100 order-2 dual-collapse2">
+                                    <ul class="navbar-nav ml-auto">
+                                        <follow-list
+                                        v-bind:following="following"
+                                        @update-following-list="update_following_list"
+                                        />
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true">
+                                            <i class="fas fa-user"></i>
+                                        </a>
+                                        <div class="dropdown-menu w-100 order-4 dropdown-menu-right" aria-labelledby="navbarDropdown">
+                                            <a class="dropdown-item" :href="profile">Profile</a>
+                                            <div class="dropdown-divider"></div>
+                                            <a class="dropdown-item" :href="update_profile">Edit Profile</a>
+                                            <a class="dropdown-item" :href="logout">Log out</a>
+                                        </div>
+                                    </li>
+                                    </ul>
+                                </div>
+                            </nav>
+                        </div>
+                        <div class="container mb-1 text-center">
+                            <h1 class="main-title">MSN Mentor-Mentee Match</h1>
+                        </div>
+                        <div class="tag mb-3" style="width:100%;">
+                            <search-home
+                            v-bind:checkboxOn="load_complete"
+                            v-bind:requestUser="request_user" 
+                            @user-list-filter="user_list_filter"
+                            @get-users-by-sim="get_users_by_sim"
+                            @update-user-list="update_user_list"/>
+                        </div>
                     </div>
-                
-                    <div class="navbar-collapse collapse w-100 order-2 dual-collapse2">
-                        <ul class="navbar-nav ml-auto">
-                            <follow-list
-                            v-bind:following="following"
-                            @update-following-list="update_following_list"
-                            />
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true">
-                                <i class="fas fa-user"></i>
-                            </a>
-                            <div class="dropdown-menu w-100 order-4 dropdown-menu-right" aria-labelledby="navbarDropdown">
-                                <a class="dropdown-item" :href="profile">Profile</a>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" :href="update_profile">Edit Profile</a>
-                                <a class="dropdown-item" :href="logout">Log out</a>
-                            </div>
-                        </li>
-                        </ul>
+                    <div class="user-list-div">
+                        <div style="margin: 0px 0px 35px 0px;">
+                            <h3 class="line-break"><span>Hoo's My Match</span></h3>
+                        </div>
+                        <div v-if="!load_complete" class="loader"></div>
+                        <div class="col-xs-12 col-sm-12 col-md-10 col-lg-10 col-xs-offset-0 col-sm-offset-0 mb-5" style="width:100%; margin: 0 auto;">
+                            <user-list
+                                v-bind:allUsers="all_users"
+                                v-bind:requestUser="request_user"
+                                v-bind:following="following"
+                                @update-following-list="update_following_list"/>
+                        </div>
                     </div>
-                </nav>
-            </div>
-            <div class="container mb-1 text-center">
-                <h1 class="main-title">MSN Mentor-Mentee Match</h1>
-            </div>
-            <div class="tag mb-3" style="width:100%;">
-                <search-home
-                v-bind:checkboxOn="load_complete"
-                v-bind:requestUser="request_user" 
-                @user-list-filter="user_list_filter"
-                @get-users-by-sim="get_users_by_sim"
-                @update-user-list="update_user_list"/>
-            </div>
+                </div>
+            </main>
         </div>
-        <div class="user-list-div">
-            <div style="margin: 0px 0px 35px 0px;">
-                <h3 class="line-break"><span>Hoo's My Match</span></h3>
-            </div>
-            <div v-if="!load_complete" class="loader"></div>
-            <div class="col-xs-12 col-sm-12 col-md-10 col-lg-10 col-xs-offset-0 col-sm-offset-0 mb-5" style="width:100%; margin: 0 auto;">
-                <user-list
-                    v-bind:allUsers="all_users"
-                    v-bind:requestUser="request_user"
-                    v-bind:following="following"
-                    @update-following-list="update_following_list"/>
-            </div>
-        </div>
+        <home-footer/>
     </div>
 </template>
 
@@ -77,6 +84,7 @@
     import UserList from '../components/UserList'
     import FollowList from '../components/FollowList'
     import SearchHome from '../components/SearchHome'
+    import HomeFooter from '../components/HomeFooter'
     import axios from 'axios'
 
     export default{
@@ -87,6 +95,7 @@
             UserList,
             FollowList,
             SearchHome,
+            HomeFooter,
         },
         data: function (){ 
             return{
@@ -161,7 +170,7 @@
             },
             cosine_sim(u,v){
                 if(u.length != v.length){
-                    console.log("what the f*** are you doing?(Cosine)");
+                    // console.log("what the f*** are you doing?(Cosine)");
                     return 0;
                 }
                 let uv = 0;
@@ -184,7 +193,7 @@
                         map[obj.pk] = obj[key_arr[i]];
                         return map;
                     }, {});
-                    let score_result = fuzz.extract(field_query, result, this.options);
+                    let score_result = this.fuzz.extract(field_query, result, this.options);
                     score_result = score_result.map(function(y){
                         return y[2];
                     })
@@ -206,7 +215,7 @@
                         return x.skill_name;
                     })
                     if(tmp_skill_arr.length > 0){
-                        let score_result = fuzz.extract(field_query, tmp_skill_arr, this.options);
+                        let score_result = this.fuzz.extract(field_query, tmp_skill_arr, this.options);
                         if(score_result.length > 0){
                             return_all_users[tmp_all_users[i].pk] = score_result.length;
                         }
@@ -218,10 +227,10 @@
                 var tmp_all_users = this.backup_all_users;
                 var ref = this;
                 tags.forEach(function(tag) {
-                    colon_index = tag.indexOf(":");
+                    let colon_index = tag.indexOf(":");
                     if(colon_index != -1 && colon_index != tag.length){
-                        field_tag = tag.substring(0, colon_index).toLowerCase();
-                        field_query = tag.substring(colon_index + 1).toLowerCase();
+                        let field_tag = tag.substring(0, colon_index).toLowerCase();
+                        let field_query = tag.substring(colon_index + 1).toLowerCase();
                         if(field_tag === "name"){
                             tmp_all_users = ref.fuzzy_search(tmp_all_users, ['first_name','last_name'], field_query);
                         }
@@ -263,8 +272,8 @@
                         }
                     }
                     else{
-                        tmp_kv_users = ref.fuzzy_search_skill(tmp_all_users, tag.toLowerCase());
-                        tmp_all_users_arr = []
+                        let tmp_kv_users = ref.fuzzy_search_skill(tmp_all_users, tag.toLowerCase());
+                        let tmp_all_users_arr = []
                         for(let i = 0;i < tmp_all_users.length; i++){
                             if(tmp_all_users[i].pk in tmp_kv_users){
                                 tmp_all_users[i]["tag_num"] = tmp_kv_users[tmp_all_users[i].pk];
@@ -333,5 +342,394 @@
 <style lang="css">
     *{
         box-sizing: border-box;
+    }
+    body{
+        display:flex; 
+        flex-direction:column;
+    }
+
+
+    #wrap {
+        min-height: 100%;
+    }
+    
+    #main {
+        overflow: auto;
+        /* padding-bottom: 311px; */
+        /* must be same height as the footer */
+    }
+    .user-list-div{
+    /* width:100%;
+    height: 100%;
+    position:relative;
+    background: url('images/cloud_01.jpg') no-repeat;
+    background-attachment: fixed;
+    background-position: center center;
+    background-size: cover; */
+    padding-top: 48px;
+    
+    }
+
+    .line-break {
+    width: 80%; 
+    text-align: center; 
+    border-bottom: 1px solid rgb(134, 130, 130); 
+    line-height: 0.1em;
+    margin: 0 auto; 
+    } 
+
+    .line-break span { 
+    color:#2ea49a;
+    font-weight: 350;
+    font-family: Baskerville, "Baskerville Old Face", sans-serif;
+    background:#fff; 
+    padding:0 20px; 
+    margin: 5px 0px 2px 0px;
+    }
+
+    #header-wrapper {
+    position: relative;
+    /* z-index: -5; */
+    padding: 0px 0px 40px 0px;
+    /* background-image: url("images/header.svg");
+    background-image: url("images/overlay.png"), url("images/header.svg"),  -moz-linear-gradient(75deg, #FF7088 15%, #F2B69D 55%);
+    background-image: url("images/overlay.png"), url("images/header.svg"), -webkit-linear-gradient(75deg, #FF7088 15%, #F2B69D 55%);
+    background-image: url("images/overlay.png"), url("images/header.svg"), -ms-linear-gradient(75deg, #FF7088 15%, #F2B69D 55%);
+    background-image: url("images/overlay.png"), url("images/header.svg"), linear-gradient(75deg, #FF7088 15%, #F2B69D 55%);
+    background-size: 100% 180%;
+    background-size: 128px 128px, 100% 180%, auto;
+    background-repeat: repeat, no-repeat, no-repeat;
+    background-color: #e5e2e29c;
+    background-attachment: fixed;
+    background-position: center center; */
+    color:#000000;
+    width:100%;
+    /* height: 100%; */
+    position:relative;
+    background: url('../assets/static/css/images/cloud_new_09.jpg') no-repeat;
+    background-attachment: fixed;
+    background-position: center center;
+    background-size: cover;
+
+    -webkit-box-shadow: inset 0 -3px 3px 0px rgba(0,0,0,.13), inset 0 -7px 7px 0px rgba(0,0,0,.12);
+    box-shadow: inset 0 -3px 3px 0px rgba(0,0,0,.13), inset 0 -7px 7px 0px rgba(0,0,0,.12);
+    /* padding: 0; */
+    }
+
+
+
+
+    .main-title{
+    margin-top: 100px;
+    margin-bottom: 30px;
+    color:#32a49a;
+    font-weight: 800 !important;
+    /* font-family: Baskerville, "Baskerville Old Face", sans-serif; */
+    text-transform: uppercase;
+    font-family: "Raleway", Helvetica, sans-serif;
+    /* font-family: Optima, sans-serif; */
+    font-size: 45px;
+    letter-spacing: 0.02em;
+    /* text-shadow: 1px 2px 4px rgb(155, 155, 155); */
+    }
+
+    .sub-title{
+    color:#ffffff;
+    }
+
+
+
+
+    .loader {
+    border: 16px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 16px solid #3498db;
+    width: 100px;
+    height: 100px;
+    -webkit-animation: spin 2s linear infinite; /* Safari */
+    animation: spin 2s linear infinite;
+    margin:0 auto;
+    }
+
+    /* Safari */
+    @-webkit-keyframes spin {
+    0% { -webkit-transform: rotate(0deg); }
+    100% { -webkit-transform: rotate(360deg); }
+    }
+
+    @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+    }
+
+
+
+
+    .user-card-inner:hover .progressive-image {
+    opacity: 0.3;
+    transition: .5s ease;
+    }
+
+
+    .progressive-image {
+    transition: .5s ease;
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    display: inline-block;
+    
+    }
+    .progressive-image-canvas {
+    visibility: hidden;
+    position: absolute;
+    top: 0;
+    left: 0;
+    }
+    .progressive-image-main {
+    border-top-left-radius: calc(.25rem - 1px);
+    border-top-right-radius: calc(.25rem - 1px);
+    opacity: 1;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: auto;
+    z-index: 1;
+    transition-duration: 0.5s;
+    transition-property: all;
+    transition-timing-function: ease-out;
+    transform: translateZ(0);
+    }
+    .progressive-image-before-enter {
+    /* opacity: 1; */
+    }
+    /* .progressive-image-enter {
+    opacity: 0.3;
+    transition: .5s ease;
+    } */
+    .progressive-image-placeholder {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    z-index: 0;
+    overflow: hidden;
+    transition-duration: 300ms;
+    transition-property: all;
+    transition-timing-function: ease-out;
+    backface-visibility: hidden;
+    transform: translateZ(0) scale(1.1);
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    }
+    .progressive-image-placeholder-out {
+    transition-duration: inherit;
+    transition-property: all;
+    transition-timing-function: ease-out;
+    /**
+    * the transitioon delay needs to be longer than the
+    * .progressive-image-main transition-duration, otherwise it will flick
+    * because there won't be a background.
+    */
+    transition-delay: 0.4s;
+    opacity: 0;
+    }
+    .progressive-image-preloader {
+    pointer-events: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    }
+
+    #navbar-left-div ul li a {
+    border-bottom: 0;
+    font-family: "Raleway", Helvetica, sans-serif;
+    font-size: 0.8em;
+    font-weight: 320;
+    letter-spacing: 0.20em;
+    text-transform: uppercase;
+    }
+
+    .navbar-nav .nav-item .nav-link .fav-dropdown{
+        color: rgb(255, 0, 0);
+    }
+
+    .navbar-nav .nav-item .nav-link {
+    color:rgb(0, 0, 0);
+    }
+
+    .navbar-msn .navbar-toggler span {
+    color:#000000;
+    }
+
+    .navbar-msn .dropdown-item {
+    font-family: "Raleway", Helvetica, sans-serif;
+    text-transform: uppercase;
+    font-size: 13px !important;
+    font-weight: 340 !important;
+    letter-spacing: 0.08em !important;
+    /* color: #ffffff; */
+    }
+
+    .fa-heart {
+    color:#ee184d;
+    }
+
+    .navbar-msn .nav-item.active .nav-link,
+    .navbar-msn .nav-item:hover .nav-link {
+        color: #636363;
+    }
+
+    .navbar-msn{
+    background-color: #ffffff;
+    /* background:transparent; */
+    }
+
+
+
+    #navbar-left-div ul li {
+        border-left: solid 1px rgba(197, 197, 197, 0.945);
+        line-height: 1;
+        margin-left: 1em;
+        padding-left: 1em;
+    }
+
+    #navbar-left-div ul li:first-child {
+    border-left: 0;
+    margin-left: 0;
+    padding-left: 0;
+    }
+
+
+
+    /* 
+    ##Device = Desktops
+    ##Screen = 1281px to higher resolution desktops
+    */
+    @media (min-width: 1281px) { 
+    .card-columns{
+        column-count: 5 !important; 
+    }
+    }
+
+    /* 
+    ##Device = Laptops, Desktops
+    ##Screen = B/w 1025px to 1280px
+    */
+    @media (min-width: 1025px) and (max-width: 1280px) {
+    .card-columns{
+        column-count: 4 !important;
+    }
+    }
+
+    /* 
+    ##Device = Tablets, Ipads (portrait)
+    ##Screen = B/w 768px to 1024px
+    */
+
+    @media (min-width: 768px) and (max-width: 1024px) {
+    .card-columns{
+        column-count: 3 !important;
+    }
+
+    .main-title{
+        font-size: 45px;
+    }
+    }
+
+    /* 
+    ##Device = Tablets, Ipads (landscape)
+    ##Screen = B/w 768px to 1024px
+    */
+
+    @media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
+    .card-columns{
+        column-count: 3 !important;
+    }
+
+    .main-title{
+        font-size: 36px;
+    }
+    }
+
+    /* 
+    ##Device = Low Resolution Tablets, Mobiles (Landscape)
+    ##Screen = B/w 481px to 767px
+    */
+
+    @media (min-width: 481px) and (max-width: 767px) {
+    .card-columns{
+        column-count: 2 !important;
+    }
+    /* 
+    #header-wrapper {
+        position: relative;
+        padding: 0px 0px 40px 0px;
+        background-image: url("images/header.svg");
+        background-image: url("images/overlay.png"), url("images/header.svg"),  -moz-linear-gradient(55deg, #FF7088 15%, #F2B69D 55%);
+        background-image: url("images/overlay.png"), url("images/header.svg"), -webkit-linear-gradient(55deg, #FF7088 15%, #F2B69D 55%);
+        background-image: url("images/overlay.png"), url("images/header.svg"), -ms-linear-gradient(55deg, #FF7088 15%, #F2B69D 55%);
+        background-image: url("images/overlay.png"), url("images/header.svg"), linear-gradient(55deg, #FF7088 15%, #F2B69D 55%);
+        background-color: #ffffff;
+        background-size: 100% 100%;
+        background-size: 128px 128px, 100% 100%, auto;
+        background-repeat: repeat, no-repeat, no-repeat;
+        padding: 0;
+    } */
+
+    .main-title{
+        margin-top: 60px;
+        margin-bottom: 30px;
+        font-size: 30px;
+    }
+
+    }
+
+    /* 
+    ##Device = Most of the Smartphones Mobiles (Portrait)
+    ##Screen = B/w 320px to 479px
+    */
+
+    @media (min-width: 320px) and (max-width: 480px) {
+    .card-columns{
+        column-count: 1 !important;
+    }
+
+    /* #header-wrapper {
+        position: relative;
+        padding: 0px 0px 40px 0px;
+        background-image: url("images/header.svg");
+        background-image: url("images/overlay.png"), url("images/header.svg"),  -moz-linear-gradient(70deg, #FF7088 15%, #F2B69D 55%);
+        background-image: url("images/overlay.png"), url("images/header.svg"), -webkit-linear-gradient(70deg, #FF7088 15%, #F2B69D 55%);
+        background-image: url("images/overlay.png"), url("images/header.svg"), -ms-linear-gradient(70deg, #FF7088 15%, #F2B69D 55%);
+        background-image: url("images/overlay.png"), url("images/header.svg"), linear-gradient(70deg, #FF7088 15%, #F2B69D 55%);
+        background-color: #ffffff;
+        background-size: 100% 100%;
+        background-size: 128px 128px, 100% 100%, auto;
+        background-repeat: repeat, no-repeat, no-repeat;
+        padding: 0;
+    } */
+
+    .main-title{
+        margin-top: 60px;
+        margin-bottom: 30px;
+        font-size: 28px;
+    }
+
+    
+    }
+
+    @media (min-width: 10px) and (max-width: 319px) {
+        .card-columns{
+            column-count: 1 !important;
+        }
+
+
+        .main-title{
+            font-size: 20px;
+        }
     }
 </style>

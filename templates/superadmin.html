@@ -1,0 +1,26 @@
+<!-- templates/super_admin.html -->
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+{% bootstrap_css %}
+{% load static %}
+{% load render_bundle from webpack_loader %}
+
+{% block title %}Super Admin{% endblock %}
+
+
+{% block content %}
+{% if request.user.is_superuser %}
+    <div id="superadmin"></div>
+{% else %}
+    <div>
+        <h1>Error</h1>
+    </div>
+{% endif %}
+
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/axios@0.18.0/dist/axios.js"></script>
+
+{% render_bundle 'superadmin' %}
+
+{% endblock %}
