@@ -9,7 +9,7 @@ module.exports = {
           // entry for the page
           entry: 'src/home/main.js',
           // the source template
-          template: '../templates/home.html',
+          template: 'templates/home.html',
           // output as dist/home.html
           filename: 'home.html',
           // when using title option,
@@ -27,7 +27,7 @@ module.exports = {
             // entry for the page
             entry: 'src/superadmin/main.js',
             // the source template
-            template: '../templates/superadmin.html',
+            template: 'templates/superadmin.html',
             // output as dist/superadmin.html
             filename: 'superadmin.html',
         }
@@ -40,7 +40,7 @@ module.exports = {
 
         config
             .plugin('BundleTracker')
-            .use(BundleTracker, [{filename: '../frontend/webpack-stats.json'}])
+            .use(BundleTracker, [{filename: 'webpack-stats.json'}])
 
         config.resolve.alias
             .set('__STATIC__', 'static')
