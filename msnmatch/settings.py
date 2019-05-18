@@ -66,7 +66,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'msnmatch.urls'
 
-TEMPLATES_DIR = os.path.join(BASE_DIR, 'dist')
+TEMPLATES_DIR = os.path.join(BASE_DIR, 'templates')
 FRONTEND_DIR = os.path.join(BASE_DIR, 'frontend')
 
 TEMPLATES = [
@@ -161,6 +161,7 @@ DATE_INPUT_FORMATS = ['%m/%d/%Y']
 
 # STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # STATIC_URL = '/static/'
+# STATIC_URL = 'http://127.0.0.1:8080/'
 
 # AWS_DEFAULT_ACL = None
 
@@ -190,8 +191,8 @@ STATICFILES_DIRS = [
 WEBPACK_LOADER = {
     'DEFAULT': {
         'CACHE': not DEBUG,
-        'BUNDLE_DIR_NAME': 'dist/',  # must end with slash
-        'STATS_FILE': os.path.join('webpack-stats.json'),
+        'BUNDLE_DIR_NAME': '/dist/',  # must end with slash
+        'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.json'),
     }
 }
 
