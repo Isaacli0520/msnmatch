@@ -66,7 +66,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'msnmatch.urls'
 
-TEMPLATES_DIR = os.path.join(BASE_DIR, 'templates')
+TEMPLATES_DIR = os.path.join(BASE_DIR, 'dist')
 FRONTEND_DIR = os.path.join(BASE_DIR, 'frontend')
 
 TEMPLATES = [
@@ -184,7 +184,7 @@ STATICFILES_STORAGE = 'msnmatch.storage_backends.StaticStorage'
 DEFAULT_FILE_STORAGE = 'msnmatch.storage_backends.MediaStorage' 
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'frontend/src/assets/static'),
+    os.path.join(BASE_DIR, 'src/assets/static'),
 ]
 
 WEBPACK_LOADER = {
