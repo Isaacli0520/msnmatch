@@ -3,8 +3,8 @@ const BundleTracker = require("webpack-bundle-tracker");
 module.exports = {
     // publicPath: "http://127.0.0.1:8080/",
     // publicPath: "msn-match-test.herokuapp.com/",
-    // publicPath: "./dist/",
-    // outputDir: './dist/',
+    outputDir: 'dist',
+    // assetsDir: 'static',
 
     pages: {
         home: {
