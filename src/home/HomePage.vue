@@ -273,6 +273,7 @@
                     return_all_users = return_all_users.concat(this.backup_all_users.filter(function(x){
                         return score_result.indexOf(x.pk.toString(10)) != -1;
                     }));
+                    console.log(key_arr[i],"---",return_all_users);
                 }
                 return Array.from(new Set(return_all_users));
             },
@@ -379,7 +380,7 @@
         mounted(){
             this.fuzz = require('fuzzball');
             this.options = {
-                scorer: this.fuzz.WRatio,
+                scorer: this.fuzz.partial_ratio,
                 cutoff: 80,
             },
             this.request_user.username = this.request_user_username;
