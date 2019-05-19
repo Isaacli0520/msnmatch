@@ -26,9 +26,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'f@hcb!l&kpn_4u+iz)6j4w(5j4$b2!)-=*j(9&(x_0a-j8o6)5'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ['http://msn-match-test.herokuapp.com/']
+ALLOWED_HOSTS = ['msn-match-test.herokuapp.com/', 'match.msnatuva.org','localhost']
 
 BUILD_VERSION = "msnmatch-1.0601"
 
