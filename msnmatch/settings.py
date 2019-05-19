@@ -67,7 +67,6 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'msnmatch.urls'
 
 TEMPLATES_DIR = os.path.join(BASE_DIR, 'templates')
-FRONTEND_DIR = os.path.join(BASE_DIR, 'frontend')
 
 TEMPLATES = [
     {
@@ -159,9 +158,6 @@ DATE_INPUT_FORMATS = ['%m/%d/%Y']
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
-# STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-# STATIC_URL = '/static/'
-# STATIC_URL = 'http://127.0.0.1:8080/'
 
 # AWS_DEFAULT_ACL = None
 
@@ -184,14 +180,12 @@ AWS_S3_OBJECT_PARAMETERS = {
 # STATICFILES_STORAGE = 'msnmatch.storage_backends.StaticStorage'
 DEFAULT_FILE_STORAGE = 'msnmatch.storage_backends.MediaStorage' 
 
-MIDDLEWARE_CLASSES = (
-    
-)
+STATIC_HOST = 'https://dcdzilomi76so.cloudfront.net' if not DEBUG else ''
+STATIC_URL = STATIC_HOST + '/static/'
 
-STATIC_URL = '/static/'
-# # Place static in the same location as webpack build files
+
+# STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-# STATICFILES_DIRS = []
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 STATICFILES_DIRS = [

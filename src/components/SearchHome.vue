@@ -35,34 +35,30 @@
         </div>
 
         <div class="modal fade" id="modal_role" tabindex="-1" role="dialog" aria-labelledby="match_request" aria-hidden="true">
-            <form method="post">
-                {% csrf_token %}
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header text-center">
-                            <h4 class="modal-title">{{modal_role}}</h4>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            <p class="role-confirm-text">Do you really want to be a <strong>{{modal_role}}</strong>?</p>
-                            <small class="text-muted">*Note that your role can only be changed by the mentor program chair once you've made your choice.</small>
-                        </div>
-                        <div class="modal-footer">
-                            <input type="submit" class="btn btn-primary" :name="modal_role" value="Yes">
-                            <input type="button" class="btn btn-danger" data-dismiss="modal" value="No">
-                        </div>
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header text-center">
+                        <h4 class="modal-title">{{modal_role}}</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="role-confirm-text">Do you really want to be a <strong>{{modal_role}}</strong>?</p>
+                        <small class="text-muted">*Note that your role can only be changed by the mentor program chair once you've made your choice.</small>
+                    </div>
+                    <div class="modal-footer">
+                        <input type="button" class="btn btn-primary" @click.stop="choose_role(modal_role)" value="Yes">
+                        <input type="button" class="btn btn-danger" data-dismiss="modal" value="No">
                     </div>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
 </template>
 
-
-
 <script>
+import axios from 'axios'
 export default {
     props:{
         'requestUser':Object,
@@ -92,6 +88,12 @@ export default {
                 this.add_tag(this.searchquery);
                 this.searchquery = ""
             }
+        },
+        choose_role(modal_role){
+            axios.get('/skills/ajax/choose_role/',{params: {role:modal_role}}).then(response => {
+                this.$emit('update-request-user-role', response.data.user_role);  
+                $('#modal_role').modal('hide'); 
+            });
         },
         getUsersBySim(e){
             this.$emit('get-users-by-sim');

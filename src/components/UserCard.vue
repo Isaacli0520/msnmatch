@@ -80,11 +80,8 @@ export default {
         /* width: 30%; */
     }
 
-    .card-body {
-        padding:10px;
-    }
-
     .user-id-tags{
+        margin: 0px 0px 3px 0px;
         display: flex;
         flex-flow: row wrap;
         width:100%;

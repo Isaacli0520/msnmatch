@@ -12,12 +12,11 @@
                 <img :src="user.picture" class="card-img-top" alt="None">
                 <div class="skill-tags">
                     <template v-for="(skills_of_type, skills_type_name) in user.skills">
-                        <a v-for="skill in skills_of_type"
-                            class="skill-tag"
-                            :href="skill.skill_url"
-                            v-bind:class="skill.skill_type">
-                            <span>{{skill.skill_name}}</span>
-                        </a>
+                        <tag-span v-for="skill in skills_of_type"
+                            v-bind:key="skill.skill_pk"
+                            v-bind:skill="skill"
+                            v-bind:clickable="'href'"
+                        />
                     </template>
                 </div>
                 <div>
@@ -94,10 +93,15 @@
 
 <script>
 
+import TagSpan from './TagSpan'
+
 export default {
     props: {
         requestUser: Object,
         user: Object,
+    },
+    components: {
+        TagSpan,
     },
     methods: {
         addToFav(modal_user){

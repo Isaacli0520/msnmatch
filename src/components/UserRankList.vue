@@ -4,9 +4,9 @@
             <div class="user-big-div">
                 <div class="user-div" @click=collapseDiv(user.pk)>
                     <span class="user-main font-weight-bold">{{ user.first_name }} {{ user.last_name }}</span>
-                    <span v-if="user.role" class="user-role" :class="user.role">{{ user.role }}</span> 
-                    <span v-if="user.year" class="user-year">{{ user.year }}</span>
-                    <span v-if="user.follow.length > 0" class="user-follow">{{ user.follow.length | pluralize }}</span>
+                    <span v-if="user.role" class="user-tag" :class="user.role">{{ user.role }}</span> 
+                    <span v-if="user.year" class="user-tag user-year">{{ user.year }}</span>
+                    <span v-if="user.follow.length > 0" class="user-tag user-follow">{{ user.follow.length | pluralize }}</span>
                 </div>
                 <div class="collapse multi-collapse" :id="user.pk">
                     <div class="card card-body w-100">
@@ -82,7 +82,7 @@ export default {
     font-size: 20px;
 }
 
-.user-year{
+.user-tag{
     font-size: 15px !important;
     float:right;
     padding: 3px 8px 3px 8px;
@@ -90,36 +90,21 @@ export default {
     margin: 0px 0px 0px 5px;
     font-family: Gill Sans, sans-serif;
     color: #ffffff;
+}
+
+.user-year{
     background-color: #ff5c5c;
 }
 
 .user-follow{
-    font-size: 15px !important;
-    float:right;
-    padding: 3px 8px 3px 8px;
-    border-radius: 5px;
-    margin: 0px 0px 0px 5px;
-    font-family: Gill Sans, sans-serif;
-    color: #ffffff;
     background-color: #e714dd;
 }
 
-.user-role{
-    font-size: 15px !important;
-    float:right;
-    padding: 3px 8px 3px 8px;
-    border-radius: 5px;
-    margin: 0px 0px 0px 5px;
-    font-family: Gill Sans, sans-serif;
-}
-
 .Mentor{
-    color:#ffffff;
     background: rgba(26, 158, 235, 0.781);
 }
   
 .Mentee{
-    color:#ffffff;
     background: rgba(9, 194, 40, 0.781);
 }    
 </style>

@@ -1,9 +1,8 @@
 const BundleTracker = require("webpack-bundle-tracker");
+const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 
 module.exports = {
-    // publicPath: "http://127.0.0.1:8080/",
-    // publicPath: "msn-match-test.herokuapp.com/",
-    publicPath: 'static',
+    publicPath: IS_PRODUCTION ? 'static' : 'http://127.0.0.1:8080/',
     outputDir: 'dist',
     // assetsDir: 'static',
 
@@ -33,7 +32,12 @@ module.exports = {
             template: 'templates/superadmin.html',
             // output as dist/superadmin.html
             filename: 'superadmin.html',
-        }
+        },
+        tagpage: {
+          entry: 'src/tagpage/main.js',
+          template: 'templates/tags.html',
+          filename: 'tags.html',
+        },
       },
 
     chainWebpack: config => {

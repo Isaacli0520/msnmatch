@@ -6,7 +6,7 @@
                     <div class="col-12" style = "width:100%; margin: 0 auto;" id="header-wrapper">
                         <div id="navigation">
                             <nav class="navbar navbar-expand-md navbar-msn" >
-                                <a class="navbar-brand" href="{% url 'home' %}">
+                                <a class="navbar-brand" :href="home_url">
                                     <img :src="brand_pic" width="30" height="30" class="d-inline-block align-top" alt="">
                                 </a>
                                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".dual-collapse2" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -54,6 +54,7 @@
                             <search-home
                             v-bind:checkboxOn="load_complete"
                             v-bind:requestUser="request_user" 
+                            @update-request-user-role="update_request_user_role"
                             @user-list-filter="user_list_filter"
                             @get-users-by-sim="get_users_by_sim"
                             @update-user-list="update_user_list"/>
@@ -119,7 +120,21 @@
             options:null,
             }
         },
+        watch:{
+            backup_all_users:function (){
+                console.log("backup_all_users change");
+            }
+        },
         methods:{
+            update_request_user_role(user_role){
+                this.request_user.role = user_role;
+                this.all_users.filter(obj => {
+                    return obj.pk == this.request_user.pk
+                })[0].role = user_role;
+                this.backup_all_users.filter(obj => {
+                    return obj.pk == this.request_user.pk
+                })[0].role = user_role;
+            },
             get_users_by_sim(){
                 let req_user = this.backup_all_users.filter(obj => {
                     return obj.pk == this.request_user.pk;
@@ -128,7 +143,7 @@
                     return obj.pk != this.request_user.pk;
                 });
                 for(let i = 0; i < other_users.length; i++){
-                    other_users[i]["score"] = (this.similarity_between(req_user, other_users[i])*100).toFixed(2);
+                    other_users[i]["score"] = parseFloat((this.similarity_between(req_user, other_users[i])*100).toFixed(2));
                 }
                 this.all_users = other_users.sort(function(a,b){
                     return b.score - a.score;
@@ -224,7 +239,7 @@
                 return return_all_users;
             },
             user_list_filter(tags){
-                var tmp_all_users = this.backup_all_users;
+                var tmp_all_users = JSON.parse(JSON.stringify(this.backup_all_users));
                 var ref = this;
                 tags.forEach(function(tag) {
                     let colon_index = tag.indexOf(":");
@@ -254,7 +269,7 @@
                         }
                         else if(["major"].indexOf(field_tag) != -1){
                             let tmp_cutoff = ref.options.cutoff;
-                            ref.options.cutoff = 40;
+                            ref.options.cutoff = 70;
                             tmp_all_users = ref.fuzzy_search(tmp_all_users, ['major', 'major_two', 'minor'], field_query);
                             ref.options.cutoff = tmp_cutoff;
                         }
@@ -285,7 +300,7 @@
                         });
                     }
                 });
-                ref.update_user_list(tmp_all_users);
+                ref.all_users = tmp_all_users;
             },
             update_user_list(new_users){
                 this.all_users = new_users; 
@@ -304,7 +319,7 @@
         mounted(){
             this.fuzz = require('fuzzball');
             this.options = {
-                scorer: this.fuzz.token_set_ratio,
+                scorer: this.fuzz.WRatio,
                 cutoff: 80,
             },
             this.request_user.username = this.request_user_username;
@@ -327,7 +342,7 @@
             axios.get('/skills/ajax/get_all_users/',{params: {}}).then(response => {
                 // console.log(response.data.all_users);
                 this.backup_all_users = response.data.all_users;
-                this.all_users = this.backup_all_users;
+                this.all_users = JSON.parse(JSON.stringify(this.backup_all_users));
                 this.load_complete = true;
             });
 

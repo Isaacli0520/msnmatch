@@ -31,7 +31,7 @@ def handler403(request, exception):
 def get_home_page_basic_info(request):
 	tmp = {
 		"home_url":reverse('home'),
-		"tags_url":reverse('skill_search'),
+		"tags_url":reverse('tags'),
 		"trending_tags_url":reverse('skill_rank'),
 		"brand_pic": settings.STATIC_URL + "css/images/brand.png",
 		"profile": reverse('profile', args=[request.user.username]),

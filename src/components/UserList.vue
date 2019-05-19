@@ -5,6 +5,7 @@
             v-if="user.role != '' " 
             v-for="user in allUsers"
             v-bind:user="user"
+            v-bind:key="user.pk"
             @open-modal="openModal"
             />
         </div>

@@ -1,15 +1,15 @@
 .Entertainment{
-    color: #ffffff;
+    color:#ffffff;
     background-color: #f1b9a6e7;
 }
-      
+    
 .Sport{
-    color: #ffffff;
+    color:#ffffff;
     background-color: #80b6e2;
 }
     
 .Game{
-    color: #ffffff;
+    color:#ffffff;
     background-color: #8a1ae6;
 }
 
@@ -29,9 +29,9 @@
 }
 
 .Language{
-    color: #ffffff;
+    color:#ffffff;
     background-color: #af51db;
-  }
+}
 
 .Books{
     color:#ffffff;
@@ -44,6 +44,6 @@
 }
 
 .Custom{
-    color: #ffffff;
+    color:#ffffff;
     background-color: #ff0800;
 }
