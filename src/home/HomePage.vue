@@ -1,5 +1,24 @@
 <template>
     <div>
+        <div class="modal fade" id="modal-intruction" tabindex="-1" role="dialog" aria-labelledby="modal-intruction" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modal-intruction">{{modal_title}}</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div v-html="modal_content">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div id="wrap">
             <main>
                 <div class="main">
@@ -28,15 +47,24 @@
                             
                                 <div class="navbar-collapse collapse w-100 order-2 dual-collapse2">
                                     <ul class="navbar-nav ml-auto">
+                                        <li class="nav-item dropdown">
+                                            <a class="nav-link dropdown-toggle" id="help-nav" href="#" role="button" data-toggle="dropdown" aria-haspopup="true">
+                                                <i class="far fa-question-circle"></i>
+                                            </a>   
+                                            <div class="dropdown-menu custom-drop-menu w-100 dropdown-menu-right" aria-labelledby="help-nav">
+                                                <a class="dropdown-item" @click="openModal('get-started')">Get Started</a>
+                                                <a class="dropdown-item" @click="openModal('match-rule')">Match Rule</a>
+                                            </div> 
+                                        </li>
                                         <follow-list
                                         v-bind:following="following"
                                         @update-following-list="update_following_list"
                                         />
                                     <li class="nav-item dropdown">
-                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown-user" role="button" data-toggle="dropdown" aria-haspopup="true">
                                             <i class="fas fa-user"></i>
                                         </a>
-                                        <div class="dropdown-menu w-100 order-4 dropdown-menu-right" aria-labelledby="navbarDropdown">
+                                        <div class="dropdown-menu custom-drop-menu w-100 order-4 dropdown-menu-right" aria-labelledby="navbarDropdown-user">
                                             <a class="dropdown-item" :href="profile">Profile</a>
                                             <div class="dropdown-divider"></div>
                                             <a class="dropdown-item" :href="update_profile">Edit Profile</a>
@@ -64,7 +92,7 @@
                         <div style="margin: 0px 0px 35px 0px;">
                             <h3 class="line-break"><span>Hoo's My Match</span></h3>
                         </div>
-                        <div v-if="!load_complete" class="loader"></div>
+                        <div v-if="!load_complete" class="lds-ring"><div></div><div></div><div></div><div></div></div>
                         <div class="col-xs-12 col-sm-12 col-md-10 col-lg-10 col-xs-offset-0 col-sm-offset-0 mb-5" style="width:100%; margin: 0 auto;">
                             <user-list
                                 v-bind:allUsers="all_users"
@@ -76,7 +104,11 @@
                 </div>
             </main>
         </div>
-        <home-footer/>
+        <home-footer
+            v-bind:home_url="home_url"
+            v-bind:tags_url="tags_url"
+            v-bind:profile="profile"
+        />
     </div>
 </template>
 
@@ -116,16 +148,42 @@
                 "pk":"",
                 "role":"",
             },
+            modal_title:"",
+            modal_title_dist:{
+                "get-started":"Get Started",
+                "match-rule":"Mentee Mentor Match Rule"
+            },
+            modal_content:"",
+            modal_content_dist:{
+                "get-started":"<p class='font-weight-bold'>Be a Mentee or Mentor</p> \
+                <p>1. Click on <strong>Be a Mentee</strong> or <strong>Be a Mentor</strong> at the home page to be a Mentee or Mentor\
+                <br>2. If you don't choose a role, you won't appear in the user list at the home page and you won't be able to add anyone to your favorite list.</p>\
+                <p class='font-weight-bold'>Edit Your Profile</p> \
+                <p>1. Click the user dropdown menu <i class='fas fa-user'></i> and select edit profile.<br>2. <strong>Year</strong> and <strong>Major</strong> are required fields, while the others are optional.</p> \
+                <p class='font-weight-bold'>Add Your Interests</p>\
+                <p>1. Click on <strong>Tags</strong> at the upper-left corner to go to the Tags page.\
+                <br>2. You can add skills by typing in the search bar and add existing/customized tag\
+                <br>3. You can also add skills by click on the tags below the search bar\
+                <br>4. To delete a tag, just click the <i class='fas fa-times'></i> of that tag</p>",
+
+                "match-rule":"<p class='font-weight-bold'>Add to Favorite</p> \
+                <p>1. Click on Mentee/Mentor Profile based on your role and you can add them to your favorte list by clicking the <strong>add to favorite</strong> button \
+                <br>2. Please note that the favorite list has a preference ranking based on the order you add others to your list. \
+                <br>3. The first one should be the one you prefer the most and so on for the rest.</p>\
+                <p class='font-weight-bold'>How are Mentees and Mentors Matched?</p>\
+                <p>1. This is done by the mentor program chair, feel free to contact him if you have any question.(WeChat Id: zgt19991026)</p>\
+                " 
+            },
             fuzz: null,
             options:null,
             }
         },
-        watch:{
-            backup_all_users:function (){
-                console.log("backup_all_users change");
-            }
-        },
         methods:{
+            openModal(key){
+                this.modal_title = this.modal_title_dist[key];
+                this.modal_content = this.modal_content_dist[key];
+                $('#modal-intruction').modal('show');
+            },
             update_request_user_role(user_role){
                 this.request_user.role = user_role;
                 this.all_users.filter(obj => {
@@ -355,6 +413,46 @@
 </script>
 
 <style lang="css">
+    .custom-drop-menu{
+        box-shadow: 0 2px 5px 0px rgba(0,0,0,.16), 0 2px 10px 0px rgba(0,0,0,.12);
+    }
+
+    .lds-ring {
+        margin: 0 auto;
+        width: 80px;
+        height: 80px;
+        }
+    .lds-ring div {
+        box-sizing: border-box;
+        display: block;
+        position: absolute;
+        width: 64px;
+        height: 64px;
+        margin: 8px;
+        border: 8px solid #35a39a;
+        border-radius: 50%;
+        animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+        border-color: #35a39a transparent transparent transparent;
+    }
+    .lds-ring div:nth-child(1) {
+        animation-delay: -0.45s;
+    }
+    .lds-ring div:nth-child(2) {
+        animation-delay: -0.3s;
+    }
+    .lds-ring div:nth-child(3) {
+        animation-delay: -0.15s;
+    }
+    @keyframes lds-ring {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+
     *{
         box-sizing: border-box;
     }

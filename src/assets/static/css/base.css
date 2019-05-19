@@ -147,6 +147,10 @@ section .section-title {
 	margin-right: 5px;
 }
 
+.custom-drop-menu{
+  box-shadow: 0 2px 5px 0px rgba(0,0,0,.16), 0 2px 10px 0px rgba(0,0,0,.12);
+}
+
 
   #navbar-left-div ul li a {
     border-bottom: 0;

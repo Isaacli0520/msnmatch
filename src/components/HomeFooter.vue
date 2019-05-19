@@ -6,9 +6,9 @@
                 <div class="col-xs-12 col-sm-6 col-md-4">
                     <h5 style="font-weight: 400;">Quick links</h5>
                     <ul class="list-unstyled quick-links">
-                    <li><a href="{% url 'home' %}"><i class="fa fa-angle-double-right"></i>Home</a></li>
-                    <li><a href="{% url 'skill_search' %}"><i class="fa fa-angle-double-right"></i>Tags</a></li>
-                    <li><a href="{% url 'profile' request.user.username %}"><i class="fa fa-angle-double-right"></i>Profile</a></li>
+                    <li><a :href="home_url"><i class="fa fa-angle-double-right"></i>Home</a></li>
+                    <li><a :href="tags_url"><i class="fa fa-angle-double-right"></i>Tags</a></li>
+                    <li><a :href="profile"><i class="fa fa-angle-double-right"></i>Profile</a></li>
                     </ul>
                 </div>
                 <div class="col-xs-12 col-sm-6 col-md-6">
@@ -33,6 +33,11 @@
 <script>
 
 export default {
+    props:{
+        home_url:String,
+        tags_url:String,
+        profile:String,
+    },
     data: function(){
         return {
         }
