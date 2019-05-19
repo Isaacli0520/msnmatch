@@ -367,10 +367,12 @@
                 if(add_del == 1){
                     this.following.push(following_user)
                     this.all_users.filter(function(item) { return item.pk === following_user.pk; })[0].follow = true;
+                    this.backup_all_users.filter(function(item) { return item.pk === following_user.pk; })[0].follow = true;
                 }
                 else if(add_del == 0){
                     this.following.splice(this.following.indexOf(following_user), 1);
                     this.all_users.filter(function(item) { return item.pk === following_user.pk; })[0].follow = false;
+                    this.backup_all_users.filter(function(item) { return item.pk === following_user.pk; })[0].follow = false;
                 }
             },
         },

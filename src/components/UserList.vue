@@ -72,7 +72,7 @@ export default {
             else{
                 $('#follow-btn').popover('disable')
                 axios.get('/skills/ajax/add_to_list/',{params: {user_pk:user.pk}}).then(response => {
-                    $('#userProfileModal').modal('hide');
+                    $('#user-modal').modal('hide');
                     var tmp_fav = {
                         "pk": user.pk,
                         "user_url": user.user_url,

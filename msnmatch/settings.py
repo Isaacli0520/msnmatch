@@ -26,7 +26,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'f@hcb!l&kpn_4u+iz)6j4w(5j4$b2!)-=*j(9&(x_0a-j8o6)5'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['http://msn-match-test.herokuapp.com/']
 
@@ -180,7 +180,7 @@ AWS_S3_OBJECT_PARAMETERS = {
 # STATICFILES_STORAGE = 'msnmatch.storage_backends.StaticStorage'
 DEFAULT_FILE_STORAGE = 'msnmatch.storage_backends.MediaStorage' 
 
-STATIC_HOST = 'https://dcdzilomi76so.cloudfront.net' if not DEBUG else ''
+STATIC_HOST = 'https://d1ixiphwkdejqh.cloudfront.net' if not DEBUG else ''
 STATIC_URL = STATIC_HOST + '/static/'
 
 
