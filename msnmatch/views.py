@@ -15,6 +15,8 @@ import time
 from msnmatch import settings
 from django.http import JsonResponse
 import collections
+from django.urls import reverse
+from msnmatch import settings
 
 def handler404(request, exception):
     response = render(request, "404.html")
@@ -25,6 +27,23 @@ def handler403(request, exception):
     response = render(request, "403.html")
     response.status_code = 403
     return response
+
+def get_home_page_basic_info(request):
+	tmp = {
+		"home_url":reverse('home'),
+		"tags_url":reverse('tags'),
+		"trending_tags_url":reverse('skill_rank'),
+		"brand_pic": settings.STATIC_URL + "css/images/brand.png",
+		"profile": reverse('profile', args=[request.user.username]),
+		"update_profile":reverse('update_profile', args=[request.user.username]),
+		"logout":reverse('logout'),
+		"request_user_username":request.user.username,
+		"request_user_pk":request.user.pk,
+		"request_user_role":request.user.profile.role,
+	}
+	return JsonResponse({
+		"all_info":tmp,
+	})
 
 def get_all_ranked_users(request):
 	all_users = User.objects.all().exclude(username="admin")
@@ -70,8 +89,8 @@ def get_all_ranked_users(request):
 
 
 @login_required
-def super_admin(request):
-	return render(request, 'super_admin.html')
+def superadmin(request):
+	return render(request, 'superadmin.html')
 
 @login_required
 def home(request):

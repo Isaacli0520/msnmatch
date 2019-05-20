@@ -3,7 +3,7 @@ from . import views
 from django.contrib.auth import logout, login
 
 urlpatterns = [
-  path('search/', views.skill_search, name='skill_search'),
+  path('search/', views.tags, name='tags'),
   path('rank/', views.skill_rank, name='skill_rank'),
   path('<skill_pk>/', views.skill, name='skill'),
   path('ajax/result/', views.skill_search_result, name="skill_search_result"),
@@ -16,6 +16,7 @@ urlpatterns = [
   path('ajax/get_follow_list/', views.get_follow_list, name="get_follow_list"),
   path('ajax/del_fav/', views.del_fav, name="del_fav"),
   path('ajax/get_users_by_sim/', views.get_users_by_sim, name="get_users_by_sim"),
+  path('ajax/choose_role/', views.choose_role, name="choose_role"),
   
 #   path('ajax/course_taking_add_delete/', views.course_taking_add_delete, name='course_taking_add_delete'),
 #   path('ajax/course_taken_add_delete/', views.course_taken_add_delete, name='course_taken_add_delete'),

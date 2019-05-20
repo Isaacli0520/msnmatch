@@ -69,6 +69,18 @@ def add_del_skill(request):
 		"origin_exist":origin_exist,
 	})
 
+def choose_role(request):
+	tmp_role = request.GET.get("role")
+	if tmp_role == "Mentor" and request.user.profile.role == "":
+		request.user.profile.role = "Mentor"
+		request.user.save()
+	elif tmp_role == "Mentee" and request.user.profile.role == "":
+		request.user.profile.role = "Mentee"
+		request.user.save()
+	return JsonResponse({
+		"user_role":request.user.profile.role,
+	})
+
 @login_required
 def skill(request, skill_pk):
 	tmp_skill = Skill.objects.get(pk = skill_pk)
@@ -253,6 +265,7 @@ def get_user_json_sim(request,all_users):
 			if skill.skill_type not in skill_set:
 				skill_set[skill.skill_type] = []
 			new_skill = {
+				"skill_pk": skill.pk,
 				"skill_name": skill.skill_name,
 				"skill_type": skill.skill_type,
 				"skill_url":"/skills/"+str(skill.pk)+"/",
@@ -295,6 +308,7 @@ def get_user_json_sim(request,all_users):
 			"follow": Follow.objects.filter(follower=request.user, followee=user).exists(),
 			"avatar":avatar_url,
 			"matched":user.profile.matched,
+			"score":0,
 		}
 		all_users_list.append(new_user)
 	return JsonResponse({
@@ -310,6 +324,7 @@ def get_user_json(request, all_users):
 			if skill.skill_type not in skill_set:
 				skill_set[skill.skill_type] = []
 			new_skill = {
+				"skill_pk": skill.pk,
 				"skill_name": skill.skill_name,
 				"skill_type": skill.skill_type,
 				"skill_url":"/skills/"+str(skill.pk)+"/",
@@ -351,6 +366,7 @@ def get_user_json(request, all_users):
 			"follow": Follow.objects.filter(follower=request.user, followee=user).exists(),
 			"avatar":avatar_url,
 			"matched":user.profile.matched,
+			"score":0,
 		}
 		all_users_list.append(new_user)
 	print("--- %s seconds ---" % (time.time() - start_time))
@@ -359,8 +375,8 @@ def get_user_json(request, all_users):
 	})
 
 @login_required
-def skill_search(request):
-	return render(request, 'skill_search.html',{
+def tags(request):
+	return render(request, 'tags.html',{
 		"user": User.objects.get(username = request.user.username),
 		})
 

@@ -19,3 +19,4 @@ fuzzywuzzy
 python-Levenshtein
 numpy
 scipy
+django-webpack-loader
