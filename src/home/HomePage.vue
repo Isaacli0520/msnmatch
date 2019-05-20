@@ -276,7 +276,7 @@
                     return_all_users = return_all_users.concat(this.backup_all_users.filter(function(x){
                         return score_result.indexOf(x.pk.toString(10)) != -1;
                     }));
-                    console.log(key_arr[i],"---",return_all_users);
+                    // console.log(key_arr[i],"---",return_all_users);
                 }
                 return Array.from(new Set(return_all_users));
             },
