@@ -260,12 +260,15 @@
                 return Math.pow((x+1),(2/3.0))-Math.pow((x+1),(-1/8.0));
             },
             fuzzy_search(tmp_all_users, key_arr, field_query){
+                if(tmp_all_users.length == 0)
+                    return [];
                 var return_all_users = [];
                 for(let i = 0;i < key_arr.length; i++){
                     let result = tmp_all_users.reduce(function(map, obj) {
                         map[obj.pk] = obj[key_arr[i]];
                         return map;
                     }, {});
+                    // map is the resulting dictionary
                     let score_result = this.fuzz.extract(field_query, result, this.options);
                     score_result = score_result.map(function(y){
                         return y[2];
@@ -278,6 +281,8 @@
                 return Array.from(new Set(return_all_users));
             },
             fuzzy_search_skill(tmp_all_users, field_query){
+                if (tmp_all_users.length == 0)
+                    return [];
                 var return_all_users = [];
                 for(let i = 0;i < tmp_all_users.length; i++){
                     let tmp_skills = tmp_all_users[i].skills;
@@ -366,13 +371,17 @@
             },
             update_following_list(following_user, add_del){
                 if(add_del == 1){
-                    this.following.push(following_user)
-                    this.all_users.filter(function(item) { return item.pk === following_user.pk; })[0].follow = true;
+                    this.following.push(following_user);
+                    let all_users_filtered = this.all_users.filter(function(item) { return item.pk === following_user.pk;});
+                    if (all_users_filtered.length > 0)
+                        all_users_filtered[0].follow = true;
                     this.backup_all_users.filter(function(item) { return item.pk === following_user.pk; })[0].follow = true;
                 }
                 else if(add_del == 0){
                     this.following.splice(this.following.indexOf(following_user), 1);
-                    this.all_users.filter(function(item) { return item.pk === following_user.pk; })[0].follow = false;
+                    let all_users_filtered = this.all_users.filter(function(item) { return item.pk === following_user.pk;});
+                    if (all_users_filtered.length > 0)
+                        all_users_filtered[0].follow = false;
                     this.backup_all_users.filter(function(item) { return item.pk === following_user.pk; })[0].follow = false;
                 }
             },
