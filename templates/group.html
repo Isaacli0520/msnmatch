@@ -1,0 +1,20 @@
+<!-- templates/group.html -->
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+{% bootstrap_css %}
+{% load static %}
+{% load render_bundle from webpack_loader %}
+
+{% block title %}Groups{% endblock %}
+
+{% block css %}
+
+{% endblock %}
+
+{% block content %}
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js"></script>
+
+<div id="group-page"></div>
+{% render_bundle 'grouppage' %}
+
+{% endblock %}
