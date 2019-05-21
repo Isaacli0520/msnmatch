@@ -33,10 +33,25 @@ module.exports = {
             // output as dist/superadmin.html
             filename: 'superadmin.html',
         },
-        tagpage: {
-          entry: 'src/tagpage/main.js',
+        tagspage: {
+          entry: 'src/tags/main.js',
           template: 'templates/tags.html',
           filename: 'tags.html',
+        },
+        familypage: {
+          entry: 'src/family/main.js',
+          template: 'templates/family.html',
+          filename: 'family.html',
+        },
+        groupsmanagepage: {
+          entry: 'src/groupsmanage/main.js',
+          template: 'templates/groups_manage.html',
+          filename: 'groups_manage.html',
+        },
+        grouppage: {
+          entry: 'src/group/main.js',
+          template: 'templates/group.html',
+          filename: 'group.html',
         },
       },
 

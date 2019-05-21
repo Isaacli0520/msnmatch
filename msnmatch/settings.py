@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'storages',
     'skills',
     'webpack_loader',
+    'groups',
 ]
 
 MIDDLEWARE = [

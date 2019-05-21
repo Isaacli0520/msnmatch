@@ -105,9 +105,17 @@ def get_groups_json(group_queryset):
 			'group_tags':skill_set,
 			'picture':picture_url,
 			'avatar':avatar_url,
-			'managers':[{"pk":tmp_user.pk, "user_url":("/users/"+tmp_user.username+"/"),"first_name":tmp_user.first_name, "last_name":tmp_user.last_name} for tmp_user in group.group_users.filter(grouprelation__group_role="Manager")],
-			'members':[{"pk":tmp_user.pk, "user_url":("/users/"+tmp_user.username+"/"),"first_name":tmp_user.first_name, "last_name":tmp_user.last_name} for tmp_user in group.group_users.filter(grouprelation__group_role="Member")],
+			'managers': get_user_arr(group.group_users.filter(grouprelation__group_role="Manager")),
+			'members':get_user_arr(group.group_users.filter(grouprelation__group_role="Member")),
 		})
 	return JsonResponse({
 		"groups":ret_group_arr,
 	})
+
+def get_user_arr(queryset):
+	return [{"pk":tmp_user.pk, 
+			"year":tmp_user.profile.year, 
+			"user_url":("/users/"+tmp_user.username+"/"),
+			"first_name":tmp_user.first_name, 
+			"last_name":tmp_user.last_name} 
+			for tmp_user in queryset]
