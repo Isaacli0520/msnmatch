@@ -11,7 +11,7 @@
                 <autoComplete/>
             </div>
         </div>
-  </div>
+    </div>
 </template>
 
 <script>

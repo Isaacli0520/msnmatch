@@ -1,47 +1,59 @@
 <template>
-    <div>
-        <div class="mt-2 mb-2">
-            <div class="skill-user-tags mb-3">
-                <template class="skill-user-span" v-for="(skills_of_type, skills_type_name) in skills">
-                    <tag-span v-for="skill in skills_of_type"
-                        v-bind:key="skill.skill_name"
-                        v-bind:skill="skill"
-                        v-bind:clickable="'delete'"
-                        @add-skill="add_skill"
-                        @del-skill="del_skill"
-                    />
-                </template>
-            </div>
-            <div class="autocomplete mt-4">
-                <div :class="['search-form', (skill_results.length>0) ? 'search-form-active': '']">
-                    <div class="search-icon">
-                        <i class="fas fa-search"></i>
-                    </div>
-                    <input v-on:keyup="autocomplete_func" autocomplete="off" v-model="searchquery" id="myInput" type="text" name="class" placeholder="Search for a skill" class="search-input" aria-label="Search">
-                </div>
-                <div class="autocomplete-items">
-                    <div class="autocomplete-item" :key="skill.skill_pk" v-for="skill in skill_results" v-on:click="add_skill(skill)" :value="skill.skill_pk">
-                        <span class="auto-main font-weight-bold" >{{ skill.skill_name }}</span>
-                        <span class="auto-tag auto-skill-type" :class="skill.skill_type">{{ skill.skill_type }}</span> 
-                        <span class="auto-tag auto-custom" v-if="skill.skill_cus">Customized</span>
-                        <span class="auto-tag auto-exist" v-if="!skill.skill_cus">Existing</span>
-                    </div>
-                </div>
+    <div class="container">
+        <div class="col-12 mb-5" style = "width:100%; margin: 0 auto;">
+            <div class="container mt-5 mb-4 text-center">
+                <h1 class="display-4 skill-main-title" >Add Your Tags to Your Group</h1>
+                <h6 class="text-muted">Search for existing tags or Add your own tags</h6>
             </div>
         </div>
-        <div class="mt-4 mb-3">
-            <tag-list 
-                v-bind:all_skills="all_skills" 
-                @add-skill="add_skill"
-                @del-skill="del_skill"
-                />
+        <div class="col-xs-12 col-sm-12 col-md-10 col-lg-8 col-xs-offset-0 col-sm-offset-0" id = "skill-list-app" style="width:100%; margin: 0 auto;">
+            <div class="autocomplete mb-4" style="width:100%;">
+                <div>
+                    <div class="mt-2 mb-2">
+                        <div class="skill-user-tags mb-3">
+                            <template class="skill-user-span" v-for="(skills_of_type, skills_type_name) in skills">
+                                <tag-span v-for="skill in skills_of_type"
+                                    v-bind:key="skill.skill_name"
+                                    v-bind:skill="skill"
+                                    v-bind:clickable="'delete'"
+                                    @add-skill="add_skill"
+                                    @del-skill="del_skill"
+                                />
+                            </template>
+                        </div>
+                        <div class="autocomplete mt-4">
+                            <div :class="['search-form', (skill_results.length>0) ? 'search-form-active': '']">
+                                <div class="search-icon">
+                                    <i class="fas fa-search"></i>
+                                </div>
+                                <input v-on:keyup="autocomplete_func" autocomplete="off" v-model="searchquery" id="myInput" type="text" name="class" placeholder="Search for a skill" class="search-input" aria-label="Search">
+                            </div>
+                            <div class="autocomplete-items">
+                                <div class="autocomplete-item" :key="skill.skill_pk" v-for="skill in skill_results" v-on:click="add_skill(skill)" :value="skill.skill_pk">
+                                    <span class="auto-main font-weight-bold" >{{ skill.skill_name }}</span>
+                                    <span class="auto-tag auto-skill-type" :class="skill.skill_type">{{ skill.skill_type }}</span> 
+                                    <span class="auto-tag auto-custom" v-if="skill.skill_cus">Customized</span>
+                                    <span class="auto-tag auto-exist" v-if="!skill.skill_cus">Existing</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4 mb-3">
+                        <tag-list 
+                            v-bind:all_skills="all_skills" 
+                            @add-skill="add_skill"
+                            @del-skill="del_skill"
+                            />
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </template>
 
 <script>
-import TagList from './TagList'
-import TagSpan from './TagSpan'
+import TagList from '../components/TagList'
+import TagSpan from '../components/TagSpan'
 import axios from 'axios'
 
 export default{
@@ -57,14 +69,20 @@ export default{
         TagList,
         TagSpan,
     },
+    computed: {
+        group_pk: function(){
+            let url = window.location.pathname.split('/');
+            return url[url.length - 3];
+        },
+    },
     methods:{
         get_all_skills(){
             axios.get('/skills/ajax/get_all_skills/',{params: {}}).then(response => {
                 this.all_skills = response.data.all_skills;
             });
         },
-        get_all_user_skills(){
-            axios.get('/skills/ajax/get_all_user_skills/',{params: {}}).then(response => {
+        get_all_group_skills(){
+            axios.get('/skills/ajax/get_all_group_skills/',{params: {group_pk: this.group_pk}}).then(response => {
                 this.skills = response.data.all_skills;
             });
         },
@@ -72,7 +90,7 @@ export default{
             if (this.searchquery.length == 0){
                 this.skill_results = [];
             }
-            axios.get('/skills/ajax/result/',{params: {searchquery: this.searchquery}}).then(response => {
+            axios.get('/skills/ajax/group_result/',{params: {searchquery: this.searchquery, group_pk: this.group_pk}}).then(response => {
                 this.skill_results = [];
                 this.skill_results = response.data.skill_list;
                 let tmp_arr = response.data.skill_list.filter(obj =>{ return this.searchquery.toLowerCase() == obj.skill_name.toLowerCase() }); 
@@ -90,7 +108,7 @@ export default{
                 });
         },
         add_skill(skill){
-            axios.get('/skills/ajax/add_del_skill/',{params: {skill_pk: skill.skill_pk, add_del:"add", skill_cus:skill.skill_cus, skill_name:skill.skill_name}}).then(response => {
+            axios.get('/skills/ajax/add_del_group_skill/',{params: {skill_pk: skill.skill_pk, add_del:"add", skill_cus:skill.skill_cus, skill_name:skill.skill_name, group_pk: this.group_pk}}).then(response => {
                 if (skill.skill_exist == false){
                     skill.skill_exist = true;
                     if (!response.data.origin_exist){
@@ -100,7 +118,7 @@ export default{
                 });
         },
         del_skill(skill){
-            axios.get('/skills/ajax/add_del_skill/',{params: {skill_pk: skill.skill_pk, add_del:"del", skill_name:skill.skill_name}}).then(response => {
+            axios.get('/skills/ajax/add_del_group_skill/',{params: {skill_pk: skill.skill_pk, add_del:"del", skill_name:skill.skill_name, group_pk:this.group_pk}}).then(response => {
                 // console.log("delete a skill");  
                 if (skill.skill_exist == true){
                     skill.skill_exist = false;
@@ -113,7 +131,7 @@ export default{
         },
         },
     mounted(){
-        this.get_all_user_skills();
+        this.get_all_group_skills();
         this.get_all_skills();
         },
     }

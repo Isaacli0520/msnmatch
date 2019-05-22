@@ -21,6 +21,8 @@ from .models import MatchRequest
 
 @login_required
 def update_profile(request, username):
+	if request.user.username != username:
+		return redirect(reverse('update_profile', kwargs={"username": request.user.username, }))
 	if request.method == 'POST':
 		profile_form = ProfileForm(request.POST, request.FILES, instance=request.user.profile)
 		user_form = UserForm(request.POST, instance=request.user)

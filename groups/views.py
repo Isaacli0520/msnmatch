@@ -53,13 +53,24 @@ def get_group(request):
 	groups = Group.objects.filter(pk=int(request.GET.get('group_pk')))
 	return get_groups_json(groups)
 
+def get_group_edit(request):
+	return JsonResponse({
+		"edit":GroupRelation.objects.filter(user=request.user, group=get_object_or_404(Group, pk=int(request.GET.get('group_pk'))), group_role="Manager").exists(),
+		}) 
+
 def get_all_families(request):
 	families = Group.objects.filter(group_type = "Family")
 	return get_groups_json(families)
 
 @login_required
+def update_group_tags(request, group_pk):
+	return render(request, 'group_tag.html')
+
+@login_required
 def update_group(request, group_pk):
 	tmp_group = get_object_or_404(Group, pk=group_pk)
+	if not GroupRelation.objects.filter(user=request.user, group=tmp_group, group_role="Manager").exists():
+		return redirect(reverse('groups_manage'))
 	if request.method == 'POST':
 		group_form = GroupForm(request.POST, request.FILES, instance=tmp_group)
 		if group_form.is_valid():

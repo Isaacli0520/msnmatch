@@ -53,6 +53,11 @@ module.exports = {
           template: 'templates/group.html',
           filename: 'group.html',
         },
+        grouptagpage: {
+          entry: 'src/grouptag/main.js',
+          template: 'templates/group_tag.html',
+          filename: 'group_tag.html',
+        },
       },
 
     chainWebpack: config => {

@@ -1,0 +1,23 @@
+<!-- templates/group_tag.html -->
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+{% bootstrap_css %}
+{% load static %}
+{% load render_bundle from webpack_loader %}
+
+{% block title %}Tags for group{% endblock %}
+
+
+{% block content %}
+
+
+<link rel="stylesheet" href="{% static 'css/tags_color.css' %}">
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/axios@0.18.0/dist/axios.js"></script>
+
+<div id="group-tag-page"></div>
+
+{% render_bundle 'grouptagpage' %}
+
+{% endblock %}

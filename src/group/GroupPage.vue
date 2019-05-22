@@ -4,23 +4,46 @@
         <span>{{ group.group_name }}</span>
     </div>
     <hr>
-    <div class= "users-manager">
-        <div class="all-users">
-            <div class="user-div" :key="user.pk" v-for="user in group.managers">
-                <a :href="user.user_url" class="user-main">
-                    <span class="font-weight-bold">{{ user.first_name }} {{ user.last_name }}</span>
-                </a>
-                <span class="user-year">{{ user.year }}</span>
+    <div class="row w-100">
+        <div class="col-7 card-columns custom-card-columns">
+            <div class="card users-manager custom-card ">
+                <div class="card-body">
+                    <h5 class="card-title custom-card-title">Managers</h5>
+                    <div class="all-users">
+                        <div class="user-div" :key="user.pk" v-for="user in group.managers">
+                            <a :href="user.user_url" class="user-main">
+                                <span class="font-weight-bold">{{ user.first_name }} {{ user.last_name }}</span>
+                            </a>
+                            <span class="user-year">{{ user.year }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card users-member custom-card">
+                <div class="card-body">
+                    <h5 class="card-title custom-card-title">Members</h5>
+                    <div class="all-users">
+                        <div class="user-div" :key="user.pk" v-for="user in group.members">
+                            <a :href="user.user_url" class="user-main">
+                                <span class="font-weight-bold">{{ user.first_name }} {{ user.last_name }}</span>
+                            </a>
+                            <span class="user-year">{{ user.year }}</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-    <div class= "users-member">
-        <div class="all-users">
-            <div class="user-div" :key="user.pk" v-for="user in group.members">
-                <a :href="user.user_url" class="user-main">
-                    <span class="font-weight-bold">{{ user.first_name }} {{ user.last_name }}</span>
-                </a>
-                <span class="user-year">{{ user.year }}</span>
+        <div class="col-5">
+            <div class="card w-100 custom-card">
+                <img :src="group.picture" class="card-img-top" alt="none">
+                <div class="card-body">
+                    <div>
+                        <a v-if="edit" :href="group_edit_url">Edit Group</a>
+                    </div>
+                    <div>
+                        <a v-if="edit" :href="group_tag_url">Add Tags</a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -38,6 +61,8 @@ export default {
     data: function(){
         return{
             group:{},
+            edit:false,
+
         }
     },
     methods: {
@@ -58,12 +83,23 @@ export default {
         },
     },
     computed: {
+        group_pk: function(){
+            let url = window.location.pathname.split('/');
+            return url[url.length - 2];
+        },
+        group_edit_url: function(){
+            return '/groups/' + this.group_pk + '/edit/';
+        },
+        group_tag_url: function(){
+            return '/groups/' + this.group_pk + '/tags/';
+        },
     },
     mounted(){
-        let url = window.location.pathname.split('/');
-        console.log("url",window.location.pathname,'----', url, '---', url[url.length - 2]);
-        axios.get('/groups/ajax/get_group/',{params: {'group_pk': url[url.length - 2]}}).then(response => {
+        axios.get('/groups/ajax/get_group/',{params: {'group_pk': this.group_pk}}).then(response => {
             this.group = response.data.groups[0]; 
+        });
+        axios.get('/groups/ajax/get_group_edit/',{params: {'group_pk': this.group_pk}}).then(response => {
+            this.edit = response.data.edit; 
         });
     },
 }
@@ -72,6 +108,22 @@ export default {
 <style scoped lang="css">
     *{
         box-sizing: border-box;
+    }
+
+    .custom-card-columns{
+        column-count: 1 !important;
+    }
+
+    .custom-card{
+        padding: 0px 10px 0px 10px;
+        margin-bottom: 20px !important;
+    }
+
+    .custom-card-title{
+        color:#000000;
+        font-weight: 500;
+        font-size: 29px !important;
+        font-family: Baskerville, "Baskerville Old Face", sans-serif;
     }
 
     .big-title{
@@ -84,7 +136,7 @@ export default {
     .user-div{
         box-shadow: 0 2px 5px 0 rgba(0,0,0,.16), 0 2px 10px 0 rgba(0,0,0,.12);
         border-radius: 8px;
-        margin: 5px 10px 5px 10px;
+        margin: 5px 0px 5px 0px;
         padding: 8px 14px 8px 20px;
         overflow: hidden;
         background: #ffffff;  
