@@ -38,6 +38,16 @@
                     </table>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" id="follow-btn"
+                            class="btn btn-Primary" 
+                            v-if="!family.follow && requestUser.role != '' && (family.managers.map(obj => {return obj.pk;}).indexOf(requestUser.pk) == -1)"
+                            @click.stop="addToFav(family)"
+                            >Add to Favorites</button>
+                        <button type="button" id="unfollow-btn"
+                            class="btn btn-Danger" 
+                            v-if="family.follow && requestUser.role != ''  && (family.managers.map(obj => {return obj.pk;}).indexOf(requestUser.pk) == -1)"
+                            @click.stop="delFromFav(family)"
+                            >Remove from Favorites</button>
                     </div>
                 </div>
             </div>
@@ -49,7 +59,6 @@
 <script>
 
 import TagSpan from './TagSpan'
-
 export default {
     props: {
         requestUser: Object,
@@ -59,12 +68,18 @@ export default {
         TagSpan,
     },
     methods: {
-        addToFav(modal_user){
-            this.$emit('add-to-fav', modal_user); 
+        addToFav(family){
+            this.$emit('add-to-fav', family); 
+        },
+        delFromFav(family){
+            this.$emit('del-from-fav', family); 
         },
     },
     computed: {
-    }
+    },
+    mounted(){
+        console.log("mounted", this.manager_pk);
+    },
 }
 </script>
 

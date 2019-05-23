@@ -24,7 +24,7 @@ from fuzzywuzzy import fuzz, process
 from msnmatch import settings
 from django.shortcuts import get_object_or_404
 import time
-from groups.models import Group, GroupRelation, TagRelation
+from groups.models import Group, GroupRelation, TagRelation, GroupFollowRelation
 
 MAXIMUM_COURSES = 12
 DEBUGGG = False
@@ -44,12 +44,14 @@ def skill_rank(request):
 def add_del_skill(request):
 	user = request.user
 	add_del = request.GET.get("add_del")
+	added = False
 	if not Skill.objects.filter(pk = request.GET.get("skill_pk")).exists() and add_del == "add":
 		exist = False
 		if not Skill.objects.filter(skill_name = request.GET.get("skill_name")).exists():
 			skill = Skill.objects.create(skill_name=request.GET.get("skill_name"), skill_intro="", skill_type="Custom")
 			SkillRelation.objects.create(user=user,skill=skill)
 			exist = True
+			added = True
 			origin_exist = False
 		else:
 			origin_exist = True
@@ -63,22 +65,27 @@ def add_del_skill(request):
 				skill.delete()
 		elif not SkillRelation.objects.filter(user=user, skill=skill).exists() and add_del == "add":
 			SkillRelation.objects.create(user=user,skill=skill)
+			added = True
 		exist = SkillRelation.objects.filter(user=user, skill=skill).exists()
 
 	return JsonResponse({
 		"exist": exist,
 		"origin_exist":origin_exist,
+		"added": added,
+		"skill_exist":SkillRelation.objects.filter(user=user, skill=skill).exists(),
 	})
 
 def add_del_group_skill(request):
 	group = get_object_or_404(Group, pk=int(request.GET.get('group_pk')))
 	add_del = request.GET.get("add_del")
+	added = False
 	if not Skill.objects.filter(pk = request.GET.get("skill_pk")).exists() and add_del == "add":
 		exist = False
 		if not Skill.objects.filter(skill_name = request.GET.get("skill_name")).exists():
 			skill = Skill.objects.create(skill_name=request.GET.get("skill_name"), skill_intro="", skill_type="Custom")
 			TagRelation.objects.create(group=group, tag=skill)
 			exist = True
+			added = True
 			origin_exist = False
 		else:
 			origin_exist = True
@@ -91,11 +98,14 @@ def add_del_group_skill(request):
 				skill.delete()
 		elif not TagRelation.objects.filter(group=group, tag=skill).exists() and add_del == "add":
 			TagRelation.objects.create(group=group, tag=skill)
+			added = True
 		exist = TagRelation.objects.filter(group=group, tag=skill).exists()
 
 	return JsonResponse({
 		"exist": exist,
 		"origin_exist":origin_exist,
+		"added": added,
+		"skill_exist":TagRelation.objects.filter(group=group, tag=skill).exists(),
 	})
 
 def choose_role(request):
@@ -198,6 +208,16 @@ def add_to_list(request):
 		"success": success,
 	})
 
+def add_to_group_list(request):
+	to_group = get_object_or_404(Group, pk=int(request.GET.get('group_pk')))
+	success = 0
+	if not GroupFollowRelation.objects.filter(user=request.user, group=to_group).exists() and GroupFollowRelation.objects.filter(user=request.user).count() < 3:
+		GroupFollowRelation.objects.create(user=request.user, group=to_group)
+		success = 1
+	return JsonResponse({
+		"success": success,
+	})
+
 def get_follow_list(request):
 	following = Follow.objects.following(request.user)
 	# print("following", following)
@@ -227,6 +247,14 @@ def del_fav(request):
 		
 	})
 
+def del_group_fav(request):
+	to_group = get_object_or_404(Group, pk = int(request.GET.get('group_pk')))
+	if GroupFollowRelation.objects.filter(user=request.user, group=to_group).exists():
+		GroupFollowRelation.objects.get(user=request.user, group=to_group).delete()
+	return JsonResponse({
+
+	})
+
 
 def get_all_skills(request):
 	all_skills = Skill.objects.all()
@@ -236,6 +264,28 @@ def get_all_skills(request):
 		if skill.skill_type not in skill_set and skill.skill_type != "Custom":
 			skill_set[skill.skill_type] = []
 		if not SkillRelation.objects.filter(user=request.user, skill=skill).exists():
+			new_skill = {
+				"skill_pk": skill.pk,
+				"skill_name": skill.skill_name,
+				"skill_intro": skill.skill_intro,
+				"skill_type": skill.skill_type,
+				"skill_exist": False,
+			}
+			skill_set[skill.skill_type].append(new_skill)
+
+	return JsonResponse({
+		"all_skills":skill_set,
+		})
+
+def get_all_skills_group(request):
+	all_skills = Skill.objects.all()
+	group = get_object_or_404(Group, pk=int(request.GET.get('group_pk')))
+	# skill_list = []
+	skill_set = {}
+	for skill in all_skills.exclude(skill_type="Custom"):
+		if skill.skill_type not in skill_set and skill.skill_type != "Custom":
+			skill_set[skill.skill_type] = []
+		if not TagRelation.objects.filter(group=group, tag=skill).exists():
 			new_skill = {
 				"skill_pk": skill.pk,
 				"skill_name": skill.skill_name,

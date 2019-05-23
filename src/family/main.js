@@ -3,6 +3,7 @@ import FamilyPage from './FamilyPage.vue'
 
 Vue.config.productionTip = false
 
+
 new Vue({
   render: h => h(FamilyPage),
   components: { FamilyPage }

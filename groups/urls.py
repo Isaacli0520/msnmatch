@@ -13,4 +13,5 @@ urlpatterns = [
   path('ajax/get_member_groups/', views.get_member_groups, name='get_member_groups'),
   path('ajax/get_group/', views.get_group, name='get_group'),
   path('ajax/get_group_edit/', views.get_group_edit, name='get_group_edit'),
+  path('ajax/get_family_page_basic_info/',views.get_family_page_basic_info, name='get_family_page_basic_info'),
 ]

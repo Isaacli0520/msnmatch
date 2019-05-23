@@ -83,7 +83,7 @@
                     && user.role != requestUser.role 
                     && requestUser.pk != user.pk " 
                     class="btn btn-Primary" @click.stop="addToFav(user)"
-                    >Add to Favorite</button>
+                    >Add to Favorites</button>
                 </div>
             </div>
         </div>

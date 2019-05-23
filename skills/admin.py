@@ -6,7 +6,7 @@ class SkillRelationInline(admin.TabularInline):
     model = Skill.skill_users.through
 
 class SkillAdmin(admin.ModelAdmin):
-    list_display = ['skill_name', 'skill_intro', 'skill_type']
+    list_display = ['skill_name','pk', 'skill_intro', 'skill_type']
     list_filter = ('skill_type',)
     inlines = [
         SkillRelationInline,

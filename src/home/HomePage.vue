@@ -42,6 +42,12 @@
                                         <li class="nav-item">
                                             <a class="nav-link" :href="trending_tags_url">Trending Tags</a>
                                         </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" :href="family_url">Family</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" :href="group_manage_url">Group</a>
+                                        </li>
                                     </ul>
                                 </div>
                             
@@ -134,6 +140,8 @@
             return{
             home_url:"",
             tags_url:"",
+            family_url:"",
+            group_manage_url:"",
             trending_tags_url:"",
             brand_pic:"",
             profile:"",
@@ -400,6 +408,8 @@
                 let data = response.data.all_info;
                 this.home_url = data.home_url;
                 this.tags_url = data.tags_url;
+                this.family_url = data.family_url;
+                this.group_manage_url = data.group_manage_url;
                 this.trending_tags_url = data.trending_tags_url;
                 this.brand_pic = data.brand_pic;
                 this.profile = data.profile;

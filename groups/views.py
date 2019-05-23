@@ -15,7 +15,7 @@ import json
 import random
 from msnmatch import settings
 from django.shortcuts import get_object_or_404
-from .models import Group, GroupRelation
+from .models import Group, GroupRelation, GroupFollowRelation
 import time
 from .forms import GroupForm
 
@@ -60,7 +60,7 @@ def get_group_edit(request):
 
 def get_all_families(request):
 	families = Group.objects.filter(group_type = "Family")
-	return get_groups_json(families)
+	return get_family_json(request, families)
 
 @login_required
 def update_group_tags(request, group_pk):
@@ -82,6 +82,57 @@ def update_group(request, group_pk):
 		'group_form': group_form,
 	})
 
+def get_family_page_basic_info(request):
+	tmp = {
+		"request_user_username":request.user.username,
+		"request_user_pk":request.user.pk,
+		"request_user_role":request.user.profile.role,
+	}
+	return JsonResponse({
+		"all_info":tmp,
+	})
+
+
+def get_family_json(request, group_queryset):
+	ret_group_arr = []
+	for group in group_queryset:
+		skill_set = {}
+		for skill in group.group_tags.all():
+			if skill.skill_type not in skill_set:
+				skill_set[skill.skill_type] = []
+			new_skill = {
+				"skill_pk": skill.pk,
+				"skill_name": skill.skill_name,
+				"skill_type": skill.skill_type,
+				"skill_url":"/skills/"+str(skill.pk)+"/",
+			}
+			skill_set[skill.skill_type].append(new_skill)
+		
+		if group.picture:
+			picture_url = group.picture.url
+		else:
+			picture_url = settings.STATIC_URL + "css/images/brand.jpg"
+
+		if group.avatar:
+			avatar_url = group.avatar.url
+		else:
+			avatar_url = settings.STATIC_URL + "css/images/brand_blur.jpg"
+
+		ret_group_arr.append({
+			'pk':group.pk,
+			'group_name':group.group_name,
+			'group_type':group.group_type,
+			'group_intro':group.group_intro,
+			'group_tags':skill_set,
+			'picture':picture_url,
+			'avatar':avatar_url,
+			'managers': get_user_arr(group.group_users.filter(grouprelation__group_role="Manager")),
+			'members':get_user_arr(group.group_users.filter(grouprelation__group_role="Member")),
+			'follow':GroupFollowRelation.objects.filter(user=request.user, group=group).exists(),
+		})
+	return JsonResponse({
+		"groups":ret_group_arr,
+	})
 
 def get_groups_json(group_queryset):
 	ret_group_arr = []

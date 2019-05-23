@@ -2,7 +2,7 @@
     <div class="container">
         <div class="col-12 mb-5" style = "width:100%; margin: 0 auto;">
             <div class="container mt-5 mb-4 text-center">
-                <h1 class="display-4 skill-main-title" >Add Your Tags to Your Group</h1>
+                <h1 class="display-4 skill-main-title" >Add Tags to Your Group</h1>
                 <h6 class="text-muted">Search for existing tags or Add your own tags</h6>
             </div>
         </div>
@@ -77,7 +77,7 @@ export default{
     },
     methods:{
         get_all_skills(){
-            axios.get('/skills/ajax/get_all_skills/',{params: {}}).then(response => {
+            axios.get('/skills/ajax/get_all_skills_group/',{params: {group_pk: this.group_pk}}).then(response => {
                 this.all_skills = response.data.all_skills;
             });
         },
@@ -109,11 +109,18 @@ export default{
         },
         add_skill(skill){
             axios.get('/skills/ajax/add_del_group_skill/',{params: {skill_pk: skill.skill_pk, add_del:"add", skill_cus:skill.skill_cus, skill_name:skill.skill_name, group_pk: this.group_pk}}).then(response => {
-                if (skill.skill_exist == false){
-                    skill.skill_exist = true;
+                // if (skill.skill_exist == false){
+                //     skill.skill_exist = true;
+                //     if (!response.data.origin_exist){
+                //         this.skills[skill.skill_type].splice(this.skills[skill.skill_type].indexOf(skill), 0, skill);
+                //     }
+                // }
+                if (response.data.added){
+                    skill.skill_exist = response.data.skill_exist;
                     if (!response.data.origin_exist){
                         this.skills[skill.skill_type].splice(this.skills[skill.skill_type].indexOf(skill), 0, skill);
                     }
+                    this.all_skills[skill.skill_type].splice(this.all_skills[skill.skill_type].indexOf(skill), 1);
                 }
                 });
         },
@@ -139,6 +146,11 @@ export default{
 
 
 <style scoped lang="css">
+
+    .skill-main-title{
+        color:#32a49a; 
+        font-family: Palatino, URW Palladio L, serif;
+    }
 
     .autocomplete {
         width:100%;

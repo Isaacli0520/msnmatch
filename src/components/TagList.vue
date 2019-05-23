@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div v-for="(skills_of_type, skills_type_name) in all_skills">
+        <div :key="skills_type_name" v-for="(skills_of_type, skills_type_name) in all_skills">
             <h4 class="skill-type-text">{{skill_type_names[skills_type_name]}}</h4>
             <div class="skill-tags">
                 <tag-span v-for="skill in skills_of_type"
@@ -42,7 +42,6 @@ export default{
     methods:{
         add_skill(skill){
             this.$emit('add-skill', skill);
-            this.all_skills[skill.skill_type].splice(this.all_skills[skill.skill_type].indexOf(skill), 1);
         },
         del_skill(skill){
             this.$emit('del-skill', skill);

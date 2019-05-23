@@ -1,7 +1,7 @@
 <template>
     <div class="mt-3 mb-3 col-xs-12 col-sm-12 col-md-10 col-lg-10 col-xs-offset-0 col-sm-offset-0 container" id="admin-app" style="width:100%; margin: 0 auto;">
-        <div class="text-center mt-3 mb-3">
-            <h1>Groups you can manage</h1>
+        <div class="big-title mt-2 mb-2 text-center">
+            <span>Groups you can manage</span>
         </div>
         <div class="card-columns">
             <group-card 
@@ -11,8 +11,8 @@
             @open-modal="openModal"
             />
         </div>
-        <div class="text-center mt-3 mb-3">
-            <h1>Groups you are in</h1>
+        <div class="big-title mt-2 mb-2 text-center">
+            <span>Groups you are in</span>
         </div>
         <div class="card-columns">
             <group-card 
@@ -73,6 +73,13 @@ export default {
 <style scoped lang="css">
     *{
         box-sizing: border-box;
+    }
+
+    .big-title{
+        color:#000000;
+        font-weight: 500;
+        font-size: 42px !important;
+        font-family: Baskerville, "Baskerville Old Face", sans-serif;
     }
 
     .card-columns{

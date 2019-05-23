@@ -18,6 +18,7 @@
                 <span :key="family_manager.pk" v-for="family_manager in family.managers" class="group-id-tag group-id-manager-name" >
                     {{ family_manager.first_name }} {{ family_manager.last_name }}
                 </span>
+                <span v-if="family.follow" class="group-id-tag group-id-tag-fav">Like</span>
             </div>
         </div>
     </div>
@@ -79,6 +80,11 @@ export default {
         padding: 2px 6px 2px 6px;
         margin: 5px 4px 0px 0px;
         border-radius: 4px;
+    }
+
+    .group-id-tag-fav{
+        color:#ffffff;
+        background: rgba(255, 0, 43, 0.993);
     }
 
     .group-id-manager-name{

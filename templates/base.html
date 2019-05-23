@@ -25,6 +25,8 @@
     {% url 'course_search_auto' as courses_auto %}
     {% url 'tags' as tags %}
     {% url 'skill_rank' as skill_rank %}
+    {% url 'family' as family %}
+    {% url 'groups_manage' as groups_manage %}
     {% block css %}
     {% endblock %}
 	</head>
@@ -47,6 +49,12 @@
                 </li>
                 <li class="nav-item {% active request skill_rank %}">
                     <a class="nav-link" href="{{ skill_rank }}">Trending Tags</a>
+                </li>
+                <li class="nav-item {% active request family %}">
+                    <a class="nav-link" href="{{ family }}">Family</a>
+                </li>
+                <li class="nav-item {% active request groups_manage %}">
+                    <a class="nav-link" href="{{ groups_manage }}">Group</a>
                 </li>
             </ul>
         </div>

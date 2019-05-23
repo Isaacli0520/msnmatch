@@ -1,7 +1,7 @@
 <template>
     <div class="mt-3 mb-3 col-xs-12 col-sm-12 col-md-10 col-lg-10 col-xs-offset-0 col-sm-offset-0 container" id="admin-app" style="width:100%; margin: 0 auto;">
-        <div class="text-center mt-3 mb-3">
-            <h1>Super Cool Family Page</h1>
+        <div class="big-title mt-2 mb-2 text-center">
+            <span>Super Cool Family Page</span>
         </div>
         <div class="card-columns">
             <family-card 
@@ -13,8 +13,9 @@
         </div>
         <family-modal
             v-bind:family="modal_family"
-            v-bind:requestUser="requestUser"
+            v-bind:requestUser="request_user"
             @add-to-fav="addToFav"
+            @del-from-fav="delFromFav"
         />
     </div>
 </template>
@@ -35,29 +36,39 @@ export default {
         return {        
         allFmls: [],  
         tags: [],
-        following: [],
-        requestUser: {},
-        flw_limit : 2,
+        request_user:{
+                "username":"",
+                "pk":"",
+                "role":"",
+            },
+        flw_limit : 3,
         modal_family: {
             "pk": -1,
             "group_type": "",
             "group_name": "",
             "group_intro": "",
-            "managers":{},
-            "members":{},
+            "managers":[],
+            "members":[],
             "group_tags":{},
             "picture": "",
             "avatar":"",
         },
         }
     },
+    computed:{
+        following: function(){
+            return this.allFmls.filter(obj => {
+                return obj.follow
+            }).length
+        },
+    },
     methods:{
         openModal(family){
             this.modal_family = family;
             $('#family-modal').modal('show');
         },
-        addToFav(user){
-            if (this.following.length >= this.flw_limit){
+        addToFav(family){
+            if (this.following >= this.flw_limit){
                     $('#follow-btn').popover({
                             trigger: 'focus',
                             placement: 'top',
@@ -65,29 +76,36 @@ export default {
                             html: true,
                             content: "Don't be too 花心 <br /> You can only like 3 users",
                         });
-                    $('#follow-btn').popover('show')
+                    $('#follow-btn').popover('show');
                 }
             else{
                 $('#follow-btn').popover('disable')
-                axios.get('/skills/ajax/add_to_list/',{params: {user_pk:user.pk}}).then(response => {
-                    $('#user-modal').modal('hide');
-                    var tmp_fav = {
-                        "pk": user.pk,
-                        "user_url": user.user_url,
-                        "first_name": user.first_name,
-                        "last_name": user.last_name,
-                    }
-                    if(response.data.success == 1){
-                        this.$emit('update-following-list', tmp_fav ,1); 
-                    }
+                axios.get('/skills/ajax/add_to_group_list/',{params: {group_pk:family.pk}}).then(response => {
+                    $('#family-modal').modal('hide');
+                    this.allFmls[this.allFmls.indexOf(family)].follow = true;
                 });
             }
+        },
+        delFromFav(family){
+            axios.get('/skills/ajax/del_group_fav/',{params: {group_pk:family.pk}}).then(response => {
+                $('#follow-btn').popover('hide');
+                $('#follow-btn').popover('disable');
+                $('#family-modal').modal('hide');
+                this.allFmls[this.allFmls.indexOf(family)].follow = false;
+            });
         },
     },
     mounted(){
         axios.get('/groups/ajax/get_all_families/',{params: {}}).then(response => {
             this.allFmls = response.data.groups; 
         });
+        axios.get('/groups/ajax/get_family_page_basic_info/', {params:{}}).then(response =>{
+            let data = response.data.all_info;
+            console.log("basic_info",data);
+            this.request_user.role = data.request_user_role;
+            this.request_user.username = data.request_user_username;
+            this.request_user.pk = data.request_user_pk;
+        })
     },
 }
 </script>
@@ -95,6 +113,13 @@ export default {
 <style scoped lang="css">
     *{
         box-sizing: border-box;
+    }
+    
+    .big-title{
+        color:#000000;
+        font-weight: 500;
+        font-size: 42px !important;
+        font-family: Baskerville, "Baskerville Old Face", sans-serif;
     }
 
     .card-columns{

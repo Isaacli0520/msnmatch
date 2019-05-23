@@ -91,11 +91,19 @@ export default{
         },
         add_skill(skill){
             axios.get('/skills/ajax/add_del_skill/',{params: {skill_pk: skill.skill_pk, add_del:"add", skill_cus:skill.skill_cus, skill_name:skill.skill_name}}).then(response => {
-                if (skill.skill_exist == false){
-                    skill.skill_exist = true;
+                // if (skill.skill_exist == false){
+                //     skill.skill_exist = true;
+                //     if (!response.data.origin_exist){
+                //         this.skills[skill.skill_type].splice(this.skills[skill.skill_type].indexOf(skill), 0, skill);
+                //     }
+                //     this.all_skills[skill.skill_type].splice(this.all_skills[skill.skill_type].indexOf(skill), 1);
+                // }
+                if (response.data.added){
+                    skill.skill_exist = response.data.skill_exist;
                     if (!response.data.origin_exist){
                         this.skills[skill.skill_type].splice(this.skills[skill.skill_type].indexOf(skill), 0, skill);
                     }
+                    this.all_skills[skill.skill_type].splice(this.all_skills[skill.skill_type].indexOf(skill), 1);
                 }
                 });
         },

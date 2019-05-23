@@ -89,5 +89,9 @@ class TagRelation(models.Model):
 	tag = models.ForeignKey(Skill, on_delete=models.CASCADE)
 	group = models.ForeignKey(Group, on_delete=models.CASCADE)
 
+class GroupFollowRelation(models.Model):
+	user = models.ForeignKey(User, on_delete=models.CASCADE)
+	group = models.ForeignKey(Group, on_delete=models.CASCADE)
+
 
 	
