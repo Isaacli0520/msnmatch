@@ -23,7 +23,7 @@
                         <tbody>
                             <tr>
                                 <td class="field-title">Family Heads</td>
-                                <td><a :href="tmp_user.user_url" :key="tmp_user.pk" v-for="tmp_user in family.managers">{{ tmp_user.first_name }} {{ tmp_user.last_name }}</a></td>
+                                <td><a :href="tmp_user.user_url" :key="tmp_user.pk" v-for="tmp_user in family.managers"><span class="inline-name">{{ tmp_user.first_name }} {{ tmp_user.last_name }}</span></a></td>
                             </tr>
                             <tr>
                                 <td class="field-title">Family Name</td>
@@ -40,12 +40,12 @@
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                         <button type="button" id="follow-btn"
                             class="btn btn-Primary" 
-                            v-if="!family.follow && requestUser.role != '' && (family.managers.map(obj => {return obj.pk;}).indexOf(requestUser.pk) == -1)"
+                            v-if="!family.follow && requestUser.role == 'Mentee' && (family.managers.map(obj => {return obj.pk;}).indexOf(requestUser.pk) == -1)"
                             @click.stop="addToFav(family)"
                             >Add to Favorites</button>
                         <button type="button" id="unfollow-btn"
                             class="btn btn-Danger" 
-                            v-if="family.follow && requestUser.role != ''  && (family.managers.map(obj => {return obj.pk;}).indexOf(requestUser.pk) == -1)"
+                            v-if="family.follow && requestUser.role == 'Mentee'  && (family.managers.map(obj => {return obj.pk;}).indexOf(requestUser.pk) == -1)"
                             @click.stop="delFromFav(family)"
                             >Remove from Favorites</button>
                     </div>
@@ -98,6 +98,16 @@ export default {
         width:100%;
         margin: 5px 0px 20px 0px;
         }
+
+    .inline-name{
+        padding: 5px 9px 5px 9px;
+        border-radius: 5px;
+        margin: 1px 4px 1px 0px;
+        font-family: Gill Sans, sans-serif;
+        box-shadow: 0 6px 8px rgba(0, 0, 0, 0.175);
+        color: #ffffff;
+        background-color: #5bd4b6;
+    }
 
     .skill-tag{
         padding: 5px 9px 5px 9px;
