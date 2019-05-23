@@ -60,6 +60,8 @@
                                             <div class="dropdown-menu custom-drop-menu w-100 dropdown-menu-right" aria-labelledby="help-nav">
                                                 <a class="dropdown-item" @click="openModal('get-started')">Get Started</a>
                                                 <a class="dropdown-item" @click="openModal('match-rule')">Match Rule</a>
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" @click="openModal('updates')">Updates</a>
                                             </div> 
                                         </li>
                                         <follow-list
@@ -159,7 +161,8 @@
             modal_title:"",
             modal_title_dist:{
                 "get-started":"Get Started",
-                "match-rule":"Mentee Mentor Match Rule"
+                "match-rule":"Mentee Mentor Match Rule",
+                "updates":"Updates",
             },
             modal_content:"",
             modal_content_dist:{
@@ -180,7 +183,15 @@
                 <br>3. The first one should be the one you prefer the most and so on for the rest.</p>\
                 <p class='font-weight-bold'>How are Mentees and Mentors Matched?</p>\
                 <p>1. This is done by the mentor program chair, feel free to contact him if you have any question.(WeChat Id: zgt19991026)</p>\
-                " 
+                ",
+                
+                "updates":"<p class='font-weight-bold'>2019-05-23</p> \
+                <strong>1. Add Family Page</strong> \
+                <ul><li>Mentees can now like up to 3 families</li></ul>\
+                <strong>2. Add Group Management Page</strong>\
+                <ul><li>Family heads can now customize family information at the Group Management Page</li></ul>\
+                <strong>3. Bio maximum words changed from 500 to 1000</strong>\
+                "
             },
             fuzz: null,
             options:null,

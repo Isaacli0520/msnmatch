@@ -64,6 +64,9 @@ def get_all_families(request):
 
 @login_required
 def update_group_tags(request, group_pk):
+	tmp_group = get_object_or_404(Group, pk=group_pk)
+	if not GroupRelation.objects.filter(user=request.user, group=tmp_group, group_role="Manager").exists():
+		return redirect(reverse('groups_manage'))
 	return render(request, 'group_tag.html')
 
 @login_required

@@ -116,7 +116,7 @@ export default {
     }
     
     .big-title{
-        color:#000000;
+        color:#32a49a;
         font-weight: 500;
         font-size: 42px !important;
         font-family: Baskerville, "Baskerville Old Face", sans-serif;

@@ -1,7 +1,8 @@
 <template>
     <div class="mt-3 mb-3 col-xs-12 col-sm-12 col-md-10 col-lg-10 col-xs-offset-0 col-sm-offset-0 container" id="admin-app" style="width:100%; margin: 0 auto;">
         <div class="big-title mt-2 mb-2 text-center">
-            <span>Groups you can manage</span>
+            <span v-if="all_manager_groups.length >  0">Groups you can manage</span>
+            <span v-else>You have no groups to manage</span>
         </div>
         <div class="card-columns">
             <group-card 
@@ -12,7 +13,8 @@
             />
         </div>
         <div class="big-title mt-2 mb-2 text-center">
-            <span>Groups you are in</span>
+            <span v-if="all_manager_groups.length >  0">Groups you are in</span>
+            <span v-else>You are not in any groups</span>
         </div>
         <div class="card-columns">
             <group-card 
@@ -76,7 +78,7 @@ export default {
     }
 
     .big-title{
-        color:#000000;
+        color:#32a49a;
         font-weight: 500;
         font-size: 42px !important;
         font-family: Baskerville, "Baskerville Old Face", sans-serif;

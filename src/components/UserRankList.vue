@@ -1,6 +1,6 @@
 <template>
     <div class="all-users">
-        <div v-for="user in all_users_list">
+        <div :key="user.pk" v-for="user in all_users_list">
             <div class="user-big-div">
                 <div class="user-div" @click=collapseDiv(user.pk)>
                     <span class="user-main font-weight-bold">{{ user.first_name }} {{ user.last_name }}</span>

@@ -120,7 +120,7 @@ export default {
     }
 
     .custom-card-title{
-        color:#000000;
+        color:#32a49a;
         font-weight: 500;
         font-size: 29px !important;
         font-family: Baskerville, "Baskerville Old Face", sans-serif;
