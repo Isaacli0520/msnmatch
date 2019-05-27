@@ -185,7 +185,11 @@
                 <p>1. This is done by the mentor program chair, feel free to contact him if you have any question.(WeChat Id: zgt19991026)</p>\
                 ",
                 
-                "updates":"<p class='font-weight-bold'>2019-05-23</p> \
+                "updates":"<p class='font-weight-bold'>2019-05-27</p> \
+                <strong>1. Fuzzy search algorithm changed for specific fields</strong><br>\
+                <strong>2. Number of trending tags changed from 50 to 75</strong><br>\
+                <strong>3. Family page title fixed</strong><br><br>\
+                <p class='font-weight-bold'>2019-05-23</p> \
                 <strong>1. Add Family Page</strong> \
                 <ul><li>Mentees can now like up to 3 families</li></ul>\
                 <strong>2. Add Group Management Page</strong>\
@@ -342,7 +346,10 @@
                             tmp_all_users = ref.fuzzy_search(tmp_all_users, ['last_name'], field_query);
                         }
                         else if(["gender","sex"].indexOf(field_tag) != -1){
+                            let tmp_scorer = ref.options.scorer;
+                            ref.options.scorer = ref.fuzz.token_sort_ratio;
                             tmp_all_users = ref.fuzzy_search(tmp_all_users, ['sex'], field_query);
+                            ref.options.scorer = tmp_scorer;
                         }
                         else if(["birth date", "birth_date", "birthdate","birth","date"].indexOf(field_tag) != -1){
                             tmp_all_users = ref.fuzzy_search(tmp_all_users, ['birth_date'], field_query);
