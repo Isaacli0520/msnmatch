@@ -26,6 +26,10 @@
                                 <td><a :href="tmp_user.user_url" :key="tmp_user.pk" v-for="tmp_user in family.managers"><span class="inline-name">{{ tmp_user.first_name }} {{ tmp_user.last_name }}</span></a></td>
                             </tr>
                             <tr>
+                                <td class="field-title">Family Members</td>
+                                <td><a :href="tmp_user.user_url" :key="tmp_user.pk" v-for="tmp_user in family.members"><span class="inline-name">{{ tmp_user.first_name }} {{ tmp_user.last_name }}</span></a></td>
+                            </tr>
+                            <tr>
                                 <td class="field-title">Family Name</td>
                                 <td>{{family.group_name}}</td>
                             </tr>
@@ -40,12 +44,12 @@
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                         <button type="button" id="follow-btn"
                             class="btn btn-Primary" 
-                            v-if="!family.follow && requestUser.role == 'Mentee' && (family.managers.map(obj => {return obj.pk;}).indexOf(requestUser.pk) == -1)"
+                            v-if="inGroups == 0 && !family.inGroup && requestUser.role == 'Mentee' && (family.managers.map(obj => {return obj.pk;}).indexOf(requestUser.pk) == -1)"
                             @click.stop="addToFav(family)"
                             >Add to Favorites</button>
                         <button type="button" id="unfollow-btn"
                             class="btn btn-Danger" 
-                            v-if="family.follow && requestUser.role == 'Mentee'  && (family.managers.map(obj => {return obj.pk;}).indexOf(requestUser.pk) == -1)"
+                            v-if="family.inGroup && requestUser.role == 'Mentee'  && (family.managers.map(obj => {return obj.pk;}).indexOf(requestUser.pk) == -1)"
                             @click.stop="delFromFav(family)"
                             >Remove from Favorites</button>
                     </div>
@@ -63,6 +67,7 @@ export default {
     props: {
         requestUser: Object,
         family: Object,
+        allFmls: Array,
     },
     components: {
         TagSpan,
@@ -75,7 +80,12 @@ export default {
             this.$emit('del-from-fav', family); 
         },
     },
-    computed: {
+    computed:{
+        inGroups: function(){
+            return this.allFmls.filter(obj => {
+                return obj.inGroup
+            }).length
+        },
     },
     mounted(){
         console.log("mounted", this.manager_pk);

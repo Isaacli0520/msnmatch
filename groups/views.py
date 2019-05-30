@@ -131,7 +131,7 @@ def get_family_json(request, group_queryset):
 			'avatar':avatar_url,
 			'managers': get_user_arr(group.group_users.filter(grouprelation__group_role="Manager")),
 			'members':get_user_arr(group.group_users.filter(grouprelation__group_role="Member")),
-			'follow':GroupFollowRelation.objects.filter(user=request.user, group=group).exists(),
+			'inGroup':GroupRelation.objects.filter(user=request.user, group=group).exists(),
 		})
 	return JsonResponse({
 		"groups":ret_group_arr,

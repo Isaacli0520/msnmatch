@@ -18,7 +18,7 @@
                 <span :key="family_manager.pk" v-for="family_manager in family.managers" class="group-id-tag group-id-manager-name" >
                     {{ family_manager.first_name }} {{ family_manager.last_name }}
                 </span>
-                <span v-if="family.follow" class="group-id-tag group-id-tag-fav">Like</span>
+                <span v-if="family.inGroup" class="group-id-tag group-id-tag-fav">Member</span>
             </div>
         </div>
     </div>

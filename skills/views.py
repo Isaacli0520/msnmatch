@@ -211,8 +211,9 @@ def add_to_list(request):
 def add_to_group_list(request):
 	to_group = get_object_or_404(Group, pk=int(request.GET.get('group_pk')))
 	success = 0
-	if not GroupFollowRelation.objects.filter(user=request.user, group=to_group).exists() and GroupFollowRelation.objects.filter(user=request.user).count() < 3:
-		GroupFollowRelation.objects.create(user=request.user, group=to_group)
+	print("first",GroupRelation.objects.filter(user=request.user, group=to_group).exists(), "second", GroupRelation.objects.filter(user=request.user).count() < 1)
+	if GroupRelation.objects.filter(group=to_group, group_role="Member").count() < 15 and not GroupRelation.objects.filter(user=request.user, group=to_group, group_role="Member").exists() and GroupRelation.objects.filter(user=request.user).count() < 1:
+		GroupRelation.objects.create(user=request.user, group=to_group, group_role="Member")
 		success = 1
 	return JsonResponse({
 		"success": success,
@@ -249,8 +250,8 @@ def del_fav(request):
 
 def del_group_fav(request):
 	to_group = get_object_or_404(Group, pk = int(request.GET.get('group_pk')))
-	if GroupFollowRelation.objects.filter(user=request.user, group=to_group).exists():
-		GroupFollowRelation.objects.get(user=request.user, group=to_group).delete()
+	if GroupRelation.objects.filter(user=request.user, group=to_group, group_role="Member").exists():
+		GroupRelation.objects.get(user=request.user, group=to_group, group_role="Member").delete()
 	return JsonResponse({
 
 	})

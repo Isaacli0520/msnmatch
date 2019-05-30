@@ -12,9 +12,13 @@ import os, sys
 import uuid
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from friendship.models import Follow
+from groups.models import Group
 
 class SkillRelationInline(admin.TabularInline):
     model = Skill.skill_users.through
+
+class GroupRelationInline(admin.TabularInline):
+    model = Group.group_users.through
 
 class FollowRelationInline(admin.TabularInline):
     model = Follow
@@ -80,7 +84,7 @@ def export_users(modeladmin, request, queryset):
 export_users.short_description = 'Export to csv'
 
 class CustomUserAdmin(UserAdmin):
-    inlines = (ProfileInline, SkillRelationInline, FollowRelationInline)
+    inlines = (ProfileInline, SkillRelationInline, FollowRelationInline, GroupRelationInline)
     list_display = ('username','get_sex', 'email', 'first_name', 'last_name', 'is_staff', 'get_location','get_matched', 'get_role','get_year','get_birth_date','get_major')
     list_filter = ('is_staff', 'profile__sex','profile__role','profile__year', 'profile__matched')
     list_select_related = ('profile', )

@@ -3,6 +3,18 @@
         <div class="big-title mt-2 mb-2 text-center">
             <span>Super Cool Family Page</span>
         </div>
+        <div class="card mt-3 mb-3">
+            <div class="card-body">
+                <div class="custom-progress" :key="family.pk" v-for="family in allFmls">
+                    <div class="progress-family-title">
+                        <span>{{family.group_name}}</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar" role="progressbar" :style="{width: 100*family.members.length/15 + '%',}" :aria-valuenow="100*family.members.length/15" aria-valuemin="0" aria-valuemax="100">{{family.members.length | prog}}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="card-columns">
             <family-card 
             v-for="family in allFmls"
@@ -14,6 +26,7 @@
         <family-modal
             v-bind:family="modal_family"
             v-bind:requestUser="request_user"
+            v-bind:allFmls="allFmls"
             @add-to-fav="addToFav"
             @del-from-fav="delFromFav"
         />
@@ -41,7 +54,7 @@ export default {
                 "pk":"",
                 "role":"",
             },
-        flw_limit : 3,
+        flw_limit : 1,
         modal_family: {
             "pk": -1,
             "group_type": "",
@@ -56,56 +69,65 @@ export default {
         }
     },
     computed:{
-        following: function(){
+        inGroups: function(){
             return this.allFmls.filter(obj => {
-                return obj.follow
+                return obj.inGroup
             }).length
         },
     },
+    filters: {
+        prog: function (value) {
+            if (value > 0){
+                return value.toString(10) + " / 15";
+            }else{
+                return "";
+            }
+        },
+    },
     methods:{
+        getAllFamilies(){
+            axios.get('/groups/ajax/get_all_families/',{params: {}}).then(response => {
+                this.allFmls = response.data.groups; 
+            });
+        },
+        getBasicInfo(){
+            axios.get('/groups/ajax/get_family_page_basic_info/', {params:{}}).then(response =>{
+                let data = response.data.all_info;
+                console.log("basic_info",data);
+                this.request_user.role = data.request_user_role;
+                this.request_user.username = data.request_user_username;
+                this.request_user.pk = data.request_user_pk;
+            })
+        },
         openModal(family){
             this.modal_family = family;
             $('#family-modal').modal('show');
         },
         addToFav(family){
-            if (this.following >= this.flw_limit){
-                    $('#follow-btn').popover({
-                            trigger: 'focus',
-                            placement: 'top',
-                            container: 'body',
-                            html: true,
-                            content: "Don't be too 花心 <br /> You can only like 3 users",
-                        });
-                    $('#follow-btn').popover('show');
-                }
-            else{
-                $('#follow-btn').popover('disable')
+            if (this.inGroups < this.flw_limit){
                 axios.get('/skills/ajax/add_to_group_list/',{params: {group_pk:family.pk}}).then(response => {
+                    console.log("add to list");
+                    if (response.data.success == 1){
+                        console.log("sucesssssss");
+                        this.getAllFamilies();
+                    }
+                    else{
+                        alert("你来晚了亲 ( >﹏<。)～");
+                    }
                     $('#family-modal').modal('hide');
-                    this.allFmls[this.allFmls.indexOf(family)].follow = true;
                 });
             }
         },
         delFromFav(family){
             axios.get('/skills/ajax/del_group_fav/',{params: {group_pk:family.pk}}).then(response => {
-                $('#follow-btn').popover('hide');
-                $('#follow-btn').popover('disable');
+                this.getAllFamilies();
                 $('#family-modal').modal('hide');
-                this.allFmls[this.allFmls.indexOf(family)].follow = false;
             });
         },
     },
     mounted(){
-        axios.get('/groups/ajax/get_all_families/',{params: {}}).then(response => {
-            this.allFmls = response.data.groups; 
-        });
-        axios.get('/groups/ajax/get_family_page_basic_info/', {params:{}}).then(response =>{
-            let data = response.data.all_info;
-            console.log("basic_info",data);
-            this.request_user.role = data.request_user_role;
-            this.request_user.username = data.request_user_username;
-            this.request_user.pk = data.request_user_pk;
-        })
+        this.getAllFamilies();
+        this.getBasicInfo();
     },
 }
 </script>
@@ -114,16 +136,29 @@ export default {
     *{
         box-sizing: border-box;
     }
+
+    .progress-bars{
+        margin: 0 auto;
+        width: 80%;
+    }
+
+    .progress{
+        height:22px;
+    }
+
+    .custom-progress{
+        margin-top:15px;
+    }
     
     .big-title{
-        color:#32a49a;
+        color:#000000;
         font-weight: 500;
         font-size: 42px !important;
         font-family: Baskerville, "Baskerville Old Face", sans-serif;
     }
 
     .card-columns{
-        column-count: 2 !important;
+        column-count: 3 !important;
     }
 
     /* 

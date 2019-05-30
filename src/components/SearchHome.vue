@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="search-tags mb-3">
-            <span v-for="tag in tags"
+            <span :key="index" v-for="(tag,index) in tags"
                 class="search-tag">
                 <span>{{tag}}</span>
                 <span class="search-tag-remove"><i v-on:click="del_tag(tag)" class="fas fa-times"></i></span>
@@ -123,7 +123,7 @@ export default {
         max-width: 600px;
         height: 40px;
         border-radius: 5px;
-        box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 2px 5px 0 rgba(0,0,0,.16), 0 2px 10px 0 rgba(0,0,0,.12);
         /* transform: translate(-50%, -50%); */
         background: #fff;
         transition: all 0.3s ease;

@@ -17,6 +17,7 @@
     "css-loader": "^2.1.1",
     "express": "^4.17.0",
     "fuzzball": "^1.2.2",
+    "iview": "^3.4.2",
     "jquery": "^3.4.1",
     "mdbootstrap": "^4.8.1",
     "popper.js": "^1.15.0",

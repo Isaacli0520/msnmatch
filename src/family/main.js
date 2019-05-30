@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import FamilyPage from './FamilyPage.vue'
 
+
 Vue.config.productionTip = false
 
 
