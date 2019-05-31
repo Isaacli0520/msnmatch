@@ -185,7 +185,9 @@
                 <p>1. This is done by the mentor program chair, feel free to contact him if you have any question.(WeChat Id: zgt19991026)</p>\
                 ",
                 
-                "updates":"<p class='font-weight-bold'>2019-05-27</p> \
+                "updates":"<p class='font-weight-bold'>2019-05-31</p> \
+                <strong>1. Family page updated</strong><br><br>\
+                <p class='font-weight-bold'>2019-05-27</p> \
                 <strong>1. Fuzzy search algorithm changed for specific fields</strong><br>\
                 <strong>2. Number of trending tags changed from 50 to 75</strong><br>\
                 <strong>3. Family page title fixed</strong><br><br>\

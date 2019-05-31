@@ -23,11 +23,11 @@
                         <tbody>
                             <tr>
                                 <td class="field-title">Family Heads</td>
-                                <td><a :href="tmp_user.user_url" :key="tmp_user.pk" v-for="tmp_user in family.managers"><span class="inline-name">{{ tmp_user.first_name }} {{ tmp_user.last_name }}</span></a></td>
+                                <td class="inline-names"><a :href="tmp_user.user_url" class="inline-name inline-manager" :key="tmp_user.pk" v-for="tmp_user in family.managers"><span>{{ tmp_user.first_name }} {{ tmp_user.last_name }}</span></a></td>
                             </tr>
                             <tr>
                                 <td class="field-title">Family Members</td>
-                                <td><a :href="tmp_user.user_url" :key="tmp_user.pk" v-for="tmp_user in family.members"><span class="inline-name">{{ tmp_user.first_name }} {{ tmp_user.last_name }}</span></a></td>
+                                <td class="inline-names"><a :href="tmp_user.user_url" class="inline-name inline-member" :key="tmp_user.pk" v-for="tmp_user in family.members"><span>{{ tmp_user.first_name }} {{ tmp_user.last_name }}</span></a></td>
                             </tr>
                             <tr>
                                 <td class="field-title">Family Name</td>
@@ -109,14 +109,26 @@ export default {
         margin: 5px 0px 20px 0px;
         }
 
+    .inline-names{
+        display: flex;
+        flex-flow: row wrap;
+        }
+
     .inline-name{
         padding: 5px 9px 5px 9px;
         border-radius: 5px;
-        margin: 1px 4px 1px 0px;
+        margin: 3px 4px 3px 0px;
         font-family: Gill Sans, sans-serif;
         box-shadow: 0 6px 8px rgba(0, 0, 0, 0.175);
         color: #ffffff;
+    }
+
+    .inline-manager{
         background-color: #5bd4b6;
+    }
+
+    .inline-member{
+        background-color: #e23b8e;
     }
 
     .skill-tag{
