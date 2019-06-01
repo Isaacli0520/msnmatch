@@ -123,15 +123,15 @@ def get_family_json(request, group_queryset):
 		else:
 			avatar_url = settings.STATIC_URL + "css/images/brand_blur.jpg"
 		
-		tmp_skills = {}
-		for member_user in group.group_users.filter(grouprelation__group_role="Member"):
-			for skill in member_user.skill_set.all():
-				if skill.pk not in tmp_skills:
-					tmp_skills[skill.pk] = 1
-				else:
-					tmp_skills[skill.pk] += 1
+		# tmp_skills = {}
+		# for member_user in group.group_users.filter(grouprelation__group_role="Member"):
+		# 	for skill in member_user.skill_set.all():
+		# 		if skill.pk not in tmp_skills:
+		# 			tmp_skills[skill.pk] = 1
+		# 		else:
+		# 			tmp_skills[skill.pk] += 1
 		
-		tmp_skills = sorted(tmp_skills.items(), key=itemgetter(1), reverse=True);
+		# tmp_skills = sorted(tmp_skills.items(), key=itemgetter(1), reverse=True)
 
 		ret_group_arr.append({
 			'pk':group.pk,
@@ -143,7 +143,7 @@ def get_family_json(request, group_queryset):
 			'avatar':avatar_url,
 			'managers': get_user_arr(group.group_users.filter(grouprelation__group_role="Manager")),
 			'members':get_user_arr(group.group_users.filter(grouprelation__group_role="Member")),
-			'member_tags': get_skill_json_by_pk(tmp_skills),
+			# 'member_tags': get_skill_json_by_pk(tmp_skills),
 			'inGroup':GroupRelation.objects.filter(user=request.user, group=group).exists(),
 		})
 	return JsonResponse({

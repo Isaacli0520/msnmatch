@@ -64,7 +64,7 @@ export default {
             "group_intro": "",
             "managers":[],
             "members":[],
-            "member_tags":[],
+            // "member_tags":[],
             "group_tags":{},
             "picture": "",
             "avatar":"",
