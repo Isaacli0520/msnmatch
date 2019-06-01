@@ -10,7 +10,9 @@
                         <span>{{family.group_name}}</span>
                     </div>
                     <div class="progress">
-                        <div class="progress-bar" role="progressbar" :style="{width: 100*family.members.length/15 + '%',}" :aria-valuenow="100*family.members.length/15" aria-valuemin="0" aria-valuemax="100">{{family.members.length | prog}}</div>
+                        <div class="progress-bar bg-female" role="progressbar" :style="{width: 100*getUsersBySex(family, 'Female')/15 + '%',}" :aria-valuenow="100*getUsersBySex(family, 'Female')/15" aria-valuemin="0" aria-valuemax="100">{{getUsersBySex(family, 'Female') | prog}}</div>
+                        <div class="progress-bar bg-male" role="progressbar" :style="{width: 100*getUsersBySex(family, 'Male')/15 + '%',}" :aria-valuenow="100*getUsersBySex(family, 'Male')/15" aria-valuemin="0" aria-valuemax="100">{{getUsersBySex(family, 'Male') | prog}}</div>
+                        <div class="progress-bar bg-nosex" role="progressbar" :style="{width: 100*getUsersBySex(family, '')/15 + '%',}" :aria-valuenow="100*getUsersBySex(family, '')/15" aria-valuemin="0" aria-valuemax="100">{{getUsersBySex(family, '') | prog}}</div>
                     </div>
                 </div>
             </div>
@@ -62,6 +64,7 @@ export default {
             "group_intro": "",
             "managers":[],
             "members":[],
+            "member_tags":[],
             "group_tags":{},
             "picture": "",
             "avatar":"",
@@ -78,13 +81,18 @@ export default {
     filters: {
         prog: function (value) {
             if (value > 0){
-                return value.toString(10) + " / 15";
+                return value.toString(10);
             }else{
                 return "";
             }
         },
     },
     methods:{
+        getUsersBySex: function (family, sex) {
+            if(!family.members)
+                return 0;
+            return family.members.filter(obj => {return obj.sex==sex}).length;
+        },
         getAllFamilies(){
             axios.get('/groups/ajax/get_all_families/',{params: {}}).then(response => {
                 this.allFmls = response.data.groups; 
@@ -137,9 +145,8 @@ export default {
         box-sizing: border-box;
     }
 
-    .progress-bars{
-        margin: 0 auto;
-        width: 80%;
+    .family-instruction{
+        font-family: Gill Sans, sans-serif;
     }
 
     .progress{
@@ -147,7 +154,24 @@ export default {
     }
 
     .custom-progress{
+        font-family: Gill Sans, sans-serif;
         margin-top:15px;
+    }
+
+    .bg-nosex{
+        background-color: rgb(91, 231, 110);
+    }
+
+    .bg-male{
+        background-color: rgb(27, 207, 252);
+    }
+
+    .bg-female{
+        background-color: rgb(247, 115, 225);
+    }
+
+    .card-text{
+        color:#000000 !important;
     }
     
     .big-title{

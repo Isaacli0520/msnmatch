@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 from users.models import Profile
 from skills.models import Skill, SkillRelation
 from .models import Group, GroupRelation
+from skills.models import Skill, SkillRelation
 from django.db.models import Q, F, Count
 from django.http import JsonResponse
 from friendship.models import Follow
@@ -18,6 +19,7 @@ from django.shortcuts import get_object_or_404
 from .models import Group, GroupRelation, GroupFollowRelation
 import time
 from .forms import GroupForm
+from operator import itemgetter
 
 
 @login_required
@@ -120,6 +122,16 @@ def get_family_json(request, group_queryset):
 			avatar_url = group.avatar.url
 		else:
 			avatar_url = settings.STATIC_URL + "css/images/brand_blur.jpg"
+		
+		tmp_skills = {}
+		for member_user in group.group_users.filter(grouprelation__group_role="Member"):
+			for skill in member_user.skill_set.all():
+				if skill.pk not in tmp_skills:
+					tmp_skills[skill.pk] = 1
+				else:
+					tmp_skills[skill.pk] += 1
+		
+		tmp_skills = sorted(tmp_skills.items(), key=itemgetter(1), reverse=True);
 
 		ret_group_arr.append({
 			'pk':group.pk,
@@ -131,6 +143,7 @@ def get_family_json(request, group_queryset):
 			'avatar':avatar_url,
 			'managers': get_user_arr(group.group_users.filter(grouprelation__group_role="Manager")),
 			'members':get_user_arr(group.group_users.filter(grouprelation__group_role="Member")),
+			'member_tags': get_skill_json_by_pk(tmp_skills),
 			'inGroup':GroupRelation.objects.filter(user=request.user, group=group).exists(),
 		})
 	return JsonResponse({
@@ -177,9 +190,21 @@ def get_groups_json(group_queryset):
 		"groups":ret_group_arr,
 	})
 
+def get_skill_json_by_pk(queryset):
+	tmp_arr = []
+	for skill_pk, num in queryset:
+		tmp_skill = Skill.objects.get(pk=skill_pk)
+		tmp_arr.append({"skill_pk": tmp_skill.pk,
+					"skill_name": tmp_skill.skill_name,
+					"skill_type": tmp_skill.skill_type,
+					"skill_url":"/skills/"+str(tmp_skill.pk)+"/",
+					"user_num":num,})
+	return tmp_arr
+
 def get_user_arr(queryset):
 	return [{"pk":tmp_user.pk, 
 			"year":tmp_user.profile.year, 
+			"sex":tmp_user.profile.sex,
 			"user_url":("/users/"+tmp_user.username+"/"),
 			"first_name":tmp_user.first_name, 
 			"last_name":tmp_user.last_name} 

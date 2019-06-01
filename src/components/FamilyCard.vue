@@ -10,7 +10,7 @@
         </div>
         <div class="card-body">
             <div class="d-flex w-100 justify-content-between">
-                <h4 class="mb-1 font-weight-bold">
+                <h4 class="mb-1">
                     {{ family.group_name }}
                 </h4>
             </div>
@@ -50,6 +50,10 @@ export default {
         box-sizing: border-box;
     }
 
+    .card-body{
+        font-family: Gill Sans, sans-serif;
+    }
+
     .progressive-image:hover{
         opacity: 0.45;
         transition: .5s ease;
@@ -84,11 +88,11 @@ export default {
 
     .group-id-tag-fav{
         color:#ffffff;
-        background: rgba(255, 0, 43, 0.993);
+        background: rgba(245, 69, 172, 0.993);
     }
 
     .group-id-manager-name{
         color:#ffffff;
-        background-color: rgb(143, 6, 202);
+        background-color: rgb(23, 223, 196);
     }
 </style>

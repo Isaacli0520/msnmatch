@@ -38,6 +38,7 @@
                                 <td>{{family.group_intro}}</td>
                             </tr>
                             
+                            
                         </tbody>
                     </table>
                     <div class="modal-footer">
