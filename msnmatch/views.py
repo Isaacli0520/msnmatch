@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, get_list_or_404
 from users.models import User, Profile
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
-from courses.models import Relation, Course
+from courses.models import CourseUser, Course
 from friendship.exceptions import AlreadyExistsError
 from django.contrib import messages
 from friendship.models import Friend, Follow, FriendshipRequest, Block
@@ -93,6 +93,10 @@ def get_all_ranked_users(request):
 @login_required
 def superadmin(request):
 	return render(request, 'superadmin.html')
+
+@login_required
+def match(request):
+	return render(request, 'match.html')
 
 @login_required
 def home(request):

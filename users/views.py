@@ -4,7 +4,7 @@ from django.views import generic
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
 from django.contrib.auth.models import User
-from courses.models import Relation, Course
+from courses.models import CourseUser, Course
 from friendship.exceptions import AlreadyExistsError
 from django.contrib import messages
 from friendship.models import Friend, Follow, FriendshipRequest, Block

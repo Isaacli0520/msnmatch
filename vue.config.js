@@ -58,10 +58,36 @@ module.exports = {
           template: 'templates/group_tag.html',
           filename: 'group_tag.html',
         },
+        coursespage: {
+          entry: 'src/courses/main.js',
+          template: 'templates/courses.html',
+          filename: 'courses.html',
+        },
+        coursepage: {
+          entry: 'src/course/main.js',
+          template: 'templates/course.html',
+          filename: 'course.html',
+        },
+        match: {
+          entry: 'src/match/main.js',
+          template: 'templates/match.html',
+          filename: 'match.html',
+        },
+      },
+
+    css: {
+        loaderOptions: {
+          sass: {
+            data: `@import "src/sass/main.scss"`,
+          },
+        },
       },
 
     chainWebpack: config => {
-
+        ["vue-modules", "vue", "normal-modules", "normal"].forEach((match) => {
+          config.module.rule('sass').oneOf(match).use('sass-loader')
+            .tap(opt => Object.assign(opt, { data: `@import 'src/sass/main.scss'` }))
+        })
         config.optimization
             .splitChunks(false)
 
