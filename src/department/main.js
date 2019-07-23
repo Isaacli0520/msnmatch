@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import CategoryPage from './CategoryPage.vue'
+import DepartmentPage from './DepartmentPage.vue'
 import Vuetify from 'vuetify/lib'
 import {Message} from 'element-ui'
 
@@ -11,7 +11,7 @@ const vuetifyOptions = {
 }
 
 new Vue({
-  render: h => h(CategoryPage),
+  render: h => h(DepartmentPage),
   vuetify: new Vuetify(vuetifyOptions),
-  components: { CategoryPage }
-}).$mount('#category-page');
+  components: { DepartmentPage }
+}).$mount('#department-page');

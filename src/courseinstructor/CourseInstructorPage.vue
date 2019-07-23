@@ -3,6 +3,11 @@
     <custom-header></custom-header>
     <v-content>
         <v-container fluid grid-list-md>
+            <v-layout mt-1>
+                <v-flex>
+                    <v-breadcrumbs class="cus-breadcrumbs" :items="navItems" divider=">"></v-breadcrumbs>
+                </v-flex>
+            </v-layout>
             <v-layout mt-2> <!-- Mnemonic and Number -->
                 <v-flex class="cus-headline-flex"> 
                     <div>
@@ -235,6 +240,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
         profile:"",
         update_profile:"",
         logout:"",
+        navItems:[],
         course:{
             "course_pk":"",
             "mnemonic":"",
@@ -395,46 +401,36 @@ axios.defaults.xsrfCookieName = "csrftoken";
             });
             this.reviewDialog = false;
         },
-        get_basic_info(){
-            axios.get('/courses/ajax/get_basic_info/',{params: {}}).then(response => {
-                // console.log(response.data.all_users);
-                let data = response.data.all_info;
-                this.home_url = data.home_url;
-                this.brand_pic = data.brand_pic;
-                this.profile = data.profile;
-                this.update_profile = data.update_profile;
-                this.logout = data.logout;
-            });
-        },
-        navMethod(item){
-            if(item.title=="Profile"){
-                this.profileMethod()
-            }
-            else if(item.title=="Edit Profile"){
-                this.editProfileMethod()
-            }
-            else if(item.title=="Log Out"){
-                this.logOutMethod()
-            }
-        },
-        profileMethod(){
-            window.location.href = this.profile;
-        },
-        editProfileMethod(){
-            window.location.href = this.update_profile;
-        },
-        logOutMethod(){
-            window.location.href = this.logout;
-        },
         getCourseInstructor(){
             axios.get('/courses/ajax/get_course_instructor/',{params: {course_pk:this.course_pk, instructor_pk:this.instructor_pk, }}).then(response => {
                 let data = response.data;
-                console.log("data",data);
                 this.course = data.course;
                 document.title = this.course.mnemonic + this.course.number;
                 this.course_instructors = data.course_instructors;
                 this.instructor = data.instructor;
                 this.course_users = data.course_users;
+                this.navItems = [
+                    {
+                        text: "Departments",
+                        disabled: false,
+                        href: '/courses/departments/',
+                    },
+                    {
+                        text: this.course.department.name,
+                        disabled: false,
+                        href: '/courses/departments/' + this.course.department.department_pk + "/",
+                    },
+                    {
+                        text: this.course.mnemonic + this.course.number,
+                        disabled: false,
+                        href: '/courses/'+this.course.course_pk + "/",
+                    },
+                    {
+                        text: this.instructor,
+                        disabled: true,
+                        href: "NONE",
+                    },
+                ];
           });
         },
         goToHref(text){
@@ -454,6 +450,14 @@ axios.defaults.xsrfCookieName = "csrftoken";
 </script>
 
 <style>
+    .v-breadcrumbs li{
+        font-size:20px !important;
+    }
+
+    .cus-breadcrumbs{
+        padding-left: 4px !important;
+    }
+
     .review-text{
         color:rgb(0, 0, 0);
         font-size: 16px;
@@ -560,6 +564,18 @@ axios.defaults.xsrfCookieName = "csrftoken";
         .cus-headline-text{
             font-size: 1.3em;
             
+        }
+
+        .instructor-name{
+            font-size:1.7em;
+        }
+
+        .instructor-topic{
+            font-size:1.4em;
+        }
+
+        .v-breadcrumbs li{
+            font-size:14px !important;
         }
     }
 

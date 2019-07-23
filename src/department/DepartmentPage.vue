@@ -11,8 +11,7 @@
             <v-layout mb-3>
                 <v-flex class="cus-headline-flex"> 
                     <div>
-                    <span class="cus-headline-number">{{course.mnemonic}}{{course.number}}</span>
-                    <span class="cus-headline-text">{{course.title}}</span>
+                    <span class="cus-headline-text">{{category.title}}</span>
                     </div>
                 </v-flex>
                 <v-spacer></v-spacer>
@@ -121,23 +120,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
   export default {
     data() {
       return {
-        course:{
-            "pk": 0,
-            "mnemonic": "",
-            "number": "",
-            "title": "",
-            "category":"",
-            "take": {
-                "instructor":"",
-                "semester":"",
-                "take":"",
-            },
-            "department":{
-                "name":"",
-                "department_pk":"",
-            },
-            "instructors":[],
-        },
+        departments:null,
         currentSemester:"2019Fall",
         selected_course:null,
         courseNameLimit:40,
@@ -168,27 +151,9 @@ axios.defaults.xsrfCookieName = "csrftoken";
       
     },
     computed:{
-        takeItemsComputed(){
-            return this.takeItems.filter(obj => {
-                return obj.value.instructor_pk == this.takeItemKey;
-            })
-        },
-        teaching_instructors(){
-            return this.course.instructors.filter(obj => {
-                return obj.semesters.indexOf(this.currentSemester) != -1;
-            })
-        },
-        not_teaching_instructors(){
-            return this.course.instructors.filter(obj => {
-                return obj.semesters.indexOf(this.currentSemester) == -1;
-            })
-        },
-        course_pk: function(){
+        department_pk: function(){
             let url = window.location.pathname.split('/');
             return url[url.length - 2];
-        },
-        course_edit_url: function(){
-            return '/courses/' + this.course_pk + '/edit/';
         },
     },
     methods: {
@@ -215,86 +180,10 @@ axios.defaults.xsrfCookieName = "csrftoken";
                 }
             }
         },
-        openDialogTake(instructor){
-            this.takeItemKey = instructor.pk;
-            this.dialogTake = true;
-        },
-        takeSave(){
-            if(this.takeCourse != null){
-                var params = {
-                    'course_pk':this.takeCourse.course_pk,
-                    'instructor_pk':this.takeCourse.instructor_pk,
-                    'semester':this.takeCourse.semester, 
-                    'take':this.takeCourse.take,
-                    'delete':false,
-                }
-            }
-            else{
-                var params = {
-                    'course_pk':this.course.pk,
-                    'instructor_pk':"",
-                    'semester':"", 
-                    'take':"",
-                    'delete':true,
-                }
-            }
-            axios.post('/courses/ajax/save_take/',
-            params,).then(response => {
-                if(response.data.success){
-                    this.$message({
-                        message: 'Updated',
-                        type: 'success'
-                    });
-                }
-                if(!params.delete){
-                    this.takeCourse.instructor_pk = response.data.now.instructor_pk;
-                    this.takeCourse.semester = response.data.now.semester;
-                    this.takeCourse.take = response.data.now.take;
-                    this.course.take.instructor_pk = response.data.now.instructor_pk;
-                    this.course.take.semester = response.data.now.semester;
-                    this.course.take.take = response.data.now.take;
-                }
-                else{
-                    this.course.take = {
-                        "instructor_pk":"",
-                        "course_pk":"",
-                        "semester":"",
-                        "take":"",
-                    }
-                }
-            });
-            this.dialogTake = false;
-        },
         getCourse(){
-            axios.get('/courses/ajax/get_course/',{params: {pk:this.course_pk, }}).then(response => {
+            axios.get('/courses/ajax/get_department/',{params: {pk:this.course_pk, }}).then(response => {
                 this.course = response.data.course;
-                document.title = this.course.mnemonic + this.course.number;
-                for(let i = 0; i < this.course.instructors.length; i++){
-                    this.course.instructors[i].semesters = this.course.instructors[i].semesters.sort(this.sortBySemester);
-                    for(let j = 0; j < this.course.instructors[i].semesters.length; j++){
-                        var tmp_label = " Taken"
-                        var tmp_take = "taken"
-                        if(this.course.instructors[i].semesters.indexOf(this.currentSemester) != -1){
-                            tmp_label = (j == 0 ? " Currently Taking" : " Taken");
-                            tmp_take = (j == 0 ? "taking" : "taken")
-                        }
-                        this.takeItems.push({
-                            "label":this.course.instructors[i].semesters[j] + tmp_label,
-                            "value":{
-                                "semester":this.course.instructors[i].semesters[j],
-                                "instructor_pk":this.course.instructors[i].pk,
-                                "course_pk":this.course.pk,
-                                "take": tmp_take,
-                            }
-                        });
-                    }
-                }
-
-                for(let k = 0; k < this.takeItems.length; k++){
-                    if(this.takeItems[k].value.instructor_pk == this.course.take.instructor_pk && this.takeItems[k].value.semester == this.course.take.semester){
-                        this.takeCourse = this.takeItems[k].value;
-                    }
-                }
+                
 
                 this.navItems = [
                     {
@@ -303,14 +192,9 @@ axios.defaults.xsrfCookieName = "csrftoken";
                         href: '/courses/departments/',
                     },
                     {
-                        text: this.course.department.name,
-                        disabled: false,
-                        href: '/courses/departments/' + this.course.department.department_pk + "/",
-                    },
-                    {
-                        text: this.course.mnemonic + this.course.number,
+                        text: this.department.name,
                         disabled: true,
-                        href: '/courses/'+this.course.pk + "/",
+                        href: "none",
                     },
                 ];
                 
@@ -455,8 +339,8 @@ axios.defaults.xsrfCookieName = "csrftoken";
         }
 
         .v-breadcrumbs li{
-            font-size:14px !important;
-        }
+        font-size:14px !important;
+    }
     }
 
 

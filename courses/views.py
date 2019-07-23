@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.contrib.auth.models import User
-from .models import Course, CourseUser, CourseInstructor, Instructor
+from .models import Course, CourseUser, CourseInstructor, Instructor, Department
 from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector, TrigramSimilarity
 from django.db.models import Q, F
 from django.db.models.functions import Lower, Substr, Length
@@ -53,6 +53,43 @@ def course_instructor(request, course_number, instructor_number):
 	return render(request, 'course_instructor.html')
 
 @login_required
+def departments(request):
+	return render(request, 'departments.html')
+
+@login_required
+def department(request):
+	return render(request, 'department.html')
+
+@login_required
+def get_departments(request):
+	all_departments = Department.objects.all()
+	departments = []
+	for department in all_departments:
+		departments.append({
+			"department_pk":department.pk,
+			"name":department.name,
+			"school":department.school,
+		})
+	return JsonResponse({
+		"departments":departments,
+	})
+
+@login_required
+def get_department(request):
+	department_pk = request.GET.get("department_pk")
+	department = get_object_or_404(Department, pk=department_pk)
+	courses = department.course_set.all()
+	ret_courses = []
+	for cs in courses:
+		ret_courses.append({
+			"course_pk":cs.pk,
+			"name":cs.name,
+		})
+	return JsonResponse({
+		"courses":ret_courses,
+	})
+
+@login_required
 def submit_review(request):
 	if request.method == "POST":
 		post = json.loads(request.body)
@@ -62,10 +99,12 @@ def submit_review(request):
 		course = get_object_or_404(Course, pk=course_pk)
 		instructor = get_object_or_404(Instructor, pk=instructor_pk)
 		course_instructor = get_object_or_404(CourseInstructor, pk=course_instructor_pk)
-		cs_user_query = CourseUser.objects.filter(course=course, instructor=instructor, user=request.user)
+		cs_user_query = CourseUser.objects.filter(course=course, user=request.user)
 		if cs_user_query.first() != None:
 			cs_user = cs_user_query.first()
 			cs_user.text = text
+			cs_user.instructor = instructor
+			cs_user.take = "taken"
 			cs_user.rating_course = rating_course
 			cs_user.rating_instructor = rating_instructor
 			cs_user.course_instructor = course_instructor
@@ -107,7 +146,7 @@ def save_take(request):
 		if past_query.first() != None:
 			past_query.first().delete()
 		if not delete:
-			cs_user = CourseUser.objects.create(user=request.user, course = course, take = take, course_instructor = cs_instr)
+			cs_user = CourseUser.objects.create(user=request.user, course = course, instructor = instructor, take = take, course_instructor = cs_instr)
 			now_instructor_pk, now_semester, now_take = cs_user.course_instructor.instructor.pk, cs_user.course_instructor.semester, cs_user.take
 		success = True
 	else:
@@ -161,7 +200,10 @@ def course_search_result(request):
 	})
 
 def get_json_of_courses(queryset, user):
-	return [get_json_of_course(cs, user) for cs in queryset]
+	if queryset != None and queryset.first() != None:
+		return [get_json_of_course(cs, user) for cs in queryset]
+	else:
+		return []
 
 def get_json_of_course(course, user):
 	tmp_courseUser_query = CourseUser.objects.filter(user=user, course=course).first()
@@ -224,6 +266,10 @@ def get_detailed_json_of_course_instructor(course, instructor, user):
 				"description":course.description,
 				"prerequisite":course.prerequisite,
 				"type":course.type,
+				"department":{
+					"name":course.department.name,
+					"department_pk":course.department.pk,
+				},
 				"rating_instructor":r_instr,
 				"rating_course":r_cs,
 			},
@@ -311,28 +357,54 @@ def get_detailed_json_of_course(course, user):
 		"title":course.title,
 		"take":take,
 		"instructors":final_instructors,
-		"category":course.category,
+		"department":{
+			"name":course.department.name,
+			"department_pk":course.department.pk,
+		},
 		"rating_course":rating_course,
 	}
 
-# def course_search_result(request):
-# 	course_list = []
-# 	query_string = request.GET.get("input").strip()
-# 	retrieved_courses = course_retrieve(query_string)
+def get_detailed_json_of_course(course, user):
+	courseUser_query = CourseUser.objects.filter(user=user, course=course).first()
+	courseInstructor_query = CourseInstructor.objects.filter(course=course)
 
-# 	for cs in retrieved_courses:
-# 		new_cs = {
-# 			"course_number": cs.course_number.strip(),
-# 			"course_name": cs.course_name.strip(),
-# 			"course_match": lcs(query_string.lower(), cs.course_number.strip().lower() + " " + cs.course_name.strip().lower()),
-# 			"course_exist": cs.course_users.filter(username__iexact = request.user.username).exists(),
-# 			"course_taking": CourseUser.objects.filter(user=request.user, course=cs, take="taking").exists(),
-# 			"course_taken": CourseUser.objects.filter(user=request.user, course=cs, take="taken").exists(),
-# 		}
-# 		course_list.append(new_cs)
-# 	return JsonResponse({
-# 		"retrieved_courses":course_list,
-# 		})
+	allCourseUser_course_query = CourseUser.objects.filter(course=course)
+	rating_course_arr = []
+	for cs_user in allCourseUser_course_query:
+		if cs_user.rating_course != None and cs_user.rating_course > 0:
+			rating_course_arr.append(cs_user.rating_course)
+	if len(rating_course_arr) > 0:
+		rating_course = sum(rating_course_arr)/len(rating_course_arr)
+	else:
+		rating_course = 0
+
+	if courseUser_query == None:
+		take = {
+			"instructor_pk":"",
+			"course_pk":"",
+			"semester":"",
+			"take":"",
+		}
+	else:
+		take = {
+			"instructor_pk":courseUser_query.course_instructor.instructor.pk,
+			"course_pk":courseUser_query.course.pk,
+			"semester":courseUser_query.course_instructor.semester,
+			"take":courseUser_query.take,
+		}
+	return {
+		"pk":course.pk,
+		"mnemonic":course.mnemonic,
+		"number":course.number,
+		"title":course.title,
+		"take":take,
+		"instructors":final_instructors,
+		"department":{
+			"name":course.department.name,
+			"department_pk":course.department.pk,
+		},
+		"rating_course":rating_course,
+	}
 
 @login_required
 def course_search(request):

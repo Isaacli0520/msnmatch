@@ -142,40 +142,45 @@ export default{
             search: null,
             searchquery: '',
             user_items:[
-            { title:"Profile", icon:"fas fa-user" },
-            { title:"Edit Profile", icon:"fas fa-biohazard" },
-            { title:"Log Out", icon:"fas fa-angry"},
-        ],
-        old_items: [
-            //   {  icon: 'contacts', text: 'Contacts' },
-            //   { icon: 'history', text: 'Frequently contacted' },
-            //   { icon: 'content_copy', text: 'Duplicates' },
-            //   {
-            //     icon: 'keyboard_arrow_up',
-            //     'icon-alt': 'keyboard_arrow_down',
-            //     text: 'Labels',
-            //     model: true,
-            //     children: [
-            //       { icon: 'add', text: 'Create label' }
-            //     ]
-            //   },
-            //   {
-            //     icon: 'keyboard_arrow_up',
-            //     'icon-alt': 'keyboard_arrow_down',
-            //     text: 'More',
-            //     model: false,
-            //     children: [
-            //       { text: 'Import' },
-            //       { text: 'Export' },
-            //       { text: 'Print' },
-            //       { text: 'Undo changes' },
-            //       { text: 'Other contacts' }
-            //     ]
-            //   },
-            { icon: 'settings', text: 'Settings' },
-            { icon: 'chat_bubble', text: 'Send feedback' },
-            { icon: 'help', text: 'Help' },
+                { title:"Profile", icon:"fas fa-user" },
+                { title:"Edit Profile", icon:"fas fa-biohazard" },
+                { title:"Log Out", icon:"fas fa-angry"},
             ],
+            home_url:"",
+            brand_pic:"",
+            profile:"",
+            update_profile:"",
+            logout:"",
+            old_items: [
+                //   {  icon: 'contacts', text: 'Contacts' },
+                //   { icon: 'history', text: 'Frequently contacted' },
+                //   { icon: 'content_copy', text: 'Duplicates' },
+                //   {
+                //     icon: 'keyboard_arrow_up',
+                //     'icon-alt': 'keyboard_arrow_down',
+                //     text: 'Labels',
+                //     model: true,
+                //     children: [
+                //       { icon: 'add', text: 'Create label' }
+                //     ]
+                //   },
+                //   {
+                //     icon: 'keyboard_arrow_up',
+                //     'icon-alt': 'keyboard_arrow_down',
+                //     text: 'More',
+                //     model: false,
+                //     children: [
+                //       { text: 'Import' },
+                //       { text: 'Export' },
+                //       { text: 'Print' },
+                //       { text: 'Undo changes' },
+                //       { text: 'Other contacts' }
+                //     ]
+                //   },
+                { icon: 'settings', text: 'Settings' },
+                { icon: 'chat_bubble', text: 'Send feedback' },
+                { icon: 'help', text: 'Help' },
+                ],
         }
     },
     components:{
@@ -227,11 +232,43 @@ export default{
         navAsideMethod(item){
             
         },
+        navMethod(item){
+            if(item.title=="Profile"){
+                this.profileMethod()
+            }
+            else if(item.title=="Edit Profile"){
+                this.editProfileMethod()
+            }
+            else if(item.title=="Log Out"){
+                this.logOutMethod()
+            }
+        },
+        get_basic_info(){
+            axios.get('/courses/ajax/get_basic_info/',{params: {}}).then(response => {
+                // console.log(response.data.all_users);
+                let data = response.data.all_info;
+                this.home_url = data.home_url;
+                this.brand_pic = data.brand_pic;
+                this.profile = data.profile;
+                this.update_profile = data.update_profile;
+                this.logout = data.logout;
+            });
+        },
+        profileMethod(){
+            window.location.href = this.profile;
+        },
+        editProfileMethod(){
+            window.location.href = this.update_profile;
+        },
+        logOutMethod(){
+            window.location.href = this.logout;
+        },
         goToHref(text){
             window.location.href = text;
         },
     },
     mounted(){
+        this.get_basic_info();
     },
     }
 </script>
