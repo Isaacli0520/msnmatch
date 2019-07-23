@@ -1,130 +1,6 @@
 <template>
-  <v-app id="inspire">
-    <v-navigation-drawer
-      fixed
-      :clipped="$vuetify.breakpoint.mdAndUp"
-      app
-      v-model="drawer"
-    >
-      <v-list dense>
-        <template v-for="item in old_items">
-            <v-layout
-                row
-                v-if="item.heading"
-                align-center
-                :key="item.heading">
-                <v-flex xs6>
-                    <v-subheader v-if="item.heading">
-                        {{ item.heading }}
-                    </v-subheader>
-                </v-flex>
-                <v-flex xs6 class="text-xs-center">
-                    <a href="#!" class="body-2 black--text">EDIT</a>
-                </v-flex>
-            </v-layout>
-            <v-list-group
-                v-else-if="item.children"
-                v-model="item.model"
-                :key="item.text"
-                :prepend-icon="item.model ? item.icon : item['icon-alt']"
-                append-icon="">
-                <v-list-item slot="activator">
-                    <v-list-item-content>
-                        <v-list-item-title>
-                            {{ item.text }}
-                        </v-list-item-title>
-                    </v-list-item-content>
-                </v-list-item>
-                <v-list-item
-                    v-for="(child, i) in item.children"
-                    :key="i">
-                    <v-list-item-action v-if="child.icon">
-                        <v-icon>{{ child.icon }}</v-icon>
-                    </v-list-item-action>
-                    <v-list-item-content>
-                        <v-list-item-title>
-                        {{ child.text }}
-                        </v-list-item-title>
-                    </v-list-item-content>
-                </v-list-item>
-            </v-list-group>
-          <v-list-item v-else @click="" :key="item.text">
-                <v-list-item-action>
-                    <v-icon>{{ item.icon }}</v-icon>
-                </v-list-item-action>
-                <v-list-item-content>
-                    <v-list-item-title>
-                        {{ item.text }}
-                    </v-list-item-title>
-                </v-list-item-content>
-          </v-list-item>
-        </template>
-      </v-list>
-    </v-navigation-drawer>
-    <v-app-bar
-      color="teal darken-3"
-      dark
-      app
-      :clipped-left="$vuetify.breakpoint.mdAndUp"
-      fixed
-    >
-    <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
-      <v-toolbar-title style="width: 300px" class="ml-0 pl-3">
-        Hoosmyprofessor
-      </v-toolbar-title>
-
-      <v-autocomplete
-      v-model="selected_course"
-      :items="items"
-      :loading="isLoading"
-      :search-input.sync="search"
-      color="white"
-      solo-inverted
-      flat
-      hide-no-data
-      hide-selected
-      hide-details
-      label="Public APIs"
-      placeholder="Start typing to Search"
-      return-object
-    >
-      <template v-slot:item="data">
-        <v-list-item-content>
-          <v-list-item-title v-html="data.item.text"></v-list-item-title>
-          <v-list-item-subtitle v-if="data.item.take != 'Null' " v-html="data.item.take"></v-list-item-subtitle>
-        </v-list-item-content>  
-      </template>
-    </v-autocomplete>
-        <v-spacer></v-spacer>
-        <v-btn icon>
-            <v-icon>apps</v-icon>
-        </v-btn>
-        <v-menu offset-y
-        class="mx-auto"
-        min-width="170">
-            <template v-slot:activator="{ on }">
-            <v-btn
-                icon
-                v-on="on">
-                <v-icon>fas fa-user-circle</v-icon>
-            </v-btn>
-            </template>
-            <v-list dense rounded>
-                <v-list-item
-                    v-for="(item, index) in user_items"
-                    :key="index"
-                    @click="navMethod(item)">
-                    <v-list-item-icon>
-                        <v-icon dense v-text="item.icon"></v-icon>
-                    </v-list-item-icon>
-                    <v-list-item-content>
-                        <v-list-item-title>{{ item.title }}</v-list-item-title>
-                    </v-list-item-content>
-                </v-list-item>
-            </v-list>
-        </v-menu>
-
-    </v-app-bar>
+  <v-app>
+    <custom-header></custom-header>
     <v-content>
         <v-container fluid grid-list-md>
             <v-layout mt-2> <!-- Mnemonic and Number -->
@@ -242,18 +118,28 @@
                 <v-flex d-flex :key="user.user_pk" v-for="user in users_with_review">
                     <v-card>
                         <v-card-text>
-                            <div class="text--primary">
+                            <div class="review-text">
                                 {{user.text}}
                             </div>
                         </v-card-text>
                         <v-card-actions>
-                            <v-spacer></v-spacer>
-                            <span class="review-rating">
-                                Course: {{user.rating_course}}   
-                            </span>
-                            <span class="review-rating">
-                                Instructor: {{user.rating_instructor}}
-                            </span>
+                            <v-layout>
+                                <v-spacer></v-spacer>
+                            <div>
+                                <v-chip
+                                    class="ma-1" color="teal lighten-2" label small text-color="white">
+                                    {{user.semester}}
+                                </v-chip>
+                                <v-chip
+                                    class="ma-1" color="teal lighten-2" label small text-color="white">
+                                    Course: {{user.rating_course}}
+                                </v-chip>
+                                <v-chip
+                                    class="ma-1" color="teal lighten-2" label small text-color="white">
+                                    Instructor: {{user.rating_instructor}}
+                                </v-chip>
+                            </div>
+                            </v-layout>
                         </v-card-actions>
                     </v-card>
                 </v-flex>
@@ -293,6 +179,17 @@
                                 hover>
                             </v-rating>
                         </v-flex>
+                        <v-flex d-flex>
+                            <v-select
+                                v-model="review_course_instructor_pk"
+                                :items="course_instructors"
+                                item-text="semester"
+                                item-value="course_instructor_pk"
+                                label="Semester"
+                                :menu-props="{ offsetY: true }"
+                                outlined
+                            ></v-select>
+                        </v-flex>
                     </v-layout>
                     <v-layout>
                         <v-flex>
@@ -320,6 +217,7 @@
 
 <script>
 import axios from 'axios'
+import CustomHeader from '../components/CustomHeader'
 axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 axios.defaults.xsrfCookieName = "csrftoken";
 
@@ -348,6 +246,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
             "rating_instructor":null,
             "rating_course":null,
         },
+        course_instructors:[],
         course_users:[],
         semester:"",
         topic:"",
@@ -357,6 +256,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
         review_rating_course:0,
         review_rating_instructor:0,
         review_text:"",
+        review_course_instructor_pk:null,
 
         drawer: null,
         source: "/lessons/",
@@ -398,6 +298,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
       }
     },
     components:{
+        CustomHeader,
     },
     watch: {
       selected_course(val){
@@ -469,12 +370,9 @@ axios.defaults.xsrfCookieName = "csrftoken";
             let url = window.location.pathname.split('/');
             return url[url.length - 3];
         },
-        course_instructor_pk:function(){
+        instructor_pk:function(){
             let url = window.location.pathname.split('/');
             return url[url.length - 2];
-        },
-        course_edit_url: function(){
-            return '/courses/' + this.course_pk + '/edit/';
         },
     },
     methods: {
@@ -483,8 +381,9 @@ axios.defaults.xsrfCookieName = "csrftoken";
                 "text":this.review_text,
                 "rating_course":this.review_rating_course,
                 "rating_instructor":this.review_rating_instructor,
-                "course_pk":this.course.course_pk,
-                "course_instructor_pk":this.course_instructor_pk,
+                "course_pk":this.course_pk,
+                "instructor_pk":this.instructor_pk,
+                "course_instructor_pk":this.review_course_instructor_pk,
             }).then(response => {
                 if(response.data.success){
                     this.$message({
@@ -527,19 +426,14 @@ axios.defaults.xsrfCookieName = "csrftoken";
         logOutMethod(){
             window.location.href = this.logout;
         },
-        getCourseUser(){
-            axios.get('/courses/ajax/get_course_user', {params:{course_instructor_pk:this.course_instructor_pk}}).then(response =>{
-                this.course_users = response.data.course_users;
-            });
-        },
         getCourseInstructor(){
-            axios.get('/courses/ajax/get_course_instructor/',{params: {pk:this.course_instructor_pk, }}).then(response => {
+            axios.get('/courses/ajax/get_course_instructor/',{params: {course_pk:this.course_pk, instructor_pk:this.instructor_pk, }}).then(response => {
                 let data = response.data;
                 console.log("data",data);
                 this.course = data.course;
-                this.semester = data.semester;
+                document.title = this.course.mnemonic + this.course.number;
+                this.course_instructors = data.course_instructors;
                 this.instructor = data.instructor;
-                this.topic = data.topic;
                 this.course_users = data.course_users;
           });
         },
@@ -560,6 +454,12 @@ axios.defaults.xsrfCookieName = "csrftoken";
 </script>
 
 <style>
+    .review-text{
+        color:rgb(0, 0, 0);
+        font-size: 16px;
+        font-family: "Roboto", sans-serif;
+    }
+
     .review-rating{
         color:rgb(141, 141, 141);
         font-size: 15px;

@@ -11,8 +11,7 @@
             <v-layout mb-3>
                 <v-flex class="cus-headline-flex"> 
                     <div>
-                    <span class="cus-headline-number">{{course.mnemonic}}{{course.number}}</span>
-                    <span class="cus-headline-text">{{course.title}}</span>
+                    <span class="cus-headline-text">{{category.title}}</span>
                     </div>
                 </v-flex>
                 <v-spacer></v-spacer>
@@ -295,23 +294,16 @@ axios.defaults.xsrfCookieName = "csrftoken";
         getCourse(){
             axios.get('/courses/ajax/get_course/',{params: {pk:this.course_pk, }}).then(response => {
                 this.course = response.data.course;
-                document.title = this.course.mnemonic + this.course.number;
                 for(let i = 0; i < this.course.instructors.length; i++){
                     this.course.instructors[i].semesters = this.course.instructors[i].semesters.sort(this.sortBySemester);
                     for(let j = 0; j < this.course.instructors[i].semesters.length; j++){
-                        var tmp_label = " Taken"
-                        var tmp_take = "taken"
-                        if(this.course.instructors[i].semesters.indexOf(this.currentSemester) != -1){
-                            tmp_label = (j == 0 ? " Currently Taking" : " Taken");
-                            tmp_take = (j == 0 ? "taking" : "taken")
-                        }
                         this.takeItems.push({
-                            "label":this.course.instructors[i].semesters[j] + tmp_label,
+                            "label":this.course.instructors[i].semesters[j] + (j == 0 ? " Currently Taking" : " Taken"),
                             "value":{
                                 "semester":this.course.instructors[i].semesters[j],
                                 "instructor_pk":this.course.instructors[i].pk,
                                 "course_pk":this.course.pk,
-                                "take": tmp_take,
+                                "take":(j == 0 ? "taking" : "taken"),
                             }
                         });
                     }

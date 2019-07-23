@@ -1,202 +1,242 @@
 <template>
-    <v-app>
-        <v-navigation-drawer app>
-            Navigation Drawer
-        </v-navigation-drawer>
+    <div>
+        <v-navigation-drawer
+      fixed
+      :clipped="$vuetify.breakpoint.mdAndUp"
+      app
+      v-model="drawer">
+      <v-list dense>
+        <template v-for="item in old_items">
+            <v-layout
+                row
+                v-if="item.heading"
+                align-center
+                :key="item.heading">
+                <v-flex xs6>
+                    <v-subheader v-if="item.heading">
+                        {{ item.heading }}
+                    </v-subheader>
+                </v-flex>
+                <v-flex xs6 class="text-xs-center">
+                    <a href="#!" class="body-2 black--text">EDIT</a>
+                </v-flex>
+            </v-layout>
+            <v-list-group
+                v-else-if="item.children"
+                v-model="item.model"
+                :key="item.text"
+                :prepend-icon="item.model ? item.icon : item['icon-alt']"
+                append-icon="">
+                <v-list-item slot="activator">
+                    <v-list-item-content>
+                        <v-list-item-title>
+                            {{ item.text }}
+                        </v-list-item-title>
+                    </v-list-item-content>
+                </v-list-item>
+                <v-list-item
+                    v-for="(child, i) in item.children"
+                    :key="i">
+                    <v-list-item-action v-if="child.icon">
+                        <v-icon>{{ child.icon }}</v-icon>
+                    </v-list-item-action>
+                    <v-list-item-content>
+                        <v-list-item-title>
+                        {{ child.text }}
+                        </v-list-item-title>
+                    </v-list-item-content>
+                </v-list-item>
+            </v-list-group>
+          <v-list-item v-else @click="navAsideMethod(item)" :key="item.text">
+                <v-list-item-action>
+                    <v-icon>{{ item.icon }}</v-icon>
+                </v-list-item-action>
+                <v-list-item-content>
+                    <v-list-item-title>
+                        {{ item.text }}
+                    </v-list-item-title>
+                </v-list-item-content>
+          </v-list-item>
+        </template>
+      </v-list>
+    </v-navigation-drawer>
+    <v-app-bar
+      color="teal darken-3"
+      dark
+      app
+      :clipped-left="$vuetify.breakpoint.mdAndUp"
+      fixed>
+    <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
+      <v-toolbar-title style="width: 300px" class="ml-0 pl-3">
+        Hoosmyprofessor
+      </v-toolbar-title>
 
-        <v-app-bar app>
-            APP BAR
-        </v-app-bar>
-
-        <v-content>
-            <v-container fluid>
-
-            </v-container>
-        </v-content>
-
-        <v-footer app>
-            Footer
-        </v-footer>
-    </v-app>
+      <v-autocomplete
+      v-model="selected_course"
+      :items="items"
+      :loading="isLoading"
+      :search-input.sync="search"
+      color="white"
+      solo-inverted
+      flat
+      hide-no-data
+      hide-selected
+      hide-details
+      label="Public APIs"
+      placeholder="Start typing to Search"
+      return-object
+    >
+      <template v-slot:item="data">
+        <v-list-item-content>
+          <v-list-item-title v-html="data.item.text"></v-list-item-title>
+          <v-list-item-subtitle v-html="data.item.take"></v-list-item-subtitle>
+        </v-list-item-content>  
+      </template>
+    </v-autocomplete>
+        <v-spacer></v-spacer>
+        <v-btn icon>
+            <v-icon>apps</v-icon>
+        </v-btn>
+        <v-menu offset-y
+        class="mx-auto"
+        min-width="170">
+            <template v-slot:activator="{ on }">
+            <v-btn
+                icon
+                v-on="on">
+                <v-icon>fas fa-user-circle</v-icon>
+            </v-btn>
+            </template>
+            <v-list dense rounded>
+                <v-list-item
+                    v-for="(item, index) in user_items"
+                    :key="index"
+                    @click="navMethod(item)">
+                    <v-list-item-icon>
+                        <v-icon dense v-text="item.icon"></v-icon>
+                    </v-list-item-icon>
+                    <v-list-item-content>
+                        <v-list-item-title>{{ item.title }}</v-list-item-title>
+                    </v-list-item-content>
+                </v-list-item>
+            </v-list>
+        </v-menu>
+    </v-app-bar>
+    </div>
 </template>
 
 <script>
 import axios from 'axios'
+// import Vue from 'vue'
+// import Vuetify from 'vuetify/lib'
+// Vue.use(Vuetify);
 
 export default{
     data: function () {
         return {
+            drawer: null,
+            selected_course:null,
+            isLoading: false,
+            lastTime: 0,
+            entries:[],
+            search: null,
             searchquery: '',
+            user_items:[
+            { title:"Profile", icon:"fas fa-user" },
+            { title:"Edit Profile", icon:"fas fa-biohazard" },
+            { title:"Log Out", icon:"fas fa-angry"},
+        ],
+        old_items: [
+            //   {  icon: 'contacts', text: 'Contacts' },
+            //   { icon: 'history', text: 'Frequently contacted' },
+            //   { icon: 'content_copy', text: 'Duplicates' },
+            //   {
+            //     icon: 'keyboard_arrow_up',
+            //     'icon-alt': 'keyboard_arrow_down',
+            //     text: 'Labels',
+            //     model: true,
+            //     children: [
+            //       { icon: 'add', text: 'Create label' }
+            //     ]
+            //   },
+            //   {
+            //     icon: 'keyboard_arrow_up',
+            //     'icon-alt': 'keyboard_arrow_down',
+            //     text: 'More',
+            //     model: false,
+            //     children: [
+            //       { text: 'Import' },
+            //       { text: 'Export' },
+            //       { text: 'Print' },
+            //       { text: 'Undo changes' },
+            //       { text: 'Other contacts' }
+            //     ]
+            //   },
+            { icon: 'settings', text: 'Settings' },
+            { icon: 'chat_bubble', text: 'Send feedback' },
+            { icon: 'help', text: 'Help' },
+            ],
         }
     },
     components:{
     },
+    watch:{
+        selected_course(val){
+            if(val != null){
+                this.goToHref("/courses/" + val.value + "/");
+            }
+        },
+        search(val) {
+            // Items have already been loaded
+            if (val == null || val.length == 0){
+            this.entries = []
+            return
+            }
+            if (val.length < 2) return
+
+            // Items have already been requested
+            // if (this.isLoading) return
+
+            this.isLoading = true
+            this.lastTime += 1;
+            // Lazily load input items
+            axios.get('/courses/ajax/course_search_result/',{params: {query:val, time: this.lastTime}}).then(response => {
+                    if(response.data.time == this.lastTime){
+                        this.entries = response.data.course_result; 
+                    }
+            })
+            .catch(err => {
+                console.log("error: ",err)
+            })
+            .finally(() => {this.isLoading = false});
+        },
+    },
+    computed:{
+        items(){
+            return this.entries.map(entry => {
+            let tmp_course_name = entry.mnemonic + entry.number + " " + entry.title;
+            const course_name = tmp_course_name.length > this.courseNameLimit
+                ? tmp_course_name.slice(0, this.courseNameLimit) + '...'
+                : tmp_course_name;
+
+            return {text:course_name, value:entry.pk, take:entry.take};
+            })
+        },
+    },
     methods:{
-        get_all_skills(){
-            axios.get('/skills/ajax/get_all_skills/',{params: {}}).then(response => {
-                this.all_skills = response.data.all_skills;
-            });
+        navAsideMethod(item){
+            
         },
+        goToHref(text){
+            window.location.href = text;
         },
+    },
     mounted(){
-        this.get_all_skills();
-        },
+    },
     }
 </script>
 
 
 <style scoped lang="css">
 
-    .cus-header{
-        width: 100vw;
-    }
-
-    .autocomplete {
-        width:100%;
-        position: relative;
-        display: inline-block;
-    }
-
-    .skill-user-tags{
-        display: flex;
-        flex-flow: row wrap;
-        width:100%;
-        margin: 5px 0px 20px 0px;
-    }
-
-    .search-form {
-        position: relative;
-        /* top: 50%;
-        left: 50%; */
-        margin: 0 auto;
-        width: 100%;
-        height: 40px;
-        border-radius: 5px;
-        /* box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);*/
-        /* transform: translate(-50%, -50%); */
-        box-shadow: 0 2px 5px 1px rgba(0,0,0,.16), 0 2px 10px 1px rgba(0,0,0,.12);
-        background: #fff;
-        transition: all 0.3s ease;
-    
-    }
-
-    .search-form-active{
-        border-bottom: 1px solid #ededed;
-        border-bottom-left-radius: 0px;
-        border-bottom-right-radius: 0px;
-    }
-    
-    .search-input {
-        position: absolute;
-        top: 10px;
-        left: 38px;
-        font-size: 14px;
-        background: none;
-        color: #5a6674;
-        width: 85%;
-        height: 20px;
-        border: none;
-        appearance: none;
-        outline: none;
-    }
-
-    .autocomplete-items {
-        position: absolute;
-        z-index: 200;
-        margin: 0 auto;
-        width:100%;
-        box-shadow: 0 2px 5px 0px rgba(0,0,0,.16), 0 2px 10px 0px rgba(0,0,0,.12);
-        overflow: hidden;
-        background:none;
-        border-radius: 0px 0px 10px 10px;
-    }
-
-    .auto-main{
-        font-size: 18px;
-        font-family: Roboto,sans-serif;
-    }
-
-    .auto-tag{
-        font-size: 15px !important;
-        float:right;
-        padding: 3px 8px 3px 8px;
-        border-radius: 5px;
-        margin: 0px 0px 0px 5px;
-        font-family: Gill Sans, sans-serif;
-        color: #ffffff;
-    }
-
-    .auto-custom{
-        background-color: #e25876;
-    }
-
-    .auto-exist{
-        background-color: #f2dc35;
-    }
-
-    .auto-skill-type{
-        background-color: #ff5c5c;
-    }
-
-    .search-icon{
-        padding:12px 10px 9px 14px;
-    }
-
-    .autocomplete-item{
-        font-family: Gill Sans, sans-serif;
-        width:100%;
-        overflow: hidden;
-        border-radius: 0px;
-        padding: 10px 17px 10px 17px;
-        cursor: pointer;
-        background: #fff; 
-    }
-
-    div.autocomplete-item:last-child{
-        border-radius: 0px 0px 10px 10px;
-    }
-
-    .autocomplete-item:hover {
-        background-color: #e9e9e9; 
-    }
-
-    .Entertainment{
-        background-color: #f1b9a6e7;
-    }
-        
-    .Sport{
-        background-color: #80b6e2;
-    }
-        
-    .Game{
-        background-color: #8a1ae6;
-    }
-
-    .Film{
-        background-color:#4cb41b;
-    }
-
-    .Music{
-        background-color:#3915db;
-    }
-
-    .General{
-        background-color:#88999c;
-    }
-
-    .Language{
-        background-color: #af51db;
-    }
-
-    .Books{
-        background-color:#ff9900;
-    }
-
-    .Academic{
-        background-color:#5bd4b6;
-    }
-
-    .Custom{
-        background-color: #ff0800;
-    }
 </style>

@@ -1,0 +1,136 @@
+American Studies
+AMST
+German
+GERM
+Science, Technology,Society
+STS
+Anthropology
+ANTH
+German in Translation
+GETR
+South Asian Literature in Translation
+SATR
+Applied Mathematics
+APMA
+Histroy
+HIST
+Slavic
+SLAV
+Architecture
+ARCH 
+Histroy-East Asia Histroy
+HIEA
+Sociology
+SOC
+Architectural History
+ARH 
+History-Europe History
+HIEU
+Spanish
+SPAN
+Art History
+ARTH
+History-Latin America
+HILA
+Statistics
+STAT
+Art
+ARTS
+History-US History
+HIUS
+University Seminar
+USEM
+Astronomy
+ASTR
+Japanese
+JAPN 
+Women, GenderSexuality
+WGS
+Biology
+BIOL 
+Kinesiology
+KINE
+Chemical Engineering
+CHE
+Korean
+KOR
+Chemistry
+CHEM
+Materials ScienceEngineering
+MSE
+Chinese in Translation
+CHTR
+Mathematics
+MATH
+Classics
+CLAS
+MechanicalAerospace Engineering
+MAE
+College Advising Seminar
+COLA 
+Media Study
+MDST
+Commerce
+COMM 
+Music
+MUSI
+Comparative Literature
+CPLT 
+Music-Ensemble
+MUEN
+Computer Science
+CS
+Philosophy
+PHIL
+Dance
+DANC
+Physics
+PHYS
+Drama
+DRAM
+Planning-UrbanEnvironment
+PLAN
+Economics
+ECON
+Politics-American Politics
+PLAP
+Education
+EDIS
+Politics-Departmental Seminar
+PLAD
+ElectronicalComputer Engineering
+ECE 
+Politics-International Relations
+PLIR
+Engagement
+EGMT 
+Politics-Political Theory
+PLPT
+Engineering
+ENGR
+Public Policy
+PPOL
+English
+ENGL
+Psychology
+PSYC
+English Writing
+ENWR
+Religion-Buddhism
+RELB
+Entrepreneurship
+ENTP
+Religion-General Religion
+RELG
+Environmental Science
+EVSC
+Religion-Islam
+RELI
+Forum
+FORU
+Religion-Judaism
+RELJ
+French
+FREN
+Russian in Translation
+RUTR

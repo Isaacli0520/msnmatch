@@ -49,7 +49,7 @@ def course(request, course_number):
 	return render(request, 'course.html')
 
 @login_required
-def course_instructor(request, course_instructor_number):
+def course_instructor(request, course_number, instructor_number):
 	return render(request, 'course_instructor.html')
 
 @login_required
@@ -57,20 +57,23 @@ def submit_review(request):
 	if request.method == "POST":
 		post = json.loads(request.body)
 		text, rating_course, rating_instructor = post["text"], post["rating_course"], post["rating_instructor"]
-		course_pk, course_instructor_pk =  post["course_pk"], post["course_instructor_pk"]
+		course_pk, instructor_pk, course_instructor_pk =  post["course_pk"], post["instructor_pk"], post["course_instructor_pk"]
 		
 		course = get_object_or_404(Course, pk=course_pk)
+		instructor = get_object_or_404(Instructor, pk=instructor_pk)
 		course_instructor = get_object_or_404(CourseInstructor, pk=course_instructor_pk)
-		cs_user_query = CourseUser.objects.filter(course=course, user=request.user)
+		cs_user_query = CourseUser.objects.filter(course=course, instructor=instructor, user=request.user)
 		if cs_user_query.first() != None:
 			cs_user = cs_user_query.first()
 			cs_user.text = text
 			cs_user.rating_course = rating_course
 			cs_user.rating_instructor = rating_instructor
+			cs_user.course_instructor = course_instructor
 			cs_user.save()
 		else:
 			CourseUser.objects.create(course=course,
 				user=request.user, 
+				instructor=instructor,
 				course_instructor=course_instructor,
 				text=text,
 				take="taken",
@@ -128,21 +131,12 @@ def get_course(request):
 	})
 @login_required
 def get_course_instructor(request):
-	print("get course instructor")
-	pk = request.GET.get("pk")
-	course_instructor = get_object_or_404(CourseInstructor, pk=pk)
-	print("ALALALALALAL", course_instructor)
-	print(get_detailed_json_of_course_instructor(course_instructor, request.user))
-	return JsonResponse(get_detailed_json_of_course_instructor(course_instructor, request.user))
+	course_pk, instructor_pk = request.GET.get("course_pk"), request.GET.get("instructor_pk")
+	course = get_object_or_404(Course, pk=course_pk)
+	instructor = get_object_or_404(Instructor, pk=instructor_pk)
+	return JsonResponse(get_detailed_json_of_course_instructor(course, instructor, request.user))
 
-@login_required
-def get_course_user(request):
-	course_instructor_pk = request.GET.get("course_instructor_pk")
-	course_instructor = get_object_or_404(CourseInstructor, pk=course_instructor_pk)
-	course_users = [get_detailed_json_of_course_user(course_user, request.user) for course_user in CourseUser.objects.filter(course_instructor=course_instructor)]
-	return JsonResponse({
-		"course_users":course_users,
-	})
+
 
 @login_required
 def course_search_result(request):
@@ -196,16 +190,23 @@ def get_basic_info(request):
 	})
 
 
-def get_detailed_json_of_course_instructor(course_instructor, user):
-	course, instructor, topic, semester = course_instructor.course, course_instructor.instructor, course_instructor.topic, course_instructor.semester
-	course_users = [get_detailed_json_of_course_user(course_user, user) for course_user in CourseUser.objects.filter(course_instructor=course_instructor)]
+def get_detailed_json_of_course_instructor(course, instructor, user):
+	course_instructor_relations = []
+	course_instructor_query = CourseInstructor.objects.filter(course=course, instructor=instructor)
+	for course_instructor in course_instructor_query:
+		course_instructor_relations.append({
+			"course_instructor_pk":course_instructor.pk,
+			"topic":course_instructor.topic,
+			"semester":course_instructor.semester,
+			})
+	course_users = [get_detailed_json_of_course_user(course_user, user) for course_user in CourseUser.objects.filter(course=course, instructor=instructor)]
 	rating_course = []
 	rating_instructor = []
 	print("course Users", course_users)
 	for cs_user in course_users:
-		if cs_user['rating_course'] != None:
+		if cs_user['rating_course'] != None and cs_user['rating_course'] > 0:
 			rating_course.append(cs_user['rating_course'])
-		if cs_user['rating_instructor'] != None:
+		if cs_user['rating_instructor'] != None and cs_user['rating_instructor'] > 0:
 			rating_instructor.append(cs_user['rating_instructor'])
 	r_instr = 0
 	r_cs = 0
@@ -227,8 +228,7 @@ def get_detailed_json_of_course_instructor(course_instructor, user):
 				"rating_course":r_cs,
 			},
 		"instructor":instructor.__str__(),
-		"topic":topic,
-		"semester":semester,
+		"course_instructors":course_instructor_relations,
 		"course_users":course_users,
 	}
 
@@ -238,6 +238,7 @@ def get_detailed_json_of_course_user(course_user, user):
 		"name":course_user.user.first_name + " " + course_user.user.last_name,
 		"take":course_user.take,
 		"text":course_user.text,
+		"semester":course_user.course_instructor.semester,
 		"rating_course":course_user.rating_course,
 		"rating_instructor":course_user.rating_instructor,
 	}
@@ -245,17 +246,38 @@ def get_detailed_json_of_course_user(course_user, user):
 def get_detailed_json_of_course(course, user):
 	courseUser_query = CourseUser.objects.filter(user=user, course=course).first()
 	courseInstructor_query = CourseInstructor.objects.filter(course=course)
+
+	allCourseUser_course_query = CourseUser.objects.filter(course=course)
+	rating_course_arr = []
+	for cs_user in allCourseUser_course_query:
+		if cs_user.rating_course != None and cs_user.rating_course > 0:
+			rating_course_arr.append(cs_user.rating_course)
+	if len(rating_course_arr) > 0:
+		rating_course = sum(rating_course_arr)/len(rating_course_arr)
+	else:
+		rating_course = 0
+
 	if courseInstructor_query.first() == None:
 		final_instructors = []
 	else:
 		instructors = {}
 		for cs_instructor in courseInstructor_query:
-			tmp_name = cs_instructor.instructor.first_name + " " + cs_instructor.instructor.last_name
+			tmp_name = cs_instructor.instructor.__str__()
+			allCourseUser_instructor_query = CourseUser.objects.filter(instructor = cs_instructor.instructor)
+			rating_instructor_arr = []
+			for cs_user in allCourseUser_instructor_query:
+				if cs_user.rating_instructor != None and cs_user.rating_instructor > 0:
+					rating_instructor_arr.append(cs_user.rating_instructor)
+			if len(rating_instructor_arr) > 0:
+				rating_instructor = sum(rating_instructor_arr)/len(rating_instructor_arr)
+			else:
+				rating_instructor = 0
 			if tmp_name not in instructors:
 				instructors[tmp_name] = {"semesters":[ cs_instructor.semester ]}
 				instructors[tmp_name]["topic"] = cs_instructor.topic
 				instructors[tmp_name]["pk"] = cs_instructor.instructor.pk
 				instructors[tmp_name]["cs_instr_pk"] = cs_instructor.pk
+				instructors[tmp_name]["rating_instructor"] = rating_instructor
 			else:
 				instructors[tmp_name]["semesters"].append(cs_instructor.semester)
 		final_instructors = []
@@ -266,6 +288,7 @@ def get_detailed_json_of_course(course, user):
 				"topic":v["topic"],
 				"pk":v["pk"],
 				"cs_instr_pk":v["cs_instr_pk"],
+				"rating_instructor":v["rating_instructor"],
 			})
 	if courseUser_query == None:
 		take = {
@@ -288,6 +311,8 @@ def get_detailed_json_of_course(course, user):
 		"title":course.title,
 		"take":take,
 		"instructors":final_instructors,
+		"category":course.category,
+		"rating_course":rating_course,
 	}
 
 # def course_search_result(request):

@@ -7,6 +7,9 @@ class Instructor(models.Model):
   def __str__(self):
     return self.first_name + " " + self.last_name;
 
+class Department(models.Model):
+  name = models.CharField(max_length=255, default="")
+  school = models.CharField(max_length=255, default="")
 
 class Course(models.Model):
   users = models.ManyToManyField(User, through='CourseUser')
@@ -19,9 +22,11 @@ class Course(models.Model):
   prerequisite = models.CharField(max_length = 1000, blank=True)
   type=models.CharField(max_length=100, blank=True)
   rating = models.FloatField(null=True, blank=True)
+  department = models.ForeignKey(Department, on_delete=models.CASCADE, default=1)
 
   def __str__(self):
     return self.mnemonic + str(self.number)
+
 
 class CourseInstructor(models.Model):
   instructor = models.ForeignKey(Instructor, on_delete=models.CASCADE)
@@ -29,21 +34,17 @@ class CourseInstructor(models.Model):
   semester = models.CharField(max_length=100, default="Null")
   topic = models.CharField(max_length=500, blank=True)
 
+
 class CourseUser(models.Model):
   user = models.ForeignKey(User, on_delete=models.CASCADE)
   course = models.ForeignKey(Course, on_delete=models.CASCADE)
+  instructor = models.ForeignKey(Instructor, on_delete=models.CASCADE, default = 1)
   take = models.CharField(max_length=255,default="Null")
   course_instructor = models.ForeignKey(CourseInstructor, on_delete=models.CASCADE, default = 1)
   text = models.CharField(max_length=2000, blank=True)
   rating_instructor = models.FloatField(null=True, blank=True)
   rating_course = models.FloatField(null=True, blank=True)
 
-
-# class Review(models.Model):
-#   user = models.ForeignKey(User, on_delete=models.CASCADE)
-#   course = models.ForeignKey(Course, on_delete=models.CASCADE)
-#   course_instructor = models.ForeignKey(CourseInstructor, on_delete=models.CASCADE)
-#   text = models.TextField(default="Null")
 
 # 'ClassNumber', 'Mnemonic', 'Number', 'Section', 'Type', 'Units',
 #  'Instructor(s)', 'Days', 'Room', 'Title', 'Topic', 'Status', 
