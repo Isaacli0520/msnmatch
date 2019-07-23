@@ -103,7 +103,7 @@
       <template v-slot:item="data">
         <v-list-item-content>
           <v-list-item-title v-html="data.item.text"></v-list-item-title>
-          <v-list-item-subtitle v-html="data.item.take"></v-list-item-subtitle>
+          <v-list-item-subtitle v-if="data.item.take != 'Null' " v-html="data.item.take"></v-list-item-subtitle>
         </v-list-item-content>  
       </template>
     </v-autocomplete>

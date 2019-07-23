@@ -10,7 +10,7 @@ class CourseInstructorRelationInline(admin.TabularInline):
 
 class CustomUserAdmin(admin.ModelAdmin):
     inlines = (CourseUserRelationInline, CourseInstructorRelationInline)
-    list_display = ['get_courseNum','type','units', 'title', 'topic']
+    list_display = ['get_courseNum','type','units', 'title']
     list_filter = ('type','mnemonic', 'units',)
 
     def get_courseNum(self, instance):

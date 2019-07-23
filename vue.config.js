@@ -68,6 +68,11 @@ module.exports = {
           template: 'templates/course.html',
           filename: 'course.html',
         },
+        courseinstructorpage: {
+          entry: 'src/courseinstructor/main.js',
+          template: 'templates/course_instructor.html',
+          filename: 'course_instructor.html',
+        },
         match: {
           entry: 'src/match/main.js',
           template: 'templates/match.html',

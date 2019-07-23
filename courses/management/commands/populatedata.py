@@ -1,11 +1,13 @@
 from django.core.management.base import BaseCommand, CommandError
-from courses.models import Course, Instructor, CourseUser, CourseInstructor, Review
+from courses.models import Course, Instructor, CourseUser, CourseInstructor
 import re
 import os
 import csv
 
 class Command(BaseCommand):
 	def handle(self, *args, **kwargs):
+		pattern = r"co-taught by ((([a-z]+.*)+) and)+ ([a-z]+.*)+"
+		ppp=re.compile(pattern,flags=re.IGNORECASE)
 		for cs in Course.objects.all():
 			cs.delete()
 		data = []
@@ -14,25 +16,51 @@ class Command(BaseCommand):
 				if file[:5] == "Class":
 					data.extend(read_course_data(os.path.join(path, file), file))
 		for cs in data:
-			course_query = Course.objects.filter(number=cs['Number'], mnemonic=cs['Mnemonic'], units=cs['Units'],
-			title=cs['Title'],topic=cs['Topic'], type=cs['Type'])
+			course_query = Course.objects.filter(number=cs['Number'], mnemonic=cs['Mnemonic'],
+			title=cs['Title'], type=cs['Type'])
 
 			if course_query.first() == None:
 				tmp_course = Course.objects.create(number=cs['Number'], mnemonic=cs['Mnemonic'], units=cs['Units'],
-				title=cs['Title'],topic=cs['Topic'],description=cs["Description"], type=cs['Type'],
+				title=cs['Title'],description=cs["Description"], type=cs['Type'],
 				prerequisite=cs['Prerequisite'])
 			else:
 				tmp_course = course_query.first()
+				if tmp_course.units != cs['Units']:
+					tmp_course.units = cs["Units"]
+					tmp_course.save()
 
-			instr_query = Instructor.objects.filter(name=cs["Instructor(s)"])
-			if instr_query.first() == None:
-				tmp_instr = Instructor.objects.create(name=cs["Instructor(s)"])
-			else:
-				tmp_instr = instr_query.first()
-			
-			cs_instr_query = CourseInstructor.objects.filter(instructor=tmp_instr, course=tmp_course, semester=cs["Semester"])
-			if cs_instr_query.first() == None:
-				CourseInstructor.objects.create(instructor=tmp_instr, course=tmp_course, semester=cs["Semester"])
+			tmp_instructors = [ins.strip().split() for ins in cs["Instructor(s)"].split(',')]
+			final_instructors = []
+			for instructor in tmp_instructors:
+				if len(instructor) >= 1 and len(instructor) <= 3:
+					final_instructors.append(instructor)
+				elif " ".join(instructor).lower()[:12] == "co-taught by":
+					for inner_instructor in re.split(r"co-taught by", " ".join(instructor), flags=re.I)[1].split(" and "):
+						final_instructors.append(inner_instructor.strip().split())
+				elif len(instructor) > 2 and "and" in instructor:
+					for inner_instructor in " ".join(instructor).split('and'):
+						final_instructors.append(inner_instructor.strip().split())
+				elif len(instructor) > 2:
+					final_instructors.append(instructor)
+			# if sum([len(item) for item in final_instructors]) > 3:
+			# 	print("instructors", final_instructors)
+			# print("instructors", final_instructors)
+			for instructor in final_instructors:
+				if len(instructor) == 1:
+					tmp_first_name = instructor[0]
+					tmp_last_name = ""
+				else:
+					tmp_first_name = instructor[0]
+					tmp_last_name = instructor[-1]
+				instr_query = Instructor.objects.filter(first_name=tmp_first_name, last_name=tmp_last_name)
+				if instr_query.first() == None:
+					tmp_instr = Instructor.objects.create(first_name=tmp_first_name, last_name=tmp_last_name)
+				else:
+					tmp_instr = instr_query.first()
+				
+				cs_instr_query = CourseInstructor.objects.filter(instructor=tmp_instr, course=tmp_course, topic=cs["Topic"],  semester=cs["Semester"])
+				if cs_instr_query.first() == None:
+					CourseInstructor.objects.create(instructor=tmp_instr, course=tmp_course, topic=cs["Topic"], semester=cs["Semester"])
 			
 
 

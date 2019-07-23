@@ -51,11 +51,7 @@ def people(request):
 @login_required
 def profile(request, username):
 	user = User.objects.get(username=username)
-	user_taking_courses = user.course_set.filter(relation__take="taking")
-	user_taken_courses = user.course_set.filter(relation__take="taken")
 	# print(user_taken_courses)
-	friends = Friend.objects.friends(user)
-	friend_requests = FriendshipRequest.objects.filter(to_user=user)
 	from_user = request.user
 
 	all_skills = user.skill_set.all()
@@ -69,17 +65,7 @@ def profile(request, username):
 	for k in skill_set:
 		skill_list += skill_set[k]
 
-	current_matching = user.matching_requests_received.filter(finished=False)
-	past_matching_received = user.matching_requests_received.filter(finished=True).order_by("created").reverse()
-	past_matching_sent = user.matching_requests_sent.filter(finished=True)
-	sent_matching = user.matching_requests_sent.all()
-	# past_sent_matching = user.matching_requests_sent.filter(finished=True)
-	to_user = user
-	ctx = {'to_username': username}
-	try:
-		request_exist = FriendshipRequest.objects.get(from_user=from_user, to_user=to_user)
-	except FriendshipRequest.DoesNotExist:
-		request_exist = None
+	
 	show_cal = False
 	if request.method == 'POST':
 		if "review" in request.POST:
@@ -130,15 +116,6 @@ def profile(request, username):
 		"user": user,
 		"editable": editable,
 		"user_skills":skill_list,
-		"user_taking_courses": user_taking_courses,
-		"user_taken_courses": user_taken_courses,
-		"friends": friends,
-		"requests": friend_requests,
-		"request_exist": request_exist,
-		"current_matching": current_matching,
-		"past_matching_received": past_matching_received,
-		"past_matching_sent": past_matching_sent,
-		"sent_matching":sent_matching,
 		"calendar_url": calendar_url,
 		"show_cal": show_cal,
 			"cal_act" : False,

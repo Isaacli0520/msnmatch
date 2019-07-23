@@ -218,3 +218,10 @@ section .section-title {
     margin-left: 0;
     padding-left: 0;
   }
+
+  @media (min-width: 10px) and (max-width: 767px) {
+    body{
+      background: url('images/white_background.jpg') no-repeat;
+      background-color: #ffffff;
+    }
+  }

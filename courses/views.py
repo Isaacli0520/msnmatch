@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.contrib.auth.models import User
-from .models import Course, CourseUser, CourseInstructor
+from .models import Course, CourseUser, CourseInstructor, Instructor
 from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector, TrigramSimilarity
 from django.db.models import Q, F
 from django.db.models.functions import Lower, Substr, Length
@@ -16,6 +16,8 @@ from fuzzywuzzy import fuzz, process
 import re
 from django.shortcuts import get_object_or_404
 import json
+from django.urls import reverse
+from msnmatch import settings
 
 mnemonics = ['AAS', 'MATH', 'ANTH', 'SWAH', 'MDST', 'ARAD', 'ARAH', 'ARTH', 'ARTS',
 'ARAB', 'ARTR', 'HEBR', 'HIND', 'MESA', 'MEST', 'PERS', 'SANS', 'SAST', 'SATR', 'URDU', 'ASTR',
@@ -42,48 +44,112 @@ DEBUGGG = False
 def courses(request):
 	return render(request, 'courses.html')
 
-# def course_taking_add_delete(request):
-# 	user = User.objects.get(username = request.GET.get("username"))
-# 	course = Course.objects.get(course_number = request.GET.get("course_number"))
-
-# 	if CourseUser.objects.filter(user=user, course=course, take="taking").exists():
-# 		CourseUser.objects.get(user=user,course=course, take="taking").delete()
-# 	else:
-# 		CourseUser.objects.create(user=user,course=course, take="taking")
-
-# 	return JsonResponse({
-# 		"exist":CourseUser.objects.filter(user=user, course=course, take="taking").exists(),
-# 	})
-
-
-# def course_taken_add_delete(request):
-# 	user = User.objects.get(username = request.GET.get("username"))
-# 	course = Course.objects.get(course_number = request.GET.get("course_number"))
-
-# 	if CourseUser.objects.filter(user=user, course=course, take="taken").exists():
-# 		CourseUser.objects.get(user=user,course=course, take="taken").delete()
-# 	else:
-# 		CourseUser.objects.create(user=user,course=course, take="taken")
-
-# 	return JsonResponse({
-# 		"exist":CourseUser.objects.filter(user=user, course=course, take="taken").exists(),
-# 	})
-
 @login_required
 def course(request, course_number):
 	return render(request, 'course.html')
 
+@login_required
+def course_instructor(request, course_instructor_number):
+	return render(request, 'course_instructor.html')
+
+@login_required
+def submit_review(request):
+	if request.method == "POST":
+		post = json.loads(request.body)
+		text, rating_course, rating_instructor = post["text"], post["rating_course"], post["rating_instructor"]
+		course_pk, course_instructor_pk =  post["course_pk"], post["course_instructor_pk"]
+		
+		course = get_object_or_404(Course, pk=course_pk)
+		course_instructor = get_object_or_404(CourseInstructor, pk=course_instructor_pk)
+		cs_user_query = CourseUser.objects.filter(course=course, user=request.user)
+		if cs_user_query.first() != None:
+			cs_user = cs_user_query.first()
+			cs_user.text = text
+			cs_user.rating_course = rating_course
+			cs_user.rating_instructor = rating_instructor
+			cs_user.save()
+		else:
+			CourseUser.objects.create(course=course,
+				user=request.user, 
+				course_instructor=course_instructor,
+				text=text,
+				take="taken",
+				rating_course=rating_course,
+				rating_instructor=rating_instructor)
+		success = True
+	else:
+		success = False
+	return JsonResponse({
+		"success":success,
+	})
+
+@login_required
+def save_take(request):
+	now_instructor_pk, now_semester, now_take = "", "", ""
+	if request.method == "POST":
+		post = json.loads(request.body)
+		take, semester, delete = post['take'], post['semester'], post['delete']
+		course = get_object_or_404(Course, pk=post['course_pk'])
+		past_query = CourseUser.objects.filter(user=request.user, course = course)
+		if delete:
+			if past_query.first() != None:
+				past_query.first().delete()
+			return JsonResponse({
+				"success":True,
+			})
+		instructor = get_object_or_404(Instructor, pk=post['instructor_pk'])
+	
+		cs_instr = get_object_or_404(CourseInstructor, course=course,instructor=instructor, semester=semester)
+
+		if past_query.first() != None:
+			past_query.first().delete()
+		if not delete:
+			cs_user = CourseUser.objects.create(user=request.user, course = course, take = take, course_instructor = cs_instr)
+			now_instructor_pk, now_semester, now_take = cs_user.course_instructor.instructor.pk, cs_user.course_instructor.semester, cs_user.take
+		success = True
+	else:
+		success = False
+	return JsonResponse({
+		"success":success,
+		"now":{
+			"instructor_pk":now_instructor_pk,
+			"semester":now_semester,
+			"take":now_take,
+		},
+	})
+
+@login_required
 def get_course(request):
+	print("get course")
 	pk = request.GET.get("pk")
 	course = get_object_or_404(Course, pk=pk)
 	return JsonResponse({
 		"course":get_detailed_json_of_course(course, request.user),
 	})
+@login_required
+def get_course_instructor(request):
+	print("get course instructor")
+	pk = request.GET.get("pk")
+	course_instructor = get_object_or_404(CourseInstructor, pk=pk)
+	print("ALALALALALAL", course_instructor)
+	print(get_detailed_json_of_course_instructor(course_instructor, request.user))
+	return JsonResponse(get_detailed_json_of_course_instructor(course_instructor, request.user))
 
+@login_required
+def get_course_user(request):
+	course_instructor_pk = request.GET.get("course_instructor_pk")
+	course_instructor = get_object_or_404(CourseInstructor, pk=course_instructor_pk)
+	course_users = [get_detailed_json_of_course_user(course_user, request.user) for course_user in CourseUser.objects.filter(course_instructor=course_instructor)]
+	return JsonResponse({
+		"course_users":course_users,
+	})
 
+@login_required
 def course_search_result(request):
 	score_cutoff = 85
 	query = request.GET.get("query").strip()
+	time = request.GET.get("time")
+	print("QUERY", query)
 	if query.upper() in mnemonics:
 		field_queryset = Course.objects.filter(mnemonic = query.upper())
 	else:
@@ -97,6 +163,7 @@ def course_search_result(request):
 	
 	return JsonResponse({
 		"course_result":get_json_of_courses(field_queryset, request.user),
+		"time":time,
 	})
 
 def get_json_of_courses(queryset, user):
@@ -116,29 +183,111 @@ def get_json_of_course(course, user):
 		"take":take,
 	}
 
+def get_basic_info(request):
+	tmp = {
+		"home_url":reverse('home'),
+		"brand_pic": settings.STATIC_URL + "css/images/brand.png",
+		"profile": reverse('profile', args=[request.user.username]),
+		"update_profile":reverse('update_profile', args=[request.user.username]),
+		"logout":reverse('logout'),
+	}
+	return JsonResponse({
+		"all_info":tmp,
+	})
+
+
+def get_detailed_json_of_course_instructor(course_instructor, user):
+	course, instructor, topic, semester = course_instructor.course, course_instructor.instructor, course_instructor.topic, course_instructor.semester
+	course_users = [get_detailed_json_of_course_user(course_user, user) for course_user in CourseUser.objects.filter(course_instructor=course_instructor)]
+	rating_course = []
+	rating_instructor = []
+	print("course Users", course_users)
+	for cs_user in course_users:
+		if cs_user['rating_course'] != None:
+			rating_course.append(cs_user['rating_course'])
+		if cs_user['rating_instructor'] != None:
+			rating_instructor.append(cs_user['rating_instructor'])
+	r_instr = 0
+	r_cs = 0
+	if len(rating_instructor) > 0:
+		r_instr = sum(rating_instructor)/len(rating_instructor)
+	if len(rating_course) > 0:
+		r_cs = sum(rating_course)/len(rating_course)
+
+	return {
+		"course":{
+				"course_pk":course.pk,
+				"mnemonic":course.mnemonic,
+				"number":course.number,
+				"title":course.title,
+				"description":course.description,
+				"prerequisite":course.prerequisite,
+				"type":course.type,
+				"rating_instructor":r_instr,
+				"rating_course":r_cs,
+			},
+		"instructor":instructor.__str__(),
+		"topic":topic,
+		"semester":semester,
+		"course_users":course_users,
+	}
+
+def get_detailed_json_of_course_user(course_user, user):
+	return {
+		"user_pk":course_user.user.pk,
+		"name":course_user.user.first_name + " " + course_user.user.last_name,
+		"take":course_user.take,
+		"text":course_user.text,
+		"rating_course":course_user.rating_course,
+		"rating_instructor":course_user.rating_instructor,
+	}
+
 def get_detailed_json_of_course(course, user):
 	courseUser_query = CourseUser.objects.filter(user=user, course=course).first()
 	courseInstructor_query = CourseInstructor.objects.filter(course=course)
 	if courseInstructor_query.first() == None:
-		instructors = {}
+		final_instructors = []
 	else:
 		instructors = {}
 		for cs_instructor in courseInstructor_query:
-			if cs_instructor.instructor.name not in instructors:
-				instructors[cs_instructor.instructor.name] = [ cs_instructor.semester ]
+			tmp_name = cs_instructor.instructor.first_name + " " + cs_instructor.instructor.last_name
+			if tmp_name not in instructors:
+				instructors[tmp_name] = {"semesters":[ cs_instructor.semester ]}
+				instructors[tmp_name]["topic"] = cs_instructor.topic
+				instructors[tmp_name]["pk"] = cs_instructor.instructor.pk
+				instructors[tmp_name]["cs_instr_pk"] = cs_instructor.pk
 			else:
-				instructors[cs_instructor.instructor.name].append(cs_instructor.semester)
+				instructors[tmp_name]["semesters"].append(cs_instructor.semester)
+		final_instructors = []
+		for k,v in instructors.items():
+			final_instructors.append({
+				"name":k,
+				"semesters":v["semesters"],
+				"topic":v["topic"],
+				"pk":v["pk"],
+				"cs_instr_pk":v["cs_instr_pk"],
+			})
 	if courseUser_query == None:
-		take = "Null"
+		take = {
+			"instructor_pk":"",
+			"course_pk":"",
+			"semester":"",
+			"take":"",
+		}
 	else:
-		take = courseUser_query.take
+		take = {
+			"instructor_pk":courseUser_query.course_instructor.instructor.pk,
+			"course_pk":courseUser_query.course.pk,
+			"semester":courseUser_query.course_instructor.semester,
+			"take":courseUser_query.take,
+		}
 	return {
 		"pk":course.pk,
 		"mnemonic":course.mnemonic,
 		"number":course.number,
 		"title":course.title,
 		"take":take,
-		"instructors":instructors,
+		"instructors":final_instructors,
 	}
 
 # def course_search_result(request):
