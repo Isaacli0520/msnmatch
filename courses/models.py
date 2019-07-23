@@ -11,6 +11,10 @@ class Department(models.Model):
   name = models.CharField(max_length=255, default="")
   school = models.CharField(max_length=255, default="")
 
+def get_department():
+  Department.objects.get_or_create(id=1)
+  return 1
+
 class Course(models.Model):
   users = models.ManyToManyField(User, through='CourseUser')
   instructors = models.ManyToManyField(Instructor, through='CourseInstructor')
@@ -22,7 +26,7 @@ class Course(models.Model):
   prerequisite = models.CharField(max_length = 1000, blank=True)
   type=models.CharField(max_length=100, blank=True)
   rating = models.FloatField(null=True, blank=True)
-  department = models.ForeignKey(Department, on_delete=models.CASCADE, default=1)
+  department = models.ForeignKey(Department, on_delete=models.CASCADE, default=get_department)
 
   def __str__(self):
     return self.mnemonic + str(self.number)
