@@ -1,13 +1,146 @@
 <template>
-  <v-app id="inspire">
-    <custom-header></custom-header>
-    <v-content>
-      <v-container fluid fill-height>
-        <v-layout justify-center align-center>
-        </v-layout>
-      </v-container>
-    </v-content>
-  </v-app>
+    <v-app>
+        <custom-header></custom-header>
+        <v-content>
+            <v-carousel v-if="with_carousel">
+                <v-carousel-item
+                    v-for="(color, i) in colors"
+                    :key="color"
+                >
+                    <v-sheet
+                    :color="color"
+                    height="100%"
+                    tile
+                    >
+                    <v-layout
+                        align-center
+                        fill-height
+                        justify-center
+                    >
+                        <div class="display-3">Slide {{ i + 1 }}</div>
+                    </v-layout>
+                    </v-sheet>
+                </v-carousel-item>
+            </v-carousel>
+            <v-container fluid grid-list-lg>
+                <v-layout mb-3>
+                    <v-flex> 
+                        <div>
+                            <span class="cus-headline-text">Hoosmyprofessor</span>
+                        </div>
+                    </v-flex>
+                    <v-spacer></v-spacer>
+                </v-layout>
+                <v-layout fill-height wrap>
+                    <v-flex child-flex d-flex xs12 sm12 md4 lg4 xl4>
+                        <v-card>
+                            <v-card-title>Trash Can</v-card-title>
+                            <v-card-text>
+                                <v-layout row wrap>
+                                    <v-flex
+                                        style="width:100%;"
+                                        :key="index_item + '-trash' " 
+                                        v-for="(item, index_item) in trash_items">
+                                        <v-list-item
+                                            :href="item.href">
+                                            <v-list-item-avatar
+                                                v-if="item.icon">
+                                                <v-icon>{{ item.icon }}</v-icon>
+                                            </v-list-item-avatar>
+                                            <v-list-item-content>
+                                                <v-list-item-title>{{ item.title }}</v-list-item-title>
+                                            </v-list-item-content>
+                                        </v-list-item>
+                                    </v-flex>
+                                </v-layout>
+                            </v-card-text>
+                        </v-card>
+                    </v-flex>
+                    <template v-for="i in ['Taking', 'Taken']">
+                        <v-flex child-flex d-flex :key="i + '-taking-taken' " xs12 sm6 md4 lg4 xl4>
+                            <v-card>
+                                <v-card-title>Top 10 {{i}} Courses</v-card-title>
+                                <v-card-text>
+                                    <v-layout row wrap>
+                                        <v-flex
+                                            style="width:100%;"
+                                            :key="index_course + '-trending-course' " 
+                                            v-for="(course, index_course) in trending_courses[i]">
+                                            <v-list-item
+                                                :href="'/courses/'+ course.course_pk + '/' ">
+                                                <v-list-item-avatar
+                                                    color="orange lighten-2">
+                                                    <span style="color:#fff;">{{index_course + 1}}</span>
+                                                </v-list-item-avatar>
+                                                <v-list-item-content two-line>
+                                                    <v-list-item-title>{{course.mnemonic}}{{course.number}} {{course.title}}</v-list-item-title>
+                                                    <v-list-item-subtitle>{{i}}: {{course[i.toLowerCase()]}}</v-list-item-subtitle>
+                                                </v-list-item-content>
+                                            </v-list-item>
+                                        </v-flex>
+                                    </v-layout>
+                                </v-card-text>
+                            </v-card>
+                        </v-flex>
+                    </template>
+                    <v-flex d-flex child-flex xs12 sm12 md12 lg12 xl12>
+                        <v-card min-height="65vh">
+                            <v-card-title>Recommendations</v-card-title>
+                            <v-card-text>
+                                <v-layout row wrap>
+                                    <v-flex d-flex>
+                                        <v-select
+                                            v-model="year"
+                                            :items="year_options"
+                                            label="Year"
+                                            :menu-props="{ offsetY: true }"
+                                            outlined>
+                                        </v-select>
+                                    </v-flex>
+                                    <v-flex d-flex>
+                                        <v-select
+                                            v-model="semester"
+                                            :items="semester_options"
+                                            label="Semester"
+                                            :menu-props="{ offsetY: true }"
+                                            outlined>
+                                        </v-select>
+                                    </v-flex>
+                                    <v-flex d-flex>
+                                        <v-select
+                                            v-model="major"
+                                            :items="major_options"
+                                            label="Major"
+                                            :menu-props="{ offsetY: true }"
+                                            outlined>
+                                        </v-select>
+                                    </v-flex>
+                                </v-layout>
+                                <v-layout row wrap>
+                                    <v-flex
+                                        style="width:100%;"
+                                        :key="index_course + '-rcm-course' " 
+                                        v-for="(course, index_course) in rcm_courses">
+                                        <v-list-item
+                                            :href="'/courses/'+ course.course_pk + '/' ">
+                                            <v-list-item-avatar
+                                                color="orange lighten-2">
+                                                <span style="color:#fff;">{{index_course + 1}}</span>
+                                            </v-list-item-avatar>
+                                            <v-list-item-content two-line>
+                                                <v-list-item-title>{{course.mnemonic}}{{course.number}} {{course.title}}</v-list-item-title>
+                                                <v-list-item-subtitle>Taken: {{ course.taken }}</v-list-item-subtitle>
+                                            </v-list-item-content>
+                                        </v-list-item>
+                                    </v-flex>
+                                </v-layout>
+                            </v-card-text>
+                        </v-card>
+                    </v-flex>
+                </v-layout>
+            </v-container>
+        </v-content>
+    </v-app>
 </template>
 
 <script>
@@ -15,126 +148,141 @@ import axios from 'axios'
 import CustomHeader from '../components/CustomHeader'
 
   export default {
-    data() {
-      return {
-        selected_course:null,
-        courseNameLimit:40,
-        isLoading: false,
-        entries:[],
-        search: null,
-
-        lastTime:0,
-        dialog: false,
-        drawer: null,
-        source: "/lessons/",
-        old_items: [
-          { icon: 'contacts', text: 'Contacts' },
-          { icon: 'history', text: 'Frequently contacted' },
-          { icon: 'content_copy', text: 'Duplicates' },
-          {
-            icon: 'keyboard_arrow_up',
-            'icon-alt': 'keyboard_arrow_down',
-            text: 'Labels',
-            model: true,
-            children: [
-              { icon: 'add', text: 'Create label' }
-            ]
-          },
-          {
-            icon: 'keyboard_arrow_up',
-            'icon-alt': 'keyboard_arrow_down',
-            text: 'More',
-            model: false,
-            children: [
-              { text: 'Import' },
-              { text: 'Export' },
-              { text: 'Print' },
-              { text: 'Undo changes' },
-              { text: 'Other contacts' }
-            ]
-          },
-          { icon: 'settings', text: 'Settings' },
-          { icon: 'chat_bubble', text: 'Send feedback' },
-          { icon: 'help', text: 'Help' },
-          { icon: 'phonelink', text: 'App downloads' },
-          { icon: 'keyboard', text: 'Go to the old version' }
-        ],
-      }
-    },
-    components:{
-      CustomHeader,
-    },
-    watch: {
-      selected_course(val){
-        if(val != null){
-          this.goToHref("/courses/" + val.value + "/");
-        }
-      },
-      search (val) {
-        // Items have already been loaded
-        if (val == null || val.length == 0){
-          this.entries = []
-          return
-        }
-        if (val.length < 2) return
-
-        // Items have already been requested
-        // if (this.isLoading) return
-
-        this.isLoading = true
-        this.lastTime += 1;
-        // Lazily load input items
-        axios.get('/courses/ajax/course_search_result/',{params: {query:val, time: this.lastTime}}).then(response => {
-                console.log("response",response)
-                if(response.data.time == this.lastTime){
-                    this.entries = response.data.course_result; 
+	data() {
+	    return {
+            year:1,
+            semester:"Fall",
+            major:null,
+            major_options:[],
+            year_options:[
+                {
+                    "text":"1",
+                    "value":1,
+                },
+                {
+                    "text":"2",
+                    "value":2,
+                },
+                {
+                    "text":"3",
+                    "value":3,
+                },
+                {
+                    "text":"4",
+                    "value":4,
+                },
+            ],
+            semester_options:[
+                {
+                    "text":"Fall",
+                    "value":"Fall",
+                },
+                {
+                    "text":"Spring",
+                    "value":"Spring",
+                },
+            ],
+            with_carousel:false,
+            trending_courses:{
+                "Taking":[],
+                "Taken":[],
+            },
+            rcm_courses:[],
+            trash_items:[
+                {
+                    "title":"Browse by Departments",
+                    "icon":"fas fa-list-ol",
+                    "href":"/courses/departments/",
+                },
+                {
+                    "title":"My Courses",
+                    "icon":"fas fa-user-circle",
+                    "href":"/users/",
+                },
+                {
+                    "title":"Go to Plannable",
+                    "icon":"fas fa-paper-plane",
+                    "href":"https://plannable.gitee.io",
+                },
+                {
+                    "title":"Home Page",
+                    "icon":"fas fa-home",
+                    "href":"/",
+                },
+            ],
+            colors: [
+                'primary',
+                'secondary',
+                'yellow darken-2',
+                'red',
+                'orange',
+            ],
+	    }
+	},
+	components:{
+	  CustomHeader,
+	},
+	watch: {
+        year:function(){
+            this.getRecommendations();
+        },
+        semester:function(){
+            this.getRecommendations();
+        },
+        major:function(){
+            this.getRecommendations();
+        },
+	},
+	computed:{
+	  
+	},
+	methods: {
+		goToHref(text){
+			window.location.href = text;
+        },
+        getTrendingCourses(){
+            axios.get('/courses/ajax/get_trending_courses/',{params: {}}).then(response => {
+                this.trending_courses["Taking"] = response.data.taking_courses;
+                this.trending_courses["Taken"] = response.data.taken_courses;
+            });
+        },
+        getRecommendations(){
+            axios.get('/courses/ajax/get_recommendations/',{params: {year:this.year, semester:this.semester, major:this.major}}).then(response => {
+                this.rcm_courses = response.data.rcm_courses;
+            });
+        },
+        getMajorOptions(){
+            axios.get('/courses/ajax/get_major_options/',{params: {}}).then(response => {
+                this.major_options = response.data.major_options;
+                if(response.data.major == ""){
+                    this.major = this.major_options[0].value;
                 }
-          })
-          .catch(err => {
-            console.log("error: ",err)
-          })
-          .finally(() => {this.isLoading = false})
-          ;
-      },
-    },
-    computed:{
-      items(){
-        // if (this.entries.length > 12){
-        //   var tmp_entry = this.entries.slice(0, 12);
-        // }
-        // else{
-        //   var tmp_entry = this.entries;
-        // }
-        return this.entries.map(entry => {
-          let tmp_course_name = entry.mnemonic + entry.number + " " + entry.title;
-          const course_name = tmp_course_name.length > this.courseNameLimit
-            ? tmp_course_name.slice(0, this.courseNameLimit) + '...'
-            : tmp_course_name;
-
-          return {text:course_name, value:entry.pk, take:entry.take};
-        })
-      },
-    },
-    methods: {
-        goToHref(text){
-            window.location.href = text;
-        },
-        getAutoComplete(query){
-          axios.get('/courses/ajax/course_search_result/',{params: {query:query, }}).then(response => {
-                this.allFmls = response.data.groups; 
-          });
-        },
-    },
-    mounted(){
-    },
+                else{
+                    this.major = response.data.major;
+                }
+                this.getRecommendations();
+            });
+        }
+	},
+	mounted(){
+        this.getTrendingCourses();
+        this.getMajorOptions();
+	},
   };
 </script>
 
 <style>
 
-  .cus-main{
-    width: 100vh;
-  }
-    
+	.cus-headline-text{
+		font-family: "Roboto", sans-serif;
+		font-size: 2.1em;
+		font-weight: 300;
+		color:rgb(0, 0, 0);
+		padding: 7px 12px 7px 12px;
+		border-radius: 5px;
+		line-height: 2.0;
+	}
+
+	
 
 </style>

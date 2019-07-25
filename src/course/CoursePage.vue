@@ -3,12 +3,12 @@
     <custom-header></custom-header>
     <v-content>
         <v-container fluid grid-list-md pa-2>
-            <v-layout mt-1>
+            <v-layout>
                 <v-flex>
                     <v-breadcrumbs class="cus-breadcrumbs" :items="navItems" divider=">"></v-breadcrumbs>
                 </v-flex>
             </v-layout>
-            <v-layout mb-3>
+            <v-layout mb-1>
                 <v-flex class="cus-headline-flex"> 
                     <div>
                     <span class="cus-headline-number">{{course.mnemonic}}{{course.number}}</span>
@@ -20,8 +20,8 @@
             <template v-for="i in 2">
                 <v-layout :key="i" mt-2 mb-3>
                     <v-flex> 
-                        <span v-if="i==1" class="instructor-banner">Instructors teaching this semester</span>
-                        <span v-if="i==2" class="instructor-banner">Past semesters</span>
+                        <div v-if="i==1" class="instructor-banner">Instructors teaching this semester</div>
+                        <div v-if="i==2" class="instructor-banner">Past semesters</div>
                     </v-flex>
                     <v-spacer></v-spacer>
                 </v-layout>
@@ -68,7 +68,7 @@
                             <v-btn
                             text
                             color="deep-purple accent-4"
-                            @click="goToHref('/courses/'+course.pk+'/'+instructor.pk+'/')"
+                            @click="goToHref('/courses/'+course.course_pk+'/'+instructor.pk+'/')"
                             >
                             Learn More
                             </v-btn>
@@ -122,7 +122,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
     data() {
       return {
         course:{
-            "pk": 0,
+            "course_pk": 0,
             "mnemonic": "",
             "number": "",
             "title": "",
@@ -231,7 +231,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
             }
             else{
                 var params = {
-                    'course_pk':this.course.pk,
+                    'course_pk':this.course.course_pk,
                     'instructor_pk':"",
                     'semester':"", 
                     'take':"",
@@ -246,22 +246,23 @@ axios.defaults.xsrfCookieName = "csrftoken";
                         type: 'success'
                     });
                 }
-                if(!params.delete){
-                    this.takeCourse.instructor_pk = response.data.now.instructor_pk;
-                    this.takeCourse.semester = response.data.now.semester;
-                    this.takeCourse.take = response.data.now.take;
-                    this.course.take.instructor_pk = response.data.now.instructor_pk;
-                    this.course.take.semester = response.data.now.semester;
-                    this.course.take.take = response.data.now.take;
-                }
-                else{
-                    this.course.take = {
-                        "instructor_pk":"",
-                        "course_pk":"",
-                        "semester":"",
-                        "take":"",
-                    }
-                }
+                this.getCourse();
+                // if(!params.delete){
+                //     this.takeCourse.instructor_pk = response.data.now.instructor_pk;
+                //     this.takeCourse.semester = response.data.now.semester;
+                //     this.takeCourse.take = response.data.now.take;
+                //     this.course.take.instructor_pk = response.data.now.instructor_pk;
+                //     this.course.take.semester = response.data.now.semester;
+                //     this.course.take.take = response.data.now.take;
+                // }
+                // else{
+                //     this.course.take = {
+                //         "instructor_pk":"",
+                //         "course_pk":"",
+                //         "semester":"",
+                //         "take":"",
+                //     }
+                // }
             });
             this.dialogTake = false;
         },
@@ -269,6 +270,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
             axios.get('/courses/ajax/get_course/',{params: {pk:this.course_pk, }}).then(response => {
                 this.course = response.data.course;
                 document.title = this.course.mnemonic + this.course.number;
+                this.takeItems = [];
                 for(let i = 0; i < this.course.instructors.length; i++){
                     this.course.instructors[i].semesters = this.course.instructors[i].semesters.sort(this.sortBySemester);
                     for(let j = 0; j < this.course.instructors[i].semesters.length; j++){
@@ -283,7 +285,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
                             "value":{
                                 "semester":this.course.instructors[i].semesters[j],
                                 "instructor_pk":this.course.instructors[i].pk,
-                                "course_pk":this.course.pk,
+                                "course_pk":this.course.course_pk,
                                 "take": tmp_take,
                             }
                         });
@@ -298,6 +300,11 @@ axios.defaults.xsrfCookieName = "csrftoken";
 
                 this.navItems = [
                     {
+                        text: "Main",
+                        disabled: false,
+                        href: '/courses/',
+                    },
+                    {
                         text: "Departments",
                         disabled: false,
                         href: '/courses/departments/',
@@ -310,7 +317,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
                     {
                         text: this.course.mnemonic + this.course.number,
                         disabled: true,
-                        href: '/courses/'+this.course.pk + "/",
+                        href: '/courses/'+this.course.course_pk + "/",
                     },
                 ];
                 
@@ -322,12 +329,16 @@ axios.defaults.xsrfCookieName = "csrftoken";
     },
     mounted(){
         this.getCourse();
-        this.get_basic_info();
     },
   };
 </script>
 
 <style>
+    .instructor-name{
+        font-family: "Roboto", sans-serif;
+        font-size: 1.6em;
+        font-weight: 500;
+    }
 
     .v-breadcrumbs li{
         font-size:20px !important;
@@ -375,7 +386,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
 
     .instructor-banner{
         font-family: "Roboto", sans-serif;
-        font-size: 1.3em;
+        font-size: 1.6em;
         font-weight: 500;
     }
 
@@ -448,6 +459,10 @@ axios.defaults.xsrfCookieName = "csrftoken";
 
         .instructor-name{
             font-size:1.7em;
+        }
+
+        .instructor-banner{
+            font-size: 1.3em;
         }
 
         .instructor-topic{

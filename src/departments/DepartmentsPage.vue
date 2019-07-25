@@ -3,7 +3,7 @@
     <custom-header></custom-header>
     <v-content>
         <v-container fluid grid-list-md pa-2>
-            <v-layout mt-1>
+            <v-layout>
                 <v-flex>
                     <v-breadcrumbs class="cus-breadcrumbs" :items="navItems" divider=">"></v-breadcrumbs>
                 </v-flex>
@@ -11,102 +11,34 @@
             <v-layout mb-3>
                 <v-flex class="cus-headline-flex"> 
                     <div>
-                    <span class="cus-headline-text">{{category.title}}</span>
+                    <span class="cus-headline-text">Departments</span>
                     </div>
                 </v-flex>
                 <v-spacer></v-spacer>
             </v-layout>
-            <template v-for="i in 2">
-                <v-layout :key="i" mt-2 mb-3>
-                    <v-flex> 
-                        <span v-if="i==1" class="instructor-banner">Instructors teaching this semester</span>
-                        <span v-if="i==2" class="instructor-banner">Past semesters</span>
-                    </v-flex>
-                    <v-spacer></v-spacer>
-                </v-layout>
-                <v-layout :key="i + 100000" row wrap>
-                    <v-flex d-flex 
-                    :key="index_instr"
-                    v-for="(instructor, index_instr) in i == 1 ? teaching_instructors : not_teaching_instructors">
-                    <v-card
-                    >
-                        <v-card-text>
-                            <v-flex align-self-center class="mb-2">
-                                <span class="instructor-name">{{ instructor.name }}</span>
-                                <v-chip 
-                                    v-if="course.take.instructor_pk == instructor.pk"
-                                    label
-                                    text-color="white"
-                                    color="teal darken-3"
-                                    class="ma-1">
-                                    {{course.take.take}}
-                                </v-chip>
-                            </v-flex>
-                            <v-spacer></v-spacer>
-                            <span v-if="instructor.topic.length>0" class="grey--text subtitle-1">Topic: {{ instructor.topic }}</span>
-                            <div>
-                                <div>
-                                    <span class="text--primary">Semesters taught: {{instructor.semesters.length}}</span>
-                                </div>
-                                <div>
-                                    <!-- <template v-if="instructor.rating_instructor>0"> -->
-                                    <span class="text--primary">Rating: </span>
-                                    <v-rating
-                                        v-model="instructor.rating_instructor"
-                                        color="yellow darken-3"
-                                        background-color="grey darken-1"
-                                        readonly
-                                        small
-                                        >
-                                    </v-rating>
-                                    <!-- </template> -->
-                                </div>
-                            </div>
+            <v-layout row wrap>
+                <v-flex xs12 sm12 lg12 md12 xl12 d-flex :key="index_school + 'school' " v-for="(departments, school, index_school) in departments_dict">
+                    <v-card>
+                        <v-card-title>{{ school }}</v-card-title>
+                        <v-card-text class="text--primary">
+                            <v-layout row wrap>
+                                <v-flex
+                                    xs12 sm6 md6 lg6 xl6
+                                    :key="index_d + 'department' " 
+                                    v-for="(department, index_d) in departments">
+                                    <v-list-item
+                                        :href="'/courses/departments/'+ department.department_pk + '/' ">
+                                        <v-list-item-content>
+                                            <v-list-item-title>{{department.name}}</v-list-item-title>
+                                        </v-list-item-content>
+                                    </v-list-item>
+                                </v-flex>
+                            </v-layout>
                         </v-card-text>
-                        <v-card-actions>
-                            <v-btn
-                            text
-                            color="deep-purple accent-4"
-                            @click="goToHref('/courses/'+course.pk+'/'+instructor.pk+'/')"
-                            >
-                            Learn More
-                            </v-btn>
-                            <v-btn
-                                @click="openDialogTake(instructor)"
-                                color="deep-purple accent-4" 
-                                text
-                                >
-                                Taking/Taken
-                            </v-btn>
-                        </v-card-actions>
                     </v-card>
-                    </v-flex>
-                </v-layout>
-            </template>
+                </v-flex>
+            </v-layout>
         </v-container>
-        <v-dialog v-model="dialogTake" scrollable min-width="350px" max-width="500px">
-            <v-card>
-                <v-card-title>Select Semester</v-card-title>
-                <v-divider></v-divider>
-                <v-card-text style="height: 300px;">
-                    <v-checkbox 
-                        v-model="takeCourse" 
-                        :key="item.value.instructor_pk + item.value.semester" 
-                        v-for="item in takeItemsComputed" 
-                        :value-comparator="takeCompare" 
-                        :label="item.label" 
-                        :value="item.value"
-                        color="black"
-                        ></v-checkbox>
-                </v-card-text>
-                <v-divider></v-divider>
-                <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn color="blue darken-1" text @click="dialogTake = false">Close</v-btn>
-                    <v-btn color="blue darken-1" text @click="takeSave()">Save</v-btn>
-                </v-card-actions>
-            </v-card>
-        </v-dialog>
     </v-content>
   </v-app>
 </template>
@@ -120,39 +52,11 @@ axios.defaults.xsrfCookieName = "csrftoken";
   export default {
     data() {
       return {
-        course:{
-            "pk": 0,
-            "mnemonic": "",
-            "number": "",
-            "title": "",
-            "category":"",
-            "take": {
-                "instructor":"",
-                "semester":"",
-                "take":"",
-            },
-            "instructors":[],
-        },
+        departments:[],
         currentSemester:"2019Fall",
-        selected_course:null,
-        courseNameLimit:40,
-        isLoading: false,
-        entries:[],
-        search: null,
-        home_url:"",
-        brand_pic:"",
-        profile:"",
-        update_profile:"",
-        logout:"",
-        lastTime: 1,
-
         navItems:[],
+        departments_dict:{},
 
-        takeCourse:null,
-        takeItems:[],
-        takeItemKey:"", 
-        dialogTake: false,
-        source: "/lessons/",
         
       }
     },
@@ -163,171 +67,40 @@ axios.defaults.xsrfCookieName = "csrftoken";
       
     },
     computed:{
-        takeItemsComputed(){
-            return this.takeItems.filter(obj => {
-                return obj.value.instructor_pk == this.takeItemKey;
-            })
-        },
-        teaching_instructors(){
-            return this.course.instructors.filter(obj => {
-                return obj.semesters.indexOf(this.currentSemester) != -1;
-            })
-        },
-        not_teaching_instructors(){
-            return this.course.instructors.filter(obj => {
-                return obj.semesters.indexOf(this.currentSemester) == -1;
-            })
-        },
-        course_pk: function(){
-            let url = window.location.pathname.split('/');
-            return url[url.length - 2];
-        },
-        course_edit_url: function(){
-            return '/courses/' + this.course_pk + '/edit/';
-        },
     },
     methods: {
-        takeCompare(a,b){
-            if (a == null || b == null){
-                return false;
-            }
-            return (a.course_pk == b.course_pk && a.instructor_pk == b.instructor_pk && a.semester == b.semester && a.take == b.take);
-
-        },
-        sortBySemester(a, b){
-            if(a.substring(0,4) != b.substring(0,4)){
-                return b.substring(0,4).toString(10) - a.substring(0,4).toString(10);
-            }
-            else{
-                if(a.substring(4) == b.substring(4)){
-                    return 0;
-                }
-                else if(a.substring(4) == "Fall"){
-                    return -1;
-                }
-                else{
-                    return 1;
-                }
-            }
-        },
-        openDialogTake(instructor){
-            this.takeItemKey = instructor.pk;
-            this.dialogTake = true;
-        },
-        takeSave(){
-            if(this.takeCourse != null){
-                var params = {
-                    'course_pk':this.takeCourse.course_pk,
-                    'instructor_pk':this.takeCourse.instructor_pk,
-                    'semester':this.takeCourse.semester, 
-                    'take':this.takeCourse.take,
-                    'delete':false,
-                }
-            }
-            else{
-                var params = {
-                    'course_pk':this.course.pk,
-                    'instructor_pk':"",
-                    'semester':"", 
-                    'take':"",
-                    'delete':true,
-                }
-            }
-            axios.post('/courses/ajax/save_take/',
-            params,).then(response => {
-                if(response.data.success){
-                    this.$message({
-                        message: 'Updated',
-                        type: 'success'
-                    });
-                }
-                if(!params.delete){
-                    this.takeCourse.instructor_pk = response.data.now.instructor_pk;
-                    this.takeCourse.semester = response.data.now.semester;
-                    this.takeCourse.take = response.data.now.take;
-                    this.course.take.instructor_pk = response.data.now.instructor_pk;
-                    this.course.take.semester = response.data.now.semester;
-                    this.course.take.take = response.data.now.take;
-                }
-                else{
-                    this.course.take = {
-                        "instructor_pk":"",
-                        "course_pk":"",
-                        "semester":"",
-                        "take":"",
+        getDepartments(){
+            axios.get('/courses/ajax/get_departments/',{params: {}}).then(response => {
+                this.departments = response.data.departments;
+                var tmp_d = {};
+                for(let i = 0; i < this.departments.length; i++){
+                    if(this.departments[i].name=="Computer Science"){
+                        if(this.departments[i].school=="School of Engineering and Applied Science"){
+                            var tmp_cs_department_pk = this.departments[i].department_pk;
+                        }
+                        else{
+                            var tmp_cs_index = i;
+                        }
                     }
                 }
-            });
-            this.dialogTake = false;
-        },
-        get_basic_info(){
-            axios.get('/courses/ajax/get_basic_info/',{params: {}}).then(response => {
-                // console.log(response.data.all_users);
-                let data = response.data.all_info;
-                this.home_url = data.home_url;
-                this.brand_pic = data.brand_pic;
-                this.profile = data.profile;
-                this.update_profile = data.update_profile;
-                this.logout = data.logout;
-            });
-        },
-        navMethod(item){
-            if(item.title=="Profile"){
-                this.profileMethod()
-            }
-            else if(item.title=="Edit Profile"){
-                this.editProfileMethod()
-            }
-            else if(item.title=="Log Out"){
-                this.logOutMethod()
-            }
-        },
-        profileMethod(){
-            window.location.href = this.profile;
-        },
-        editProfileMethod(){
-            window.location.href = this.update_profile;
-        },
-        logOutMethod(){
-            window.location.href = this.logout;
-        },
-        getCourse(){
-            axios.get('/courses/ajax/get_course/',{params: {pk:this.course_pk, }}).then(response => {
-                this.course = response.data.course;
-                for(let i = 0; i < this.course.instructors.length; i++){
-                    this.course.instructors[i].semesters = this.course.instructors[i].semesters.sort(this.sortBySemester);
-                    for(let j = 0; j < this.course.instructors[i].semesters.length; j++){
-                        this.takeItems.push({
-                            "label":this.course.instructors[i].semesters[j] + (j == 0 ? " Currently Taking" : " Taken"),
-                            "value":{
-                                "semester":this.course.instructors[i].semesters[j],
-                                "instructor_pk":this.course.instructors[i].pk,
-                                "course_pk":this.course.pk,
-                                "take":(j == 0 ? "taking" : "taken"),
-                            }
-                        });
+                this.departments[tmp_cs_index].department_pk = tmp_cs_department_pk;
+                for(let i = 0; i < this.departments.length; i++){
+                    if(! (this.departments[i].school in tmp_d)){
+                        tmp_d[this.departments[i].school] = [];
+                    }
+                    else{
+                        tmp_d[this.departments[i].school].push(this.departments[i])
                     }
                 }
-
-                for(let k = 0; k < this.takeItems.length; k++){
-                    if(this.takeItems[k].value.instructor_pk == this.course.take.instructor_pk && this.takeItems[k].value.semester == this.course.take.semester){
-                        this.takeCourse = this.takeItems[k].value;
-                    }
-                }
-
+                this.departments_dict = tmp_d;
                 this.navItems = [
                     {
-                        text: "Category",
+                        text: "Main",
                         disabled: false,
-                        href: '',
+                        href: '/courses/',
                     },
                     {
-                        text: this.course.category,
-                        disabled: false,
-                        href: '',
-                    },
-                    {
-                        text: this.course.mnemonic + this.course.number,
+                        text: "Departments",
                         disabled: true,
                         href: '',
                     },
@@ -340,8 +113,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
         },
     },
     mounted(){
-        this.getCourse();
-        this.get_basic_info();
+        this.getDepartments();
     },
   };
 </script>
@@ -428,10 +200,9 @@ axios.defaults.xsrfCookieName = "csrftoken";
         font-family: "Roboto", sans-serif;
         font-size: 2.1em;
         font-weight: 300;
-        background-color: rgb(226, 225, 225);
         color:rgb(0, 0, 0);
         padding: 7px 12px 7px 12px;
-        border-radius: 0px 5px 5px 0px;
+        border-radius: 5px;
         line-height: 2.0;
         box-decoration-break: clone;
 

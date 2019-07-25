@@ -3,7 +3,7 @@
     <custom-header></custom-header>
     <v-content>
         <v-container fluid grid-list-md>
-            <v-layout mt-1>
+            <v-layout>
                 <v-flex>
                     <v-breadcrumbs class="cus-breadcrumbs" :items="navItems" divider=">"></v-breadcrumbs>
                 </v-flex>
@@ -20,7 +20,7 @@
             <v-layout> <!-- Instructor Name -->
                 <v-flex>
                     <div class="instructor-name">
-                        {{instructor}}
+                        {{instructor.name}}
                     </div>
                 </v-flex>
                 <v-spacer></v-spacer>
@@ -46,9 +46,9 @@
                         <v-card-title>Rating</v-card-title>
                         <v-card-text>
                             <v-flex class="rating-div">
-                                <span>Instructor: {{course.rating_instructor}}</span>
+                                <span>Instructor: {{instructor.rating_instructor}}</span>
                                 <v-rating
-                                    v-model="course.rating_instructor"
+                                    v-model="instructor.rating_instructor"
                                     color="yellow darken-3"
                                     background-color="grey darken-1"
                                     readonly
@@ -192,8 +192,8 @@
                                 item-value="course_instructor_pk"
                                 label="Semester"
                                 :menu-props="{ offsetY: true }"
-                                outlined
-                            ></v-select>
+                                outlined>
+                            </v-select>
                         </v-flex>
                     </v-layout>
                     <v-layout>
@@ -256,7 +256,10 @@ axios.defaults.xsrfCookieName = "csrftoken";
         course_users:[],
         semester:"",
         topic:"",
-        instructor:"",
+        instructor:{
+            "name":"",
+            "rating_instructor":"",
+        },
 
         reviewDialog:false,
         review_rating_course:0,
@@ -411,6 +414,11 @@ axios.defaults.xsrfCookieName = "csrftoken";
                 this.course_users = data.course_users;
                 this.navItems = [
                     {
+                        text: "Main",
+                        disabled: false,
+                        href: '/courses/',
+                    },
+                    {
                         text: "Departments",
                         disabled: false,
                         href: '/courses/departments/',
@@ -426,7 +434,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
                         href: '/courses/'+this.course.course_pk + "/",
                     },
                     {
-                        text: this.instructor,
+                        text: this.instructor.name,
                         disabled: true,
                         href: "NONE",
                     },
@@ -444,7 +452,6 @@ axios.defaults.xsrfCookieName = "csrftoken";
     },
     mounted(){
         this.getCourseInstructor();
-        this.get_basic_info();
     },
   };
 </script>
@@ -486,12 +493,6 @@ axios.defaults.xsrfCookieName = "csrftoken";
         border-radius: 5px 5px 5px 5px;
         line-height: 1.6;
         box-decoration-break: clone;
-    }
-
-    .instructor-name{
-        font-family: "Roboto", sans-serif;
-        font-size: 1.6em;
-        font-weight: 500;
     }
 
     .semester-div{

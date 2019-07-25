@@ -61,7 +61,7 @@
       </v-list>
     </v-navigation-drawer>
     <v-app-bar
-      color="teal darken-3"
+      color="teal darken-2"
       dark
       app
       :clipped-left="$vuetify.breakpoint.mdAndUp"
@@ -89,14 +89,10 @@
       <template v-slot:item="data">
         <v-list-item-content>
           <v-list-item-title v-html="data.item.text"></v-list-item-title>
-          <v-list-item-subtitle v-html="data.item.take"></v-list-item-subtitle>
         </v-list-item-content>  
       </template>
     </v-autocomplete>
         <v-spacer></v-spacer>
-        <v-btn icon>
-            <v-icon>apps</v-icon>
-        </v-btn>
         <v-menu offset-y
         class="mx-auto"
         min-width="170">
@@ -134,7 +130,7 @@ import axios from 'axios'
 export default{
     data: function () {
         return {
-            drawer: null,
+            drawer: false,
             selected_course:null,
             isLoading: false,
             lastTime: 0,
@@ -218,7 +214,7 @@ export default{
     },
     computed:{
         items(){
-            return this.entries.map(entry => {
+            return this.entries.sort(this.sortCourseNumber).map(entry => {
             let tmp_course_name = entry.mnemonic + entry.number + " " + entry.title;
             const course_name = tmp_course_name.length > this.courseNameLimit
                 ? tmp_course_name.slice(0, this.courseNameLimit) + '...'
@@ -229,6 +225,9 @@ export default{
         },
     },
     methods:{
+        sortCourseNumber(a, b){
+            return a.number.toString(10) - b.number.toString(10);
+        },
         navAsideMethod(item){
             
         },

@@ -11,7 +11,7 @@ class UserForm(forms.ModelForm):
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
-        fields = ('location','bio','year','sex', 'major', 'major_two', 'minor', 'birth_date','wechat','picture', 'video')
+        fields = ('location','bio','graduate_year','sex', 'major', 'major_two', 'minor', 'birth_date','wechat','picture', 'video')
         labels = {
             'sex':'Gender',
         	'birth_date' : 'Birth Date',

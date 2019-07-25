@@ -18,6 +18,7 @@ from django.shortcuts import get_object_or_404
 import json
 from django.urls import reverse
 from msnmatch import settings
+from users.models import MAJOR_CHOICES
 
 mnemonics = ['AAS', 'MATH', 'ANTH', 'SWAH', 'MDST', 'ARAD', 'ARAH', 'ARTH', 'ARTS',
 'ARAB', 'ARTR', 'HEBR', 'HIND', 'MESA', 'MEST', 'PERS', 'SANS', 'SAST', 'SATR', 'URDU', 'ASTR',
@@ -46,10 +47,13 @@ def courses(request):
 
 @login_required
 def course(request, course_number):
+	get_object_or_404(Course, pk=course_number)
 	return render(request, 'course.html')
 
 @login_required
 def course_instructor(request, course_number, instructor_number):
+	get_object_or_404(Course, pk=course_number)
+	get_object_or_404(Instructor, pk=instructor_number)
 	return render(request, 'course_instructor.html')
 
 @login_required
@@ -57,12 +61,95 @@ def departments(request):
 	return render(request, 'departments.html')
 
 @login_required
-def department(request):
+def department(request, department_number):
+	get_object_or_404(Department, pk=department_number)
 	return render(request, 'department.html')
 
-@login_required
+def get_recommendations(request):
+	year, semester, major = request.GET.get('year'), request.GET.get('semester'), request.GET.get('major')
+	users_pk = [sth.pk for sth in User.objects.filter(profile__major=major)]
+	cs_users = CourseUser.objects.filter(user__pk__in=users_pk, take="taken")
+	final_cs_users = []
+	courses_dict = {}
+	for cs_user in cs_users:
+		tmp_year, tmp_semester = year_and_semester(cs_user.course_instructor.semester)
+		if tmp_year + 4 - int(cs_user.user.profile.graduate_year) == int(year) and tmp_semester == semester:
+			final_cs_users.append(cs_user)
+
+	for cs_user in final_cs_users:
+		if cs_user.course.pk not in courses_dict:
+			courses_dict[cs_user.course.pk] = 1
+		else:
+			courses_dict[cs_user.course.pk] += 1
+
+	courses = []
+	for pk, num in courses_dict.items():
+		tmp_course = get_object_or_404(Course, pk=pk)
+		courses.append({
+			"course_pk":pk,
+			"mnemonic":tmp_course.mnemonic,
+			"number":tmp_course.number,
+			"title":tmp_course.title,
+			"taken":num,
+			})
+	print("Courses", courses)
+	return JsonResponse({
+		"rcm_courses":courses,
+	})
+
+def get_major_options(request):
+	if request.user.profile.major:
+		major = request.user.profile.major
+	majors = []
+	for item in MAJOR_CHOICES:
+		majors.append({
+			"text":item[0],
+			"value":item[0],
+		})
+	return JsonResponse({
+		"major_options":majors,
+		"major":major,
+	})
+
+def year_and_semester(ys):
+	year, semester = ys[:4], ys[4:]
+	if semester == "Spring":
+		return int(year) + 1, semester
+	else:
+		return int(year), semester
+
+def get_trending_courses(request):
+	trending_courses = {}
+	for cs_user in CourseUser.objects.all():
+		tmp_course = cs_user.course
+		if tmp_course.pk not in trending_courses:
+			trending_courses[tmp_course.pk] = {"taking":0, "taken":0,}
+		if cs_user.take == "taking":
+			trending_courses[tmp_course.pk]["taking"] += 1
+		elif cs_user.take == "taken":
+			trending_courses[tmp_course.pk]["taken"] += 1
+	tmp_courses = []
+	for cs_pk, take in trending_courses.items():
+		tmp_course = get_object_or_404(Course, pk = cs_pk)
+		tmp_courses.append({
+			"course_pk":cs_pk,
+			"title":tmp_course.title,
+			"mnemonic":tmp_course.mnemonic,
+			"number":tmp_course.number,
+			"taking":take["taking"],
+			"taken":take["taken"],
+		})
+	taking_courses = sorted(tmp_courses, key=lambda x:(x["taking"]), reverse=True)[:10]
+	taken_courses = sorted(tmp_courses, key=lambda x:(x["taken"]), reverse=True)[:10]
+	taking_courses = [cs for cs in taking_courses if cs["taking"] > 0]
+	taken_courses = [cs for cs in taken_courses if cs["taken"] > 0]
+	return JsonResponse({
+		"taking_courses":taking_courses,
+		"taken_courses":taken_courses,
+	})
+
 def get_departments(request):
-	all_departments = Department.objects.all()
+	all_departments = Department.objects.all().exclude(name="")
 	departments = []
 	for department in all_departments:
 		departments.append({
@@ -74,22 +161,19 @@ def get_departments(request):
 		"departments":departments,
 	})
 
-@login_required
 def get_department(request):
 	department_pk = request.GET.get("department_pk")
 	department = get_object_or_404(Department, pk=department_pk)
-	courses = department.course_set.all()
-	ret_courses = []
-	for cs in courses:
-		ret_courses.append({
-			"course_pk":cs.pk,
-			"name":cs.name,
-		})
+	ret_courses = [get_detailed_json_of_course(cs, request.user, with_take=True) for cs in department.course_set.all().exclude(units="0")]
+	
 	return JsonResponse({
+		"department":{
+			"name":department.name,
+			"school":department.school,
+		},
 		"courses":ret_courses,
 	})
 
-@login_required
 def submit_review(request):
 	if request.method == "POST":
 		post = json.loads(request.body)
@@ -125,7 +209,6 @@ def submit_review(request):
 		"success":success,
 	})
 
-@login_required
 def save_take(request):
 	now_instructor_pk, now_semester, now_take = "", "", ""
 	if request.method == "POST":
@@ -160,63 +243,50 @@ def save_take(request):
 		},
 	})
 
-@login_required
 def get_course(request):
-	print("get course")
 	pk = request.GET.get("pk")
 	course = get_object_or_404(Course, pk=pk)
 	return JsonResponse({
-		"course":get_detailed_json_of_course(course, request.user),
+		"course":get_detailed_json_of_course(course, request.user, with_instructors=True),
 	})
-@login_required
+
 def get_course_instructor(request):
 	course_pk, instructor_pk = request.GET.get("course_pk"), request.GET.get("instructor_pk")
 	course = get_object_or_404(Course, pk=course_pk)
 	instructor = get_object_or_404(Instructor, pk=instructor_pk)
 	return JsonResponse(get_detailed_json_of_course_instructor(course, instructor, request.user))
 
-
-
-@login_required
 def course_search_result(request):
 	score_cutoff = 85
 	query = request.GET.get("query").strip()
 	time = request.GET.get("time")
-	print("QUERY", query)
 	if query.upper() in mnemonics:
-		field_queryset = Course.objects.filter(mnemonic = query.upper())
+		field_queryset = Course.objects.filter(mnemonic = query.upper()).exclude(units="0")
 	else:
 		pk_queryset = {fq.pk:(str(getattr(fq, "mnemonic")) + str(getattr(fq,"number")) + " " + str(getattr(fq, "title")) ) for fq in Course.objects.exclude(units="0")}
 		if len(pk_queryset) > 0:
-			all_pks = process.extractBests(query, pk_queryset,scorer=fuzz.partial_ratio, score_cutoff=score_cutoff, limit=None)
+			all_pks = process.extractBests(query, pk_queryset,scorer=fuzz.partial_ratio, score_cutoff=score_cutoff, limit=20)
 			all_pks = [item[2] for item in all_pks]
 			field_queryset = Course.objects.filter(pk__in=all_pks)
 		else:
 			field_queryset = None
-	
 	return JsonResponse({
-		"course_result":get_json_of_courses(field_queryset, request.user),
+		"course_result":get_json_of_courses(field_queryset),
 		"time":time,
 	})
 
-def get_json_of_courses(queryset, user):
+def get_json_of_courses(queryset):
 	if queryset != None and queryset.first() != None:
-		return [get_json_of_course(cs, user) for cs in queryset]
+		return [get_json_of_course(cs) for cs in queryset]
 	else:
 		return []
 
-def get_json_of_course(course, user):
-	tmp_courseUser_query = CourseUser.objects.filter(user=user, course=course).first()
-	if tmp_courseUser_query == None:
-		take = "Null"
-	else:
-		take = tmp_courseUser_query.take
+def get_json_of_course(course):
 	return {
 		"pk":course.pk,
 		"mnemonic":course.mnemonic,
 		"number":course.number,
 		"title":course.title,
-		"take":take,
 	}
 
 def get_basic_info(request):
@@ -242,38 +312,13 @@ def get_detailed_json_of_course_instructor(course, instructor, user):
 			"semester":course_instructor.semester,
 			})
 	course_users = [get_detailed_json_of_course_user(course_user, user) for course_user in CourseUser.objects.filter(course=course, instructor=instructor)]
-	rating_course = []
-	rating_instructor = []
-	print("course Users", course_users)
-	for cs_user in course_users:
-		if cs_user['rating_course'] != None and cs_user['rating_course'] > 0:
-			rating_course.append(cs_user['rating_course'])
-		if cs_user['rating_instructor'] != None and cs_user['rating_instructor'] > 0:
-			rating_instructor.append(cs_user['rating_instructor'])
-	r_instr = 0
-	r_cs = 0
-	if len(rating_instructor) > 0:
-		r_instr = sum(rating_instructor)/len(rating_instructor)
-	if len(rating_course) > 0:
-		r_cs = sum(rating_course)/len(rating_course)
 
 	return {
-		"course":{
-				"course_pk":course.pk,
-				"mnemonic":course.mnemonic,
-				"number":course.number,
-				"title":course.title,
-				"description":course.description,
-				"prerequisite":course.prerequisite,
-				"type":course.type,
-				"department":{
-					"name":course.department.name,
-					"department_pk":course.department.pk,
-				},
-				"rating_instructor":r_instr,
-				"rating_course":r_cs,
-			},
-		"instructor":instructor.__str__(),
+		"course":get_detailed_json_of_course(course, user),
+		"instructor":{
+			"name":instructor.__str__(),
+			"rating_instructor":get_rating_of_instructor(instructor),
+		},
 		"course_instructors":course_instructor_relations,
 		"course_users":course_users,
 	}
@@ -289,35 +334,48 @@ def get_detailed_json_of_course_user(course_user, user):
 		"rating_instructor":course_user.rating_instructor,
 	}
 
-def get_detailed_json_of_course(course, user):
+def get_detailed_json_of_course(course, user, with_instructors=False, with_take=False):
 	courseUser_query = CourseUser.objects.filter(user=user, course=course).first()
+	take = {"instructor_pk":"", "course_pk":"", "semester":"", "take":""}
+
+	rating_course = get_rating_of_course(course)
+	if courseUser_query != None:
+		take = {
+			"instructor_pk":courseUser_query.course_instructor.instructor.pk,
+			"course_pk":courseUser_query.course.pk,
+			"semester":courseUser_query.course_instructor.semester,
+			"take":courseUser_query.take,
+		}
+	course_dict = {
+		"course_pk":course.pk,
+		"mnemonic":course.mnemonic,
+		"number":course.number,
+		"title":course.title,
+		"description":course.description,
+		"prerequisite":course.prerequisite,
+		"type":course.type,
+		"take":take,
+		"department":{
+			"name":course.department.name,
+			"department_pk":course.department.pk,
+		},
+		"rating_course":rating_course,
+	}
+	if with_instructors:
+		course_dict["instructors"] = get_instructors_of_course(course)
+	if with_take:
+		course_dict["taking"] = CourseUser.objects.filter(course=course, take="taking").count()
+		course_dict["taken"] = CourseUser.objects.filter(course=course, take="taken").count()
+	return course_dict
+
+def get_instructors_of_course(course):
 	courseInstructor_query = CourseInstructor.objects.filter(course=course)
-
-	allCourseUser_course_query = CourseUser.objects.filter(course=course)
-	rating_course_arr = []
-	for cs_user in allCourseUser_course_query:
-		if cs_user.rating_course != None and cs_user.rating_course > 0:
-			rating_course_arr.append(cs_user.rating_course)
-	if len(rating_course_arr) > 0:
-		rating_course = sum(rating_course_arr)/len(rating_course_arr)
-	else:
-		rating_course = 0
-
-	if courseInstructor_query.first() == None:
-		final_instructors = []
-	else:
+	final_instructors = []
+	if courseInstructor_query.first() != None:
 		instructors = {}
 		for cs_instructor in courseInstructor_query:
 			tmp_name = cs_instructor.instructor.__str__()
-			allCourseUser_instructor_query = CourseUser.objects.filter(instructor = cs_instructor.instructor)
-			rating_instructor_arr = []
-			for cs_user in allCourseUser_instructor_query:
-				if cs_user.rating_instructor != None and cs_user.rating_instructor > 0:
-					rating_instructor_arr.append(cs_user.rating_instructor)
-			if len(rating_instructor_arr) > 0:
-				rating_instructor = sum(rating_instructor_arr)/len(rating_instructor_arr)
-			else:
-				rating_instructor = 0
+			rating_instructor = get_rating_of_instructor_with_course(cs_instructor.instructor, course)
 			if tmp_name not in instructors:
 				instructors[tmp_name] = {"semesters":[ cs_instructor.semester ]}
 				instructors[tmp_name]["topic"] = cs_instructor.topic
@@ -326,7 +384,6 @@ def get_detailed_json_of_course(course, user):
 				instructors[tmp_name]["rating_instructor"] = rating_instructor
 			else:
 				instructors[tmp_name]["semesters"].append(cs_instructor.semester)
-		final_instructors = []
 		for k,v in instructors.items():
 			final_instructors.append({
 				"name":k,
@@ -336,38 +393,9 @@ def get_detailed_json_of_course(course, user):
 				"cs_instr_pk":v["cs_instr_pk"],
 				"rating_instructor":v["rating_instructor"],
 			})
-	if courseUser_query == None:
-		take = {
-			"instructor_pk":"",
-			"course_pk":"",
-			"semester":"",
-			"take":"",
-		}
-	else:
-		take = {
-			"instructor_pk":courseUser_query.course_instructor.instructor.pk,
-			"course_pk":courseUser_query.course.pk,
-			"semester":courseUser_query.course_instructor.semester,
-			"take":courseUser_query.take,
-		}
-	return {
-		"pk":course.pk,
-		"mnemonic":course.mnemonic,
-		"number":course.number,
-		"title":course.title,
-		"take":take,
-		"instructors":final_instructors,
-		"department":{
-			"name":course.department.name,
-			"department_pk":course.department.pk,
-		},
-		"rating_course":rating_course,
-	}
+	return final_instructors
 
-def get_detailed_json_of_course(course, user):
-	courseUser_query = CourseUser.objects.filter(user=user, course=course).first()
-	courseInstructor_query = CourseInstructor.objects.filter(course=course)
-
+def get_rating_of_course(course):
 	allCourseUser_course_query = CourseUser.objects.filter(course=course)
 	rating_course_arr = []
 	for cs_user in allCourseUser_course_query:
@@ -377,101 +405,23 @@ def get_detailed_json_of_course(course, user):
 		rating_course = sum(rating_course_arr)/len(rating_course_arr)
 	else:
 		rating_course = 0
+	return rating_course
 
-	if courseUser_query == None:
-		take = {
-			"instructor_pk":"",
-			"course_pk":"",
-			"semester":"",
-			"take":"",
-		}
+def get_rating_of_instructor_with_course(instructor, course):
+	allCourseUser_instructor_query = CourseUser.objects.filter(course=course, instructor = instructor)
+	return get_rating(allCourseUser_instructor_query)
+
+def get_rating_of_instructor(instructor):
+	allCourseUser_instructor_query = CourseUser.objects.filter(instructor = instructor)
+	return get_rating(allCourseUser_instructor_query)
+
+def get_rating(course_user_queryset):
+	rating_instructor_arr = []
+	for cs_user in course_user_queryset:
+		if cs_user.rating_instructor != None and cs_user.rating_instructor > 0:
+			rating_instructor_arr.append(cs_user.rating_instructor)
+	if len(rating_instructor_arr) > 0:
+		rating_instructor = sum(rating_instructor_arr)/len(rating_instructor_arr)
 	else:
-		take = {
-			"instructor_pk":courseUser_query.course_instructor.instructor.pk,
-			"course_pk":courseUser_query.course.pk,
-			"semester":courseUser_query.course_instructor.semester,
-			"take":courseUser_query.take,
-		}
-	return {
-		"pk":course.pk,
-		"mnemonic":course.mnemonic,
-		"number":course.number,
-		"title":course.title,
-		"take":take,
-		"instructors":final_instructors,
-		"department":{
-			"name":course.department.name,
-			"department_pk":course.department.pk,
-		},
-		"rating_course":rating_course,
-	}
-
-@login_required
-def course_search(request):
-	query_string = ''
-	if 'q' in request.GET:
-		query_string = request.GET['q'].strip()
-		retrieved_courses = course_retrieve(query_string)
-
-		return render(request, 'course_search.html', { "retrieved_courses":retrieved_courses, "query_string":query_string })
-	else:
-		return render(request, 'course_search.html', { "retrieved_courses":None, "query_string":query_string })
-
-def course_retrieve(query_string):
-
-	# Get the num and non-num strings of the query_string
-	nums = re.findall(r'\d+', query_string)
-	strs = []
-	for s in re.findall(r'[^\d.]+', query_string):
-		strs += s.split()
-	strs = [s.strip() for s in strs]
-
-	# Extract the mnemonics from the non-num strings
-	tmp_mn = [strs[i] for i in range(len(strs)) if strs[i].upper() in mnemonics]
-	tmp_ix = [i for i in range(len(strs)) if strs[i].upper() in mnemonics]
-	new_strs = [strs[i] for i in range(len(strs)) if i not in tmp_ix]
-
-	# Get the extracted queries of mnemonics, nums, and other non-num strings
-	query_string_mn = " ".join(tmp_mn)
-	query_string_str = " ".join([s.strip() for s in new_strs])
-	query_string_num = nums[0] if len(nums) > 0 else ""
-
-	# Get the exact match class (if there is no such class, exact_match_first_course == None)
-	exact_match_courses = Course.objects.filter(course_number = "".join(query_string_mn + query_string_num).upper())
-	exact_match_first_course = exact_match_courses.first()
-
-	if DEBUGGG == True:
-		print(query_string, "----", query_string_mn, "----", query_string_num, "----",query_string_str, "----")
-
-	if query_string_str == "" and query_string_mn.upper() in mnemonics and exact_match_first_course != None :
-		retrieved_courses = exact_match_courses
-	elif query_string.upper() in mnemonics:
-		retrieved_courses = Course.objects.filter(course_number__startswith = query_string.upper())
-	else:
-		tmp_queryset = Course.objects.annotate(
-			similarity_prefix=TrigramSimilarity(Substr('course_number',1, Length('course_number')-4),query_string_mn),
-			similarity_number=TrigramSimilarity(Substr('course_number', Length('course_number')-3, 4),query_string_num),
-			similarity_name=TrigramSimilarity('course_name', query_string_str)).filter(Q(similarity_prefix__gt=0.25)|Q(similarity_number__gt=0.23)|Q(similarity_name__gt=0.15))
-		retrieved_courses = sorted(tmp_queryset, key=lambda c: (-c.similarity_prefix,-c.similarity_number, -c.similarity_name,re.findall(r'\d+', c.course_number)[0],re.findall(r'[^\d.]+', c.course_number)[0]))
-		retrieved_courses = retrieved_courses[:MAXIMUM_COURSES]
-
-		if DEBUGGG == True:
-			for course in retrieved_courses:
-				print(course.similarity_prefix,"  ",course.similarity_number,"  ",course.similarity_name,"  ", re.findall(r'[^\d.]+', course.course_number)[0],"  ", re.findall(r'\d+', course.course_number)[0])
-
-	return retrieved_courses
-
-def lcs(s1, s2):
-	l1, l2 = len(s1), len(s2)
-	if l1 == 0 or l2 == 0: return []
-	index = 0
-	ret = []
-	for i in range(len(s2)):
-		while index < l1 and s1[index] == " ":
-			index += 1
-		if index < l1 and s2[i] == s1[index]:
-			ret.append(1)
-			index += 1
-		else:
-			ret.append(0)
-	return ret
+		rating_instructor = 0
+	return rating_instructor

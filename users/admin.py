@@ -56,6 +56,13 @@ def update_avatar(modeladmin, request, queryset):
             user.save()
 update_avatar.short_description = 'Update User Images'
 
+def update_graduate_year(modeladmin, request, queryset):
+    for user in queryset:
+        if user.profile.year:
+            user.profile.graduate_year = str(2024 - int(user.profile.year[0]))
+            user.save()
+update_graduate_year.short_description = 'Update User Graduate Year'
+
 
 
 def change_role_mentor(modeladmin, request, queryset):
@@ -85,10 +92,10 @@ export_users.short_description = 'Export to csv'
 
 class CustomUserAdmin(UserAdmin):
     inlines = (ProfileInline, SkillRelationInline, FollowRelationInline, GroupRelationInline)
-    list_display = ('username','get_sex', 'email', 'first_name', 'last_name', 'is_staff', 'get_location','get_matched', 'get_role','get_year','get_birth_date','get_major')
-    list_filter = ('is_staff', 'profile__sex','profile__role','profile__year', 'profile__matched')
+    list_display = ('username','get_sex', 'email', 'first_name', 'last_name', 'is_staff', 'get_location','get_matched', 'get_role','get_year', 'get_graduate_year','get_birth_date','get_major')
+    list_filter = ('is_staff', 'profile__sex','profile__role','profile__year','profile__graduate_year', 'profile__matched')
     list_select_related = ('profile', )
-    actions = [change_role_mentor, change_role_mentee, export_users, update_avatar]  # <-- Add the list action function here
+    actions = [change_role_mentor, change_role_mentee, export_users, update_avatar, update_graduate_year]  # <-- Add the list action function here
 
     def get_form(self, request, obj=None, **kwargs):
         # if request.user.is_superuser:
@@ -110,6 +117,10 @@ class CustomUserAdmin(UserAdmin):
     def get_year(self, instance):
         return instance.profile.year
     get_year.short_description = 'Year'
+
+    def get_graduate_year(self, instance):
+        return instance.profile.graduate_year
+    get_graduate_year.short_description = 'Graduate Year'
 
     def get_birth_date(self, instance):
         return instance.profile.birth_date

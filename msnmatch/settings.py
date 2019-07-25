@@ -32,6 +32,8 @@ ALLOWED_HOSTS = ['msn-match-test.herokuapp.com/', 'match.msnatuva.org','localhos
 
 BUILD_VERSION = "msnmatch-1.0601"
 
+CURRENT_YEAR = 2020
+
 # Application definition
 
 INSTALLED_APPS = [

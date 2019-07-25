@@ -14,4 +14,4 @@ new Vue({
   render: h => h(DepartmentsPage),
   vuetify: new Vuetify(vuetifyOptions),
   components: { DepartmentsPage }
-}).$mount('departments-page');
+}).$mount('#departments-page');

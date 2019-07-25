@@ -48,6 +48,7 @@ class CourseUser(models.Model):
   text = models.CharField(max_length=2000, blank=True)
   rating_instructor = models.FloatField(null=True, blank=True)
   rating_course = models.FloatField(null=True, blank=True)
+  section = models.CharField(max_length=255, blank=True)
 
 
 # 'ClassNumber', 'Mnemonic', 'Number', 'Section', 'Type', 'Units',

@@ -25,8 +25,8 @@ from django.conf.urls import (
 handler400, handler403, handler404, handler500
 )
 
-# handler404 = 'mango.views.handler404'
-# handler403 = 'mango.views.handler403'
+handler404 = 'msnmatch.views.handler404'
+handler403 = 'msnmatch.views.handler403'
 
 urlpatterns = [
 	path('admin/', admin.site.urls),

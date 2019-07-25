@@ -3,110 +3,57 @@
     <custom-header></custom-header>
     <v-content>
         <v-container fluid grid-list-md pa-2>
-            <v-layout mt-1>
+            <v-layout>
                 <v-flex>
                     <v-breadcrumbs class="cus-breadcrumbs" :items="navItems" divider=">"></v-breadcrumbs>
                 </v-flex>
             </v-layout>
             <v-layout mb-3>
-                <v-flex class="cus-headline-flex"> 
+                <v-flex> 
                     <div>
-                    <span class="cus-headline-text">{{category.title}}</span>
+                    <span v-if="department.name.length > 0" class="cus-headline-text">{{department.name}}</span>
                     </div>
                 </v-flex>
                 <v-spacer></v-spacer>
             </v-layout>
-            <template v-for="i in 2">
-                <v-layout :key="i" mt-2 mb-3>
-                    <v-flex> 
-                        <span v-if="i==1" class="instructor-banner">Instructors teaching this semester</span>
-                        <span v-if="i==2" class="instructor-banner">Past semesters</span>
-                    </v-flex>
-                    <v-spacer></v-spacer>
-                </v-layout>
-                <v-layout :key="i + 100000" row wrap>
-                    <v-flex d-flex 
-                    :key="index_instr"
-                    v-for="(instructor, index_instr) in i == 1 ? teaching_instructors : not_teaching_instructors">
-                    <v-card
-                    >
-                        <v-card-text>
-                            <v-flex align-self-center class="mb-2">
-                                <span class="instructor-name">{{ instructor.name }}</span>
-                                <v-chip 
-                                    v-if="course.take.instructor_pk == instructor.pk"
-                                    label
-                                    text-color="white"
-                                    color="teal darken-3"
-                                    class="ma-1">
-                                    {{course.take.take}}
-                                </v-chip>
-                            </v-flex>
-                            <v-spacer></v-spacer>
-                            <span v-if="instructor.topic.length>0" class="grey--text subtitle-1">Topic: {{ instructor.topic }}</span>
-                            <div>
+            <v-layout row wrap>
+                <template v-for="(course, index) in courses">
+                    <v-flex xs12 sm12 md12 lg12 xl12 :key="index"  d-flex>
+                        <v-card
+                            :href="'/courses/' + course.course_pk + '/' ">
+                            <v-card-title>{{course.mnemonic}}{{course.number}} {{ course.title }}</v-card-title>
+                            <v-card-text>
                                 <div>
-                                    <span class="text--primary">Semesters taught: {{instructor.semesters.length}}</span>
+                                    <v-chip
+                                        class="ma-1" color="teal lighten-2" label small text-color="white">
+                                        Rating: {{course.rating_course}}
+                                    </v-chip>
+                                    <v-chip
+                                        class="ma-1" color="teal lighten-2" label small text-color="white">
+                                        Taking: {{course.taking}}
+                                    </v-chip>
+                                    <v-chip
+                                        class="ma-1" color="teal lighten-2" label small text-color="white">
+                                        Taken: {{course.taken}}
+                                    </v-chip>
+                                    <v-chip
+                                        v-if=" taking_or_taken(course) != '' "
+                                        class="ma-1" color="orange darken-1" label small text-color="white">
+                                        {{taking_or_taken(course)}}
+                                    </v-chip>
                                 </div>
-                                <div>
-                                    <!-- <template v-if="instructor.rating_instructor>0"> -->
-                                    <span class="text--primary">Rating: </span>
-                                    <v-rating
-                                        v-model="instructor.rating_instructor"
-                                        color="yellow darken-3"
-                                        background-color="grey darken-1"
-                                        readonly
-                                        small
-                                        >
-                                    </v-rating>
-                                    <!-- </template> -->
-                                </div>
-                            </div>
-                        </v-card-text>
-                        <v-card-actions>
-                            <v-btn
-                            text
-                            color="deep-purple accent-4"
-                            @click="goToHref('/courses/'+course.pk+'/'+instructor.pk+'/')"
-                            >
-                            Learn More
-                            </v-btn>
-                            <v-btn
-                                @click="openDialogTake(instructor)"
-                                color="deep-purple accent-4" 
-                                text
-                                >
-                                Taking/Taken
-                            </v-btn>
-                        </v-card-actions>
-                    </v-card>
+                                <v-flex d-flex>
+                                    {{ course.description }}
+                                </v-flex>
+                            </v-card-text>
+                        </v-card>
                     </v-flex>
-                </v-layout>
-            </template>
+                    <v-flex mt-4 mb-4  v-if="course.divider" :key="index+'divider'">
+                    </v-flex>
+                    <!-- <v-spacer :key="index+'spacer'"></v-spacer> -->
+                </template>
+            </v-layout>
         </v-container>
-        <v-dialog v-model="dialogTake" scrollable min-width="350px" max-width="500px">
-            <v-card>
-                <v-card-title>Select Semester</v-card-title>
-                <v-divider></v-divider>
-                <v-card-text style="height: 300px;">
-                    <v-checkbox 
-                        v-model="takeCourse" 
-                        :key="item.value.instructor_pk + item.value.semester" 
-                        v-for="item in takeItemsComputed" 
-                        :value-comparator="takeCompare" 
-                        :label="item.label" 
-                        :value="item.value"
-                        color="black"
-                        ></v-checkbox>
-                </v-card-text>
-                <v-divider></v-divider>
-                <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn color="blue darken-1" text @click="dialogTake = false">Close</v-btn>
-                    <v-btn color="blue darken-1" text @click="takeSave()">Save</v-btn>
-                </v-card-actions>
-            </v-card>
-        </v-dialog>
     </v-content>
   </v-app>
 </template>
@@ -120,27 +67,14 @@ axios.defaults.xsrfCookieName = "csrftoken";
   export default {
     data() {
       return {
-        departments:null,
+        department:{
+            name:"",
+            school:"",
+        },
+        courses:[],
         currentSemester:"2019Fall",
-        selected_course:null,
-        courseNameLimit:40,
-        isLoading: false,
-        entries:[],
-        search: null,
-        home_url:"",
-        brand_pic:"",
-        profile:"",
-        update_profile:"",
-        logout:"",
-        lastTime: 1,
 
         navItems:[],
-
-        takeCourse:null,
-        takeItems:[],
-        takeItemKey:"", 
-        dialogTake: false,
-        source: "/lessons/",
         
       }
     },
@@ -157,35 +91,38 @@ axios.defaults.xsrfCookieName = "csrftoken";
         },
     },
     methods: {
-        takeCompare(a,b){
-            if (a == null || b == null){
-                return false;
+        taking_or_taken(course){
+            if(course.take.take == "taking"){
+                return "Taking"
             }
-            return (a.course_pk == b.course_pk && a.instructor_pk == b.instructor_pk && a.semester == b.semester && a.take == b.take);
-
-        },
-        sortBySemester(a, b){
-            if(a.substring(0,4) != b.substring(0,4)){
-                return b.substring(0,4).toString(10) - a.substring(0,4).toString(10);
+            else if(course.take.take == "taken"){
+                return "Taken"
             }
             else{
-                if(a.substring(4) == b.substring(4)){
-                    return 0;
-                }
-                else if(a.substring(4) == "Fall"){
-                    return -1;
-                }
-                else{
-                    return 1;
-                }
+               return "" 
             }
         },
-        getCourse(){
-            axios.get('/courses/ajax/get_department/',{params: {pk:this.course_pk, }}).then(response => {
-                this.course = response.data.course;
-                
-
+        sortCourseNumber(a, b){
+            return a.number.toString(10) - b.number.toString(10);
+        },
+        getDepartment(){
+            axios.get('/courses/ajax/get_department/',{params: {department_pk:this.department_pk, }}).then(response => {
+                this.courses = response.data.courses.sort(this.sortCourseNumber);
+                for(let i = 0; i < this.courses.length - 1; i++){
+                    if(Math.floor(this.courses[i + 1].number.toString(10)/1000) - Math.floor(this.courses[i].number.toString(10)/1000) >= 1){
+                        this.courses[i]["divider"] = true;
+                    }
+                    else{
+                        this.courses[i]["divider"] = false;
+                    }
+                }
+                this.department = response.data.department;
                 this.navItems = [
+                    {
+                        text: "Main",
+                        disabled: false,
+                        href: '/courses/',
+                    },
                     {
                         text: "Departments",
                         disabled: false,
@@ -194,7 +131,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
                     {
                         text: this.department.name,
                         disabled: true,
-                        href: "none",
+                        href:  '/courses/departments/' + this.department_pk + "/",
                     },
                 ];
                 
@@ -205,8 +142,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
         },
     },
     mounted(){
-        this.getCourse();
-        this.get_basic_info();
+        this.getDepartment();
     },
   };
 </script>
@@ -293,10 +229,9 @@ axios.defaults.xsrfCookieName = "csrftoken";
         font-family: "Roboto", sans-serif;
         font-size: 2.1em;
         font-weight: 300;
-        background-color: rgb(226, 225, 225);
         color:rgb(0, 0, 0);
         padding: 7px 12px 7px 12px;
-        border-radius: 0px 5px 5px 0px;
+        border-radius: 5px;
         line-height: 2.0;
         box-decoration-break: clone;
 

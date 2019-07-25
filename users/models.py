@@ -16,12 +16,22 @@ from friendship.models import Friend, FriendshipRequest
 from PIL import ImageFilter
 from friendship.models import Follow
 from django.contrib import admin
+from msnmatch import settings
 
 YEAR_CHOICES = (
 			('1st year', '1st year'),
 			('2nd year', '2nd year'),
 			('3rd year', '3rd year'),
 			('4th year', '4th year'),
+		)
+
+GRADUATE_YEAR_CHOICES = (
+			('2018', '2018'),
+			('2019', '2019'),
+			('2020', '2020'),
+			('2021', '2021'),
+			('2022', '2022'),
+			('2023', '2023'),
 		)
 ROLE_CHOICES = (
 			('Mentee', 'Mentee'),
@@ -143,6 +153,7 @@ class Profile(models.Model):
 	location = models.CharField(max_length=30, blank=True)
 	birth_date = models.DateField(null=True, blank=True)
 	year = models.CharField(max_length=255, choices=YEAR_CHOICES)
+	graduate_year = models.CharField(max_length=255, choices =GRADUATE_YEAR_CHOICES, blank=True)
 	major = models.CharField(max_length=255, choices=MAJOR_CHOICES)
 	major_two = models.CharField(max_length=255, choices=MAJOR_CHOICES, blank=True)
 	minor = models.CharField(max_length=255, choices=MINOR_CHOICES, blank=True)
@@ -153,6 +164,12 @@ class Profile(models.Model):
 	role = models.CharField(max_length=255, choices=ROLE_CHOICES, blank=True)
 	wechat = models.CharField(max_length=255, blank=True)
 	matched = models.BooleanField(default=False)
+
+	def real_year(self):
+		if self.graduate_year:
+			return settings.CURRENT_YEAR - int(self.graduate_year) + 4
+		else:
+			return ""
 
 	def save(self, *args, **kwargs):
 		# delete old file when replacing by updating the file
