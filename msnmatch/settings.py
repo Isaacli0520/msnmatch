@@ -37,6 +37,7 @@ CURRENT_YEAR = 2020
 # Application definition
 
 INSTALLED_APPS = [
+    'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -56,6 +57,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -161,6 +163,14 @@ DATE_INPUT_FORMATS = ['%m/%d/%Y']
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
+
+CORS_ORIGIN_WHITELIST = (
+    'https://127.0.0.1:8080',
+    'http://127.0.0.1:8080',
+    'https://localhost:8080', 
+    'http://localhost:8080', 
+)
+CORS_ALLOW_CREDENTIALS = True
 
 # AWS_DEFAULT_ACL = None
 

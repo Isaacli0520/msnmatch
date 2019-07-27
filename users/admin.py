@@ -13,6 +13,8 @@ import uuid
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from friendship.models import Follow
 from groups.models import Group
+from users.views import custom_md5
+from msnmatch import settings
 
 class SkillRelationInline(admin.TabularInline):
     model = Skill.skill_users.through
@@ -63,7 +65,11 @@ def update_graduate_year(modeladmin, request, queryset):
             user.save()
 update_graduate_year.short_description = 'Update User Graduate Year'
 
-
+def update_credential(modeladmin, request, queryset):
+    for user in queryset:
+        user.profile.credential = custom_md5(settings.SECRET_KEY + user.username, settings.SECRET_KEY)
+        user.save()
+update_credential.short_description = 'Update Credential'
 
 def change_role_mentor(modeladmin, request, queryset):
     for user in queryset:
@@ -92,10 +98,14 @@ export_users.short_description = 'Export to csv'
 
 class CustomUserAdmin(UserAdmin):
     inlines = (ProfileInline, SkillRelationInline, FollowRelationInline, GroupRelationInline)
-    list_display = ('username','get_sex', 'email', 'first_name', 'last_name', 'is_staff', 'get_location','get_matched', 'get_role','get_year', 'get_graduate_year','get_birth_date','get_major')
+    list_display = ('username','get_sex', 'email', 'first_name', 'last_name', 'is_staff', 'get_location', 'get_credential' ,'get_matched', 'get_role','get_year', 'get_graduate_year','get_birth_date','get_major')
     list_filter = ('is_staff', 'profile__sex','profile__role','profile__year','profile__graduate_year', 'profile__matched')
     list_select_related = ('profile', )
-    actions = [change_role_mentor, change_role_mentee, export_users, update_avatar, update_graduate_year]  # <-- Add the list action function here
+    actions = [change_role_mentor, change_role_mentee, export_users, update_avatar, update_graduate_year, update_credential]  # <-- Add the list action function here
+
+    def get_credential(self, instance):
+        return instance.profile.credential
+    get_credential.short_description = 'Credential'
 
     def get_form(self, request, obj=None, **kwargs):
         # if request.user.is_superuser:

@@ -2,7 +2,7 @@
   <v-app>
     <custom-header></custom-header>
     <v-content>
-        <v-container fluid grid-list-md pa-2>
+        <v-container fluid grid-list-lg>
             <v-layout>
                 <v-flex>
                     <v-breadcrumbs class="cus-breadcrumbs" :items="navItems" divider=">"></v-breadcrumbs>
@@ -72,7 +72,6 @@ axios.defaults.xsrfCookieName = "csrftoken";
             school:"",
         },
         courses:[],
-        currentSemester:"2019Fall",
 
         navItems:[],
         
@@ -230,7 +229,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
         font-size: 2.1em;
         font-weight: 300;
         color:rgb(0, 0, 0);
-        padding: 7px 12px 7px 12px;
+        padding: 7px 12px 7px 3px;
         border-radius: 5px;
         line-height: 2.0;
         box-decoration-break: clone;

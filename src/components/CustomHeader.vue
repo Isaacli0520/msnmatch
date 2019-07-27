@@ -140,13 +140,17 @@ export default{
             user_items:[
                 { title:"Profile", icon:"fas fa-user" },
                 { title:"Edit Profile", icon:"fas fa-biohazard" },
+                { title:"My Courses", icon:"fas fa-list-ol" },
                 { title:"Log Out", icon:"fas fa-angry"},
             ],
-            home_url:"",
-            brand_pic:"",
-            profile:"",
-            update_profile:"",
-            logout:"",
+            urls:{
+                home_url:"",
+                brand_pic:"",
+                profile:"",
+                update_profile:"",
+                logout:"",
+                my_courses:"",
+            },
             old_items: [
                 //   {  icon: 'contacts', text: 'Contacts' },
                 //   { icon: 'history', text: 'Frequently contacted' },
@@ -233,34 +237,22 @@ export default{
         },
         navMethod(item){
             if(item.title=="Profile"){
-                this.profileMethod()
+                this.goToHref(this.urls.profile)
             }
             else if(item.title=="Edit Profile"){
-                this.editProfileMethod()
+                this.goToHref(this.urls.update_profile)
             }
             else if(item.title=="Log Out"){
-                this.logOutMethod()
+                this.goToHref(this.urls.log_out)
+            }
+            else if(item.title=="My Courses"){
+                this.goToHref(this.urls.my_courses)
             }
         },
         get_basic_info(){
             axios.get('/courses/ajax/get_basic_info/',{params: {}}).then(response => {
-                // console.log(response.data.all_users);
-                let data = response.data.all_info;
-                this.home_url = data.home_url;
-                this.brand_pic = data.brand_pic;
-                this.profile = data.profile;
-                this.update_profile = data.update_profile;
-                this.logout = data.logout;
+                this.urls = response.data.all_info;
             });
-        },
-        profileMethod(){
-            window.location.href = this.profile;
-        },
-        editProfileMethod(){
-            window.location.href = this.update_profile;
-        },
-        logOutMethod(){
-            window.location.href = this.logout;
         },
         goToHref(text){
             window.location.href = text;

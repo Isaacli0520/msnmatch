@@ -31,18 +31,18 @@
                     </v-flex>
                     <v-spacer></v-spacer>
                 </v-layout>
-                <v-layout fill-height wrap>
+                <v-layout wrap>
                     <v-flex child-flex d-flex xs12 sm12 md4 lg4 xl4>
                         <v-card>
                             <v-card-title>Trash Can</v-card-title>
                             <v-card-text>
-                                <v-layout row wrap>
-                                    <v-flex
+                                    <v-list
                                         style="width:100%;"
                                         :key="index_item + '-trash' " 
                                         v-for="(item, index_item) in trash_items">
                                         <v-list-item
-                                            :href="item.href">
+                                            :href="item.href"
+                                            :target="item.target">
                                             <v-list-item-avatar
                                                 v-if="item.icon">
                                                 <v-icon>{{ item.icon }}</v-icon>
@@ -51,9 +51,9 @@
                                                 <v-list-item-title>{{ item.title }}</v-list-item-title>
                                             </v-list-item-content>
                                         </v-list-item>
-                                    </v-flex>
-                                </v-layout>
+                                    </v-list>
                             </v-card-text>
+                            <v-card-actions></v-card-actions>
                         </v-card>
                     </v-flex>
                     <template v-for="i in ['Taking', 'Taken']">
@@ -61,8 +61,7 @@
                             <v-card>
                                 <v-card-title>Top 10 {{i}} Courses</v-card-title>
                                 <v-card-text>
-                                    <v-layout row wrap>
-                                        <v-flex
+                                        <v-list
                                             style="width:100%;"
                                             :key="index_course + '-trending-course' " 
                                             v-for="(course, index_course) in trending_courses[i]">
@@ -77,13 +76,12 @@
                                                     <v-list-item-subtitle>{{i}}: {{course[i.toLowerCase()]}}</v-list-item-subtitle>
                                                 </v-list-item-content>
                                             </v-list-item>
-                                        </v-flex>
-                                    </v-layout>
+                                        </v-list>
                                 </v-card-text>
                             </v-card>
                         </v-flex>
                     </template>
-                    <v-flex d-flex child-flex xs12 sm12 md12 lg12 xl12>
+                    <v-flex child-flex d-flex xs12 sm12 md12 lg12 xl12>
                         <v-card min-height="65vh">
                             <v-card-title>Recommendations</v-card-title>
                             <v-card-text>
@@ -116,8 +114,7 @@
                                         </v-select>
                                     </v-flex>
                                 </v-layout>
-                                <v-layout row wrap>
-                                    <v-flex
+                                    <v-list
                                         style="width:100%;"
                                         :key="index_course + '-rcm-course' " 
                                         v-for="(course, index_course) in rcm_courses">
@@ -132,8 +129,7 @@
                                                 <v-list-item-subtitle>Taken: {{ course.taken }}</v-list-item-subtitle>
                                             </v-list-item-content>
                                         </v-list-item>
-                                    </v-flex>
-                                </v-layout>
+                                    </v-list>
                             </v-card-text>
                         </v-card>
                     </v-flex>
@@ -150,10 +146,14 @@ import CustomHeader from '../components/CustomHeader'
   export default {
 	data() {
 	    return {
+            credential:"",
+            plannableURL:"",
+            username:"",
             year:1,
             semester:"Fall",
             major:null,
             major_options:[],
+            taking_courses:[],
             year_options:[
                 {
                     "text":"1",
@@ -193,21 +193,25 @@ import CustomHeader from '../components/CustomHeader'
                     "title":"Browse by Departments",
                     "icon":"fas fa-list-ol",
                     "href":"/courses/departments/",
+                    "target":"",
                 },
                 {
                     "title":"My Courses",
                     "icon":"fas fa-user-circle",
-                    "href":"/users/",
+                    "href":"",
+                    "target":"",
                 },
                 {
                     "title":"Go to Plannable",
                     "icon":"fas fa-paper-plane",
                     "href":"https://plannable.gitee.io",
+                    "target":"_blank",
                 },
                 {
                     "title":"Home Page",
                     "icon":"fas fa-home",
                     "href":"/",
+                    "target":"",
                 },
             ],
             colors: [
@@ -217,19 +221,47 @@ import CustomHeader from '../components/CustomHeader'
                 'red',
                 'orange',
             ],
+            courseTypes:[
+                'Clinical',
+                'Discussion',
+                'Drill',
+                'Independent Study',
+                'Laboratory',
+                'Lecture',
+                'Practicum',
+                'Seminar',
+                'Studio',
+                'Workshop',
+                '',
+            ]
 	    }
 	},
 	components:{
 	  CustomHeader,
 	},
 	watch: {
-        year:function(){
+        taking_courses(val){
+            var tmp_arr = [];
+            for(let i = 0; i < val.length; i++){
+                tmp_arr.push(val[i].mnemonic.toLowerCase() + val[i].number+this.courseTypes.indexOf(val[i].type).toString(10))
+            }
+            this.plannableURL = JSON.stringify(tmp_arr);
+            this.getPlannableURL();
+        },
+        credential(){
+            this.getPlannableURL();
+        },
+        username(){
+            this.getPlannableURL();
+            this.trash_items[1].href = "/users/" + this.username + "/courses/";
+        },
+        year(){
             this.getRecommendations();
         },
-        semester:function(){
+        semester(){
             this.getRecommendations();
         },
-        major:function(){
+        major(){
             this.getRecommendations();
         },
 	},
@@ -262,11 +294,31 @@ import CustomHeader from '../components/CustomHeader'
                 }
                 this.getRecommendations();
             });
-        }
+        },
+        getTakingCourses(){
+            axios.get('/courses/ajax/get_taking_courses/',{params: {}}).then(response => {
+                this.taking_courses = response.data.taking_courses;
+            });
+        },
+        getCredential(){
+            axios.get('/courses/ajax/get_credential/',{params: {}}).then(response => {
+                this.credential = response.data.credential;
+                this.username = response.data.username;
+                console.log("credential", this.credential);
+            }).catch( err => {
+                this.credential = "";
+                this.username = "";
+            });
+        },
+        getPlannableURL(){
+            this.trash_items[2].href = "localhost:8080/?courses=" + this.plannableURL + "&username=[" + this.username + "]&credential=[" + this.credential + "]";
+        },
 	},
 	mounted(){
+        this.getCredential();
         this.getTrendingCourses();
         this.getMajorOptions();
+        this.getTakingCourses();
 	},
   };
 </script>
@@ -278,7 +330,7 @@ import CustomHeader from '../components/CustomHeader'
 		font-size: 2.1em;
 		font-weight: 300;
 		color:rgb(0, 0, 0);
-		padding: 7px 12px 7px 12px;
+		padding: 7px 12px 7px 3px;
 		border-radius: 5px;
 		line-height: 2.0;
 	}

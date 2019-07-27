@@ -63,7 +63,6 @@ import axios from 'axios'
     },
     methods: {
         goToHref(href){
-            console.log("lalala");
             window.location.href = href;
         },
     },

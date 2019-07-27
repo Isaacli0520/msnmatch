@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.urls import reverse_lazy, reverse
 from django.views import generic
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.contrib.auth.models import User
@@ -19,6 +20,8 @@ import json
 from django.urls import reverse
 from msnmatch import settings
 from users.models import MAJOR_CHOICES
+from users.views import custom_md5
+from users.models import PlanProfile
 
 mnemonics = ['AAS', 'MATH', 'ANTH', 'SWAH', 'MDST', 'ARAD', 'ARAH', 'ARTH', 'ARTS',
 'ARAB', 'ARTR', 'HEBR', 'HIND', 'MESA', 'MEST', 'PERS', 'SANS', 'SAST', 'SATR', 'URDU', 'ASTR',
@@ -65,9 +68,74 @@ def department(request, department_number):
 	get_object_or_404(Department, pk=department_number)
 	return render(request, 'department.html')
 
+def get_my_courses(request):
+	return JsonResponse({
+		"taking_courses":get_take_courses(request.user, "taking"),
+		"taken_courses":get_take_courses(request.user, "taken"),
+	})
+
+def get_taking_courses(request):
+	return JsonResponse({
+		"taking_courses":get_take_courses(request.user, "taking")
+	})
+
+def get_take_courses(user, take):
+	cs_users = CourseUser.objects.filter(user=user, take=take)
+	courses = []
+	for cs_user in cs_users:
+		if cs_user.course.pk not in courses:
+			courses.append(cs_user.course.pk)
+	final_courses = []
+	for course_pk in courses:
+		tmp_course = get_object_or_404(Course, pk=course_pk)
+		final_courses.append({
+			"course_pk":course_pk,
+			"mnemonic":tmp_course.mnemonic,
+			"number":tmp_course.number,
+			"title":tmp_course.title,
+			"take":take,
+			"type":tmp_course.type,
+		})
+	return final_courses
+
+def get_credential(request):
+	return JsonResponse({
+		"credential":request.user.profile.credential,
+		"username":request.user.username,
+	})
+
+@csrf_exempt
+def save_plannable_profile(request):
+	if request.method == "POST":
+		post = json.loads(request.body)
+		username, credential, name, profile = post["username"][1:-1], post["credential"][1:-1], post["name"], post["profile"]
+		user = get_object_or_404(User, username=username)
+		if credential == custom_md5(settings.SECRET_KEY + user.username, settings.SECRET_KEY):
+			print("NIIIICEEEEEE")
+			planProfileQueryset = PlanProfile.objects.filter(user=user, name=name)
+			if planProfileQueryset.first() != None:
+				plan_profile = planProfileQueryset.first()
+				plan_profile.content = profile
+				plan_profile.save()
+			else:
+				plan_profile = PlanProfile.objects.create(user=user, name=name, content=profile)
+			success = True
+		else:
+			success = False
+	else:
+		success = False
+	return JsonResponse({
+		"success":success,
+	})
+
 def get_recommendations(request):
 	year, semester, major = request.GET.get('year'), request.GET.get('semester'), request.GET.get('major')
 	users_pk = [sth.pk for sth in User.objects.filter(profile__major=major)]
+	if len(users_pk) == 0:
+		return JsonResponse({
+			"rcm_courses":[],
+		})
+		
 	cs_users = CourseUser.objects.filter(user__pk__in=users_pk, take="taken")
 	final_cs_users = []
 	courses_dict = {}
@@ -295,6 +363,7 @@ def get_basic_info(request):
 		"brand_pic": settings.STATIC_URL + "css/images/brand.png",
 		"profile": reverse('profile', args=[request.user.username]),
 		"update_profile":reverse('update_profile', args=[request.user.username]),
+		"my_courses":reverse('my_courses', args=[request.user.username]),
 		"logout":reverse('logout'),
 	}
 	return JsonResponse({

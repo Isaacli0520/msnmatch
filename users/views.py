@@ -16,6 +16,7 @@ from users.models import MatchingHistory
 from .forms import UserForm, ProfileForm
 from .models import MatchRequest
 from msnmatch import settings
+from hashlib import md5
 
 @login_required
 def update_profile(request, username):
@@ -35,6 +36,13 @@ def update_profile(request, username):
 		'user_form': user_form,
 		'profile_form': profile_form,
 	})
+
+@login_required
+def my_courses(request, username):
+    if request.user.username != username:
+        return redirect(reverse('my_courses', kwargs={"username": request.user.username, }))
+    return render(request, "mycourses.html")
+
 
 @login_required
 def profile(request, username):
@@ -75,3 +83,7 @@ def profile(request, username):
 
 	return render(request, 'profile.html', ctx)
 
+def custom_md5(pwd, salt):
+    obj = md5()
+    obj.update((pwd + salt).encode('utf-8'))
+    return obj.hexdigest()

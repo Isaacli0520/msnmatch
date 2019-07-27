@@ -2,7 +2,7 @@
   <v-app>
     <custom-header></custom-header>
     <v-content>
-        <v-container fluid grid-list-md>
+        <v-container fluid grid-list-lg>
             <v-layout>
                 <v-flex>
                     <v-breadcrumbs class="cus-breadcrumbs" :items="navItems" divider=">"></v-breadcrumbs>

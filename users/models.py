@@ -144,7 +144,14 @@ def get_name(self):
 
 User.add_to_class("__str__", get_name)
 
+def get_user():
+  User.objects.get_or_create(id=1)
+  return 1
 
+class PlanProfile(models.Model):
+	name = models.CharField(max_length=255, null=True, blank=True)
+	content = models.TextField(null=True, blank=True)
+	user = models.ForeignKey(User, on_delete=models.CASCADE, default=get_user)
 
 class Profile(models.Model):
 	user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -164,6 +171,7 @@ class Profile(models.Model):
 	role = models.CharField(max_length=255, choices=ROLE_CHOICES, blank=True)
 	wechat = models.CharField(max_length=255, blank=True)
 	matched = models.BooleanField(default=False)
+	credential = models.TextField(blank=True)
 
 	def real_year(self):
 		if self.graduate_year:

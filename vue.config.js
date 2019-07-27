@@ -2,7 +2,7 @@ const BundleTracker = require("webpack-bundle-tracker");
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 
 module.exports = {
-    publicPath: IS_PRODUCTION ? 'static' : 'http://127.0.0.1:8080/',
+    publicPath: IS_PRODUCTION ? 'static' : 'http://127.0.0.1:8081/',
     outputDir: 'dist',
     // assetsDir: 'static',
 
@@ -77,6 +77,11 @@ module.exports = {
           entry: 'src/departments/main.js',
           template: 'templates/departments.html',
           filename: 'departments.html',
+        },
+        mycoursespage: {
+          entry: 'src/mycourses/main.js',
+          template: 'templates/mycourses.html',
+          filename: 'mycourses.html',
         },
         courseinstructorpage: {
           entry: 'src/courseinstructor/main.js',

@@ -16,7 +16,11 @@ urlpatterns = [
   path('ajax/get_trending_courses/', views.get_trending_courses, name='get_trending_courses'),
   path('ajax/get_recommendations/', views.get_recommendations, name='get_recommendations'),
   path('ajax/get_major_options/', views.get_major_options, name='get_major_options'),
+  path('ajax/get_taking_courses/', views.get_taking_courses, name='get_taking_courses'),
+  path('ajax/get_my_courses/', views.get_my_courses, name='get_my_courses'),
   path('ajax/get_departments/', views.get_departments, name='get_departments'),
+  path('ajax/get_credential/', views.get_credential, name='get_credential'),
+  path('api/save_plannable_profile/', views.save_plannable_profile, name='save_plannable_profile'),
   path('ajax/submit_review/', views.submit_review, name='submit_review'),
   path('<course_number>/<instructor_number>/', views.course_instructor, name='course_instructor'),
 ]
