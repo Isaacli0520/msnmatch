@@ -36,22 +36,22 @@
                         <v-card>
                             <v-card-title>Trash Can</v-card-title>
                             <v-card-text>
-                                    <v-list
+                                <v-list>
+                                    <v-list-item
                                         style="width:100%;"
                                         :key="index_item + '-trash' " 
-                                        v-for="(item, index_item) in trash_items">
-                                        <v-list-item
-                                            :href="item.href"
-                                            :target="item.target">
-                                            <v-list-item-avatar
-                                                v-if="item.icon">
-                                                <v-icon>{{ item.icon }}</v-icon>
-                                            </v-list-item-avatar>
-                                            <v-list-item-content>
-                                                <v-list-item-title>{{ item.title }}</v-list-item-title>
-                                            </v-list-item-content>
-                                        </v-list-item>
-                                    </v-list>
+                                        v-for="(item, index_item) in trash_items"
+                                        :href="item.href"
+                                        :target="item.target">
+                                        <v-list-item-avatar
+                                            v-if="item.icon">
+                                            <v-icon>{{ item.icon }}</v-icon>
+                                        </v-list-item-avatar>
+                                        <v-list-item-content>
+                                            <v-list-item-title>{{ item.title }}</v-list-item-title>
+                                        </v-list-item-content>
+                                    </v-list-item>
+                                </v-list>
                             </v-card-text>
                             <v-card-actions></v-card-actions>
                         </v-card>
@@ -61,11 +61,11 @@
                             <v-card>
                                 <v-card-title>Top 10 {{i}} Courses</v-card-title>
                                 <v-card-text>
-                                        <v-list
-                                            style="width:100%;"
-                                            :key="index_course + '-trending-course' " 
-                                            v-for="(course, index_course) in trending_courses[i]">
+                                        <v-list>
                                             <v-list-item
+                                                style="width:100%;"
+                                                :key="index_course + '-trending-course' " 
+                                                v-for="(course, index_course) in trending_courses[i]"
                                                 :href="'/courses/'+ course.course_pk + '/' ">
                                                 <v-list-item-avatar
                                                     color="orange lighten-2">
@@ -114,11 +114,11 @@
                                         </v-select>
                                     </v-flex>
                                 </v-layout>
-                                    <v-list
-                                        style="width:100%;"
-                                        :key="index_course + '-rcm-course' " 
-                                        v-for="(course, index_course) in rcm_courses">
+                                    <v-list>
                                         <v-list-item
+                                            style="width:100%;"
+                                            :key="index_course + '-rcm-course' " 
+                                            v-for="(course, index_course) in rcm_courses"
                                             :href="'/courses/'+ course.course_pk + '/' ">
                                             <v-list-item-avatar
                                                 color="orange lighten-2">

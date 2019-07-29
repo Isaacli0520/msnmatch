@@ -2,7 +2,22 @@
   <v-app>
     <custom-header></custom-header>
     <v-content>
-        <v-container fluid grid-list-lg>
+        <v-container v-if="!loaded" fluid fill-height>
+            <v-layout 
+                align-center
+                justify-center>
+                <div class="text-center">
+                    <v-progress-circular
+                    :size="60"
+                    :width="6"
+                    v-if="!loaded"
+                    indeterminate
+                    color="teal lighten-1">
+                    </v-progress-circular>
+                </div>
+            </v-layout>
+        </v-container>
+        <v-container v-if="loaded" fluid grid-list-lg>
             <v-layout>
                 <v-flex>
                     <v-breadcrumbs class="cus-breadcrumbs" :items="navItems" divider=">"></v-breadcrumbs>
@@ -17,84 +32,85 @@
                 </v-flex>
                 <v-spacer></v-spacer>
             </v-layout>
-            <template v-for="i in 2">
-                <v-layout :key="i" mt-2 mb-3>
-                    <v-flex> 
-                        <div v-if="i==1" class="instructor-banner">Instructors teaching this semester</div>
-                        <div v-if="i==2" class="instructor-banner">Past semesters</div>
+            <v-layout wrap>
+                <template v-for="i in 2">
+                    <v-flex mb-3 :key="i + '-instructor-card' " xs12 sm12 md12 lg12 xl12 d-flex child-flex>
+                        <v-card>
+                            <v-card-title> {{ i==1 ? 'Instructors teaching this semester': 'Past semesters' }} </v-card-title>
+                            <v-card-text>
+                                <v-layout :key="i + 100000" row wrap>
+                                    <v-flex 
+                                    xs12 sm6 md4 lg4 xl4
+                                    d-flex 
+                                    :key="index_instr + (i == 1 ? '-teaching' : '-not-teaching') "
+                                    v-for="(instructor, index_instr) in i == 1 ? teaching_instructors : not_teaching_instructors">
+                                        <v-card style="width:100%;">
+                                            <v-card-title>
+                                                <div>
+                                                    <div>{{instructor.name}}</div>
+                                                    <div v-if="instructor.topic" class="subtitle-1 grey--text">   {{instructor.topic}}</div>
+                                                </div>
+                                            </v-card-title>
+                                            <v-divider></v-divider>
+                                            <v-card-text>
+                                                <div>
+                                                    <v-chip 
+                                                        class="ma-1"
+                                                        v-if="course.take.instructor_pk == instructor.pk"
+                                                        label
+                                                        text-color="white"
+                                                        color="orange lighten-1">
+                                                        {{course.take.take}}
+                                                    </v-chip>
+                                                    <v-chip
+                                                        class="ma-1"
+                                                        label
+                                                        text-color="white"
+                                                        color="teal darken-1">
+                                                        Semesters Taught:{{instructor.semesters.length}}
+                                                    </v-chip>
+                                                </div>
+                                                <v-rating 
+                                                v-model="instructor.rating_instructor"
+                                                readonly></v-rating>
+                                            </v-card-text>
+                                            <v-divider class=""></v-divider>
+                                            <v-card-actions>
+                                                <v-chip
+                                                    class="ma-1"
+                                                    outlined
+                                                    color="deep-purple accent-4"
+                                                    @click="goToHref('/courses/'+course.course_pk+'/'+instructor.pk+'/')"
+                                                    >
+                                                    Learn More
+                                                </v-chip>
+                                                <v-chip
+                                                    class="ma-1"
+                                                    @click="openDialogTake(instructor)"
+                                                    color="deep-purple accent-4" 
+                                                    outlined
+                                                    >
+                                                    Taking/Taken
+                                                </v-chip>
+                                            </v-card-actions>
+                                        </v-card>
+                                    </v-flex>
+                                </v-layout>
+                            </v-card-text>
+                        </v-card>
                     </v-flex>
-                    <v-spacer></v-spacer>
-                </v-layout>
-                <v-layout :key="i + 100000" row wrap>
-                    <v-flex d-flex 
-                    :key="index_instr"
-                    v-for="(instructor, index_instr) in i == 1 ? teaching_instructors : not_teaching_instructors">
-                    <v-card
-                    >
-                        <v-card-text>
-                            <v-flex align-self-center class="mb-2">
-                                <span class="instructor-name">{{ instructor.name }}</span>
-                                <v-chip 
-                                    v-if="course.take.instructor_pk == instructor.pk"
-                                    label
-                                    text-color="white"
-                                    color="teal darken-3"
-                                    class="ma-1">
-                                    {{course.take.take}}
-                                </v-chip>
-                            </v-flex>
-                            <v-spacer></v-spacer>
-                            <span v-if="instructor.topic.length>0" class="grey--text subtitle-1">Topic: {{ instructor.topic }}</span>
-                            <div>
-                                <div>
-                                    <span class="text--primary">Semesters taught: {{instructor.semesters.length}}</span>
-                                </div>
-                                <div>
-                                    <!-- <template v-if="instructor.rating_instructor>0"> -->
-                                    <span class="text--primary">Rating: </span>
-                                    <v-rating
-                                        v-model="instructor.rating_instructor"
-                                        color="yellow darken-3"
-                                        background-color="grey darken-1"
-                                        readonly
-                                        small
-                                        >
-                                    </v-rating>
-                                    <!-- </template> -->
-                                </div>
-                            </div>
-                        </v-card-text>
-                        <v-card-actions>
-                            <v-btn
-                            text
-                            color="deep-purple accent-4"
-                            @click="goToHref('/courses/'+course.course_pk+'/'+instructor.pk+'/')"
-                            >
-                            Learn More
-                            </v-btn>
-                            <v-btn
-                                @click="openDialogTake(instructor)"
-                                color="deep-purple accent-4" 
-                                text
-                                >
-                                Taking/Taken
-                            </v-btn>
-                        </v-card-actions>
-                    </v-card>
-                    </v-flex>
-                </v-layout>
-            </template>
+                </template>
+            </v-layout>
         </v-container>
-        <v-dialog v-model="dialogTake" scrollable min-width="350px" max-width="500px">
+        <v-dialog v-model="dialogTake" scrollable min-width="350px" max-width="600px">
             <v-card>
                 <v-card-title>Select Semester</v-card-title>
                 <v-divider></v-divider>
                 <v-card-text style="height: 300px;">
                     <v-checkbox 
                         v-model="takeCourse" 
-                        :key="item.value.instructor_pk + item.value.semester" 
+                        :key="item.value.course_instructor_pk" 
                         v-for="item in takeItemsComputed" 
-                        :value-comparator="takeCompare" 
                         :label="item.label" 
                         :value="item.value"
                         color="black"
@@ -140,6 +156,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
         },
         currentSemester:"2019Fall",
 
+        loaded:false,
         navItems:[],
 
         takeCourse:null,
@@ -164,12 +181,22 @@ axios.defaults.xsrfCookieName = "csrftoken";
         },
         teaching_instructors(){
             return this.course.instructors.filter(obj => {
-                return obj.semesters.indexOf(this.currentSemester) != -1;
+                for(let i = 0; i < obj.semesters.length; i++){
+                    if(obj.semesters[i].semester == this.currentSemester){
+                        return true
+                    }
+                }
+                return false;
             })
         },
         not_teaching_instructors(){
             return this.course.instructors.filter(obj => {
-                return obj.semesters.indexOf(this.currentSemester) == -1;
+                for(let i = 0; i < obj.semesters.length; i++){
+                    if(obj.semesters[i].semester == this.currentSemester){
+                        return false
+                    }
+                }
+                return true;
             })
         },
         course_pk: function(){
@@ -181,13 +208,6 @@ axios.defaults.xsrfCookieName = "csrftoken";
         },
     },
     methods: {
-        takeCompare(a,b){
-            if (a == null || b == null){
-                return false;
-            }
-            return (a.course_pk == b.course_pk && a.instructor_pk == b.instructor_pk && a.semester == b.semester && a.take == b.take);
-
-        },
         sortBySemester(a, b){
             if(a.substring(0,4) != b.substring(0,4)){
                 return b.substring(0,4).toString(10) - a.substring(0,4).toString(10);
@@ -215,6 +235,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
                     'instructor_pk':this.takeCourse.instructor_pk,
                     'semester':this.takeCourse.semester, 
                     'take':this.takeCourse.take,
+                    'course_instructor_pk':this.takeCourse.course_instructor_pk,
                     'delete':false,
                 }
             }
@@ -222,6 +243,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
                 var params = {
                     'course_pk':this.course.course_pk,
                     'instructor_pk':"",
+                    'course_instructor_pk':"",
                     'semester':"", 
                     'take':"",
                     'delete':true,
@@ -236,22 +258,6 @@ axios.defaults.xsrfCookieName = "csrftoken";
                     });
                 }
                 this.getCourse();
-                // if(!params.delete){
-                //     this.takeCourse.instructor_pk = response.data.now.instructor_pk;
-                //     this.takeCourse.semester = response.data.now.semester;
-                //     this.takeCourse.take = response.data.now.take;
-                //     this.course.take.instructor_pk = response.data.now.instructor_pk;
-                //     this.course.take.semester = response.data.now.semester;
-                //     this.course.take.take = response.data.now.take;
-                // }
-                // else{
-                //     this.course.take = {
-                //         "instructor_pk":"",
-                //         "course_pk":"",
-                //         "semester":"",
-                //         "take":"",
-                //     }
-                // }
             });
             this.dialogTake = false;
         },
@@ -261,20 +267,25 @@ axios.defaults.xsrfCookieName = "csrftoken";
                 document.title = this.course.mnemonic + this.course.number;
                 this.takeItems = [];
                 for(let i = 0; i < this.course.instructors.length; i++){
-                    this.course.instructors[i].semesters = this.course.instructors[i].semesters.sort(this.sortBySemester);
+                    // this.course.instructors[i].semesters = this.course.instructors[i].semesters.sort(this.sortBySemester);
                     for(let j = 0; j < this.course.instructors[i].semesters.length; j++){
-                        var tmp_label = " Taken"
-                        var tmp_take = "taken"
-                        if(this.course.instructors[i].semesters.indexOf(this.currentSemester) != -1){
-                            tmp_label = (j == 0 ? " Currently Taking" : " Taken");
-                            tmp_take = (j == 0 ? "taking" : "taken")
+                        var tmp_label = " Taken";
+                        var tmp_take = "taken";
+                        if(this.course.instructors[i].semesters[j].semester == this.currentSemester){
+                            tmp_label = " Currently Taking";
+                            tmp_take = "taking";
                         }
+                        var tmp_topic = ""
+                        if(this.course.instructors[i].semesters[j].topic.length > 0)
+                            tmp_topic = "Topic: " + this.course.instructors[i].semesters[j].topic;
                         this.takeItems.push({
-                            "label":this.course.instructors[i].semesters[j] + tmp_label,
+                            "label":this.course.instructors[i].semesters[j].semester + tmp_label + tmp_topic,
                             "value":{
-                                "semester":this.course.instructors[i].semesters[j],
+                                "semester":this.course.instructors[i].semesters[j].semester,
                                 "instructor_pk":this.course.instructors[i].pk,
                                 "course_pk":this.course.course_pk,
+                                "course_instructor_pk":this.course.instructors[i].semesters[j].course_instructor_pk,
+                                "topic":this.course.instructors[i].semesters[j].topic,
                                 "take": tmp_take,
                             }
                         });
@@ -282,7 +293,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
                 }
 
                 for(let k = 0; k < this.takeItems.length; k++){
-                    if(this.takeItems[k].value.instructor_pk == this.course.take.instructor_pk && this.takeItems[k].value.semester == this.course.take.semester){
+                    if(this.takeItems[k].value.course_instructor_pk == this.course.take.course_instructor_pk){
                         this.takeCourse = this.takeItems[k].value;
                     }
                 }
@@ -309,7 +320,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
                         href: '/courses/'+this.course.course_pk + "/",
                     },
                 ];
-                
+                this.loaded = true;
           });
         },
         goToHref(text){

@@ -4,25 +4,9 @@ import re
 import os
 import csv
 
-departments = {
-	"Commerce":{"COMM", "ECON", "ENTP"},
-	"Science":{"ASTR", "BIOL", "CHEM", "EVSC", "PHYS", "PSYC"},
-	"Humanity":{"AMST", "ANTH", "ARH", "ARTH", "CLAS", "EDIS", "HIEU", "HILA"
-	,"HIUS", "PHIL", "PLAD", "PLAP", "PLIR", "PLPT", "PPOL", "RELB", "RELG",
-	"RELI", "RELJ", "SOC"},
-	"Mathematics":{"APMA", "MATH", "STAT"},
-	"Engineering":{"CHE", "CS", "ECE", "ENGR", "MAE", "MSE", "STS"},
-	"Architecture":{"ARCH", "ARH", "MDST", "PLAN"},
-	"Language":{"CHTR", "CPLT", "ENGL", "ENWR", "FREN", "GERM", "GETR", "JAPN", "KOR",
-	"RUTR", "SATR", "SLAV", "SPAN"},
-	"ART":{"ARTS", "DANC", "DRAM", "MUEN", "MUSI"},
-	"Others":{"COLA", "EDIS", "EGMT", "FORU", "KINE", "USEM", "WGS"}
-}
 
 class Command(BaseCommand):
 	def handle(self, *args, **kwargs):
-		pattern = r"co-taught by ((([a-z]+.*)+) and)+ ([a-z]+.*)+"
-		ppp=re.compile(pattern,flags=re.IGNORECASE)
 		for cs in Course.objects.all():
 			cs.delete()
 		data = []
@@ -57,9 +41,7 @@ class Command(BaseCommand):
 						final_instructors.append(inner_instructor.strip().split())
 				elif len(instructor) > 2:
 					final_instructors.append(instructor)
-			# if sum([len(item) for item in final_instructors]) > 3:
-			# 	print("instructors", final_instructors)
-			# print("instructors", final_instructors)
+					
 			for instructor in final_instructors:
 				if len(instructor) == 1:
 					tmp_first_name = instructor[0]

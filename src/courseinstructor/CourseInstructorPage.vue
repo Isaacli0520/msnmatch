@@ -2,7 +2,22 @@
   <v-app>
     <custom-header></custom-header>
     <v-content>
-        <v-container fluid grid-list-lg>
+        <v-container v-if="!loaded" fluid fill-height>
+            <v-layout 
+                align-center
+                justify-center>
+                <div class="text-center">
+                    <v-progress-circular
+                    :size="60"
+                    :width="6"
+                    v-if="!loaded"
+                    indeterminate
+                    color="teal lighten-1">
+                    </v-progress-circular>
+                </div>
+            </v-layout>
+        </v-container>
+        <v-container v-if="loaded" fluid grid-list-lg>
             <v-layout>
                 <v-flex>
                     <v-breadcrumbs class="cus-breadcrumbs" :items="navItems" divider=">"></v-breadcrumbs>
@@ -26,7 +41,7 @@
                 <v-spacer></v-spacer>
             </v-layout>
             <v-layout> <!-- Course Description -->
-                <v-flex d-flex>
+                <v-flex child-flex d-flex>
                     <v-card>
                         <v-card-title>Prerequisite</v-card-title>
                         <v-card-text v-if="course.prerequisite">{{course.prerequisite.substring(13).trim()}}</v-card-text>
@@ -34,14 +49,14 @@
                     </v-card>
                 </v-flex>
             </v-layout>
-            <v-layout row wrap> <!-- Prereq and Rate -->
-                <v-flex lg8 md6 sm12 xs12 d-flex>
+            <v-layout wrap> <!-- Prereq and Rate -->
+                <v-flex lg8 md6 sm12 xs12 d-flex child-flex>
                     <v-card>
                         <v-card-title>Description</v-card-title>
                         <v-card-text>{{course.description}}</v-card-text>
                     </v-card>
                 </v-flex>
-                <v-flex lg4 md6 sm12 xs12 d-flex>
+                <v-flex lg4 md6 sm12 xs12 d-flex child-flex>
                     <v-card>
                         <v-card-title>Rating</v-card-title>
                         <v-card-text>
@@ -71,8 +86,8 @@
                     </v-card>
                 </v-flex>
             </v-layout>
-            <v-layout row wrap> <!-- Users Taking -->
-                <v-flex d-flex>
+            <v-layout> <!-- Users Taking -->
+                <v-flex>
                     <v-card>
                         <v-card-title>Users Taking {{course.mnemonic}} {{course.number}}</v-card-title>
                         <v-card-text v-if="users_taking.length > 0">
@@ -120,7 +135,7 @@
                 <v-spacer></v-spacer>
             </v-layout>
             <v-layout row wrap>  <!-- Reviews -->
-                <v-flex d-flex :key="user.user_pk" v-for="user in users_with_review">
+                <v-flex :key="user.user_pk" v-for="user in users_with_review">
                     <v-card>
                         <v-card-text>
                             <div class="review-text">
@@ -229,6 +244,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
   export default {
     data() {
       return {
+        loaded:false,
         currentSemester:"2019Fall",
         selected_course:null,
         courseNameLimit:40,
@@ -439,6 +455,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
                         href: "NONE",
                     },
                 ];
+                this.loaded = true;
           });
         },
         goToHref(text){

@@ -33,6 +33,7 @@ ALLOWED_HOSTS = ['msn-match-test.herokuapp.com/', 'match.msnatuva.org','localhos
 BUILD_VERSION = "msnmatch-1.0601"
 
 CURRENT_YEAR = 2020
+CURRENT_SEMESTER = "2019Fall"
 
 # Application definition
 

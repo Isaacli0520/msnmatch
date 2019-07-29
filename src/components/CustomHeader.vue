@@ -83,12 +83,13 @@
       hide-selected
       hide-details
       label="Public APIs"
-      placeholder="Start typing to Search"
+      placeholder="Search and Add Courses"
       return-object
     >
-      <template v-slot:item="data">
+      <template v-slot:item="{ item }">
         <v-list-item-content>
-          <v-list-item-title v-html="data.item.text"></v-list-item-title>
+            <v-list-item-title mb-2>{{item.text}}</v-list-item-title>
+            <v-list-item-subtitle>Last taught:{{item.last_taught}}</v-list-item-subtitle>
         </v-list-item-content>  
       </template>
     </v-autocomplete>
@@ -224,7 +225,7 @@ export default{
                 ? tmp_course_name.slice(0, this.courseNameLimit) + '...'
                 : tmp_course_name;
 
-            return {text:course_name, value:entry.pk, take:entry.take};
+            return {text:course_name, value:entry.pk, take:entry.take, last_taught:entry.last_taught};
             })
         },
     },

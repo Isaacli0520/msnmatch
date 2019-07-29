@@ -22,6 +22,7 @@ from msnmatch import settings
 from users.models import MAJOR_CHOICES
 from users.views import custom_md5
 from users.models import PlanProfile
+from functools import cmp_to_key
 
 mnemonics = ['AAS', 'MATH', 'ANTH', 'SWAH', 'MDST', 'ARAD', 'ARAH', 'ARTH', 'ARTS',
 'ARAB', 'ARTR', 'HEBR', 'HIND', 'MESA', 'MEST', 'PERS', 'SANS', 'SAST', 'SATR', 'URDU', 'ASTR',
@@ -111,7 +112,6 @@ def save_plannable_profile(request):
 		username, credential, name, profile = post["username"][1:-1], post["credential"][1:-1], post["name"], post["profile"]
 		user = get_object_or_404(User, username=username)
 		if credential == custom_md5(settings.SECRET_KEY + user.username, settings.SECRET_KEY):
-			print("NIIIICEEEEEE")
 			planProfileQueryset = PlanProfile.objects.filter(user=user, name=name)
 			if planProfileQueryset.first() != None:
 				plan_profile = planProfileQueryset.first()
@@ -160,7 +160,6 @@ def get_recommendations(request):
 			"title":tmp_course.title,
 			"taken":num,
 			})
-	print("Courses", courses)
 	return JsonResponse({
 		"rcm_courses":courses,
 	})
@@ -292,7 +291,7 @@ def save_take(request):
 			})
 		instructor = get_object_or_404(Instructor, pk=post['instructor_pk'])
 	
-		cs_instr = get_object_or_404(CourseInstructor, course=course,instructor=instructor, semester=semester)
+		cs_instr = get_object_or_404(CourseInstructor, pk=post["course_instructor_pk"])
 
 		if past_query.first() != None:
 			past_query.first().delete()
@@ -349,12 +348,46 @@ def get_json_of_courses(queryset):
 	else:
 		return []
 
+def cmp_int(a,b):
+	if a > b:
+		return 1
+	elif a < b:
+		return -1
+	else:
+		return 0
+
+
+def cmp_semester(a,b):
+	if a == b:
+		return 0
+	elif a == "":
+		return -1
+	elif b == "":
+		return 1
+	elif a[:4] != b[:4]:
+		return cmp_int( int(a[:4]), int(b[:4]) )
+	elif a[:4] == b[:4]:
+		if a[4:] == "Fall":
+			return 1
+		elif b[4:] == "Fall":
+			return -1
+	return 0
+
+def cmp_semester_key(a,b):
+	return cmp_semester(a["semester"], b["semester"])
+
 def get_json_of_course(course):
+	cs_instr_arr = [cs_instr.semester for cs_instr in CourseInstructor.objects.filter(course=course)]
+	cs_instr_arr = sorted(cs_instr_arr, key=cmp_to_key(cmp_semester))
+	last_taught = settings.CURRENT_SEMESTER
+	if settings.CURRENT_SEMESTER not in cs_instr_arr:
+		last_taught = cs_instr_arr[-1]
 	return {
 		"pk":course.pk,
 		"mnemonic":course.mnemonic,
 		"number":course.number,
 		"title":course.title,
+		"last_taught":last_taught,
 	}
 
 def get_basic_info(request):
@@ -414,6 +447,7 @@ def get_detailed_json_of_course(course, user, with_instructors=False, with_take=
 			"course_pk":courseUser_query.course.pk,
 			"semester":courseUser_query.course_instructor.semester,
 			"take":courseUser_query.take,
+			"course_instructor_pk":courseUser_query.course_instructor.pk,
 		}
 	course_dict = {
 		"course_pk":course.pk,
@@ -446,20 +480,29 @@ def get_instructors_of_course(course):
 			tmp_name = cs_instructor.instructor.__str__()
 			rating_instructor = get_rating_of_instructor_with_course(cs_instructor.instructor, course)
 			if tmp_name not in instructors:
-				instructors[tmp_name] = {"semesters":[ cs_instructor.semester ]}
-				instructors[tmp_name]["topic"] = cs_instructor.topic
+				instructors[tmp_name] = {"semesters":[{
+					"semester":cs_instructor.semester,
+					"course_instructor_pk":cs_instructor.pk,
+					"topic":cs_instructor.topic,
+				}]}
 				instructors[tmp_name]["pk"] = cs_instructor.instructor.pk
-				instructors[tmp_name]["cs_instr_pk"] = cs_instructor.pk
 				instructors[tmp_name]["rating_instructor"] = rating_instructor
 			else:
-				instructors[tmp_name]["semesters"].append(cs_instructor.semester)
+				instructors[tmp_name]["semesters"].append({
+					"semester":cs_instructor.semester,
+					"course_instructor_pk":cs_instructor.pk,
+					"topic":cs_instructor.topic,
+				})
 		for k,v in instructors.items():
+			topic = ""
+			if len(v["semesters"]) > 0:
+				v["semesters"] = sorted(v["semesters"], key=cmp_to_key(cmp_semester_key), reverse=True)
+				topic = v["semesters"][0]["topic"]
 			final_instructors.append({
 				"name":k,
 				"semesters":v["semesters"],
-				"topic":v["topic"],
+				"topic":topic,
 				"pk":v["pk"],
-				"cs_instr_pk":v["cs_instr_pk"],
 				"rating_instructor":v["rating_instructor"],
 			})
 	return final_instructors

@@ -23,10 +23,12 @@
                         <v-card-text class="text--primary">
                             <v-layout row wrap>
                                 <v-flex
+                                    pa-1
                                     xs12 sm6 md6 lg6 xl6
                                     :key="index_d + 'department' " 
                                     v-for="(department, index_d) in departments">
                                     <v-list-item
+                                        dense
                                         :href="'/courses/departments/'+ department.department_pk + '/' ">
                                         <v-list-item-content>
                                             <v-list-item-title>{{department.name}}</v-list-item-title>
