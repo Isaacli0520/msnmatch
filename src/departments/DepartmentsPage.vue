@@ -17,7 +17,7 @@
                 <v-spacer></v-spacer>
             </v-layout>
             <v-layout row wrap>
-                <v-flex xs12 sm12 lg12 md12 xl12 d-flex :key="index_school + 'school' " v-for="(departments, school, index_school) in departments_dict">
+                <v-flex d-flex xs12 sm12 lg12 md12 xl12 d-flex :key="index_school + 'school' " v-for="(departments, school, index_school) in departments_dict">
                     <v-card>
                         <v-card-title>{{ school }}</v-card-title>
                         <v-card-text class="text--primary">
