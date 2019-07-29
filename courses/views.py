@@ -140,9 +140,10 @@ def get_recommendations(request):
 	final_cs_users = []
 	courses_dict = {}
 	for cs_user in cs_users:
-		tmp_year, tmp_semester = year_and_semester(cs_user.course_instructor.semester)
-		if tmp_year + 4 - int(cs_user.user.profile.graduate_year) == int(year) and tmp_semester == semester:
-			final_cs_users.append(cs_user)
+		if cs_user.user.profile.graduate_year:
+			tmp_year, tmp_semester = year_and_semester(cs_user.course_instructor.semester)
+			if tmp_year + 4 - int(cs_user.user.profile.graduate_year) == int(year) and tmp_semester == semester:
+				final_cs_users.append(cs_user)
 
 	for cs_user in final_cs_users:
 		if cs_user.course.pk not in courses_dict:
