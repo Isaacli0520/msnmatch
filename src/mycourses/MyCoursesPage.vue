@@ -17,12 +17,13 @@
                     <v-spacer></v-spacer>
                 </v-layout>
                 <v-layout wrap>
-                    <v-flex d-flex child-flex xs12 sm6 md6 lg6 xl6>
+                    <v-flex d-flex child-flex xs12 sm12 md12 lg12 xl12>
                         <v-card>
                             <v-card-title>Taking Courses</v-card-title>
                             <v-card-text>
-                                    <v-list
-                                        style="width:100%;"
+                                <v-layout row wrap>
+                                    <v-flex 
+                                        xs12 sm12 md6 lg6 xl6
                                         :key="index_course + '-taking-course' " 
                                         v-for="(course, index_course) in taking_courses">
                                         <v-list-item
@@ -35,18 +36,21 @@
                                                 <v-list-item-title>{{course.mnemonic}}{{course.number}} {{course.title}}</v-list-item-title>
                                             </v-list-item-content>
                                         </v-list-item>
-                                    </v-list>
+                                    </v-flex>
+                                </v-layout>
                             </v-card-text>
                         </v-card>
                     </v-flex>
-                    <v-flex d-flex child-flex xs12 sm6 md6 lg6 xl6>
+                    <v-flex d-flex child-flex xs12 sm12 md6 lg6 xl6
+                        :key="index_semester + '-semester-course' "
+                        v-for="(courses, semester, index_semester) in taken_courses_semester">
                         <v-card>
-                            <v-card-title>Taken Courses</v-card-title>
+                            <v-card-title>{{semester}}</v-card-title>
                             <v-card-text>
                                     <v-list
                                         style="width:100%;"
                                         :key="index_course + '-taken-course' " 
-                                        v-for="(course, index_course) in taken_courses">
+                                        v-for="(course, index_course) in courses">
                                         <v-list-item
                                             :href="'/courses/'+ course.course_pk + '/' ">
                                             <v-list-item-avatar
@@ -76,6 +80,7 @@ import CustomHeader from '../components/CustomHeader'
 	    return {
             taking_courses:[],
             taken_courses:[],
+            taken_courses_semester:[],
             navItems:[],
 	    }
 	},
@@ -96,7 +101,18 @@ import CustomHeader from '../components/CustomHeader'
             axios.get('/courses/ajax/get_my_courses/',{params: {}}).then(response => {
                 this.taking_courses = response.data.taking_courses;
                 this.taken_courses = response.data.taken_courses;
+                this.taken_courses_semester = this.seperateSemesters(this.taken_courses);
             });
+        },
+        seperateSemesters(courses){
+            var tmp_taking_semester = {}
+            for(let i = 0; i < courses.length; i++){
+                if(!(courses[i].semester in tmp_taking_semester)){
+                    tmp_taking_semester[courses[i].semester] = []
+                }
+                tmp_taking_semester[courses[i].semester].push(courses[i])
+            }
+            return tmp_taking_semester
         },
 	},
 	mounted(){

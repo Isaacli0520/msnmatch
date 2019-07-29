@@ -35,7 +35,7 @@
             <v-layout> <!-- Instructor Name -->
                 <v-flex>
                     <div class="instructor-name">
-                        {{instructor.name}}
+                        <a :href="' /courses/instructors/' + instructor.instructor_pk + '/' ">{{instructor.name}}</a>
                     </div>
                 </v-flex>
                 <v-spacer></v-spacer>

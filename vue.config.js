@@ -88,6 +88,11 @@ module.exports = {
           template: 'templates/course_instructor.html',
           filename: 'course_instructor.html',
         },
+        instructorpage: {
+          entry: 'src/instructor/main.js',
+          template: 'templates/instructor.html',
+          filename: 'instructor.html',
+        },
         match: {
           entry: 'src/match/main.js',
           template: 'templates/match.html',

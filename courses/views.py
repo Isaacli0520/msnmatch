@@ -65,9 +65,37 @@ def departments(request):
 	return render(request, 'departments.html')
 
 @login_required
+def instructor(request, instructor_number):
+	get_object_or_404(Instructor, pk=instructor_number)
+	return render(request, 'instructor.html')
+
+@login_required
 def department(request, department_number):
 	get_object_or_404(Department, pk=department_number)
 	return render(request, 'department.html')
+
+def get_instructor(request):
+	instructor_pk = request.GET.get("instructor_pk")
+	instructor = get_object_or_404(Instructor, pk=instructor_pk)
+	cs_instr_query = CourseInstructor.objects.filter(instructor=instructor)
+	all_courses = {}
+	for cs_instr in cs_instr_query:
+		tmp_course_number = cs_instr.course.mnemonic + cs_instr.course.number
+		if tmp_course_number not in all_courses:
+			all_courses[tmp_course_number] = {
+				"course_pk":cs_instr.course.pk,
+				"mnemonic":cs_instr.course.mnemonic,
+				"number":cs_instr.course.number,
+				"title":cs_instr.course.title,
+				"rating":get_rating_of_instructor_with_course(instructor, cs_instr.course),
+				"semesters":[]
+			}
+		all_courses[tmp_course_number]["semesters"].append(cs_instr.semester)
+	return JsonResponse({
+		"name":instructor.__str__(),
+		"rating":get_rating_of_instructor(instructor),
+		"courses":all_courses,
+	})
 
 def get_my_courses(request):
 	return JsonResponse({
@@ -81,21 +109,33 @@ def get_taking_courses(request):
 	})
 
 def get_take_courses(user, take):
-	cs_users = CourseUser.objects.filter(user=user, take=take)
-	courses = []
-	for cs_user in cs_users:
-		if cs_user.course.pk not in courses:
-			courses.append(cs_user.course.pk)
+	# cs_users = CourseUser.objects.filter(user=user, take=take)
+	# courses = []
+	# for cs_user in cs_users:
+	# 	if cs_user.course.pk not in courses:
+	# 		courses.append(cs_user.course.pk)
+	# final_courses = []
+	# for course_pk in courses:
+	# 	tmp_course = get_object_or_404(Course, pk=course_pk)
+	# 	final_courses.append({
+	# 		"course_pk":course_pk,
+	# 		"mnemonic":tmp_course.mnemonic,
+	# 		"number":tmp_course.number,
+	# 		"title":tmp_course.title,
+	# 		"take":take,
+	# 		"type":tmp_course.type,
+	# 	})
 	final_courses = []
-	for course_pk in courses:
-		tmp_course = get_object_or_404(Course, pk=course_pk)
+	cs_users = CourseUser.objects.filter(user=user, take=take)
+	for cs_user in cs_users:
 		final_courses.append({
-			"course_pk":course_pk,
-			"mnemonic":tmp_course.mnemonic,
-			"number":tmp_course.number,
-			"title":tmp_course.title,
+			"course_pk":cs_user.course.pk,
+			"mnemonic":cs_user.course.mnemonic,
+			"number":cs_user.course.number,
+			"title":cs_user.course.title,
 			"take":take,
-			"type":tmp_course.type,
+			"type":cs_user.course.type,
+			"semester":cs_user.course_instructor.semester,
 		})
 	return final_courses
 
@@ -181,7 +221,7 @@ def get_major_options(request):
 
 def year_and_semester(ys):
 	year, semester = ys[:4], ys[4:]
-	if semester == "Spring":
+	if semester == "Fall":
 		return int(year) + 1, semester
 	else:
 		return int(year), semester
@@ -419,8 +459,9 @@ def get_detailed_json_of_course_instructor(course, instructor, user):
 	return {
 		"course":get_detailed_json_of_course(course, user),
 		"instructor":{
+			"instructor_pk":instructor.pk,
 			"name":instructor.__str__(),
-			"rating_instructor":get_rating_of_instructor(instructor),
+			"rating_instructor":get_rating_of_instructor_with_course(instructor, course),
 		},
 		"course_instructors":course_instructor_relations,
 		"course_users":course_users,
@@ -481,6 +522,7 @@ def get_instructors_of_course(course):
 			tmp_name = cs_instructor.instructor.__str__()
 			rating_instructor = get_rating_of_instructor_with_course(cs_instructor.instructor, course)
 			if tmp_name not in instructors:
+				tmp_cs_user_query = CourseUser.objects.filter(course=course, instructor=cs_instructor.instructor)
 				instructors[tmp_name] = {"semesters":[{
 					"semester":cs_instructor.semester,
 					"course_instructor_pk":cs_instructor.pk,
@@ -488,6 +530,8 @@ def get_instructors_of_course(course):
 				}]}
 				instructors[tmp_name]["pk"] = cs_instructor.instructor.pk
 				instructors[tmp_name]["rating_instructor"] = rating_instructor
+				instructors[tmp_name]["taking"] = tmp_cs_user_query.filter(take="taking").count()
+				instructors[tmp_name]["taken"] = tmp_cs_user_query.filter(take="taken").count()
 			else:
 				instructors[tmp_name]["semesters"].append({
 					"semester":cs_instructor.semester,
@@ -499,12 +543,15 @@ def get_instructors_of_course(course):
 			if len(v["semesters"]) > 0:
 				v["semesters"] = sorted(v["semesters"], key=cmp_to_key(cmp_semester_key), reverse=True)
 				topic = v["semesters"][0]["topic"]
+			
 			final_instructors.append({
 				"name":k,
 				"semesters":v["semesters"],
 				"topic":topic,
 				"pk":v["pk"],
 				"rating_instructor":v["rating_instructor"],
+				"taking":v["taking"],
+				"taken":v["taken"],
 			})
 	return final_instructors
 

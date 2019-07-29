@@ -311,7 +311,9 @@ import CustomHeader from '../components/CustomHeader'
             });
         },
         getPlannableURL(){
-            this.trash_items[2].href = "localhost:8080/?courses=" + this.plannableURL + "&username=[" + this.username + "]&credential=[" + this.credential + "]";
+            var preHref = "localhost:8080"
+            // var preHref = "https://plannable.gitee.io"
+            this.trash_items[2].href = preHref + "/?courses=" + this.plannableURL + "&username=[" + this.username + "]&credential=[" + this.credential + "]";
         },
 	},
 	mounted(){

@@ -58,6 +58,7 @@
                                                         class="ma-1"
                                                         v-if="course.take.instructor_pk == instructor.pk"
                                                         label
+                                                        small
                                                         text-color="white"
                                                         color="orange lighten-1">
                                                         {{course.take.take}}
@@ -65,9 +66,26 @@
                                                     <v-chip
                                                         class="ma-1"
                                                         label
+                                                        small
                                                         text-color="white"
                                                         color="teal darken-1">
                                                         Semesters Taught:{{instructor.semesters.length}}
+                                                    </v-chip>
+                                                    <v-chip
+                                                        class="ma-1"
+                                                        label
+                                                        small
+                                                        text-color="white"
+                                                        color="teal darken-1">
+                                                        Taking:{{instructor.taking}}
+                                                    </v-chip>
+                                                    <v-chip
+                                                        class="ma-1"
+                                                        label
+                                                        small
+                                                        text-color="white"
+                                                        color="teal darken-1">
+                                                        Taken:{{instructor.taken}}
                                                     </v-chip>
                                                 </div>
                                                 <v-rating 
