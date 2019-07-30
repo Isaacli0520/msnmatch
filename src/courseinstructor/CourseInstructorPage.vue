@@ -94,7 +94,7 @@
                             <v-chip 
                             v-for="(user_taking, index) in users_taking"
                             :key="index" 
-                            :href=" '/users/'+user_taking.user_pk+'/' ">
+                            :href=" '/users/'+user_taking.username+'/' ">
                                 <v-icon left color="black">mdi-account</v-icon>
                                 {{ user_taking.name }}
                             </v-chip>
@@ -113,7 +113,7 @@
                             <v-chip 
                             v-for="(user_taken, index) in users_taken"
                             :key="index" 
-                            :href=" '/users/'+user_taken.user_pk+'/' "
+                            :href=" '/users/'+user_taken.username+'/' "
                             >
                                 <v-icon left color="black">mdi-account</v-icon>
                                 {{ user_taken.name }}

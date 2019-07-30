@@ -32,7 +32,7 @@
                     <v-spacer></v-spacer>
                 </v-layout>
                 <v-layout wrap>
-                    <v-flex child-flex d-flex xs12 sm12 md4 lg4 xl4>
+                    <v-flex  xs12 sm12 md4 lg4 xl4>
                         <v-card>
                             <v-card-title>Trash Can</v-card-title>
                             <v-card-text>

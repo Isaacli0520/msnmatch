@@ -32,6 +32,41 @@
                 </v-flex>
                 <v-spacer></v-spacer>
             </v-layout>
+            <v-layout> <!-- Course Description -->
+                <v-flex child-flex d-flex>
+                    <v-card>
+                        <v-card-title>Prerequisite</v-card-title>
+                        <v-card-text v-if="course.prerequisite">{{course.prerequisite.substring(13).trim()}}</v-card-text>
+                        <v-card-text v-else>No prereq is specified for this course(Please check on SIS)</v-card-text>
+                    </v-card>
+                </v-flex>
+            </v-layout>
+            <v-layout wrap> <!-- Prereq and Rate -->
+                <v-flex lg8 md6 sm12 xs12 d-flex child-flex>
+                    <v-card>
+                        <v-card-title>Description</v-card-title>
+                        <v-card-text>{{course.description}}</v-card-text>
+                    </v-card>
+                </v-flex>
+                <v-flex lg4 md6 sm12 xs12 d-flex child-flex>
+                    <v-card>
+                        <v-card-title>Rating</v-card-title>
+                        <v-card-text>
+                            <v-flex class="rating-div">
+                                <span>Course: {{course.rating_course}}</span>
+                                <v-rating
+                                    v-model="course.rating_course"
+                                    color="yellow darken-3"
+                                    background-color="grey darken-1"
+                                    readonly
+                                    medium
+                                    hover>
+                                </v-rating>
+                            </v-flex>
+                        </v-card-text>
+                    </v-card>
+                </v-flex>
+            </v-layout>
             <v-layout wrap>
                 <template v-for="i in 2">
                     <v-flex mb-3 :key="i + '-instructor-card' " xs12 sm12 md12 lg12 xl12 d-flex child-flex>
@@ -100,7 +135,7 @@
                                                     color="deep-purple accent-4"
                                                     @click="goToHref('/courses/'+course.course_pk+'/'+instructor.pk+'/')"
                                                     >
-                                                    Learn More
+                                                    Ratings, Reviews & More
                                                 </v-chip>
                                                 <v-chip
                                                     class="ma-1"
@@ -108,7 +143,7 @@
                                                     color="deep-purple accent-4" 
                                                     outlined
                                                     >
-                                                    Taking/Taken
+                                                    Add
                                                 </v-chip>
                                             </v-card-actions>
                                         </v-card>
@@ -160,6 +195,8 @@ axios.defaults.xsrfCookieName = "csrftoken";
             "mnemonic": "",
             "number": "",
             "title": "",
+            "description":"",
+            "prerequisite":"",
             "category":"",
             "take": {
                 "instructor":"",
@@ -171,6 +208,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
                 "department_pk":"",
             },
             "instructors":[],
+            "rating_course":0,
         },
         currentSemester:"2019Fall",
 
@@ -295,7 +333,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
                         }
                         var tmp_topic = ""
                         if(this.course.instructors[i].semesters[j].topic.length > 0)
-                            tmp_topic = "Topic: " + this.course.instructors[i].semesters[j].topic;
+                            tmp_topic = " Topic: " + this.course.instructors[i].semesters[j].topic;
                         this.takeItems.push({
                             "label":this.course.instructors[i].semesters[j].semester + tmp_label + tmp_topic,
                             "value":{

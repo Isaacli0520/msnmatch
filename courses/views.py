@@ -206,6 +206,7 @@ def get_recommendations(request):
 	})
 
 def get_major_options(request):
+	major = ""
 	if request.user.profile.major:
 		major = request.user.profile.major
 	majors = []
@@ -470,6 +471,7 @@ def get_detailed_json_of_course_instructor(course, instructor, user):
 def get_detailed_json_of_course_user(course_user, user):
 	return {
 		"user_pk":course_user.user.pk,
+		"username":course_user.user.username,
 		"name":course_user.user.first_name + " " + course_user.user.last_name,
 		"take":course_user.take,
 		"text":course_user.text,
