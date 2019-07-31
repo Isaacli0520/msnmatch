@@ -61,22 +61,36 @@
                             <v-card>
                                 <v-card-title>Top 10 {{i}} Courses</v-card-title>
                                 <v-card-text>
-                                        <v-list>
-                                            <v-list-item
-                                                style="width:100%;"
-                                                :key="index_course + '-trending-course' " 
-                                                v-for="(course, index_course) in trending_courses[i]"
-                                                :href="'/courses/'+ course.course_pk + '/' ">
-                                                <v-list-item-avatar
-                                                    color="orange lighten-2">
-                                                    <span style="color:#fff;">{{index_course + 1}}</span>
-                                                </v-list-item-avatar>
-                                                <v-list-item-content two-line>
-                                                    <v-list-item-title>{{course.mnemonic}}{{course.number}} {{course.title}}</v-list-item-title>
-                                                    <v-list-item-subtitle>{{i}}: {{course[i.toLowerCase()]}}</v-list-item-subtitle>
-                                                </v-list-item-content>
-                                            </v-list-item>
-                                        </v-list>
+                                    <v-container fluid fill-height v-if="!loaded[i]">
+                                        <v-layout 
+                                            align-center
+                                            justify-center>
+                                            <div class="text-center">
+                                                <v-progress-circular
+                                                :size="60"
+                                                :width="6"
+                                                indeterminate
+                                                color="teal lighten-1">
+                                                </v-progress-circular>
+                                            </div>
+                                        </v-layout>
+                                    </v-container>
+                                    <v-list v-if="loaded[i]">
+                                        <v-list-item
+                                            style="width:100%;"
+                                            :key="index_course + '-trending-course' " 
+                                            v-for="(course, index_course) in trending_courses[i]"
+                                            :href="'/courses/'+ course.course_pk + '/' ">
+                                            <v-list-item-avatar
+                                                color="orange lighten-2">
+                                                <span style="color:#fff;">{{index_course + 1}}</span>
+                                            </v-list-item-avatar>
+                                            <v-list-item-content two-line>
+                                                <v-list-item-title>{{course.mnemonic}}{{course.number}} {{course.title}}</v-list-item-title>
+                                                <v-list-item-subtitle>{{i}}: {{course[i.toLowerCase()]}}</v-list-item-subtitle>
+                                            </v-list-item-content>
+                                        </v-list-item>
+                                    </v-list>
                                 </v-card-text>
                             </v-card>
                         </v-flex>
@@ -114,7 +128,20 @@
                                         </v-select>
                                     </v-flex>
                                 </v-layout>
-                                    <v-list>
+                                    <v-layout 
+                                        v-if="!recommendation_loaded"
+                                        align-center
+                                        justify-center>
+                                        <div class="text-center">
+                                            <v-progress-circular
+                                            :size="60"
+                                            :width="6"
+                                            indeterminate
+                                            color="teal lighten-1">
+                                            </v-progress-circular>
+                                        </div>
+                                    </v-layout>
+                                    <v-list v-if="recommendation_loaded">
                                         <v-list-item
                                             style="width:100%;"
                                             :key="index_course + '-rcm-course' " 
@@ -146,6 +173,11 @@ import CustomHeader from '../components/CustomHeader'
   export default {
 	data() {
 	    return {
+            recommendation_loaded:false,
+            loaded:{
+                "Taken":false,
+                "Taking":false,
+            },
             credential:"",
             plannableURL:"",
             username:"",
@@ -256,12 +288,15 @@ import CustomHeader from '../components/CustomHeader'
             this.trash_items[1].href = "/users/" + this.username + "/courses/";
         },
         year(){
+            this.recommendation_loaded = false;
             this.getRecommendations();
         },
         semester(){
+            this.recommendation_loaded = false;
             this.getRecommendations();
         },
         major(){
+            this.recommendation_loaded = false;
             this.getRecommendations();
         },
 	},
@@ -276,11 +311,14 @@ import CustomHeader from '../components/CustomHeader'
             axios.get('/courses/ajax/get_trending_courses/',{params: {}}).then(response => {
                 this.trending_courses["Taking"] = response.data.taking_courses;
                 this.trending_courses["Taken"] = response.data.taken_courses;
+                this.loaded["Taken"] = true;
+                this.loaded["Taking"] = true;
             });
         },
         getRecommendations(){
             axios.get('/courses/ajax/get_recommendations/',{params: {year:this.year, semester:this.semester, major:this.major}}).then(response => {
                 this.rcm_courses = response.data.rcm_courses;
+                this.recommendation_loaded = true;
             });
         },
         getMajorOptions(){

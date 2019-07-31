@@ -60,7 +60,7 @@
                                     background-color="grey darken-1"
                                     readonly
                                     medium
-                                    hover>
+                                    half-increments>
                                 </v-rating>
                             </v-flex>
                         </v-card-text>
@@ -88,7 +88,7 @@
                                             </v-card-title>
                                             <v-divider></v-divider>
                                             <v-card-text>
-                                                <div>
+                                                <div style="margin: 0px 0px 6px 0px">
                                                     <v-chip 
                                                         class="ma-1"
                                                         v-if="course.take.instructor_pk == instructor.pk"
@@ -123,9 +123,15 @@
                                                         Taken:{{instructor.taken}}
                                                     </v-chip>
                                                 </div>
-                                                <v-rating 
-                                                v-model="instructor.rating_instructor"
-                                                readonly></v-rating>
+                                                <div style="margin-left:4px;">
+                                                    <span>Rating: {{instructor.rating_instructor}}</span>
+                                                    <v-rating 
+                                                    color="yellow darken-3"
+                                                    background-color="grey darken-1"
+                                                    half-increments
+                                                    v-model="instructor.rating_instructor"
+                                                    readonly></v-rating>
+                                                </div>
                                             </v-card-text>
                                             <v-divider class=""></v-divider>
                                             <v-card-actions>

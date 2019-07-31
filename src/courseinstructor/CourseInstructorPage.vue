@@ -64,11 +64,11 @@
                                 <span>Instructor: {{instructor.rating_instructor}}</span>
                                 <v-rating
                                     v-model="instructor.rating_instructor"
-                                    color="yellow darken-3"
-                                    background-color="grey darken-1"
                                     readonly
                                     medium
-                                    hover>
+                                    color="yellow darken-3"
+                                    background-color="grey darken-1"
+                                    half-increments>
                                 </v-rating>
                             </v-flex>
                             <v-flex class="rating-div">
@@ -93,7 +93,7 @@
                         <v-card-text v-if="users_taking.length > 0">
                             <v-chip 
                             v-for="(user_taking, index) in users_taking"
-                            :key="index" 
+                            :key="index + '-taking-user'  " 
                             :href=" '/users/'+user_taking.username+'/' ">
                                 <v-icon left color="black">mdi-account</v-icon>
                                 {{ user_taking.name }}
@@ -111,11 +111,14 @@
                         <v-card-title>Users who have Taken {{course.mnemonic}} {{course.number}}</v-card-title>
                         <v-card-text v-if="users_taken.length > 0">
                             <v-chip 
+                            color="teal darken-1"
+                            text-color="white"
+                            class="ma-1"
                             v-for="(user_taken, index) in users_taken"
-                            :key="index" 
+                            :key="index +'-taken-user' " 
                             :href=" '/users/'+user_taken.username+'/' "
                             >
-                                <v-icon left color="black">mdi-account</v-icon>
+                                <v-icon left color="white">account_circle</v-icon>
                                 {{ user_taken.name }}
                             </v-chip>
                         </v-card-text>
@@ -135,7 +138,7 @@
                 <v-spacer></v-spacer>
             </v-layout>
             <v-layout row wrap>  <!-- Reviews -->
-                <v-flex :key="user.user_pk" v-for="user in users_with_review">
+                <v-flex :key="user.course_user_pk + '-review' " v-for="user in users_with_review">
                     <v-card>
                         <v-card-text>
                             <div class="review-text">
@@ -152,11 +155,11 @@
                                 </v-chip>
                                 <v-chip
                                     class="ma-1" color="teal lighten-2" label small text-color="white">
-                                    Course: {{user.rating_course}}
+                                    Course: {{ user.rating_course ? user.rating_course : 'N/A' }}
                                 </v-chip>
                                 <v-chip
                                     class="ma-1" color="teal lighten-2" label small text-color="white">
-                                    Instructor: {{user.rating_instructor}}
+                                    Instructor: {{user.rating_instructor ? user.rating_instructor : 'N/A'}}
                                 </v-chip>
                             </div>
                             </v-layout>
@@ -362,14 +365,34 @@ axios.defaults.xsrfCookieName = "csrftoken";
             })
         },
         users_taking(){
-            return this.course_users.filter(obj => {
-                return obj.take=="taking";
-            })
+            var duplicate_keys = []
+            var ret_users_taking = []
+            for(let i = 0; i < this.course_users.length; i++){
+                if(this.course_users[i].take=="taking" && duplicate_keys.indexOf(this.course_users[i].user_pk) == -1){
+                    duplicate_keys.push(this.course_users[i].user_pk);
+                    ret_users_taking.push(this.course_users[i]);
+                }
+                
+            }
+            return ret_users_taking
+            // return this.course_users.filter(obj => {
+            //     return obj.take=="taking";
+            // })
         },
         users_taken(){
-            return this.course_users.filter(obj => {
-                return obj.take=="taken";
-            })
+            var duplicate_keys = []
+            var ret_users_taken = []
+            for(let i = 0; i < this.course_users.length; i++){
+                if(this.course_users[i].take=="taken" && duplicate_keys.indexOf(this.course_users[i].user_pk) == -1){
+                    duplicate_keys.push(this.course_users[i].user_pk);
+                    ret_users_taken.push(this.course_users[i]);
+                }
+                
+            }
+            return ret_users_taken;
+            // return this.course_users.filter(obj => {
+            //     return obj.take=="taken";
+            // })
         },
         teaching_instructors(){
             return this.course.instructors.filter(obj => {
@@ -486,6 +509,8 @@ axios.defaults.xsrfCookieName = "csrftoken";
         color:rgb(0, 0, 0);
         font-size: 16px;
         font-family: "Roboto", sans-serif;
+        word-wrap:break-word;
+        white-space: pre-line;
     }
 
     .review-rating{

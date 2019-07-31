@@ -170,7 +170,7 @@ def save_plannable_profile(request):
 
 def get_recommendations(request):
 	year, semester, major = request.GET.get('year'), request.GET.get('semester'), request.GET.get('major')
-	users_pk = [sth.pk for sth in User.objects.filter(profile__major=major)]
+	users_pk = [sth.pk for sth in User.objects.filter(profile__major=major).exclude(username="admin")]
 	if len(users_pk) == 0:
 		return JsonResponse({
 			"rcm_courses":[],
@@ -250,11 +250,23 @@ def get_trending_courses(request):
 		})
 	taking_courses = sorted(tmp_courses, key=lambda x:(x["taking"]), reverse=True)[:10]
 	taken_courses = sorted(tmp_courses, key=lambda x:(x["taken"]), reverse=True)[:10]
-	taking_courses = [cs for cs in taking_courses if cs["taking"] > 0]
-	taken_courses = [cs for cs in taken_courses if cs["taken"] > 0]
+	final_taking_courses = []
+	for cs in taking_courses:
+		cs_instr_arr = [cs_instr.semester for cs_instr in CourseInstructor.objects.filter(course=get_object_or_404(Course, pk=cs["course_pk"]))]
+		if settings.CURRENT_SEMESTER in cs_instr_arr and cs["taking"] > 0:
+			final_taking_courses.append(cs)
+
+	final_taken_courses = []
+	for cs in taken_courses:
+		cs_instr_arr = [cs_instr.semester for cs_instr in CourseInstructor.objects.filter(course=get_object_or_404(Course, pk=cs["course_pk"]))]
+		if settings.CURRENT_SEMESTER in cs_instr_arr and cs["taken"] > 0:
+			final_taken_courses.append(cs)
+	
+	# taking_courses = [cs for cs in taking_courses if cs["taking"] > 0]
+	# taken_courses = [cs for cs in taken_courses if cs["taken"] > 0]
 	return JsonResponse({
-		"taking_courses":taking_courses,
-		"taken_courses":taken_courses,
+		"taking_courses":final_taking_courses,
+		"taken_courses":final_taken_courses,
 	})
 
 def get_departments(request):
@@ -455,7 +467,14 @@ def get_detailed_json_of_course_instructor(course, instructor, user):
 			"topic":course_instructor.topic,
 			"semester":course_instructor.semester,
 			})
-	course_users = [get_detailed_json_of_course_user(course_user, user) for course_user in CourseUser.objects.filter(course=course, instructor=instructor)]
+
+	# duplicated_keys = []
+	# course_users = []
+	# for course_user in CourseUser.objects.filter(course=course, instructor=instructor):
+	# 	if course_user.user.pk not in duplicated_keys:
+	# 		duplicated_keys.append(course_user.user.pk)
+	# 		course_users.append(get_detailed_json_of_course_user(course_user))
+	course_users = [get_detailed_json_of_course_user(course_user) for course_user in CourseUser.objects.filter(course=course, instructor=instructor) ]
 
 	return {
 		"course":get_detailed_json_of_course(course, user),
@@ -468,8 +487,9 @@ def get_detailed_json_of_course_instructor(course, instructor, user):
 		"course_users":course_users,
 	}
 
-def get_detailed_json_of_course_user(course_user, user):
+def get_detailed_json_of_course_user(course_user):
 	return {
+		"course_user_pk":course_user.pk,
 		"user_pk":course_user.user.pk,
 		"username":course_user.user.username,
 		"name":course_user.user.first_name + " " + course_user.user.last_name,
@@ -567,7 +587,7 @@ def get_rating_of_course(course):
 		rating_course = sum(rating_course_arr)/len(rating_course_arr)
 	else:
 		rating_course = 0
-	return rating_course
+	return round(rating_course, 2)
 
 def get_rating_of_instructor_with_course(instructor, course):
 	allCourseUser_instructor_query = CourseUser.objects.filter(course=course, instructor = instructor)
@@ -586,4 +606,4 @@ def get_rating(course_user_queryset):
 		rating_instructor = sum(rating_instructor_arr)/len(rating_instructor_arr)
 	else:
 		rating_instructor = 0
-	return rating_instructor
+	return round(rating_instructor,2)

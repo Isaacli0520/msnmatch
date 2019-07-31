@@ -19,9 +19,13 @@
                 <v-layout>
                     <v-flex d-flex child-flex>
                         <v-card>
-                            <v-card-title>Rating</v-card-title>
+                            <v-card-title>Information</v-card-title>
                             <v-card-text>
+                                <span>Rating: {{instructor.rating}}</span>
                                 <v-rating
+                                    color="yellow darken-3"
+                                    background-color="grey darken-1"
+                                    half-increments
                                     v-model="instructor.rating"
                                     readonly>
                                 </v-rating>
@@ -32,7 +36,7 @@
                 <v-layout row wrap>
                     <v-flex xs12 sm6 md4 lg4 xl4 d-flex child-flex
                         :key="index_course"
-                        v-for="(course, course_name, index_course) in instructor.courses">
+                        v-for="(course, index_course) in courses">
                         <v-card style="width:100%;">
                             <v-card-title>
                                 <div>
@@ -43,10 +47,13 @@
                             <v-divider></v-divider>
                             <v-card-text>
                                 <v-flex>
-                                    Rating:
+                                    <span>Rating: {{course.rating}}</span>
                                     <v-rating 
                                     v-model="course.rating"
-                                    small
+                                    medium
+                                    color="yellow darken-3"
+                                    background-color="grey darken-1"
+                                    half-increments
                                     readonly></v-rating>
                                 </v-flex>
                                 <v-flex>
@@ -98,6 +105,7 @@ import CustomHeader from '../components/CustomHeader'
                 rating:0,
                 courses:[],
             },
+            courses:[],
 	    }
 	},
 	components:{
@@ -129,6 +137,9 @@ import CustomHeader from '../components/CustomHeader'
                 }
             }
         },
+        sortByNumber(a, b){
+            return a.number.toString(10) - b.number.toString(10);
+        },
         getSemesterColor(semester){
             if(semester.substring(4) == "Fall"){
                 return 'orange';
@@ -148,7 +159,9 @@ import CustomHeader from '../components/CustomHeader'
                 this.instructor = response.data;
                 for(var key in this.instructor.courses){
                     this.instructor.courses[key].semesters = this.instructor.courses[key].semesters.sort(this.sortBySemester);
+                    this.courses.push(this.instructor.courses[key]);
                 }
+                this.courses = this.courses.sort(this.sortByNumber);
                 this.navItems = [
                     {
                         text: "Main",
