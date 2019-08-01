@@ -74,6 +74,43 @@ def department(request, department_number):
 	get_object_or_404(Department, pk=department_number)
 	return render(request, 'department.html')
 
+
+def get_list_of_plannable_profiles(request):
+	username, credential = request.GET.get("username"), request.GET.get("credential")
+	user = get_object_or_404(User, username=username)
+	ret_profiles = []
+	if credential == custom_md5(settings.SECRET_KEY + user.username, settings.SECRET_KEY):
+		profiles_query =PlanProfile.objects.filter(user=user)
+		for profile in profiles_query:
+			ret_profiles.append({
+				"profile_pk":profile.pk,
+				"name":profile.name,
+			})
+	return JsonResponse({
+		"profiles":ret_profiles,
+	})
+
+@csrf_exempt
+def get_plannable_profile(request):
+	ret_profile = []
+	if request.method == "POST":
+		post = json.loads(request.body)
+		username, credential= post["username"][1:-1], post["credential"][1:-1]
+		print("lalalala", "username:", username, "credential:", credential)
+		user = get_object_or_404(User, username=username)
+		if credential == custom_md5(settings.SECRET_KEY + user.username, settings.SECRET_KEY):
+			if "name" in post:
+				profile = PlanProfile.objects.filter(name=post["name"], user=user).first()
+				if profile != None:
+					ret_profile.append(profile.content)
+			else:
+				profiles = PlanProfile.objects.filter(user=user)
+				for profile in profiles:
+					ret_profile.append(profile.content)
+	return JsonResponse(
+		ret_profile, safe=False
+	)
+
 def get_instructor(request):
 	instructor_pk = request.GET.get("instructor_pk")
 	instructor = get_object_or_404(Instructor, pk=instructor_pk)
@@ -109,22 +146,6 @@ def get_taking_courses(request):
 	})
 
 def get_take_courses(user, take):
-	# cs_users = CourseUser.objects.filter(user=user, take=take)
-	# courses = []
-	# for cs_user in cs_users:
-	# 	if cs_user.course.pk not in courses:
-	# 		courses.append(cs_user.course.pk)
-	# final_courses = []
-	# for course_pk in courses:
-	# 	tmp_course = get_object_or_404(Course, pk=course_pk)
-	# 	final_courses.append({
-	# 		"course_pk":course_pk,
-	# 		"mnemonic":tmp_course.mnemonic,
-	# 		"number":tmp_course.number,
-	# 		"title":tmp_course.title,
-	# 		"take":take,
-	# 		"type":tmp_course.type,
-	# 	})
 	final_courses = []
 	cs_users = CourseUser.objects.filter(user=user, take=take)
 	for cs_user in cs_users:
@@ -248,8 +269,8 @@ def get_trending_courses(request):
 			"taking":take["taking"],
 			"taken":take["taken"],
 		})
-	taking_courses = sorted(tmp_courses, key=lambda x:(x["taking"]), reverse=True)[:10]
-	taken_courses = sorted(tmp_courses, key=lambda x:(x["taken"]), reverse=True)[:10]
+	taking_courses = sorted(tmp_courses, key=lambda x:(x["taking"]), reverse=True)
+	taken_courses = sorted(tmp_courses, key=lambda x:(x["taken"]), reverse=True)
 	final_taking_courses = []
 	for cs in taking_courses:
 		cs_instr_arr = [cs_instr.semester for cs_instr in CourseInstructor.objects.filter(course=get_object_or_404(Course, pk=cs["course_pk"]))]
@@ -265,8 +286,8 @@ def get_trending_courses(request):
 	# taking_courses = [cs for cs in taking_courses if cs["taking"] > 0]
 	# taken_courses = [cs for cs in taken_courses if cs["taken"] > 0]
 	return JsonResponse({
-		"taking_courses":final_taking_courses,
-		"taken_courses":final_taken_courses,
+		"taking_courses":final_taking_courses[:10],
+		"taken_courses":final_taken_courses[:10],
 	})
 
 def get_departments(request):

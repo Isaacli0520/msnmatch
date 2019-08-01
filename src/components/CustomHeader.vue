@@ -76,7 +76,8 @@
       :items="items"
       :loading="isLoading"
       :search-input.sync="search"
-      color="white"
+      color="teal"
+      clearable
       solo-inverted
       flat
       hide-no-data
@@ -131,6 +132,7 @@ import axios from 'axios'
 export default{
     data: function () {
         return {
+            courseNameLimit: 42,
             drawer: false,
             selected_course:null,
             isLoading: false,

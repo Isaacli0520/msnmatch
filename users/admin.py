@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from skills.models import Skill
+from .models import PlanProfile
 import csv
 from django.http import HttpResponse
 from .models import Profile
@@ -31,6 +32,7 @@ class ProfileInline(admin.StackedInline):
     can_delete = False
     verbose_name_plural = 'Profile'
     fk_name = 'user'
+
 
 def compressImage_new(uploadedImage, resize_bool, quality):
     imageTemporary = Image.open(uploadedImage)

@@ -424,6 +424,25 @@ axios.defaults.xsrfCookieName = "csrftoken";
         },
     },
     methods: {
+        sortBySemester(a, b){
+            if(a.substring(0,4) != b.substring(0,4)){
+                return b.substring(0,4).toString(10) - a.substring(0,4).toString(10);
+            }
+            else{
+                if(a.substring(4) == b.substring(4)){
+                    return 0;
+                }
+                else if(a.substring(4) == "Fall"){
+                    return -1;
+                }
+                else{
+                    return 1;
+                }
+            }
+        },
+        sortBySemesterKey(a,b){
+            return this.sortBySemester(a["semester"], b["semester"]);
+        },
         submitReview(){
             axios.post('/courses/ajax/submit_review/', {
                 "text":this.review_text,
@@ -449,6 +468,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
                 this.course = data.course;
                 document.title = this.course.mnemonic + this.course.number;
                 this.course_instructors = data.course_instructors;
+                this.course_instructors = this.course_instructors.sort(this.sortBySemesterKey);
                 this.instructor = data.instructor;
                 this.course_users = data.course_users;
                 this.navItems = [
@@ -479,7 +499,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
                     },
                 ];
                 this.loaded = true;
-          });
+            });
         },
         goToHref(text){
             window.location.href = text;
