@@ -21,7 +21,7 @@
                         <v-card>
                             <v-card-title>Taking Courses</v-card-title>
                             <v-card-text>
-                                <v-layout row wrap>
+                                <v-layout row wrap v-if="taking_courses.length > 0">
                                     <v-flex 
                                         xs12 sm12 md6 lg6 xl6
                                         :key="index_course + '-taking-course' " 
@@ -38,6 +38,7 @@
                                         </v-list-item>
                                     </v-flex>
                                 </v-layout>
+                                <span v-else>You can search courses in the search bar and add them as taking/taken.</span>
                             </v-card-text>
                         </v-card>
                     </v-flex>

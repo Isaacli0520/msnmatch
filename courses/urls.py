@@ -24,6 +24,7 @@ urlpatterns = [
   path('ajax/get_my_courses/', views.get_my_courses, name='get_my_courses'),
   path('ajax/get_departments/', views.get_departments, name='get_departments'),
   path('ajax/get_credential/', views.get_credential, name='get_credential'),
+  path('ajax/get_reviews/', views.get_reviews, name='get_reviews'),
   path('api/save_plannable_profile/', views.save_plannable_profile, name='save_plannable_profile'),
   path('ajax/submit_review/', views.submit_review, name='submit_review'),
   path('<course_number>/<instructor_number>/', views.course_instructor, name='course_instructor'),

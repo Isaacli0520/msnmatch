@@ -75,6 +75,12 @@ def department(request, department_number):
 	return render(request, 'department.html')
 
 
+def get_reviews(request):
+	cs_users = CourseUser.objects.filter(user=request.user)
+	reviews = [cs_user for cs_user in cs_users if cs_user.text]
+	
+
+
 def get_list_of_plannable_profiles(request):
 	username, credential = request.GET.get("username"), request.GET.get("credential")
 	user = get_object_or_404(User, username=username)
@@ -389,7 +395,7 @@ def get_course(request):
 	pk = request.GET.get("pk")
 	course = get_object_or_404(Course, pk=pk)
 	return JsonResponse({
-		"course":get_detailed_json_of_course(course, request.user, with_instructors=True),
+		"course":get_detailed_json_of_course(course, request.user,with_take=True, with_instructors=True),
 	})
 
 def get_course_instructor(request):
@@ -525,7 +531,7 @@ def get_detailed_json_of_course(course, user, with_instructors=False, with_take=
 	courseUser_query = CourseUser.objects.filter(user=user, course=course).first()
 	take = {"instructor_pk":"", "course_pk":"", "semester":"", "take":""}
 
-	rating_course = get_rating_of_course(course)
+	rating_course, rating_course_counter = get_rating_of_course(course)
 	if courseUser_query != None:
 		take = {
 			"instructor_pk":courseUser_query.course_instructor.instructor.pk,
@@ -548,6 +554,7 @@ def get_detailed_json_of_course(course, user, with_instructors=False, with_take=
 			"department_pk":course.department.pk,
 		},
 		"rating_course":rating_course,
+		"rating_course_counter":rating_course_counter,
 	}
 	if with_instructors:
 		course_dict["instructors"] = get_instructors_of_course(course)
@@ -601,14 +608,16 @@ def get_instructors_of_course(course):
 def get_rating_of_course(course):
 	allCourseUser_course_query = CourseUser.objects.filter(course=course)
 	rating_course_arr = []
+	counter = {1:0, 2:0, 3:0, 4:0, 5:0}
 	for cs_user in allCourseUser_course_query:
-		if cs_user.rating_course != None and cs_user.rating_course > 0:
+		if cs_user.rating_course != None and cs_user.rating_course > 0 and cs_user.rating_course <= 5:
+			counter[int(cs_user.rating_course)] += 1
 			rating_course_arr.append(cs_user.rating_course)
 	if len(rating_course_arr) > 0:
 		rating_course = sum(rating_course_arr)/len(rating_course_arr)
 	else:
 		rating_course = 0
-	return round(rating_course, 2)
+	return round(rating_course, 2), counter
 
 def get_rating_of_instructor_with_course(instructor, course):
 	allCourseUser_instructor_query = CourseUser.objects.filter(course=course, instructor = instructor)

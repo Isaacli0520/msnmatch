@@ -77,9 +77,9 @@
                                     v-model="course.rating_course"
                                     color="yellow darken-3"
                                     background-color="grey darken-1"
+                                    half-increments
                                     readonly
-                                    medium
-                                    hover>
+                                    medium>
                                 </v-rating>
                             </v-flex>
                         </v-card-text>
@@ -92,10 +92,13 @@
                         <v-card-title>Users Taking {{course.mnemonic}} {{course.number}}</v-card-title>
                         <v-card-text v-if="users_taking.length > 0">
                             <v-chip 
+                            color="teal darken-1"
+                            text-color="white"
+                            class="ma-1"
                             v-for="(user_taking, index) in users_taking"
                             :key="index + '-taking-user'  " 
                             :href=" '/users/'+user_taking.username+'/' ">
-                                <v-icon left color="black">mdi-account</v-icon>
+                                <v-icon left color="white">account_circle</v-icon>
                                 {{ user_taking.name }}
                             </v-chip>
                         </v-card-text>

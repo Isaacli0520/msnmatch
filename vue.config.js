@@ -83,6 +83,11 @@ module.exports = {
           template: 'templates/mycourses.html',
           filename: 'mycourses.html',
         },
+        reviewspage: {
+          entry: 'src/reviews/main.js',
+          template: 'templates/reviews.html',
+          filename: 'reviews.html',
+        },
         courseinstructorpage: {
           entry: 'src/courseinstructor/main.js',
           template: 'templates/course_instructor.html',

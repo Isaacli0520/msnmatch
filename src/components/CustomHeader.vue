@@ -246,7 +246,7 @@ export default{
                 this.goToHref(this.urls.update_profile)
             }
             else if(item.title=="Log Out"){
-                this.goToHref(this.urls.log_out)
+                this.goToHref(this.urls.logout)
             }
             else if(item.title=="My Courses"){
                 this.goToHref(this.urls.my_courses)

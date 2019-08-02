@@ -32,7 +32,7 @@
                     <v-spacer></v-spacer>
                 </v-layout>
                 <v-layout wrap>
-                    <v-flex  xs12 sm12 md4 lg4 xl4>
+                    <v-flex xs12 sm12 md4 lg4 xl4>
                         <v-card>
                             <v-card-title>Trash Can</v-card-title>
                             <v-card-text>
@@ -56,25 +56,82 @@
                             <v-card-actions></v-card-actions>
                         </v-card>
                     </v-flex>
+                    <v-flex child-flex d-flex xs12 sm12 md8 lg8 xl8>
+                        <v-card
+                            :loading="!recommendation_loaded">
+                            <v-card-title>Recommendations</v-card-title>
+                            <v-card-text>
+                                <v-layout row wrap>
+                                    <v-flex xs6 sm6 md4 lg4 xl4 d-flex>
+                                        <v-select
+                                            v-model="year"
+                                            :items="year_options"
+                                            label="Year"
+                                            hide-details
+                                            :menu-props="{ offsetY: true }"
+                                            outlined>
+                                        </v-select>
+                                    </v-flex>
+                                    <v-flex xs6 sm6 md4 lg4 xl4 d-flex>
+                                        <v-select
+                                            v-model="semester"
+                                            :items="semester_options"
+                                            label="Semester"
+                                            hide-details
+                                            :menu-props="{ offsetY: true }"
+                                            outlined>
+                                        </v-select>
+                                    </v-flex>
+                                    <v-flex xs12 sm12 md4 lg4 xl4 d-flex>
+                                        <v-select
+                                            v-model="major"
+                                            :items="major_options"
+                                            label="Major"
+                                            hide-details
+                                            :menu-props="{ offsetY: true }"
+                                            outlined>
+                                        </v-select>
+                                    </v-flex>
+                                </v-layout>
+                                    <!-- <v-layout 
+                                        v-if="!recommendation_loaded"
+                                        align-center
+                                        justify-center>
+                                        <div class="text-center">
+                                            <v-progress-circular
+                                            :size="60"
+                                            :width="6"
+                                            indeterminate
+                                            color="teal lighten-1">
+                                            </v-progress-circular>
+                                        </div>
+                                    </v-layout> -->
+                                    <div class="recommendation-div"
+                                        v-if="recommendation_loaded">
+                                        <v-list-item
+                                            style="width:100%;"
+                                            :key="index_course + '-rcm-course' " 
+                                            v-for="(course, index_course) in rcm_courses"
+                                            :href="'/courses/'+ course.course_pk + '/' ">
+                                            <v-list-item-avatar
+                                                color="orange lighten-2">
+                                                <span style="color:#fff;">{{index_course + 1}}</span>
+                                            </v-list-item-avatar>
+                                            <v-list-item-content two-line>
+                                                <v-list-item-title>{{course.mnemonic}}{{course.number}} {{course.title}}</v-list-item-title>
+                                                <v-list-item-subtitle>Taken: {{ course.taken }}</v-list-item-subtitle>
+                                            </v-list-item-content>
+                                        </v-list-item>
+                                    </div>
+                            </v-card-text>
+                        </v-card>
+                    </v-flex>
                     <template v-for="i in ['Taking', 'Taken']">
-                        <v-flex child-flex d-flex :key="i + '-taking-taken' " xs12 sm6 md4 lg4 xl4>
-                            <v-card>
+                        <v-flex child-flex d-flex :key="i + '-taking-taken' " xs12 sm6 md6 lg6 xl6>
+                            <v-card 
+                                :loading="!loaded[i]">
                                 <v-card-title>Top 10 {{i}} Courses</v-card-title>
                                 <v-card-text>
-                                    <v-container fluid fill-height v-if="!loaded[i]">
-                                        <v-layout 
-                                            align-center
-                                            justify-center>
-                                            <div class="text-center">
-                                                <v-progress-circular
-                                                :size="60"
-                                                :width="6"
-                                                indeterminate
-                                                color="teal lighten-1">
-                                                </v-progress-circular>
-                                            </div>
-                                        </v-layout>
-                                    </v-container>
                                     <v-list v-if="loaded[i]">
                                         <v-list-item
                                             style="width:100%;"
@@ -95,71 +152,6 @@
                             </v-card>
                         </v-flex>
                     </template>
-                    <v-flex child-flex d-flex xs12 sm12 md12 lg12 xl12>
-                        <v-card min-height="65vh">
-                            <v-card-title>Recommendations</v-card-title>
-                            <v-card-text>
-                                <v-layout row wrap>
-                                    <v-flex d-flex>
-                                        <v-select
-                                            v-model="year"
-                                            :items="year_options"
-                                            label="Year"
-                                            :menu-props="{ offsetY: true }"
-                                            outlined>
-                                        </v-select>
-                                    </v-flex>
-                                    <v-flex d-flex>
-                                        <v-select
-                                            v-model="semester"
-                                            :items="semester_options"
-                                            label="Semester"
-                                            :menu-props="{ offsetY: true }"
-                                            outlined>
-                                        </v-select>
-                                    </v-flex>
-                                    <v-flex d-flex>
-                                        <v-select
-                                            v-model="major"
-                                            :items="major_options"
-                                            label="Major"
-                                            :menu-props="{ offsetY: true }"
-                                            outlined>
-                                        </v-select>
-                                    </v-flex>
-                                </v-layout>
-                                    <v-layout 
-                                        v-if="!recommendation_loaded"
-                                        align-center
-                                        justify-center>
-                                        <div class="text-center">
-                                            <v-progress-circular
-                                            :size="60"
-                                            :width="6"
-                                            indeterminate
-                                            color="teal lighten-1">
-                                            </v-progress-circular>
-                                        </div>
-                                    </v-layout>
-                                    <v-list v-if="recommendation_loaded">
-                                        <v-list-item
-                                            style="width:100%;"
-                                            :key="index_course + '-rcm-course' " 
-                                            v-for="(course, index_course) in rcm_courses"
-                                            :href="'/courses/'+ course.course_pk + '/' ">
-                                            <v-list-item-avatar
-                                                color="orange lighten-2">
-                                                <span style="color:#fff;">{{index_course + 1}}</span>
-                                            </v-list-item-avatar>
-                                            <v-list-item-content two-line>
-                                                <v-list-item-title>{{course.mnemonic}}{{course.number}} {{course.title}}</v-list-item-title>
-                                                <v-list-item-subtitle>Taken: {{ course.taken }}</v-list-item-subtitle>
-                                            </v-list-item-content>
-                                        </v-list-item>
-                                    </v-list>
-                            </v-card-text>
-                        </v-card>
-                    </v-flex>
                 </v-layout>
             </v-container>
         </v-content>
@@ -231,6 +223,12 @@ import CustomHeader from '../components/CustomHeader'
                     "title":"My Courses",
                     "icon":"fas fa-user-circle",
                     "href":"",
+                    "target":"",
+                },
+                {
+                    "title":"My Reviews",
+                    "icon":"fas fa-book",
+                    "href":"/",
                     "target":"",
                 },
                 {
@@ -351,7 +349,7 @@ import CustomHeader from '../components/CustomHeader'
         getPlannableURL(){
             // var preHref = "localhost:8080"
             var preHref = "https://plannable.gitee.io"
-            this.trash_items[2].href = preHref + "/?courses=" + this.plannableURL + "&username=[" + this.username + "]&credential=[" + this.credential + "]";
+            this.trash_items[3].href = preHref + "/?courses=" + this.plannableURL + "&username=[" + this.username + "]&credential=[" + this.credential + "]";
         },
 	},
 	mounted(){
@@ -365,6 +363,11 @@ import CustomHeader from '../components/CustomHeader'
 
 <style>
 
+    .recommendation-div{
+        overflow: scroll;
+        max-height: 248px;
+    }
+
 	.cus-headline-text{
 		font-family: "Roboto", sans-serif;
 		font-size: 2.1em;
@@ -375,6 +378,24 @@ import CustomHeader from '../components/CustomHeader'
 		line-height: 2.0;
 	}
 
-	
+    @media (min-width: 1025px) {
+        
+    }
+
+
+    @media (min-width: 768px) and (max-width: 1024px) {
+    }
+
+    @media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
+    }
+
+
+    @media (min-width: 10px) and (max-width: 767px) {
+        .recommendation-div{
+            overflow: scroll;
+            max-height: 300px;
+        }
+        
+    }
 
 </style>
