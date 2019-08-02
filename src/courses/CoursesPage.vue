@@ -228,7 +228,7 @@ import CustomHeader from '../components/CustomHeader'
                 {
                     "title":"My Reviews",
                     "icon":"fas fa-book",
-                    "href":"/",
+                    "href":"/courses/reviews/",
                     "target":"",
                 },
                 {

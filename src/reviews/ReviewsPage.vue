@@ -3,6 +3,62 @@
         <custom-header></custom-header>
         <v-content>
             <v-container fluid grid-list-lg>
+                <v-layout>
+                    <v-flex>
+                        <v-breadcrumbs class="cus-breadcrumbs" :items="navItems" divider=">"></v-breadcrumbs>
+                    </v-flex>
+                </v-layout>
+                <v-layout mb-3>
+                    <v-flex> 
+                        <div>
+                            <span class="cus-headline-text">My Reviews</span>
+                        </div>
+                    </v-flex>
+                    <v-spacer></v-spacer>
+                </v-layout>
+                <v-layout wrap>
+                    <v-flex d-flex child-flex xs12 sm12 md12 lg12 xl12>
+                        <v-layout row wrap v-if="reviews.length > 0">
+                            <v-flex 
+                                child-flex d-flex
+                                xs12 sm12 md6 lg6 xl6
+                                :key="index_review + '-review' " 
+                                v-for="(review, index_review) in reviews">
+                                <v-card>
+                                    <v-card-title>
+                                        {{review.course.mnemonic}}{{review.course.number}} {{review.course.title}}
+                                    </v-card-title>
+                                    <v-divider></v-divider>
+                                    <v-card-text>
+                                        <div class="review-text">
+                                            {{review.text}}
+                                        </div>
+                                    </v-card-text>
+                                    <v-card-actions>
+                                        <v-layout>
+                                            <v-spacer></v-spacer>
+                                        <div>
+                                            <v-chip
+                                                class="ma-1" color="teal lighten-2" label small text-color="white">
+                                                {{review.semester}}
+                                            </v-chip>
+                                            <v-chip
+                                                class="ma-1" color="teal lighten-2" label small text-color="white">
+                                                Course: {{ review.rating_course ? review.rating_course : 'N/A' }}
+                                            </v-chip>
+                                            <v-chip
+                                                class="ma-1" color="teal lighten-2" label small text-color="white">
+                                                Instructor: {{review.rating_instructor ? review.rating_instructor : 'N/A'}}
+                                            </v-chip>
+                                        </div>
+                                        </v-layout>
+                                    </v-card-actions>
+                                </v-card>
+                            </v-flex>
+                        </v-layout>
+                        <span v-else>You have no reviews.</span>
+                    </v-flex>
+                </v-layout>
             </v-container>
         </v-content>
     </v-app>
@@ -16,6 +72,7 @@ import CustomHeader from '../components/CustomHeader'
 	data() {
 	    return {
             navItems:[],
+            reviews:[],
 	    }
 	},
 	components:{
@@ -31,11 +88,9 @@ import CustomHeader from '../components/CustomHeader'
 		goToHref(text){
 			window.location.href = text;
         },
-        getMyCourses(){
-            axios.get('/courses/ajax/get_my_courses/',{params: {}}).then(response => {
-                this.taking_courses = response.data.taking_courses;
-                this.taken_courses = response.data.taken_courses;
-                this.taken_courses_semester = this.seperateSemesters(this.taken_courses);
+        getReviews(){
+            axios.get('/courses/ajax/get_reviews/',{params: {}}).then(response => {
+                this.reviews = response.data.reviews;
             });
         },
 	},
@@ -47,12 +102,12 @@ import CustomHeader from '../components/CustomHeader'
                 href: '/courses/',
             },
             {
-                text: "My Courses",
+                text: "My Reviews",
                 disabled: true,
                 href: '',
             },
         ];
-        this.getMyCourses();
+        this.getReviews();
 	},
   };
 </script>

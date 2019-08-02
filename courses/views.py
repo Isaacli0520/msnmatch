@@ -23,6 +23,7 @@ from users.models import MAJOR_CHOICES
 from users.views import custom_md5
 from users.models import PlanProfile
 from functools import cmp_to_key
+import time
 
 mnemonics = ['AAS', 'MATH', 'ANTH', 'SWAH', 'MDST', 'ARAD', 'ARAH', 'ARTH', 'ARTS',
 'ARAB', 'ARTR', 'HEBR', 'HIND', 'MESA', 'MEST', 'PERS', 'SANS', 'SAST', 'SATR', 'URDU', 'ASTR',
@@ -65,6 +66,10 @@ def departments(request):
 	return render(request, 'departments.html')
 
 @login_required
+def reviews(request):
+	return render(request, 'reviews.html')
+
+@login_required
 def instructor(request, instructor_number):
 	get_object_or_404(Instructor, pk=instructor_number)
 	return render(request, 'instructor.html')
@@ -76,10 +81,26 @@ def department(request, department_number):
 
 
 def get_reviews(request):
-	cs_users = CourseUser.objects.filter(user=request.user)
-	reviews = [cs_user for cs_user in cs_users if cs_user.text]
-	
+	cs_users = CourseUser.objects.filter(user=request.user, take="taken")
+	reviews_arr = [cs_user for cs_user in cs_users if cs_user.text]
+	return JsonResponse({
+		"reviews":[get_json_of_review(review) for review in reviews_arr]
+	})
 
+def get_json_of_review(review):
+	return {
+		"course":{
+			"mnemonic":review.course.mnemonic,
+			"number":review.course.number,
+			"title":review.course.title,
+			"course_pk":review.course.pk,
+		},
+		"semester":review.course_instructor.semester,
+		"text":review.text,
+		"rating_instructor":review.rating_instructor,
+		"rating_course":review.rating_course,
+		"course_instructor_pk":review.course_instructor.pk,
+	}
 
 def get_list_of_plannable_profiles(request):
 	username, credential = request.GET.get("username"), request.GET.get("credential")
@@ -405,26 +426,66 @@ def get_course_instructor(request):
 	return JsonResponse(get_detailed_json_of_course_instructor(course, instructor, request.user))
 
 def course_search_result(request):
-	score_cutoff = 85
+	# time_start = time.time()
+	# score_cutoff = 85
 	query = request.GET.get("query").strip()
-	time = request.GET.get("time")
-	if query.upper() in mnemonics:
-		field_queryset = Course.objects.filter(mnemonic = query.upper()).exclude(units="0")
-	else:
-		pk_queryset = {fq.pk:(str(getattr(fq, "mnemonic")) + str(getattr(fq,"number")) + " " + str(getattr(fq, "title")) ) for fq in Course.objects.exclude(units="0")}
-		if len(pk_queryset) > 0:
-			all_pks = process.extractBests(query, pk_queryset,scorer=fuzz.partial_ratio, score_cutoff=score_cutoff, limit=20)
-			all_pks = [item[2] for item in all_pks]
-			field_queryset = Course.objects.filter(pk__in=all_pks)
-		else:
-			field_queryset = None
+	query_time = request.GET.get("time")
+	field_queryset = course_retrieve(query)
+	# if query.upper() in mnemonics:
+	# 	field_queryset = Course.objects.filter(mnemonic = query.upper()).exclude(units="0")
+	# else:
+	# 	pk_queryset = {fq.pk:(str(getattr(fq, "mnemonic")) + str(getattr(fq,"number")) + " " + str(getattr(fq, "title")) ) for fq in Course.objects.exclude(units="0")}
+	# 	if len(pk_queryset) > 0:
+	# 		all_pks = process.extractBests(query, pk_queryset,scorer=fuzz.partial_ratio, score_cutoff=score_cutoff, limit=20)
+	# 		all_pks = [item[2] for item in all_pks]
+	# 		field_queryset = Course.objects.filter(pk__in=all_pks)
+	# 	else:
+	# 		field_queryset = None
+	# time_end = time.time()
+	# print("Time spent:", time_end - time_start)
 	return JsonResponse({
 		"course_result":get_json_of_courses(field_queryset),
-		"time":time,
+		"time":query_time,
 	})
 
+def course_retrieve(query):
+	query = query.strip().lower()
+
+	nums = re.findall(r'\d+', query)
+	strs = []
+	for s in re.findall(r'[^\d.]+', query):
+		strs += s.split()
+	strs = [s.strip() for s in strs]
+
+	# Extract the mnemonics from the non-num strings
+	tmp_mn = [strs[i] for i in range(len(strs)) if strs[i].upper() in mnemonics]
+	tmp_ix = [i for i in range(len(strs)) if strs[i].upper() in mnemonics]
+	new_strs = [strs[i] for i in range(len(strs)) if i not in tmp_ix]
+
+	# Get the extracted queries of mnemonics, nums, and other non-num strings
+	query_string_mn = " ".join(tmp_mn)
+	query_string_str = " ".join([s.strip() for s in new_strs])
+	query_string_num = nums[0] if len(nums) > 0 else ""
+
+	# print(query, "----", query_string_mn, "----", query_string_num, "----",query_string_str, "----")
+
+	exact_query = Course.objects.filter(mnemonic=query_string_mn, number=query_string_num)
+
+	if query.upper() in mnemonics:
+		return [course for course in Course.objects.filter(mnemonic=query.upper()).exclude(units="0")]
+	elif exact_query.first() != None:
+		return [course for course in exact_query.exclude(units="0")]
+	else:
+		tmp_queryset = Course.objects.exclude(units="0").annotate(
+			similarity_prefix=TrigramSimilarity('mnemonic',query_string_mn),
+			similarity_number=TrigramSimilarity('number',query_string_num),
+			similarity_name=TrigramSimilarity('title', query_string_str)).filter(Q(similarity_prefix__gt=0.25)|Q(similarity_number__gt=0.23)|Q(similarity_name__gt=0.15))
+		retrieved_courses = sorted(tmp_queryset, key=lambda c: (-c.similarity_prefix,-c.similarity_number, -c.similarity_name,c.mnemonic,c.number))
+		retrieved_courses = retrieved_courses[:20]
+		return retrieved_courses
+
 def get_json_of_courses(queryset):
-	if queryset != None and queryset.first() != None:
+	if len(queryset) > 0:
 		return [get_json_of_course(cs) for cs in queryset]
 	else:
 		return []

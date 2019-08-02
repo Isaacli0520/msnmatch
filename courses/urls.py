@@ -5,6 +5,7 @@ from django.contrib.auth import logout, login
 urlpatterns = [
   path('', views.courses, name='courses'),
   path('departments/', views.departments, name="departments"),
+  path('reviews/', views.reviews, name="reviews"),
   path('instructors/<instructor_number>/', views.instructor, name="instructor"),
   path('<course_number>/', views.course, name='course'),
   path('departments/<department_number>/', views.department, name="department"),
