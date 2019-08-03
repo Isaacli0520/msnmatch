@@ -132,7 +132,7 @@
                 </v-flex>
             </v-layout>
             <v-layout> <!-- Review Div Title -->
-                <v-flex align-self-center class="instructor-name">
+                <v-flex justify-center align-self-center class="instructor-name">
                         <span class="review-title">Reviews</span>
                         <v-btn @click="reviewDialog = true;" color="teal darken-3" fab large dark>
                             <v-icon>edit</v-icon>
@@ -237,8 +237,8 @@
                 <v-btn color="blue darken-1" text @click="submitReview()">Submit</v-btn>
             </v-card-actions>
         </v-card>
-      </v-dialog>
-  </v-app>
+    </v-dialog>
+    </v-app>
 </template>
 
 <script>

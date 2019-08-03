@@ -127,7 +127,7 @@
                         </v-card>
                     </v-flex>
                     <template v-for="i in ['Taking', 'Taken']">
-                        <v-flex child-flex d-flex :key="i + '-taking-taken' " xs12 sm6 md6 lg6 xl6>
+                        <v-flex child-flex d-flex :key="i + '-taking-taken' " xs12 sm4 md4 lg4 xl4>
                             <v-card 
                                 :loading="!loaded[i]">
                                 <v-card-title>Top 10 {{i}} Courses</v-card-title>
@@ -152,6 +152,30 @@
                             </v-card>
                         </v-flex>
                     </template>
+                    <v-flex child-flex d-flex xs12 sm4 md4 lg4 xl4>
+                        <v-card 
+                            :loading="!review_user_load">
+                            <v-card-title>Top 10 Review Users</v-card-title>
+                            <v-card-text>
+                                <v-list v-if="review_user_load">
+                                    <v-list-item
+                                        style="width:100%;"
+                                        :key="index_review + '-review_user' " 
+                                        v-for="(user, index_review) in review_users"
+                                        :href="'/users/'+ user.pk + '/' ">
+                                        <v-list-item-avatar
+                                            color="orange lighten-2">
+                                            <span style="color:#fff;">{{index_review + 1}}</span>
+                                        </v-list-item-avatar>
+                                        <v-list-item-content two-line>
+                                            <v-list-item-title>{{user.name}}</v-list-item-title>
+                                            <v-list-item-subtitle>Reviews: {{user.reviews}}</v-list-item-subtitle>
+                                        </v-list-item-content>
+                                    </v-list-item>
+                                </v-list>
+                            </v-card-text>
+                        </v-card>
+                    </v-flex>
                 </v-layout>
             </v-container>
         </v-content>
@@ -165,6 +189,8 @@ import CustomHeader from '../components/CustomHeader'
   export default {
 	data() {
 	    return {
+            review_users:[],
+            review_user_load:false,
             recommendation_loaded:false,
             loaded:{
                 "Taken":false,
@@ -313,6 +339,13 @@ import CustomHeader from '../components/CustomHeader'
                 this.loaded["Taking"] = true;
             });
         },
+        getReviewUsers(){
+            this.review_user_load = false;
+            axios.get('/courses/ajax/get_top_review_users/',{params: {}}).then(response => {
+                this.review_users = response.data.review_users;
+                this.review_user_load = true;
+            });
+        },
         getRecommendations(){
             axios.get('/courses/ajax/get_recommendations/',{params: {year:this.year, semester:this.semester, major:this.major}}).then(response => {
                 this.rcm_courses = response.data.rcm_courses;
@@ -322,12 +355,9 @@ import CustomHeader from '../components/CustomHeader'
         getMajorOptions(){
             axios.get('/courses/ajax/get_major_options/',{params: {}}).then(response => {
                 this.major_options = response.data.major_options;
-                if(response.data.major == ""){
-                    this.major = this.major_options[0].value;
-                }
-                else{
-                    this.major = response.data.major;
-                }
+                this.major = response.data.major == "" ? this.major_options[0].value : response.data.major;
+                this.semester = response.data.semester == "" ? this.semester_options[0].value : response.data.semester;
+                this.year = response.data.year == 0 ? this.year_options[0].value : response.data.year;
                 this.getRecommendations();
             });
         },
@@ -357,6 +387,7 @@ import CustomHeader from '../components/CustomHeader'
         this.getTrendingCourses();
         this.getMajorOptions();
         this.getTakingCourses();
+        this.getReviewUsers();
 	},
   };
 </script>

@@ -79,6 +79,35 @@ def department(request, department_number):
 	get_object_or_404(Department, pk=department_number)
 	return render(request, 'department.html')
 
+def get_top_review_users(request):
+	users = []
+	for user in User.objects.all():
+		users.append({
+			"pk":user.pk,
+			"name":user.first_name + " " + user.last_name,
+			"reviews":user.courseuser_set.annotate(length=Length("text")).filter(length__gt=0).count(),
+		})
+	users = sorted(users, key=lambda x:x["reviews"], reverse=True)[:10]
+	return JsonResponse({
+		"review_users":users,
+	})
+
+def get_course_instructors(request):
+	course_pk, instructor_pk = request.GET.get("course_pk"), request.GET.get("instructor_pk")
+	course = get_object_or_404(Course, pk=course_pk)
+	instructor = get_object_or_404(Instructor, pk=instructor_pk)
+
+	course_instructor_relations = []
+	course_instructor_query = CourseInstructor.objects.filter(course=course, instructor=instructor)
+	for course_instructor in course_instructor_query:
+		course_instructor_relations.append({
+			"course_instructor_pk":course_instructor.pk,
+			"semester":course_instructor.semester,
+			})
+
+	return JsonResponse({
+		"course_instructors":course_instructor_relations,
+	})
 
 def get_reviews(request):
 	cs_users = CourseUser.objects.filter(user=request.user, take="taken")
@@ -99,6 +128,7 @@ def get_json_of_review(review):
 		"text":review.text,
 		"rating_instructor":review.rating_instructor,
 		"rating_course":review.rating_course,
+		"instructor_pk":review.instructor.pk,
 		"course_instructor_pk":review.course_instructor.pk,
 	}
 
@@ -255,8 +285,12 @@ def get_recommendations(request):
 
 def get_major_options(request):
 	major = ""
+	semester = settings.CURRENT_SEMESTER[4:]
+	year = 0
 	if request.user.profile.major:
 		major = request.user.profile.major
+	if request.user.profile.graduate_year:
+		year = int(settings.CURRENT_YEAR) + 4 - int(request.user.profile.graduate_year)
 	majors = []
 	for item in MAJOR_CHOICES:
 		majors.append({
@@ -266,6 +300,8 @@ def get_major_options(request):
 	return JsonResponse({
 		"major_options":majors,
 		"major":major,
+		"year":year,
+		"semester":semester,
 	})
 
 def year_and_semester(ys):
@@ -430,7 +466,7 @@ def course_search_result(request):
 	# score_cutoff = 85
 	query = request.GET.get("query").strip()
 	query_time = request.GET.get("time")
-	field_queryset = course_retrieve(query)
+	field_queryset = course_and_instructor_retrieve(query)
 	# if query.upper() in mnemonics:
 	# 	field_queryset = Course.objects.filter(mnemonic = query.upper()).exclude(units="0")
 	# else:
@@ -444,11 +480,11 @@ def course_search_result(request):
 	# time_end = time.time()
 	# print("Time spent:", time_end - time_start)
 	return JsonResponse({
-		"course_result":get_json_of_courses(field_queryset),
+		"course_result":get_json_of_search_result(field_queryset),
 		"time":query_time,
 	})
 
-def course_retrieve(query):
+def course_and_instructor_retrieve(query):
 	query = query.strip().lower()
 
 	nums = re.findall(r'\d+', query)
@@ -469,20 +505,44 @@ def course_retrieve(query):
 
 	# print(query, "----", query_string_mn, "----", query_string_num, "----",query_string_str, "----")
 
-	exact_query = Course.objects.filter(mnemonic=query_string_mn, number=query_string_num)
+	exact_course_query = Course.objects.filter(mnemonic__iexact=query_string_mn, number__iexact=query_string_num)
+	
+	if len(query.split()) == 2:
+		tmp_a, tmp_b = query.split()[0], query.split()[1]
+		exact_instructor_query = Instructor.objects.filter(first_name__iexact = tmp_a, last_name__iexact = tmp_b) | Instructor.objects.filter(first_name__iexact = tmp_b, last_name__iexact = tmp_a)
+		print("first:",Instructor.objects.filter(first_name__iexact = tmp_a, last_name__iexact = tmp_b),"Second:", Instructor.objects.filter(first_name__iexact = tmp_b, last_name__iexact = tmp_a),"Third:", exact_instructor_query )
 
 	if query.upper() in mnemonics:
-		return [course for course in Course.objects.filter(mnemonic=query.upper()).exclude(units="0")]
-	elif exact_query.first() != None:
-		return [course for course in exact_query.exclude(units="0")]
+		return [(course, "course") for course in sorted(Course.objects.filter(mnemonic=query.upper()).exclude(units="0"), key=lambda c:(c.mnemonic, c.number))]
+	elif exact_course_query.first() != None:
+		return [(course, "course") for course in exact_course_query.exclude(units="0")]
+	elif len(query.split()) == 2 and exact_instructor_query.first() != None:
+		return [(tmp_instructor, "instructor") for tmp_instructor in exact_instructor_query]
 	else:
-		tmp_queryset = Course.objects.exclude(units="0").annotate(
+		tmp_course_queryset = Course.objects.exclude(units="0").annotate(
 			similarity_prefix=TrigramSimilarity('mnemonic',query_string_mn),
 			similarity_number=TrigramSimilarity('number',query_string_num),
-			similarity_name=TrigramSimilarity('title', query_string_str)).filter(Q(similarity_prefix__gt=0.25)|Q(similarity_number__gt=0.23)|Q(similarity_name__gt=0.15))
-		retrieved_courses = sorted(tmp_queryset, key=lambda c: (-c.similarity_prefix,-c.similarity_number, -c.similarity_name,c.mnemonic,c.number))
-		retrieved_courses = retrieved_courses[:20]
-		return retrieved_courses
+			similarity_name=TrigramSimilarity('title', query_string_str)).filter(Q(similarity_prefix__gt=0.25),Q(number__startswith=query_string_num)|Q(similarity_number__gt=0.25)|Q(similarity_name__gt=0.2))
+		retrieved_courses = sorted(tmp_course_queryset, key=lambda c: (-c.similarity_prefix,-c.similarity_number, -c.similarity_name,c.mnemonic,c.number))
+		retrieved_courses = [(tmp_r_c, "course") for tmp_r_c in retrieved_courses[:20]]
+
+		tmp_instructor_queryset = Instructor.objects.annotate(
+			similarity_first_name=TrigramSimilarity('first_name', query_string_str),
+			similarity_last_name=TrigramSimilarity('last_name', query_string_str),
+		).filter(Q(similarity_first_name__gt=0.35)|Q(similarity_last_name__gt=0.35))
+		retrieved_instructors = sorted(tmp_instructor_queryset, key=lambda c: (-c.similarity_first_name,-c.similarity_last_name))
+		retrieved_instructors = [(tmp_r_i, "instructor") for tmp_r_i in retrieved_instructors[:20]]
+		
+		return retrieved_courses + retrieved_instructors
+
+def get_json_of_search_result(queryset):
+	ret_arr = []
+	for query in queryset:
+		if query[1] == "instructor":
+			ret_arr.append(get_json_of_instructor(query[0]))
+		if query[1] == "course":
+			ret_arr.append(get_json_of_course(query[0]))
+	return ret_arr
 
 def get_json_of_courses(queryset):
 	if len(queryset) > 0:
@@ -518,6 +578,13 @@ def cmp_semester(a,b):
 def cmp_semester_key(a,b):
 	return cmp_semester(a["semester"], b["semester"])
 
+def get_json_of_instructor(instructor):
+	return {
+		"pk":instructor.pk,
+		"name": instructor.__str__(),
+		"type":"instructor",
+	}
+
 def get_json_of_course(course):
 	cs_instr_arr = [cs_instr.semester for cs_instr in CourseInstructor.objects.filter(course=course)]
 	cs_instr_arr = sorted(cs_instr_arr, key=cmp_to_key(cmp_semester))
@@ -530,6 +597,7 @@ def get_json_of_course(course):
 		"number":course.number,
 		"title":course.title,
 		"last_taught":last_taught,
+		"type":"course",
 	}
 
 def get_basic_info(request):

@@ -44,14 +44,14 @@
                     </v-flex>
                     <v-flex d-flex child-flex xs12 sm12 md6 lg6 xl6
                         :key="index_semester + '-semester-course' "
-                        v-for="(courses, semester, index_semester) in taken_courses_semester">
+                        v-for="(courses, index_semester) in taken_courses_semester">
                         <v-card>
-                            <v-card-title>{{semester}}</v-card-title>
+                            <v-card-title>{{courses.semester}}</v-card-title>
                             <v-card-text>
                                     <v-list
                                         style="width:100%;"
                                         :key="index_course + '-taken-course' " 
-                                        v-for="(course, index_course) in courses">
+                                        v-for="(course, index_course) in courses.courses">
                                         <v-list-item
                                             :href="'/courses/'+ course.course_pk + '/' ">
                                             <v-list-item-avatar
@@ -95,6 +95,25 @@ import CustomHeader from '../components/CustomHeader'
 	  
 	},
 	methods: {
+        sortBySemester(a, b){
+            if(a.substring(0,4) != b.substring(0,4)){
+                return b.substring(0,4).toString(10) - a.substring(0,4).toString(10);
+            }
+            else{
+                if(a.substring(4) == b.substring(4)){
+                    return 0;
+                }
+                else if(a.substring(4) == "Fall"){
+                    return -1;
+                }
+                else{
+                    return 1;
+                }
+            }
+        },
+        sortBySemesterKey(a,b){
+            return this.sortBySemester(a["semester"], b["semester"]);
+        },
 		goToHref(text){
 			window.location.href = text;
         },
@@ -109,11 +128,19 @@ import CustomHeader from '../components/CustomHeader'
             var tmp_taking_semester = {}
             for(let i = 0; i < courses.length; i++){
                 if(!(courses[i].semester in tmp_taking_semester)){
-                    tmp_taking_semester[courses[i].semester] = []
+                    tmp_taking_semester[courses[i].semester] = [];
                 }
-                tmp_taking_semester[courses[i].semester].push(courses[i])
+                tmp_taking_semester[courses[i].semester].push(courses[i]);
             }
-            return tmp_taking_semester
+            var ret_taking_courses = [];
+            for(let key in tmp_taking_semester){
+                ret_taking_courses.push({
+                    "semester":key,
+                    "courses":tmp_taking_semester[key]
+                });
+            }
+            ret_taking_courses = ret_taking_courses.sort(this.sortBySemesterKey);
+            return ret_taking_courses
         },
 	},
 	mounted(){
