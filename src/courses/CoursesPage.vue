@@ -93,35 +93,27 @@
                                         </v-select>
                                     </v-flex>
                                 </v-layout>
-                                    <!-- <v-layout 
-                                        v-if="!recommendation_loaded"
-                                        align-center
-                                        justify-center>
-                                        <div class="text-center">
-                                            <v-progress-circular
-                                            :size="60"
-                                            :width="6"
-                                            indeterminate
-                                            color="teal lighten-1">
-                                            </v-progress-circular>
-                                        </div>
-                                    </v-layout> -->
                                     <div class="recommendation-div"
                                         v-if="recommendation_loaded">
-                                        <v-list-item
-                                            style="width:100%;"
-                                            :key="index_course + '-rcm-course' " 
-                                            v-for="(course, index_course) in rcm_courses"
-                                            :href="'/courses/'+ course.course_pk + '/' ">
-                                            <v-list-item-avatar
-                                                color="orange lighten-2">
-                                                <span style="color:#fff;">{{index_course + 1}}</span>
-                                            </v-list-item-avatar>
-                                            <v-list-item-content two-line>
-                                                <v-list-item-title>{{course.mnemonic}}{{course.number}} {{course.title}}</v-list-item-title>
-                                                <v-list-item-subtitle>Taken: {{ course.taken }}</v-list-item-subtitle>
-                                            </v-list-item-content>
-                                        </v-list-item>
+                                        <template v-if="rcm_courses.length>0">
+                                            <v-list-item
+                                                style="width:100%;"
+                                                :key="index_course + '-rcm-course' " 
+                                                v-for="(course, index_course) in rcm_courses"
+                                                :href="'/courses/'+ course.course_pk + '/' ">
+                                                <v-list-item-avatar
+                                                    color="orange lighten-2">
+                                                    <span style="color:#fff;">{{index_course + 1}}</span>
+                                                </v-list-item-avatar>
+                                                <v-list-item-content two-line>
+                                                    <v-list-item-title>{{course.mnemonic}}{{course.number}} {{course.title}}</v-list-item-title>
+                                                    <v-list-item-subtitle>Taken: {{ course.taken }}</v-list-item-subtitle>
+                                                </v-list-item-content>
+                                            </v-list-item>
+                                        </template>
+                                        <div v-else>
+                                            Recommendations are not available for this setting.
+                                        </div>
                                     </div>
                             </v-card-text>
                         </v-card>
@@ -155,7 +147,7 @@
                     <v-flex child-flex d-flex xs12 sm4 md4 lg4 xl4>
                         <v-card 
                             :loading="!review_user_load">
-                            <v-card-title>Top 10 Review Users</v-card-title>
+                            <v-card-title>Top 10 Users</v-card-title>
                             <v-card-text>
                                 <v-list v-if="review_user_load">
                                     <v-list-item
@@ -164,7 +156,8 @@
                                         v-for="(user, index_review) in review_users"
                                         :href="'/users/'+ user.pk + '/' ">
                                         <v-list-item-avatar
-                                            color="orange lighten-2">
+                                            color="orange lighten-2"
+                                            >
                                             <span style="color:#fff;">{{index_review + 1}}</span>
                                         </v-list-item-avatar>
                                         <v-list-item-content two-line>

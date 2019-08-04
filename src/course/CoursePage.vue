@@ -49,54 +49,11 @@
                     </v-card>
                 </v-flex>
                 <v-flex xl5 lg5 md6 sm12 xs12 d-flex child-flex>
-                    <v-card>
-                        <v-card-title>Rating</v-card-title>
-                        <v-card-text>
-                            <v-layout row>
-                                <v-flex class="rating-div" xs5 sm5 md6 lg6 xl6>
-                                    <div class="rating-span">{{course.rating_course == 0 ? 'N/A' : course.rating_course }}</div>
-                                    <v-rating
-                                        v-model="course.rating_course"
-                                        color="yellow darken-3"
-                                        background-color="grey darken-1"
-                                        readonly
-                                        medium
-                                        half-increments>
-                                    </v-rating>
-                                </v-flex>
-                                <v-flex xs7 sm7 md6 lg6 xl6>
-                                    <div class="five-ratings-div" :key="rating_index + '-rating' " v-for="rating_index in 5">
-                                        <v-rating
-                                            v-model="rating_default[rating_index - 1]"
-                                            readonly
-                                            half-increments>
-                                            <template v-slot:item="props">
-                                                <v-icon
-                                                small
-                                                :color=" (props.index < rating_index - 1 ) ? 'white' : 'grey lighten-1' ">
-                                                mdi-star
-                                                </v-icon>
-                                            </template>
-                                        </v-rating>
-                                        <v-flex>
-                                        <v-progress-linear
-                                            rounded
-                                            color="yellow darken-3"
-                                            :value="100 * course.rating_course_counter[6 - rating_index]/rating_course_counter_sum">
-                                            </v-progress-linear>
-                                        </v-flex>
-                                    </div>
-                                </v-flex>
-                            </v-layout>
-                        </v-card-text>
-                        <v-divider></v-divider>
-                        <v-card-actions>
-                            <v-spacer></v-spacer>
-                            <div class="rating-action">
-                            {{course.taken}} students have taken this course
-                            </div>
-                        </v-card-actions>
-                    </v-card>
+                    <custom-rating
+                        :rating="course.rating_course"
+                        :actiontext="course.taken + ' students have taken this course' "
+                        :counter="course.rating_course_counter"
+                        ></custom-rating>
                 </v-flex>
             </v-layout>
             <v-layout wrap>
@@ -222,6 +179,7 @@
 <script>
 import axios from 'axios'
 import CustomHeader from '../components/CustomHeader'
+import CustomRating from '../components/CustomRating'
 axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 axios.defaults.xsrfCookieName = "csrftoken";
 
@@ -267,6 +225,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
     },
     components:{
         CustomHeader,
+        CustomRating,
     },
     watch: {
       
@@ -439,44 +398,6 @@ axios.defaults.xsrfCookieName = "csrftoken";
 </script>
 
 <style>
-
-    .rating-action{
-        color:rgb(145, 145, 145);
-        font-size:13px;
-    }
-
-    .v-progress-linear{
-        justify-content: center;
-        align-content: center;
-    }
-
-    .five-ratings-div{
-        display:flex;
-    }
-
-    .five-ratings-div > .v-rating > .v-icon{
-        padding: 1px;
-    }
-
-    .rating-div > .v-rating > .v-icon{
-        padding: 6px;
-    }
-
-    .rating-num-span{
-        font-size: 14px;
-    }
-
-    .rating-span{
-        font-size: 38px;
-        margin: 10px 0px 13px 0px;
-        line-height: 40px;
-        color: black;
-    }
-
-    .rating-div{
-        text-align: center;
-    }
-
     .instructor-name{
         font-family: "Roboto", sans-serif;
         font-size: 1.6em;
@@ -594,9 +515,6 @@ axios.defaults.xsrfCookieName = "csrftoken";
             font-size:11px !important;
         }
 
-        .rating-div > .v-rating > .v-icon{
-            padding: 2.0px;
-        }
 
         .cus-headline-number{
             font-size: 1.3em;

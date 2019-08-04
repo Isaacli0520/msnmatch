@@ -51,8 +51,8 @@
                                             {{review.text}}
                                         </div>
                                     </v-card-text>
-                                    <v-card-actions>
-                                        <v-layout>
+                                    <v-card-actions style="padding:4px !important;">
+                                        <v-layout style="margin:2px !important;">
                                             <v-spacer></v-spacer>
                                         <div>
                                             <v-chip
@@ -245,6 +245,12 @@ axios.defaults.xsrfCookieName = "csrftoken";
                         type: 'success'
                     });
                     this.getReviews();
+                }
+                else{
+                    this.$message({
+                        message: 'Sth is wrong baby~',
+                        type: 'error'
+                    });
                 }
             });
             this.reviewDialog = false;

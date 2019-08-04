@@ -18,19 +18,11 @@
                 </v-layout>
                 <v-layout>
                     <v-flex d-flex child-flex>
-                        <v-card>
-                            <v-card-title>Information</v-card-title>
-                            <v-card-text>
-                                <span>Rating: {{instructor.rating}}</span>
-                                <v-rating
-                                    color="yellow darken-3"
-                                    background-color="grey darken-1"
-                                    half-increments
-                                    v-model="instructor.rating"
-                                    readonly>
-                                </v-rating>
-                            </v-card-text>
-                        </v-card>
+                        <custom-rating
+                            :rating="instructor.rating"
+                            :counter="instructor.rating_counter"
+                            :actiontext=" instructor.rating_users_count + ' users have reviewed this instructor.' ">
+                        </custom-rating>
                     </v-flex>
                 </v-layout>
                 <v-layout row wrap>
@@ -92,10 +84,12 @@
 <script>
 import axios from 'axios'
 import CustomHeader from '../components/CustomHeader'
+import CustomRating from '../components/CustomRating'
 
   export default {
 	data() {
 	    return {
+            rating_default:[5,4,3,2,1],
             taking_courses:[],
             taken_courses:[],
             taken_courses_semester:[],
@@ -103,13 +97,15 @@ import CustomHeader from '../components/CustomHeader'
             instructor:{
                 name:"",
                 rating:0,
+                rating_counter:[],
                 courses:[],
             },
             courses:[],
 	    }
 	},
 	components:{
-	    CustomHeader,
+        CustomHeader,
+        CustomRating,
 	},
 	watch: {
 

@@ -57,33 +57,11 @@
                     </v-card>
                 </v-flex>
                 <v-flex lg4 md6 sm12 xs12 d-flex child-flex>
-                    <v-card>
-                        <v-card-title>Rating</v-card-title>
-                        <v-card-text>
-                            <v-flex class="rating-div">
-                                <span>Instructor: {{instructor.rating_instructor}}</span>
-                                <v-rating
-                                    v-model="instructor.rating_instructor"
-                                    readonly
-                                    medium
-                                    color="yellow darken-3"
-                                    background-color="grey darken-1"
-                                    half-increments>
-                                </v-rating>
-                            </v-flex>
-                            <v-flex class="rating-div">
-                                <span>Course: {{course.rating_course}}</span>
-                                <v-rating
-                                    v-model="course.rating_course"
-                                    color="yellow darken-3"
-                                    background-color="grey darken-1"
-                                    half-increments
-                                    readonly
-                                    medium>
-                                </v-rating>
-                            </v-flex>
-                        </v-card-text>
-                    </v-card>
+                    <custom-rating
+                        :rating="instructor.rating_instructor"
+                        :counter="instructor.rating_instructor_counter"
+                        :actiontext="instructor.rating_instructor_users_count + ' users have reviewed this instructor' ">
+                    </custom-rating>
                 </v-flex>
             </v-layout>
             <v-layout> <!-- Users Taking -->
@@ -244,6 +222,7 @@
 <script>
 import axios from 'axios'
 import CustomHeader from '../components/CustomHeader'
+import CustomRating from '../components/CustomRating'
 axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 axios.defaults.xsrfCookieName = "csrftoken";
 
@@ -330,6 +309,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
     },
     components:{
         CustomHeader,
+        CustomRating,
     },
     watch: {
       selected_course(val){

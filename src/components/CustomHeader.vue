@@ -90,7 +90,7 @@
       <template v-slot:item="{ item }">
         <v-list-item-content>
             <v-list-item-title mb-2>{{item.text}}</v-list-item-title>
-            <v-list-item-subtitle v-if="item.type=='course'">Last taught:{{item.last_taught}}</v-list-item-subtitle>
+            <v-list-item-subtitle v-if="item.last_taught.length > 0">Last taught:{{item.last_taught}}</v-list-item-subtitle>
         </v-list-item-content>  
       </template>
     </v-autocomplete>
@@ -236,7 +236,7 @@ export default{
                     return {text:course_name, value:entry.pk, last_taught:entry.last_taught, type:"course"};
                 }
                 else if(entry.type == "instructor"){
-                    return {text:entry.name, value:entry.pk,  last_taught:"", type:"instructor"};
+                    return {text:entry.name, value:entry.pk,  last_taught:entry.last_taught, type:"instructor"};
                 }
                 else{
                     console.log("Search Bar Error");
