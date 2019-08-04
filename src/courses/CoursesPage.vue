@@ -154,7 +154,7 @@
                                         style="width:100%;"
                                         :key="index_review + '-review_user' " 
                                         v-for="(user, index_review) in review_users"
-                                        :href="'/users/'+ user.pk + '/' ">
+                                        :href="'/users/'+ user.username + '/' ">
                                         <v-list-item-avatar
                                             color="orange lighten-2"
                                             >

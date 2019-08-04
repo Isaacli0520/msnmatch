@@ -86,6 +86,7 @@ def get_top_review_users(request):
 		if tmp_review > 0:
 			users.append({
 				"pk":user.pk,
+				"username":user.username,
 				"name":user.first_name + " " + user.last_name,
 				"reviews":tmp_review,
 			})
