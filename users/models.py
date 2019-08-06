@@ -153,6 +153,9 @@ class PlanProfile(models.Model):
 	content = models.TextField(null=True, blank=True)
 	user = models.ForeignKey(User, on_delete=models.CASCADE, default=get_user)
 
+	def __str__(self):
+		return self.user.first_name + " " + self.user.last_name + "----" + self.name
+
 class Profile(models.Model):
 	user = models.OneToOneField(User, on_delete=models.CASCADE)
 	sex = models.CharField(max_length=20, choices = SEX_CHOICES, blank=True)

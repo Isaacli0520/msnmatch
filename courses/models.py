@@ -29,7 +29,7 @@ class Course(models.Model):
   department = models.ForeignKey(Department, on_delete=models.CASCADE, default=get_department)
 
   def __str__(self):
-    return self.mnemonic + str(self.number)
+    return self.mnemonic + str(self.number) + str(self.title) + '--' + str(self.units)
 
 
 class CourseInstructor(models.Model):

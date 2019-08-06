@@ -79,6 +79,10 @@ def department(request, department_number):
 	get_object_or_404(Department, pk=department_number)
 	return render(request, 'department.html')
 
+@login_required
+def courses_admin(request):
+	return render(request, 'courses_admin.html')
+
 def get_top_review_users(request):
 	users = []
 	for user in User.objects.all():
@@ -150,27 +154,6 @@ def get_list_of_plannable_profiles(request):
 		"profiles":ret_profiles,
 	})
 
-@csrf_exempt
-def get_plannable_profile(request):
-	ret_profile = []
-	if request.method == "POST":
-		post = json.loads(request.body)
-		username, credential= post["username"][1:-1], post["credential"][1:-1]
-		print("lalalala", "username:", username, "credential:", credential)
-		user = get_object_or_404(User, username=username)
-		if credential == custom_md5(settings.SECRET_KEY + user.username, settings.SECRET_KEY):
-			if "name" in post:
-				profile = PlanProfile.objects.filter(name=post["name"], user=user).first()
-				if profile != None:
-					ret_profile.append(profile.content)
-			else:
-				profiles = PlanProfile.objects.filter(user=user)
-				for profile in profiles:
-					ret_profile.append(profile.content)
-	return JsonResponse(
-		ret_profile, safe=False
-	)
-
 def get_instructor(request):
 	instructor_pk = request.GET.get("instructor_pk")
 	instructor = get_object_or_404(Instructor, pk=instructor_pk)
@@ -228,6 +211,52 @@ def get_credential(request):
 		"credential":request.user.profile.credential,
 		"username":request.user.username,
 	})
+
+@csrf_exempt
+def edit_plannable_profile(request):
+	success = False
+	if request.method == "POST":
+		print("post")
+		post = json.loads(request.body)
+		username, credential= post["username"][1:-1], post["credential"][1:-1]
+		action = post["action"]
+		user = get_object_or_404(User, username=username)
+		if credential == custom_md5(settings.SECRET_KEY + user.username, settings.SECRET_KEY):
+			if action == "rename":
+				oldName, newName = post["oldName"], post["newName"]
+				tmp_profile = get_object_or_404(PlanProfile, user=user ,name=oldName)
+				tmp_profile.name = newName
+				tmp_profile.save()
+				success = True
+			elif action == "delete":
+				print("delete")
+				tmp_name = post["name"]
+				tmp_profile = get_object_or_404(PlanProfile, user=user ,name=tmp_name)
+				tmp_profile.delete()
+				success = True
+	return JsonResponse({
+		"success":success,
+	})
+
+@csrf_exempt
+def get_plannable_profile(request):
+	ret_profile = []
+	if request.method == "POST":
+		post = json.loads(request.body)
+		username, credential= post["username"][1:-1], post["credential"][1:-1]
+		user = get_object_or_404(User, username=username)
+		if credential == custom_md5(settings.SECRET_KEY + user.username, settings.SECRET_KEY):
+			if "name" in post:
+				profile = PlanProfile.objects.filter(name=post["name"], user=user).first()
+				if profile != None:
+					ret_profile.append(profile.content)
+			else:
+				profiles = PlanProfile.objects.filter(user=user)
+				for profile in profiles:
+					ret_profile.append(profile.content)
+	return JsonResponse(
+		ret_profile, safe=False
+	)
 
 @csrf_exempt
 def save_plannable_profile(request):

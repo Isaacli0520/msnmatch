@@ -17,6 +17,7 @@ from groups.models import Group
 from users.views import custom_md5
 from msnmatch import settings
 
+
 class SkillRelationInline(admin.TabularInline):
     model = Skill.skill_users.through
 
@@ -151,7 +152,9 @@ class CustomUserAdmin(UserAdmin):
             return list()
         return super(CustomUserAdmin, self).get_inline_instances(request, obj)
 
-
+class PlanProfileAdmin(admin.ModelAdmin):
+    list_display = ('name',)
 
 admin.site.unregister(User)
 admin.site.register(User, CustomUserAdmin)
+admin.site.register(PlanProfile, PlanProfileAdmin)
