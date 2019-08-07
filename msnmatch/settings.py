@@ -14,6 +14,7 @@ import django_heroku
 import os
 import psycopg2
 import dj_database_url
+import sys
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -24,6 +25,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'f@hcb!l&kpn_4u+iz)6j4w(5j4$b2!)-=*j(9&(x_0a-j8o6)5'
+
+LOGGING = { 'version': 1, 'disable_existing_loggers': False, 'handlers': { 'console': { 'level': 'DEBUG', 'class': 'logging.StreamHandler', 'stream': sys.stdout, }, }, 'loggers': { 'django': { 'level': 'DEBUG', 'handlers': ['console'], 'propagate': True, }, }, }
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
@@ -196,7 +199,7 @@ AWS_S3_OBJECT_PARAMETERS = {
 # STATICFILES_STORAGE = 'msnmatch.storage_backends.StaticStorage'
 DEFAULT_FILE_STORAGE = 'msnmatch.storage_backends.MediaStorage' 
 
-STATIC_HOST = 'https://d1ixiphwkdejqh.cloudfront.net' # if not DEBUG else ''
+STATIC_HOST = 'https://d1ixiphwkdejqh.cloudfront.net' if not DEBUG else ''
 # STATIC_HOST = ''
 STATIC_URL = STATIC_HOST + '/static/'
 
