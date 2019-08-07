@@ -31,7 +31,8 @@ LOGGING = { 'version': 1, 'disable_existing_loggers': False, 'handlers': { 'cons
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['msn-match-test.herokuapp.com', 'match.msnatuva.org','localhost']
+# ALLOWED_HOSTS = ['msn-match-test.herokuapp.com', 'match.msnatuva.org','localhost']
+ALLOWED_HOSTS = ['*']
 
 BUILD_VERSION = "msnmatch-1.0601"
 
