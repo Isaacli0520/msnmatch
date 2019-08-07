@@ -26,8 +26,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'f@hcb!l&kpn_4u+iz)6j4w(5j4$b2!)-=*j(9&(x_0a-j8o6)5'
 
-LOGGING = { 'version': 1, 'disable_existing_loggers': False, 'handlers': { 'console': { 'level': 'DEBUG', 'class': 'logging.StreamHandler', 'stream': sys.stdout, }, }, 'loggers': { 'django': { 'level': 'DEBUG', 'handlers': ['console'], 'propagate': True, }, }, }
-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
@@ -36,7 +34,7 @@ ALLOWED_HOSTS = []
 
 DEBUG_PROPAGATE_EXCEPTIONS = True
 
-BUILD_VERSION = "msnmatch-1.0601"
+BUILD_VERSION = "msnmatch-alpha-0.2"
 
 CURRENT_YEAR = 2020
 CURRENT_SEMESTER = "2019Fall"
