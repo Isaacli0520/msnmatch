@@ -363,7 +363,6 @@ import CustomHeader from '../components/CustomHeader'
             axios.get('/courses/ajax/get_credential/',{params: {}}).then(response => {
                 this.credential = response.data.credential;
                 this.username = response.data.username;
-                console.log("credential", this.credential);
             }).catch( err => {
                 this.credential = "";
                 this.username = "";

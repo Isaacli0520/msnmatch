@@ -196,8 +196,8 @@ AWS_S3_OBJECT_PARAMETERS = {
 # STATICFILES_STORAGE = 'msnmatch.storage_backends.StaticStorage'
 DEFAULT_FILE_STORAGE = 'msnmatch.storage_backends.MediaStorage' 
 
-# STATIC_HOST = 'https://d1ixiphwkdejqh.cloudfront.net' if not DEBUG else ''
-STATIC_HOST = ''
+STATIC_HOST = 'https://d1ixiphwkdejqh.cloudfront.net' # if not DEBUG else ''
+# STATIC_HOST = ''
 STATIC_URL = STATIC_HOST + '/static/'
 
 
