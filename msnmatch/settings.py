@@ -34,7 +34,7 @@ ALLOWED_HOSTS = []
 
 DEBUG_PROPAGATE_EXCEPTIONS = True
 
-BUILD_VERSION = "msnmatch-alpha-0.204"
+BUILD_VERSION = "msnmatch-alpha-0.205"
 
 CURRENT_YEAR = 2020
 CURRENT_SEMESTER = "2019Fall"
@@ -207,7 +207,7 @@ STATIC_URL = STATIC_HOST + '/static/'
 
 # STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-# STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # STATICFILES_STORAGE = "mssnmatch.storage_backends.WhiteNoiseStaticFilesStorage"
 
 STATICFILES_DIRS = [
