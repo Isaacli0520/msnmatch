@@ -208,7 +208,7 @@ STATIC_URL = STATIC_HOST + '/static/'
 # STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 # STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-STATICFILES_STORAGE = "msnmatch.storage_backends.WhiteNoiseStaticFilesStorage"
+# STATICFILES_STORAGE = "msnmatch.storage_backends.WhiteNoiseStaticFilesStorage"
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'src/assets/static'),
