@@ -34,7 +34,7 @@ ALLOWED_HOSTS = []
 
 DEBUG_PROPAGATE_EXCEPTIONS = True
 
-BUILD_VERSION = "msnmatch-alpha-0.205"
+BUILD_VERSION = "msnmatch-alpha-0.206"
 
 CURRENT_YEAR = 2020
 CURRENT_SEMESTER = "2019Fall"
@@ -193,22 +193,21 @@ AWS_S3_OBJECT_PARAMETERS = {
 
 
 # STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-# AWS_LOCATION = 'static'
+AWS_LOCATION = 'static'
 
 # STATIC_URL = 'https://' + AWS_S3_CUSTOM_DOMAIN + '/' + AWS_LOCATION + '/'
-# STATIC_URL = 'https://' + AWS_CLOUDFRONT_DOMAIN + '/' + BUILD_VERSION + '/' + AWS_LOCATION + '/'
+STATIC_URL = 'https://' + AWS_CLOUDFRONT_DOMAIN + '/' + BUILD_VERSION + '/' + AWS_LOCATION + '/'
 # STATICFILES_STORAGE = 'msnmatch.storage_backends.StaticStorage'
 DEFAULT_FILE_STORAGE = 'msnmatch.storage_backends.MediaStorage' 
 
 STATIC_HOST = 'https://d1ixiphwkdejqh.cloudfront.net' # if not DEBUG else ''
-# STATIC_HOST = ''
-STATIC_URL = STATIC_HOST + '/static/'
+# STATIC_URL = STATIC_HOST + '/static/'
 
 
 # STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 # STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-STATICFILES_STORAGE = "msnmatch.storage_backends.WhiteNoiseStaticFilesStorage"
+# STATICFILES_STORAGE = "msnmatch.storage_backends.WhiteNoiseStaticFilesStorage"
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'src/assets/static'),
