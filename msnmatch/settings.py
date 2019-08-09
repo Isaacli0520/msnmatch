@@ -197,10 +197,10 @@ AWS_LOCATION = 'static'
 
 # STATIC_URL = 'https://' + AWS_S3_CUSTOM_DOMAIN + '/' + AWS_LOCATION + '/'
 STATIC_URL = 'https://' + AWS_CLOUDFRONT_DOMAIN + '/' + BUILD_VERSION + '/' + AWS_LOCATION + '/'
-# STATICFILES_STORAGE = 'msnmatch.storage_backends.StaticStorage'
+STATICFILES_STORAGE = 'msnmatch.storage_backends.StaticStorage'
 DEFAULT_FILE_STORAGE = 'msnmatch.storage_backends.MediaStorage' 
 
-STATIC_HOST = 'https://d1ixiphwkdejqh.cloudfront.net' # if not DEBUG else ''
+# STATIC_HOST = 'https://d1ixiphwkdejqh.cloudfront.net' # if not DEBUG else ''
 # STATIC_URL = STATIC_HOST + '/static/'
 
 
