@@ -69,11 +69,6 @@ module.exports = {
           template: 'templates/course.html',
           filename: 'course.html',
         },
-        coursesadminpage: {
-          entry: 'src/coursesadmin/main.js',
-          template: 'templates/courses_admin.html',
-          filename: 'courses_admin.html',
-        },
         departmentpage: {
           entry: 'src/department/main.js',
           template: 'templates/department.html',
