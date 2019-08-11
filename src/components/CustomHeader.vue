@@ -85,8 +85,7 @@
       hide-selected
       hide-details
       placeholder="Search for Courses/Instructors"
-      return-object
-    >
+      return-object>
       <template v-slot:item="{ item }">
         <v-list-item-content>
             <v-list-item-title mb-2>{{item.text}}</v-list-item-title>
@@ -125,9 +124,6 @@
 
 <script>
 import axios from 'axios'
-// import Vue from 'vue'
-// import Vuetify from 'vuetify/lib'
-// Vue.use(Vuetify);
 
 export default{
     data: function () {

@@ -2,11 +2,9 @@ import Vue from 'vue'
 import CoursesPage from './CoursesPage.vue'
 import Vuetify from 'vuetify/lib'
 
-Vue.use(Vuetify);
+const vuetifyOptions = { }
 
-const vuetifyOptions = { 
-  
-}
+Vue.use(Vuetify);
 
 new Vue({
   render: h => h(CoursesPage),

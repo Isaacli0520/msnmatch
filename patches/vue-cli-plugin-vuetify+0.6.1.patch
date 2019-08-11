@@ -1,0 +1,73 @@
+diff --git a/node_modules/vue-cli-plugin-vuetify/index.js b/node_modules/vue-cli-plugin-vuetify/index.js
+index a580fd6..5639df9 100644
+--- a/node_modules/vue-cli-plugin-vuetify/index.js
++++ b/node_modules/vue-cli-plugin-vuetify/index.js
+@@ -4,7 +4,7 @@ function resolve (dir) {
+   return path.join(__dirname, '..', dir)
+ }
+ 
+-module.exports = (api) => {
++module.exports = (api, opts) => {
+   const hasVuetifyLoader = Boolean(
+     api.service.pkg.devDependencies['vuetify-loader'] ||
+     api.service.pkg.dependencies['vuetify-loader']
+diff --git a/node_modules/vue-cli-plugin-vuetify/index.js~ b/node_modules/vue-cli-plugin-vuetify/index.js~
+new file mode 100644
+index 0000000..a580fd6
+--- /dev/null
++++ b/node_modules/vue-cli-plugin-vuetify/index.js~
+@@ -0,0 +1,54 @@
++const path = require('path')
++
++function resolve (dir) {
++  return path.join(__dirname, '..', dir)
++}
++
++module.exports = (api) => {
++  const hasVuetifyLoader = Boolean(
++    api.service.pkg.devDependencies['vuetify-loader'] ||
++    api.service.pkg.dependencies['vuetify-loader']
++  )
++
++  if (hasVuetifyLoader) {
++    const VuetifyLoaderPlugin = require('vuetify-loader/lib/plugin')
++
++    // As the vuetify-loader automatically imports the necessary Vuetify components they are not found and
++    // transpiled by Babel. Add Vuetify explicitly as a module to be transpiled.
++    if (opts.transpileDependencies.indexOf('vuetify') === -1) {
++      api.chainWebpack(config => {
++        config.module
++          .rule('js')
++            .test(/\.m?jsx?$/)
++            .include
++            .add(resolve('vuetify'))
++            .end()
++      })
++    }
++
++    api.chainWebpack(config => {
++      config.plugin('VuetifyLoaderPlugin')
++        .use(VuetifyLoaderPlugin)
++    })
++  }
++
++  // Resolve asset references from components
++  api.chainWebpack(config => {
++    config.module
++      .rule('vue')
++      .use('vue-loader')
++      .tap(options => ({
++        ...options,
++        transformAssetUrls: {
++          // v-app-bar extends v-toolbar
++          'v-app-bar': 'src',
++          // v-carousel-item extends v-img
++          'v-carousel-item': ['src', 'lazy-src'],
++          'v-img': ['src', 'lazy-src'],
++          'v-navigation-drawer': 'src',
++          'v-parallax': 'src',
++          'v-toolbar': 'src',
++        },
++      }))
++  })
++}

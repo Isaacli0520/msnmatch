@@ -3,12 +3,10 @@ import InstructorPage from './InstructorPage.vue'
 import Vuetify from 'vuetify/lib'
 import {Message} from 'element-ui'
 
+const vuetifyOptions = { }
+
 Vue.use(Vuetify);
 Vue.prototype.$message = Message;
-
-const vuetifyOptions = { 
-  
-}
 
 Vue.config.productionTip = false
 

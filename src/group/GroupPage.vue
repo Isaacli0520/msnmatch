@@ -55,7 +55,7 @@ import Vue from 'vue'
 import VueProgressiveImage from 'vue-progressive-image'
 import axios from 'axios'
 
-Vue.use(VueProgressiveImage)
+Vue.use(VueProgressiveImage, {})
 
 export default {
     data: function(){

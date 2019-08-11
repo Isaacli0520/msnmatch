@@ -6,7 +6,7 @@ module.exports = {
     publicPath: IS_PRODUCTION ? 'https://d1ixiphwkdejqh.cloudfront.net/static/' : 'http://127.0.0.1:8080/',
     outputDir: 'dist',
     // assetsDir: 'static',
-
+    transpileDependencies: ['vuetify'],
     pages: {
         home: {
           // entry for the page
@@ -109,7 +109,7 @@ module.exports = {
     css: {
         loaderOptions: {
           sass: {
-            data: `@import "src/sass/main.scss"`,
+            data: `@import "~@/sass/main.scss"`,
           },
         },
       },
