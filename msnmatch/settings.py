@@ -200,8 +200,8 @@ AWS_LOCATION = 'static'
 # STATICFILES_STORAGE = 'msnmatch.storage_backends.StaticStorage'
 DEFAULT_FILE_STORAGE = 'msnmatch.storage_backends.MediaStorage' 
 
-# STATIC_HOST = 'https://d1ixiphwkdejqh.cloudfront.net' # if not DEBUG else ''
-# STATIC_URL = STATIC_HOST + '/static/'
+STATIC_HOST = 'https://d1ixiphwkdejqh.cloudfront.net' # if not DEBUG else ''
+STATIC_URL = STATIC_HOST + '/static/'
 
 
 # STATIC_URL = '/static/'
