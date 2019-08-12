@@ -371,7 +371,7 @@ import CustomHeader from '../components/CustomHeader'
         getPlannableURL(){
             // var preHref = "localhost:8080"
             var preHref = "https://plannable.gitee.io"
-            this.trash_items[3].href = preHref + "/?courses=" + this.plannableURL + "&username=[" + this.username + "]&credential=[" + this.credential + "]";
+            this.trash_items[3].href = preHref + "/?courses=" + this.plannableURL + "&username=" + this.username + "&credential=" + this.credential + "";
         },
 	},
 	mounted(){
