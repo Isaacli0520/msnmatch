@@ -3,7 +3,8 @@ const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 
 module.exports = {
     // publicPath: IS_PRODUCTION ? 'static' : 'http://127.0.0.1:8080/',
-    publicPath: IS_PRODUCTION ? 'https://d1ixiphwkdejqh.cloudfront.net/static/' : 'http://127.0.0.1:8080/',
+    // publicPath: IS_PRODUCTION ? 'https://d1ixiphwkdejqh.cloudfront.net/static/' : 'http://127.0.0.1:8080/',
+    publicPath: 'https://d1ixiphwkdejqh.cloudfront.net/static/',
     outputDir: 'dist',
     // assetsDir: 'static',
     transpileDependencies: ['vuetify'],
