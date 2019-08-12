@@ -1,2 +1,2 @@
 release: python manage.py migrate
-web: gunicorn msnmatch.wsgi --preload --timeout 60
+web: python manage.py collectstatic --no-input; gunicorn msnmatch.wsgi --preload --timeout 60
