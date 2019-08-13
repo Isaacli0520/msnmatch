@@ -29,12 +29,12 @@ SECRET_KEY = 'f@hcb!l&kpn_4u+iz)6j4w(5j4$b2!)-=*j(9&(x_0a-j8o6)5'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-SECURE_SSL_REDIRECT = True
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
+SECURE_SSL_REDIRECT = not DEBUG
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
 
 # ALLOWED_HOSTS = ['msn-match-test.herokuapp.com', 'match.msnatuva.org','localhost']
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 DEBUG_PROPAGATE_EXCEPTIONS = True
 
