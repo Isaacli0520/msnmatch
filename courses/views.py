@@ -619,7 +619,7 @@ def cmp_semester_key(a,b):
 def get_json_of_instructor(instructor):
 	cs_instr_arr = [cs_instr.semester for cs_instr in CourseInstructor.objects.filter(instructor=instructor)]
 	cs_instr_arr = sorted(cs_instr_arr, key=cmp_to_key(cmp_semester))
-	if settings.CURRENT_SEMESTER not in cs_instr_arr:
+	if settings.CURRENT_SEMESTER not in cs_instr_arr and len(cs_instr_arr) > 0:
 		last_taught = cs_instr_arr[-1]
 	elif settings.CURRENT_SEMESTER in cs_instr_arr:
 		last_taught = settings.CURRENT_SEMESTER
@@ -635,7 +635,7 @@ def get_json_of_instructor(instructor):
 def get_json_of_course(course):
 	cs_instr_arr = [cs_instr.semester for cs_instr in CourseInstructor.objects.filter(course=course)]
 	cs_instr_arr = sorted(cs_instr_arr, key=cmp_to_key(cmp_semester))
-	if settings.CURRENT_SEMESTER not in cs_instr_arr:
+	if settings.CURRENT_SEMESTER not in cs_instr_arr and len(cs_instr_arr) > 0:
 		last_taught = cs_instr_arr[-1]
 	elif settings.CURRENT_SEMESTER in cs_instr_arr:
 		last_taught = settings.CURRENT_SEMESTER
@@ -668,11 +668,12 @@ def get_detailed_json_of_course_instructor(course, instructor, user):
 	course_instructor_relations = []
 	course_instructor_query = CourseInstructor.objects.filter(course=course, instructor=instructor)
 	for course_instructor in course_instructor_query:
-		course_instructor_relations.append({
-			"course_instructor_pk":course_instructor.pk,
-			"topic":course_instructor.topic,
-			"semester":course_instructor.semester,
-			})
+		if course_instructor.semester != settings.CURRENT_SEMESTER:
+			course_instructor_relations.append({
+				"course_instructor_pk":course_instructor.pk,
+				"topic":course_instructor.topic,
+				"semester":course_instructor.semester,
+				})
 
 	# duplicated_keys = []
 	# course_users = []

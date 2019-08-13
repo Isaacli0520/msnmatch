@@ -22,18 +22,16 @@
                     </v-sheet>
                 </v-carousel-item>
             </v-carousel>
-            <v-container fluid grid-list-lg>
-                <v-layout mb-3>
-                    <v-flex> 
-                        <div>
-                            <span class="cus-headline-text">Hoosmyprofessor</span>
-                        </div>
-                    </v-flex>
-                    <v-spacer></v-spacer>
-                </v-layout>
+            <div class="upper-div">
+                <div class="container mb-1 text-center">
+                    <h1 class="main-title">HoosMyProfessor</h1>
+                </div>
+            </div>
+            <v-container fluid grid-list-xl class="courses-main"> 
                 <v-layout wrap>
                     <v-flex xs12 sm12 md4 lg4 xl4>
-                        <v-card>
+                        <v-card
+                            raised>
                             <v-card-title>Trash Can</v-card-title>
                             <v-card-text>
                                 <v-list>
@@ -385,6 +383,40 @@ import CustomHeader from '../components/CustomHeader'
 </script>
 
 <style>
+
+    .courses-main{
+        background-color: #fff;
+    }
+
+    .main-title{
+        margin-top: 100px;
+        margin-bottom: 30px;
+        color:#32a49a;
+        font-weight: 800 !important;
+        /* font-family: Baskerville, "Baskerville Old Face", sans-serif; */
+        /* text-transform: uppercase; */
+        font-family: "Raleway", Helvetica, sans-serif;
+        /* font-family: Optima, sans-serif; */
+        font-size: 45px;
+        letter-spacing: 0.05em;
+    }
+
+    .upper-div{
+        position: relative;
+        padding: 0px 0px 40px 0px;
+        color:#000000;
+        width:100%;
+        /* height: 100%; */
+        position:relative;
+        background: url('../assets/static/css/images/cloud_new_09.jpg') no-repeat;
+        background-attachment: fixed;
+        background-position: center center;
+        background-size: cover;
+
+        -webkit-box-shadow: inset 0 -3px 3px 0px rgba(0,0,0,.13), inset 0 -7px 7px 0px rgba(0,0,0,.12);
+        box-shadow: inset 0 -3px 3px 0px rgba(0,0,0,.13), inset 0 -7px 7px 0px rgba(0,0,0,.12);
+        /* padding: 0; */
+    }
 
     .recommendation-div{
         overflow: scroll;

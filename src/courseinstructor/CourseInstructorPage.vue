@@ -163,7 +163,7 @@
                 <span class="headline">Submit a Review</span>
             </v-card-title>
             <v-card-text>
-                <v-container grid-list-md>
+                <v-container v-if="course_instructors.length > 0" grid-list-md>
                     <v-layout wrap>
                         <v-flex>
                             <span>Instructor Rating:</span>
@@ -208,11 +208,14 @@
                         </v-flex>
                     </v-layout>
                 </v-container>
+                <p v-else>
+                    You can't review this instructor and you know why.
+                </p>
             </v-card-text>
             <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn color="blue darken-1" text @click="reviewDialog = false">Close</v-btn>
-                <v-btn color="blue darken-1" text @click="submitReview()">Submit</v-btn>
+                <v-btn color="blue darken-1" text v-if="course_instructors.length > 0" @click="submitReview()">Submit</v-btn>
             </v-card-actions>
         </v-card>
     </v-dialog>

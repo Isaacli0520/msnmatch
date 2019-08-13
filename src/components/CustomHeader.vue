@@ -1,124 +1,130 @@
 <template>
     <div>
         <v-navigation-drawer
-      fixed
-      :clipped="$vuetify.breakpoint.mdAndUp"
-      app
-      v-model="drawer">
-      <v-list dense>
-        <template v-for="item in old_items">
-            <v-layout
-                row
-                v-if="item.heading"
-                align-center
-                :key="item.heading">
-                <v-flex xs6>
-                    <v-subheader v-if="item.heading">
-                        {{ item.heading }}
-                    </v-subheader>
-                </v-flex>
-                <v-flex xs6 class="text-xs-center">
-                    <a href="#!" class="body-2 black--text">EDIT</a>
-                </v-flex>
-            </v-layout>
-            <v-list-group
-                v-else-if="item.children"
-                v-model="item.model"
-                :key="item.text"
-                :prepend-icon="item.model ? item.icon : item['icon-alt']"
-                append-icon="">
-                <v-list-item slot="activator">
-                    <v-list-item-content>
-                        <v-list-item-title>
-                            {{ item.text }}
-                        </v-list-item-title>
-                    </v-list-item-content>
-                </v-list-item>
-                <v-list-item
-                    v-for="(child, i) in item.children"
-                    :key="i">
-                    <v-list-item-action v-if="child.icon">
-                        <v-icon>{{ child.icon }}</v-icon>
-                    </v-list-item-action>
-                    <v-list-item-content>
-                        <v-list-item-title>
-                        {{ child.text }}
-                        </v-list-item-title>
-                    </v-list-item-content>
-                </v-list-item>
-            </v-list-group>
-          <v-list-item v-else @click="navAsideMethod(item)" :key="item.text">
-                <v-list-item-action>
-                    <v-icon>{{ item.icon }}</v-icon>
-                </v-list-item-action>
-                <v-list-item-content>
-                    <v-list-item-title>
-                        {{ item.text }}
-                    </v-list-item-title>
-                </v-list-item-content>
-          </v-list-item>
-        </template>
-      </v-list>
-    </v-navigation-drawer>
-    <v-app-bar
-      color="teal darken-2"
-      dark
-      app
-      :clipped-left="$vuetify.breakpoint.mdAndUp"
-      fixed>
-    <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
-      <v-toolbar-title style="width: 300px" class="ml-0 pl-3">
-        Hoosmyprofessor
-      </v-toolbar-title>
-
-      <v-autocomplete
-      v-model="selected_item"
-      :items="search_result_items"
-      :loading="isLoading"
-      :search-input.sync="search"
-      color="teal"
-      clearable
-      solo-inverted
-      no-filter
-      flat
-      hide-no-data
-      hide-selected
-      hide-details
-      placeholder="Search for Courses/Instructors"
-      return-object>
-      <template v-slot:item="{ item }">
-        <v-list-item-content>
-            <v-list-item-title mb-2>{{item.text}}</v-list-item-title>
-            <v-list-item-subtitle v-if="item.last_taught.length > 0">Last taught:{{item.last_taught}}</v-list-item-subtitle>
-        </v-list-item-content>  
-      </template>
-    </v-autocomplete>
-        <v-spacer></v-spacer>
-        <v-menu offset-y
-        class="mx-auto"
-        min-width="170">
-            <template v-slot:activator="{ on }">
-            <v-btn
-                icon
-                v-on="on">
-                <v-icon>fas fa-user-circle</v-icon>
-            </v-btn>
-            </template>
-            <v-list dense rounded>
-                <v-list-item
-                    v-for="(item, index) in user_items"
-                    :key="index"
-                    @click="navMethod(item)">
-                    <v-list-item-icon>
-                        <v-icon dense v-text="item.icon"></v-icon>
-                    </v-list-item-icon>
-                    <v-list-item-content>
-                        <v-list-item-title>{{ item.title }}</v-list-item-title>
-                    </v-list-item-content>
-                </v-list-item>
+            v-if="navDrawer"
+            fixed
+            :clipped="$vuetify.breakpoint.mdAndUp"
+            app
+            v-model="drawer">
+            <v-list dense>
+                <template v-for="item in old_items">
+                    <v-layout
+                        row
+                        v-if="item.heading"
+                        align-center
+                        :key="item.heading">
+                        <v-flex xs6>
+                            <v-subheader v-if="item.heading">
+                                {{ item.heading }}
+                            </v-subheader>
+                        </v-flex>
+                        <v-flex xs6 class="text-xs-center">
+                            <a href="#!" class="body-2 black--text">EDIT</a>
+                        </v-flex>
+                    </v-layout>
+                    <v-list-group
+                        v-else-if="item.children"
+                        v-model="item.model"
+                        :key="item.text"
+                        :prepend-icon="item.model ? item.icon : item['icon-alt']"
+                        append-icon="">
+                        <v-list-item slot="activator">
+                            <v-list-item-content>
+                                <v-list-item-title>
+                                    {{ item.text }}
+                                </v-list-item-title>
+                            </v-list-item-content>
+                        </v-list-item>
+                        <v-list-item
+                            v-for="(child, i) in item.children"
+                            :key="i">
+                            <v-list-item-action v-if="child.icon">
+                                <v-icon>{{ child.icon }}</v-icon>
+                            </v-list-item-action>
+                            <v-list-item-content>
+                                <v-list-item-title>
+                                {{ child.text }}
+                                </v-list-item-title>
+                            </v-list-item-content>
+                        </v-list-item>
+                    </v-list-group>
+                    <v-list-item v-else @click="navAsideMethod(item)" :key="item.text">
+                            <v-list-item-action>
+                                <v-icon>{{ item.icon }}</v-icon>
+                            </v-list-item-action>
+                            <v-list-item-content>
+                                <v-list-item-title>
+                                    {{ item.text }}
+                                </v-list-item-title>
+                            </v-list-item-content>
+                    </v-list-item>
+                </template>
             </v-list>
-        </v-menu>
-    </v-app-bar>
+        </v-navigation-drawer>
+        <v-app-bar
+            color="white"
+            app
+            light
+            absolute
+            :clipped-left="$vuetify.breakpoint.mdAndUp"
+            fixed>
+            <v-app-bar-nav-icon v-if="navDrawer" @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
+            <a class="navbar-brand" :href="urls.home_url">
+                <img :src="urls.brand_pic" style="margin:5px 0px 0px 0px;" width="35" height="35" class="d-inline-block align-center" alt="">
+            </a>
+            <v-toolbar-title class="nav-bar-title ml-0 mr-2 pl-3">
+                HoosMyProfessor
+            </v-toolbar-title>
+            <v-spacer></v-spacer>
+            <v-autocomplete
+                v-model="selected_item"
+                :items="search_result_items"
+                :loading="isLoading"
+                :search-input.sync="search"
+                color="black"
+                background-color="grey lighten-3"
+                clearable
+                solo-inverted
+                no-filter
+                flat
+                hide-no-data
+                hide-selected
+                hide-details
+                placeholder="Search for Courses/Instructors"
+                return-object>
+                <template v-slot:item="{ item }">
+                    <v-list-item-content>
+                        <v-list-item-title mb-2>{{item.text}}</v-list-item-title>
+                        <v-list-item-subtitle v-if="item.last_taught.length > 0">Last taught:{{item.last_taught}}</v-list-item-subtitle>
+                    </v-list-item-content>  
+                </template>
+            </v-autocomplete>
+            <v-spacer></v-spacer>
+            <v-menu offset-y
+                class="mx-auto"
+                min-width="170">
+                <template v-slot:activator="{ on }">
+                    <v-btn
+                        icon
+                        v-on="on">
+                        <v-icon>fas fa-user-circle</v-icon>
+                    </v-btn>
+                </template>
+                <v-list dense rounded>
+                    <v-list-item
+                        v-for="(item, index) in user_items"
+                        :key="index"
+                        @click="navMethod(item)">
+                        <v-list-item-icon>
+                            <v-icon dense v-text="item.icon"></v-icon>
+                        </v-list-item-icon>
+                        <v-list-item-content>
+                            <v-list-item-title>{{ item.title }}</v-list-item-title>
+                        </v-list-item-content>
+                    </v-list-item>
+                </v-list>
+            </v-menu>
+        </v-app-bar>
     </div>
 </template>
 
@@ -128,6 +134,7 @@ import axios from 'axios'
 export default{
     data: function () {
         return {
+            navDrawer:false,
             courseNameLimit: 42,
             drawer: false,
             selected_item:null,
@@ -198,8 +205,8 @@ export default{
         search(val) {
             // Items have already been loaded
             if (val == null || val.length == 0){
-            this.entries = []
-            return
+                this.entries = []
+                return
             }
             if (val.length < 2) return
 
@@ -238,7 +245,7 @@ export default{
                     console.log("Search Bar Error");
                     return {}
                 }
-                })
+            })
         },
     },
     methods:{
@@ -274,10 +281,21 @@ export default{
     mounted(){
         this.get_basic_info();
     },
-    }
+}
 </script>
 
 
-<style scoped lang="css">
+<style lang="css">
+
+    .theme--light.v-text-field--solo-inverted.v-text-field--solo.v-input--is-focused > .v-input__control > .v-input__slot .v-label, .theme--light.v-text-field--solo-inverted.v-text-field--solo.v-input--is-focused > .v-input__control > .v-input__slot input {
+        color: #000000 !important;
+    }
+
+    
+    .nav-bar-title{
+        font-family: "Raleway", Helvetica, sans-serif;
+        font-weight: 300;
+        letter-spacing: 0.07em;
+    }
 
 </style>
