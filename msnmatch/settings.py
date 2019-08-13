@@ -34,7 +34,7 @@ SESSION_COOKIE_SECURE = not DEBUG
 CSRF_COOKIE_SECURE = not DEBUG
 
 # ALLOWED_HOSTS = ['msn-match-test.herokuapp.com', 'match.msnatuva.org','localhost']
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['drx0170jym8dn.cloudfront.net','d1ixiphwkdejqh.cloudfront.net', 'msn-match.herokuapp.com', 'match.msnatuva.org']
 
 DEBUG_PROPAGATE_EXCEPTIONS = True
 

@@ -31,7 +31,7 @@
                 <v-layout wrap>
                     <v-flex xs12 sm12 md4 lg4 xl4>
                         <v-card
-                            outlined>
+                            :elevation="cardElevation">
                             <v-card-title>Trash Can</v-card-title>
                             <v-card-text>
                                 <v-list>
@@ -56,7 +56,7 @@
                     </v-flex>
                     <v-flex child-flex d-flex xs12 sm12 md8 lg8 xl8>
                         <v-card
-                            outlined
+                            :elevation="cardElevation"
                             :loading="!recommendation_loaded">
                             <v-card-title>Recommendations</v-card-title>
                             <v-card-text>
@@ -120,7 +120,7 @@
                     <template v-for="i in ['Taking', 'Taken']">
                         <v-flex child-flex d-flex :key="i + '-taking-taken' " xs12 sm4 md4 lg4 xl4>
                             <v-card 
-                                outlined
+                                :elevation="cardElevation"
                                 :loading="!loaded[i]">
                                 <v-card-title>Top 10 {{i}} Courses</v-card-title>
                                 <v-card-text>
@@ -146,7 +146,7 @@
                     </template>
                     <v-flex child-flex d-flex xs12 sm4 md4 lg4 xl4>
                         <v-card 
-                            outlined
+                            :elevation="cardElevation"
                             :loading="!review_user_load">
                             <v-card-title>Top 10 Users</v-card-title>
                             <v-card-text>
@@ -183,6 +183,7 @@ import CustomHeader from '../components/CustomHeader'
   export default {
 	data() {
 	    return {
+            cardElevation: 4,
             review_users:[],
             review_user_load:false,
             recommendation_loaded:false,
