@@ -5,7 +5,7 @@
         :loading="isLoading"
         :search-input.sync="search"
         color="black"
-        background-color="grey lighten-3"
+        :background-color="background_color"
         clearable
         solo-inverted
         no-filter
@@ -28,6 +28,12 @@
 import axios from 'axios';
 
 export default {
+    props:{
+        background_color:{
+            type:String,
+            default:"grey lighten-3",
+        },
+    },
     data() {
         return {
             courseNameLimit: 42,

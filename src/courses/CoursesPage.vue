@@ -28,7 +28,8 @@
                     <h1 class="main-title">HoosMyProfessor</h1>
                 </div>   
                 <div class="search-courses">
-                    <search-course></search-course>
+                    <search-course class="custom-search"
+                        background_color="white"></search-course>
                 </div>
             </div>
             <v-container fluid grid-list-xl class="courses-main"> 
@@ -396,6 +397,10 @@ import SearchCourse from '../components/SearchCourse'
 </script>
 
 <style>
+    .custom-search{
+        box-shadow: 0 2px 5px 0 rgba(0,0,0,.16), 0 2px 10px 0 rgba(0,0,0,.12);
+    }
+
     .search-courses{
         position: relative;
         margin: auto auto 60px auto;
