@@ -69,36 +69,15 @@
             :clipped-left="$vuetify.breakpoint.mdAndUp"
             fixed>
             <v-app-bar-nav-icon v-if="navDrawer" @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
-            <a class="navbar-brand" :href="urls.home_url">
+            <a class="navbar-brand" :href="urls.courses_url">
                 <img :src="urls.brand_pic" style="margin:5px 0px 0px 0px;" width="35" height="35" class="d-inline-block align-center" alt="">
             </a>
             <v-toolbar-title class="nav-bar-title ml-0 mr-2 pl-3">
                 HoosMyProfessor
             </v-toolbar-title>
             <v-spacer></v-spacer>
-            <v-autocomplete
-                v-model="selected_item"
-                :items="search_result_items"
-                :loading="isLoading"
-                :search-input.sync="search"
-                color="black"
-                background-color="grey lighten-3"
-                clearable
-                solo-inverted
-                no-filter
-                flat
-                hide-no-data
-                hide-selected
-                hide-details
-                placeholder="Search for Courses/Instructors"
-                return-object>
-                <template v-slot:item="{ item }">
-                    <v-list-item-content>
-                        <v-list-item-title mb-2>{{item.text}}</v-list-item-title>
-                        <v-list-item-subtitle v-if="item.last_taught.length > 0">Last taught:{{item.last_taught}}</v-list-item-subtitle>
-                    </v-list-item-content>  
-                </template>
-            </v-autocomplete>
+            <search-course
+                v-if="searchBool"></search-course>
             <v-spacer></v-spacer>
             <v-menu offset-y
                 class="mx-auto"
@@ -130,19 +109,19 @@
 
 <script>
 import axios from 'axios'
+import SearchCourse from './SearchCourse'
 
 export default{
+    props: {
+        searchBool:{
+            type:Boolean,
+            default:true,
+        },
+    },
     data: function () {
         return {
             navDrawer:false,
-            courseNameLimit: 42,
             drawer: false,
-            selected_item:null,
-            isLoading: false,
-            lastTime: 0,
-            entries:[],
-            search: null,
-            searchquery: '',
             user_items:[
                 { title:"Profile", icon:"fas fa-user" },
                 { title:"Edit Profile", icon:"fas fa-biohazard" },
@@ -156,6 +135,7 @@ export default{
                 update_profile:"",
                 logout:"",
                 my_courses:"",
+                courses_url:"",
             },
             old_items: [
                 //   {  icon: 'contacts', text: 'Contacts' },
@@ -190,63 +170,13 @@ export default{
         }
     },
     components:{
+        SearchCourse,
     },
     watch:{
-        selected_item(val){
-            if(val != null){
-                if(val.type == "course"){
-                    this.goToHref("/courses/" + val.value + "/");
-                }
-                else if(val.type == "instructor"){
-                    this.goToHref("/courses/instructors/" + val.value + "/");
-                }
-            }
-        },
-        search(val) {
-            // Items have already been loaded
-            if (val == null || val.length == 0){
-                this.entries = []
-                return
-            }
-            if (val.length < 2) return
 
-            // Items have already been requested
-            // if (this.isLoading) return
-
-            this.isLoading = true
-            this.lastTime += 1;
-            // Lazily load input items
-            axios.get('/courses/ajax/course_search_result/',{params: {query:val, time: this.lastTime}}).then(response => {
-                    if(response.data.time == this.lastTime){
-                        this.entries = response.data.course_result; 
-                    }
-            })
-            .catch(err => {
-                console.log("error: ",err)
-            })
-            .finally(() => {this.isLoading = false});
-        },
     },
     computed:{
-        search_result_items(){
-            return this.entries.map(entry => {
-                if(entry.type == "course"){
-                    let tmp_course_name = entry.mnemonic + entry.number + " " + entry.title;
-                    const course_name = tmp_course_name.length > this.courseNameLimit
-                        ? tmp_course_name.slice(0, this.courseNameLimit) + '...'
-                        : tmp_course_name;
 
-                    return {text:course_name, value:entry.pk, last_taught:entry.last_taught, type:"course"};
-                }
-                else if(entry.type == "instructor"){
-                    return {text:entry.name, value:entry.pk,  last_taught:entry.last_taught, type:"instructor"};
-                }
-                else{
-                    console.log("Search Bar Error");
-                    return {}
-                }
-            })
-        },
     },
     methods:{
         sortCourseNumber(a, b){

@@ -1,6 +1,7 @@
 <template>
     <v-app>
-        <custom-header></custom-header>
+        <custom-header
+            :searchBool="false"></custom-header>
         <v-content>
             <v-carousel v-if="with_carousel">
                 <v-carousel-item
@@ -25,6 +26,9 @@
             <div class="upper-div">
                 <div class="container mb-1 text-center">
                     <h1 class="main-title">HoosMyProfessor</h1>
+                </div>   
+                <div class="search-courses">
+                    <search-course></search-course>
                 </div>
             </div>
             <v-container fluid grid-list-xl class="courses-main"> 
@@ -33,6 +37,7 @@
                         <v-card
                             :elevation="cardElevation">
                             <v-card-title>Trash Can</v-card-title>
+                            <v-divider></v-divider>
                             <v-card-text>
                                 <v-list>
                                     <v-list-item
@@ -59,6 +64,7 @@
                             :elevation="cardElevation"
                             :loading="!recommendation_loaded">
                             <v-card-title>Recommendations</v-card-title>
+                            <v-divider></v-divider>
                             <v-card-text>
                                 <v-layout row wrap>
                                     <v-flex xs6 sm6 md4 lg4 xl4 d-flex>
@@ -123,6 +129,7 @@
                                 :elevation="cardElevation"
                                 :loading="!loaded[i]">
                                 <v-card-title>Top 10 {{i}} Courses</v-card-title>
+                                <v-divider></v-divider>
                                 <v-card-text>
                                     <v-list v-if="loaded[i]">
                                         <v-list-item
@@ -149,6 +156,7 @@
                             :elevation="cardElevation"
                             :loading="!review_user_load">
                             <v-card-title>Top 10 Users</v-card-title>
+                            <v-divider></v-divider>
                             <v-card-text>
                                 <v-list v-if="review_user_load">
                                     <v-list-item
@@ -179,11 +187,12 @@
 <script>
 import axios from 'axios'
 import CustomHeader from '../components/CustomHeader'
+import SearchCourse from '../components/SearchCourse'
 
   export default {
 	data() {
 	    return {
-            cardElevation: 4,
+            cardElevation:4,
             review_users:[],
             review_user_load:false,
             recommendation_loaded:false,
@@ -288,7 +297,8 @@ import CustomHeader from '../components/CustomHeader'
 	    }
 	},
 	components:{
-	  CustomHeader,
+        CustomHeader,
+        SearchCourse,
 	},
 	watch: {
         taking_courses(val){
@@ -320,7 +330,6 @@ import CustomHeader from '../components/CustomHeader'
         },
 	},
 	computed:{
-	  
 	},
 	methods: {
 		goToHref(text){
@@ -387,6 +396,12 @@ import CustomHeader from '../components/CustomHeader'
 </script>
 
 <style>
+    .search-courses{
+        position: relative;
+        margin: auto auto 60px auto;
+        width: 80%;
+        max-width: 600px;
+    }
 
     .courses-main{
         background-color: #fff;
@@ -446,13 +461,27 @@ import CustomHeader from '../components/CustomHeader'
     }
 
     @media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
+        .main-title{
+            font-size: 45px;
+        }
+        .search-courses{
+            margin: auto auto 45px auto;
+        }
     }
 
 
     @media (min-width: 10px) and (max-width: 767px) {
+        .main-title{
+            font-size: 28px;
+            margin-top: 60px;
+            margin-bottom: 20px;
+        }
         .recommendation-div{
             overflow: scroll;
             max-height: 300px;
+        }
+        .search-courses{
+            margin: auto auto 30px auto;
         }
         
     }
