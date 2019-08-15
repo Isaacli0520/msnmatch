@@ -30,8 +30,8 @@ SECRET_KEY = 'f@hcb!l&kpn_4u+iz)6j4w(5j4$b2!)-=*j(9&(x_0a-j8o6)5'
 DEBUG = False
 
 SECURE_SSL_REDIRECT = not DEBUG
-SESSION_COOKIE_SECURE = not DEBUG
-CSRF_COOKIE_SECURE = not DEBUG
+# SESSION_COOKIE_SECURE = not DEBUG
+# CSRF_COOKIE_SECURE = not DEBUG
 
 # ALLOWED_HOSTS = ['msn-match-test.herokuapp.com', 'match.msnatuva.org','localhost']
 ALLOWED_HOSTS = ['drx0170jym8dn.cloudfront.net','d1ixiphwkdejqh.cloudfront.net', 'msn-match.herokuapp.com', 'match.msnatuva.org']
@@ -204,8 +204,8 @@ AWS_LOCATION = 'static'
 # STATICFILES_STORAGE = 'msnmatch.storage_backends.StaticStorage'
 DEFAULT_FILE_STORAGE = 'msnmatch.storage_backends.MediaStorage' 
 
-# STATIC_HOST = 'https://d1ixiphwkdejqh.cloudfront.net' if not DEBUG else ''
-STATIC_HOST = ""
+STATIC_HOST = 'https://d1ixiphwkdejqh.cloudfront.net' if not DEBUG else ''
+# STATIC_HOST = ""
 STATIC_URL = STATIC_HOST + '/static/'
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')

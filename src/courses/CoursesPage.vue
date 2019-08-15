@@ -182,6 +182,7 @@
                 </v-layout>
             </v-container>
         </v-content>
+        <custom-footer></custom-footer>
     </v-app>
 </template>
 
@@ -189,6 +190,7 @@
 import axios from 'axios'
 import CustomHeader from '../components/CustomHeader'
 import SearchCourse from '../components/SearchCourse'
+import CustomFooter from '../components/CustomFooter'
 
   export default {
 	data() {
@@ -300,6 +302,7 @@ import SearchCourse from '../components/SearchCourse'
 	components:{
         CustomHeader,
         SearchCourse,
+        CustomFooter,
 	},
 	watch: {
         taking_courses(val){

@@ -78,6 +78,7 @@
                 </v-layout>
             </v-container>
         </v-content>
+        <custom-footer></custom-footer>
     </v-app>
 </template>
 
@@ -85,6 +86,7 @@
 import axios from 'axios'
 import CustomHeader from '../components/CustomHeader'
 import CustomRating from '../components/CustomRating'
+import CustomFooter from '../components/CustomFooter'
 
   export default {
 	data() {
@@ -106,6 +108,7 @@ import CustomRating from '../components/CustomRating'
 	components:{
         CustomHeader,
         CustomRating,
+        CustomFooter,
 	},
 	watch: {
 

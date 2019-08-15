@@ -69,12 +69,14 @@
                 </v-layout>
             </v-container>
         </v-content>
+        <custom-footer></custom-footer>
     </v-app>
 </template>
 
 <script>
 import axios from 'axios'
 import CustomHeader from '../components/CustomHeader'
+import CustomFooter from '../components/CustomFooter'
 
   export default {
 	data() {
@@ -86,7 +88,8 @@ import CustomHeader from '../components/CustomHeader'
 	    }
 	},
 	components:{
-	  CustomHeader,
+        CustomHeader,
+        CustomFooter,
 	},
 	watch: {
 

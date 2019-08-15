@@ -60,17 +60,18 @@ export default {
         },
         search(val) {
             // Items have already been loaded
+            if (val.length < 2) return
+
+            this.lastTime += 1;
             if (val == null || val.length == 0){
                 this.entries = []
                 return
             }
-            if (val.length < 2) return
 
             // Items have already been requested
             // if (this.isLoading) return
 
             this.isLoading = true
-            this.lastTime += 1;
             // Lazily load input items
             axios.get('/courses/ajax/course_search_result/',{params: {query:val, time: this.lastTime}}).then(response => {
                     if(response.data.time == this.lastTime){

@@ -55,12 +55,14 @@
             </v-layout>
         </v-container>
     </v-content>
+    <custom-footer></custom-footer>
   </v-app>
 </template>
 
 <script>
 import axios from 'axios'
 import CustomHeader from '../components/CustomHeader'
+import CustomFooter from '../components/CustomFooter'
 axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 axios.defaults.xsrfCookieName = "csrftoken";
 
@@ -79,6 +81,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
     },
     components:{
         CustomHeader,
+        CustomFooter,
     },
     watch: {
       

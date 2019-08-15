@@ -219,6 +219,7 @@
             </v-card-actions>
         </v-card>
     </v-dialog>
+    <custom-footer></custom-footer>
     </v-app>
 </template>
 
@@ -226,6 +227,7 @@
 import axios from 'axios'
 import CustomHeader from '../components/CustomHeader'
 import CustomRating from '../components/CustomRating'
+import CustomFooter from '../components/CustomFooter'
 axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 axios.defaults.xsrfCookieName = "csrftoken";
 
@@ -313,6 +315,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
     components:{
         CustomHeader,
         CustomRating,
+        CustomFooter,
     },
     watch: {
       selected_course(val){

@@ -20,6 +20,7 @@
                 <v-flex d-flex xs12 sm12 lg12 md12 xl12 :key="index_school + 'school' " v-for="(departments, school, index_school) in departments_dict">
                     <v-card>
                         <v-card-title>{{ school }}</v-card-title>
+                        <v-divider></v-divider>
                         <v-card-text class="text--primary">
                             <v-layout row wrap>
                                 <v-flex
@@ -42,12 +43,14 @@
             </v-layout>
         </v-container>
     </v-content>
+    <custom-footer></custom-footer>
   </v-app>
 </template>
 
 <script>
 import axios from 'axios'
 import CustomHeader from '../components/CustomHeader'
+import CustomFooter from '../components/CustomFooter'
 axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 axios.defaults.xsrfCookieName = "csrftoken";
 
@@ -63,6 +66,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
     },
     components:{
         CustomHeader,
+        CustomFooter,
     },
     watch: {
       
