@@ -29,22 +29,24 @@ def handler403(request, exception):
     return response
 
 def get_home_page_basic_info(request):
-	tmp = {
-		"home_url":reverse('home'),
-		"tags_url":reverse('tags'),
-		"family_url":reverse('family'),
-		"group_manage_url":reverse('groups_manage'),
-		"trending_tags_url":reverse('skill_rank'),
-		"brand_pic": settings.STATIC_URL + "css/images/brand.png",
-		"profile": reverse('profile', args=[request.user.username]),
-		"update_profile":reverse('update_profile', args=[request.user.username]),
-		"logout":reverse('logout'),
-		"request_user_username":request.user.username,
-		"request_user_pk":request.user.pk,
-		"request_user_role":request.user.profile.role,
-	}
 	return JsonResponse({
-		"all_info":tmp,
+		"urls":{
+			"home_url":reverse('home'),
+			"tags_url":reverse('tags'),
+			"family_url":reverse('family'),
+			"group_manage_url":reverse('groups_manage'),
+			"trending_tags_url":reverse('skill_rank'),
+			"brand_pic": settings.STATIC_URL + "css/images/brand.png",
+			"profile": reverse('profile', args=[request.user.username]),
+			"update_profile":reverse('update_profile', args=[request.user.username]),
+			"logout":reverse('logout'),
+			"courses_url":reverse('courses'),
+		},
+		"request_user":{
+			"request_user_username":request.user.username,
+			"request_user_pk":request.user.pk,
+			"request_user_role":request.user.profile.role,
+		},
 	})
 
 def get_all_ranked_users(request):

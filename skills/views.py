@@ -29,7 +29,6 @@ from groups.models import Group, GroupRelation, TagRelation, GroupFollowRelation
 MAXIMUM_COURSES = 12
 DEBUGGG = False
 
-
 @login_required
 def skill_rank(request):
 	if Skill.objects.count() >= 75:
@@ -127,75 +126,6 @@ def skill(request, skill_pk):
 		"tmp_skill":tmp_skill,
 		"users_with_skill":tmp_skill.skill_users.all(),
 		})
-
-def get_users_by_sim(request):
-
-	all_tags = request.GET.get("all_tags")
-	all_users = User.objects.all().exclude(username="admin").exclude(pk=request.user.pk)
-	if(all_tags != ""):
-		all_users = user_retrieve(all_tags.split('`'), all_users)
-
-	user_skills = get_format_skills(User.objects.get(pk=request.user.pk).skill_set.all())
-	all_user_skills = get_skills_of_users(queryset = all_users)
-	# print("debug:::",all_user_skills)
-	sims = {u2_pk:similarity_between(user_skills, u2_skills) for u2_pk, u2_skills in all_user_skills.items()}
-	sorted_sims = sorted(sims.items(), key = lambda c:c[1], reverse=True)
-	# print("all_similarities:", sorted_sims)
-	# print("all_users_sorted:",[User.objects.get(pk = user_pk).username for user_pk, score in sorted_sims])
-	return get_user_json_sim(request,[(User.objects.get(pk = user_pk),'{0:.3g}'.format(score*100)) for user_pk, score in sorted_sims])
-
-
-def similarity_between(u1, u2):
-	# tot_scale_length = sum([scaler(len(v)) for k,v in u1.items() if k in u2])
-	tot_scale_length = sum([scaler(len(v)) for k,v in u1.items()])
-	u1_length = sum([len(v) for k,v in u1.items()])
-	u2_length = sum([len(v) for k,v in u2.items()])
-	u1_vec = []
-	u2_vec = []
-	sims = []
-	sims_weight = []
-	# print("another one")
-	for sk_type, skills in u1.items():
-		if sk_type in u2:
-			tmp_skill_ls = list(set(u1[sk_type]+u2[sk_type]))
-			u1_vec.append([int(sk in u1[sk_type]) for sk in tmp_skill_ls])
-			u2_vec.append([int(sk in u2[sk_type]) for sk in tmp_skill_ls])
-			sims.append(1 - distance.cosine(u1_vec[-1], u2_vec[-1]))
-			tmp_cos_scaler = 1 - arith_mean((abs((len(u1[sk_type])/u1_length)-(len(u2[sk_type])/u2_length))),abs(len(u1[sk_type]) - len(u2[sk_type]))/len(tmp_skill_ls))
-			# print("u1 vec", u1_vec, "u2_vec", u2_vec )
-			# print("sims", sims[-1])
-			# print("tmp_cos_scaler", tmp_cos_scaler)
-			sims_weight.append(sims[-1]*tmp_cos_scaler*scaler(len(u1[sk_type]))/tot_scale_length)
-			# print("tot scaler", scaler(len(u1[sk_type]))/tot_scale_length)
-			# print("sims_weight",sims_weight[-1])
-	return sum(sims_weight)
-	
-def scaler(x):
-	return (x+1)**(2/3.0)-(x+1)**(-1/8.0)
-
-def harmonic_mean(x,y):
-	return 2.0/(1/x+1/y)
-
-def geometric_mean(x,y):
-	return (1.0*x*y)**(1/2)
-
-def arith_mean(x,y):
-	return (x+y)/2.0
-
-def get_skills_of_users(queryset):
-	all_user_skills = {}
-	for user in queryset:
-		all_user_skills[user.pk] = get_format_skills(User.objects.get(pk=user.pk).skill_set.all())
-	return all_user_skills
-		
-
-def get_format_skills(queryset):
-	user_skills = {}
-	for sk in queryset:
-		if sk.skill_type not in user_skills:
-			user_skills[sk.skill_type] = []
-		user_skills[sk.skill_type].append(sk.pk)
-	return user_skills
 
 def add_to_list(request):
 	to_user = User.objects.get(pk=request.GET.get("user_pk"))
@@ -357,123 +287,70 @@ def get_all_users(request):
 	
 	return get_user_json(request,all_users_list)
 
-def get_user_json_sim(request,all_users):
-	all_users_list = []
-
-	for user, score in all_users:
-		skill_set = {}
-		for skill in user.skill_set.all():
-			if skill.skill_type not in skill_set:
-				skill_set[skill.skill_type] = []
-			new_skill = {
-				"skill_pk": skill.pk,
-				"skill_name": skill.skill_name,
-				"skill_type": skill.skill_type,
-				"skill_url":"/skills/"+str(skill.pk)+"/",
-			}
-			skill_set[skill.skill_type].append(new_skill)
-		if user.profile.picture:
-			picture_url = user.profile.picture.url
-		else:
-			picture_url = settings.STATIC_URL + "css/images/brand.jpg"
-
-		if user.profile.avatar:
-			avatar_url = user.profile.avatar.url
-		else:
-			avatar_url = settings.STATIC_URL + "css/images/brand_blur.jpg"
-
-		if user.profile.video:
-			video_url = user.profile.video.url
-		else:
-			video_url = ""
-		new_user = {
-			"pk": user.pk,
-			"user_url": "/users/"+user.username+"/",
-			"picture": picture_url,
-			"first_name": user.first_name,
-			"last_name": user.last_name,
-			"email": user.email,
-			"bio": user.profile.bio,
-			"birth_date": user.profile.birth_date,
-			"location": user.profile.location,
-			"year": user.profile.year,
-			"major": user.profile.major,
-			"sex":user.profile.sex,
-			"skills": skill_set,
-			"video": video_url,
-			"role":user.profile.role,
-			"major_two":user.profile.major_two,
-			"minor":user.profile.minor,
-			"score":score,
-			"wechat":user.profile.wechat,
-			"follow": Follow.objects.filter(follower=request.user, followee=user).exists(),
-			"avatar":avatar_url,
-			"matched":user.profile.matched,
-			"score":0,
-		}
-		all_users_list.append(new_user)
-	return JsonResponse({
-		"all_users":all_users_list,
-	})
-
 def get_user_json(request, all_users):
 	all_users_list = []
-	start_time = time.time()
+	# start_time = time.time()
 	for user in all_users:
-		skill_set = {}
-		for skill in user.skill_set.all():
-			if skill.skill_type not in skill_set:
-				skill_set[skill.skill_type] = []
-			new_skill = {
-				"skill_pk": skill.pk,
-				"skill_name": skill.skill_name,
-				"skill_type": skill.skill_type,
-				"skill_url":"/skills/"+str(skill.pk)+"/",
-			}
-			skill_set[skill.skill_type].append(new_skill)
-		if user.profile.picture:
-			picture_url = user.profile.picture.url
-		else:
-			picture_url = settings.STATIC_URL + "css/images/brand.jpg"
-
-		if user.profile.avatar:
-			avatar_url = user.profile.avatar.url
-		else:
-			avatar_url = settings.STATIC_URL + "css/images/brand_blur.jpg"
-
-		if user.profile.video:
-			video_url = user.profile.video.url
-		else:
-			video_url = ""
-		new_user = {
-			"pk": user.pk,
-			"user_url": "/users/"+user.username+"/",
-			"picture": picture_url,
-			"first_name": user.first_name,
-			"last_name": user.last_name,
-			"email": user.email,
-			"bio": user.profile.bio,
-			"birth_date": user.profile.birth_date,
-			"location": user.profile.location,
-			"year": user.profile.year,
-			"major": user.profile.major,
-			"sex":user.profile.sex,
-			"skills": skill_set,
-			"video": video_url,
-			"role":user.profile.role,
-			"major_two":user.profile.major_two,
-			"minor":user.profile.minor,
-			"wechat":user.profile.wechat,
-			"follow": Follow.objects.filter(follower=request.user, followee=user).exists(),
-			"avatar":avatar_url,
-			"matched":user.profile.matched,
-			"score":0,
-		}
-		all_users_list.append(new_user)
-	print("--- %s seconds ---" % (time.time() - start_time))
+		all_users_list.append(get_detail_of_user(user, request))
+	# print("--- %s seconds ---" % (time.time() - start_time))
 	return JsonResponse({
 		"all_users":all_users_list,
 	})
+
+def get_detail_of_user(user, request, score = 0):
+	skill_set = {}
+	for skill in user.skill_set.all():
+		if skill.skill_type not in skill_set:
+			skill_set[skill.skill_type] = []
+		new_skill = {
+			"skill_pk": skill.pk,
+			"skill_name": skill.skill_name,
+			"skill_type": skill.skill_type,
+			"skill_url":"/skills/"+str(skill.pk)+"/",
+		}
+		skill_set[skill.skill_type].append(new_skill)
+	if user.profile.picture:
+		picture_url = user.profile.picture.url
+	else:
+		picture_url = settings.STATIC_URL + "css/images/brand.jpg"
+
+	if user.profile.avatar:
+		avatar_url = user.profile.avatar.url
+	else:
+		avatar_url = settings.STATIC_URL + "css/images/brand_blur.jpg"
+
+	if user.profile.video:
+		video_url = user.profile.video.url
+	else:
+		video_url = ""
+	if user.profile.graduate_year:
+		tmp_year = 4 + settings.CURRENT_YEAR - int(user.profile.graduate_year)
+	else:
+		tmp_year = ""
+	return {
+		"pk": user.pk,
+		"user_url": "/users/"+user.username+"/",
+		"picture": picture_url,
+		"first_name": user.first_name,
+		"last_name": user.last_name,
+		"email": user.email,
+		"bio": user.profile.bio,
+		"birth_date": user.profile.birth_date,
+		"location": user.profile.location,
+		"year": tmp_year,
+		"major": user.profile.major,
+		"sex":user.profile.sex,
+		"skills": skill_set,
+		"video": video_url,
+		"role":user.profile.role,
+		"major_two":user.profile.major_two,
+		"minor":user.profile.minor,
+		"wechat":user.profile.wechat,
+		"follow": Follow.objects.filter(follower=request.user, followee=user).exists(),
+		"avatar":avatar_url,
+		"matched":user.profile.matched,
+		"score":score,
+	}
 
 @login_required
 def tags(request):
@@ -524,6 +401,83 @@ def skill_group_search_result(request):
 	return JsonResponse({
 		"skill_list":skill_list,
 		})
+
+def get_users_by_sim(request):
+
+	all_tags = request.GET.get("all_tags")
+	all_users = User.objects.all().exclude(username="admin").exclude(pk=request.user.pk)
+	if(all_tags != ""):
+		all_users = user_retrieve(all_tags.split('`'), all_users)
+
+	user_skills = get_format_skills(User.objects.get(pk=request.user.pk).skill_set.all())
+	all_user_skills = get_skills_of_users(queryset = all_users)
+	# print("debug:::",all_user_skills)
+	sims = {u2_pk:similarity_between(user_skills, u2_skills) for u2_pk, u2_skills in all_user_skills.items()}
+	sorted_sims = sorted(sims.items(), key = lambda c:c[1], reverse=True)
+	# print("all_similarities:", sorted_sims)
+	# print("all_users_sorted:",[User.objects.get(pk = user_pk).username for user_pk, score in sorted_sims])
+	return get_user_json_sim(request,[(User.objects.get(pk = user_pk),'{0:.3g}'.format(score*100)) for user_pk, score in sorted_sims])
+
+def get_user_json_sim(request,all_users):
+	all_users_list = []
+
+	for user, score in all_users:
+		all_users_list.append(get_detail_of_user(user, request, score=score))
+	return JsonResponse({
+		"all_users":all_users_list,
+	})
+
+def similarity_between(u1, u2):
+	# tot_scale_length = sum([scaler(len(v)) for k,v in u1.items() if k in u2])
+	tot_scale_length = sum([scaler(len(v)) for k,v in u1.items()])
+	u1_length = sum([len(v) for k,v in u1.items()])
+	u2_length = sum([len(v) for k,v in u2.items()])
+	u1_vec = []
+	u2_vec = []
+	sims = []
+	sims_weight = []
+	# print("another one")
+	for sk_type, skills in u1.items():
+		if sk_type in u2:
+			tmp_skill_ls = list(set(u1[sk_type]+u2[sk_type]))
+			u1_vec.append([int(sk in u1[sk_type]) for sk in tmp_skill_ls])
+			u2_vec.append([int(sk in u2[sk_type]) for sk in tmp_skill_ls])
+			sims.append(1 - distance.cosine(u1_vec[-1], u2_vec[-1]))
+			tmp_cos_scaler = 1 - arith_mean((abs((len(u1[sk_type])/u1_length)-(len(u2[sk_type])/u2_length))),abs(len(u1[sk_type]) - len(u2[sk_type]))/len(tmp_skill_ls))
+			# print("u1 vec", u1_vec, "u2_vec", u2_vec )
+			# print("sims", sims[-1])
+			# print("tmp_cos_scaler", tmp_cos_scaler)
+			sims_weight.append(sims[-1]*tmp_cos_scaler*scaler(len(u1[sk_type]))/tot_scale_length)
+			# print("tot scaler", scaler(len(u1[sk_type]))/tot_scale_length)
+			# print("sims_weight",sims_weight[-1])
+	return sum(sims_weight)
+	
+def scaler(x):
+	return (x+1)**(2/3.0)-(x+1)**(-1/8.0)
+
+def harmonic_mean(x,y):
+	return 2.0/(1/x+1/y)
+
+def geometric_mean(x,y):
+	return (1.0*x*y)**(1/2)
+
+def arith_mean(x,y):
+	return (x+y)/2.0
+
+def get_skills_of_users(queryset):
+	all_user_skills = {}
+	for user in queryset:
+		all_user_skills[user.pk] = get_format_skills(User.objects.get(pk=user.pk).skill_set.all())
+	return all_user_skills
+		
+
+def get_format_skills(queryset):
+	user_skills = {}
+	for sk in queryset:
+		if sk.skill_type not in user_skills:
+			user_skills[sk.skill_type] = []
+		user_skills[sk.skill_type].append(sk.pk)
+	return user_skills
 
 def field_fuzzy_search(field_queryset, field_query, attr, profile_bool = False, score_cutoff = 80, limit=None):
 	if profile_bool:
@@ -639,18 +593,3 @@ def filter_by_field(field_queryset, prefix, field_tag, field_query):
 		field_queryset = field_queryset.filter(sth__gt=0.9)
 	
 	return field_queryset
-
-def lcs(s1, s2):
-	l1, l2 = len(s1), len(s2)
-	if l1 == 0 or l2 == 0: return []
-	index = 0
-	ret = []
-	for i in range(len(s2)):
-		while index < l1 and s1[index] == " ":
-			index += 1
-		if index < l1 and s2[i] == s1[index]:
-			ret.append(1)
-			index += 1
-		else:
-			ret.append(0)
-	return ret

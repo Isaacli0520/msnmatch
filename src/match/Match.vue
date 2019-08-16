@@ -114,8 +114,8 @@
                     <div class="col-12" style = "width:100%; margin: 0 auto;" id="header-wrapper">
                         <div id="navigation">
                             <nav class="navbar navbar-expand-md navbar-msn" >
-                                <a class="navbar-brand" :href="home_url">
-                                    <img :src="brand_pic" width="30" height="30" class="d-inline-block align-top" alt="">
+                                <a class="navbar-brand" :href="urls.home_url">
+                                    <img :src="urls.brand_pic" width="30" height="30" class="d-inline-block align-top" alt="">
                                 </a>
                                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".dual-collapse2" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                                     <i class="fas fa-bars"></i>
@@ -123,20 +123,23 @@
                                 <div class="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2 " id="navbar-left-div">
                                     <ul class="topBotomBordersOut navbar-nav mr-auto">
                                         <li class="nav-item">
-                                            <a class="nav-link" :href="home_url">Home</a>
+                                            <a class="nav-link" :href="urls.home_url">Home</a>
                                         </li>
                                         <li class="nav-item">
-                                            <a class="nav-link" :href="tags_url">Tags</a>
+                                            <a class="nav-link" :href="urls.courses_url">HoosMyProfessor</a>
                                         </li>
                                         <li class="nav-item">
-                                            <a class="nav-link" :href="trending_tags_url">Trending Tags</a>
+                                            <a class="nav-link" :href="urls.tags_url">Tags</a>
                                         </li>
+                                        <!-- <li class="nav-item">
+                                            <a class="nav-link" :href="urls.trending_tags_url">Trending Tags</a>
+                                        </li> -->
                                         <li class="nav-item">
-                                            <a class="nav-link" :href="family_url">Family</a>
+                                            <a class="nav-link" :href="urls.family_url">Family</a>
                                         </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link" :href="group_manage_url">Group</a>
-                                        </li>
+                                        <!-- <li class="nav-item">
+                                            <a class="nav-link" :href="urls.group_manage_url">Group</a>
+                                        </li> -->
                                     </ul>
                                 </div>
                             
@@ -161,10 +164,10 @@
                                             <i class="fas fa-user"></i>
                                         </a>
                                         <div class="dropdown-menu custom-drop-menu w-100 order-4 dropdown-menu-right" aria-labelledby="navbarDropdown-user">
-                                            <a class="dropdown-item" :href="profile">Profile</a>
+                                            <a class="dropdown-item" :href="urls.profile">Profile</a>
                                             <div class="dropdown-divider"></div>
-                                            <a class="dropdown-item" :href="update_profile">Edit Profile</a>
-                                            <a class="dropdown-item" :href="logout">Log out</a>
+                                            <a class="dropdown-item" :href="urls.update_profile">Edit Profile</a>
+                                            <a class="dropdown-item" :href="urls.logout">Log out</a>
                                         </div>
                                     </li>
                                     </ul>
@@ -203,7 +206,7 @@
                                                 <h5 class="mb-1 font-weight-bold">
                                                     {{card_user.first_name}} {{card_user.last_name}}
                                                 </h5>
-                                                <small style="float:right;">{{ card_user.year }}</small>
+                                                <small style="float:right;">{{ year_str(card_user.year) }}</small>
                                             </div>
                                             <div class="title d-flex w-100 justify-content-between">
                                                 <small v-if="card_user.major" class="text-muted">Major: {{ card_user.major }}</small>
@@ -226,9 +229,9 @@
             </main>
         </div>
         <home-footer
-            v-bind:home_url="home_url"
-            v-bind:tags_url="tags_url"
-            v-bind:profile="profile"/>
+            v-bind:home_url="urls.home_url"
+            v-bind:tags_url="urls.tags_url"
+            v-bind:profile="urls.profile"/>
     </div>
 </template>
 
@@ -239,6 +242,7 @@
     import HomeFooter from '../components/HomeFooter'
     import TagSpan from '../components/TagSpan'
     import axios from 'axios'
+    import jquery from 'jquery'
 
     export default{
         components:{
@@ -249,83 +253,85 @@
         },
         data: function (){ 
             return{
-            home_url:"",
-            tags_url:"",
-            family_url:"",
-            group_manage_url:"",
-            trending_tags_url:"",
-            brand_pic:"",
-            profile:"",
-            update_profile:"",
-            logout:"",
-            backup_all_users:[],
-            all_users:[],
-            following:[],
-            flw_limit : 3,
-            load_complete: false,
-            request_user:{
-                "username":"",
-                "pk":"",
-                "role":"",
-            },
-            modal_user: {
-                "pk": "",
-                "user_url": "",
-                "picture": "",
-                "first_name": "",
-                "last_name": "",
-                "email": "",
-                "bio": "",
-                "birth_date": "",
-                "location": "",
-                "year": "",
-                "major": "",
-                "skills":"",
-                "video":"",
-            },
-            modal_title:"",
-            modal_title_dist:{
-                "get-started":"Get Started",
-                "match-rule":"Mentee Mentor Match Rule",
-                "updates":"Updates",
-            },
-            modal_content:"",
-            modal_content_dist:{
-                "get-started":"<p class='font-weight-bold'>Be a Mentee or Mentor</p> \
-                <p>1. Click on <strong>Be a Mentee</strong> or <strong>Be a Mentor</strong> at the home page to be a Mentee or Mentor\
-                <br>2. If you don't choose a role, you won't appear in the user list at the home page and you won't be able to add anyone to your favorite list.</p>\
-                <p class='font-weight-bold'>Edit Your Profile</p> \
-                <p>1. Click the user dropdown menu <i class='fas fa-user'></i> and select edit profile.<br>2. <strong>Year</strong> and <strong>Major</strong> are required fields, while the others are optional.</p> \
-                <p class='font-weight-bold'>Add Your Interests</p>\
-                <p>1. Click on <strong>Tags</strong> at the upper-left corner to go to the Tags page.\
-                <br>2. You can add skills by typing in the search bar and add existing/customized tag\
-                <br>3. You can also add skills by click on the tags below the search bar\
-                <br>4. To delete a tag, just click the <i class='fas fa-times'></i> of that tag</p>",
+                "urls":{
+                    home_url:"",
+                    tags_url:"",
+                    family_url:"",
+                    group_manage_url:"",
+                    trending_tags_url:"",
+                    brand_pic:"",
+                    profile:"",
+                    update_profile:"",
+                    logout:"",
+                },
+                backup_all_users:[],
+                all_users:[],
+                following:[],
+                flw_limit : 3,
+                load_complete: false,
+                request_user:{
+                    "username":"",
+                    "pk":"",
+                    "role":"",
+                },
+                modal_user: {
+                    "pk": "",
+                    "user_url": "",
+                    "picture": "",
+                    "first_name": "",
+                    "last_name": "",
+                    "email": "",
+                    "bio": "",
+                    "birth_date": "",
+                    "location": "",
+                    "year": "",
+                    "major": "",
+                    "skills":"",
+                    "video":"",
+                },
+                modal_title:"",
+                modal_title_dist:{
+                    "get-started":"Get Started",
+                    "match-rule":"Mentee Mentor Match Rule",
+                    "updates":"Updates",
+                },
+                modal_content:"",
+                modal_content_dist:{
+                    "get-started":"<p class='font-weight-bold'>Be a Mentee or Mentor</p> \
+                    <p>1. Click on <strong>Be a Mentee</strong> or <strong>Be a Mentor</strong> at the home page to be a Mentee or Mentor\
+                    <br>2. If you don't choose a role, you won't appear in the user list at the home page and you won't be able to add anyone to your favorite list.</p>\
+                    <p class='font-weight-bold'>Edit Your Profile</p> \
+                    <p>1. Click the user dropdown menu <i class='fas fa-user'></i> and select edit profile.<br>2. <strong>Year</strong> and <strong>Major</strong> are required fields, while the others are optional.</p> \
+                    <p class='font-weight-bold'>Add Your Interests</p>\
+                    <p>1. Click on <strong>Tags</strong> at the upper-left corner to go to the Tags page.\
+                    <br>2. You can add skills by typing in the search bar and add existing/customized tag\
+                    <br>3. You can also add skills by click on the tags below the search bar\
+                    <br>4. To delete a tag, just click the <i class='fas fa-times'></i> of that tag</p>",
 
-                "match-rule":"<p class='font-weight-bold'>Add to Favorite</p> \
-                <p>1. Click on Mentee/Mentor Profile based on your role and you can add them to your favorte list by clicking the <strong>add to favorite</strong> button \
-                <br>2. Please note that the favorite list has a preference ranking based on the order you add others to your list. \
-                <br>3. The first one should be the one you prefer the most and so on for the rest.</p>\
-                <p class='font-weight-bold'>How are Mentees and Mentors Matched?</p>\
-                <p>1. This is done by the mentor program chair, feel free to contact him if you have any question.(WeChat Id: zgt19991026)</p>\
-                ",
-                
-                "updates":"<p class='font-weight-bold'>2019-05-31</p> \
-                <strong>1. Family page updated</strong><br><br>\
-                <p class='font-weight-bold'>2019-05-27</p> \
-                <strong>1. Fuzzy search algorithm changed for specific fields</strong><br>\
-                <strong>2. Number of trending tags changed from 50 to 75</strong><br>\
-                <strong>3. Family page title fixed</strong><br><br>\
-                <p class='font-weight-bold'>2019-05-23</p> \
-                <strong>1. Add Family Page</strong> \
-                <ul><li>Mentees can now like up to 3 families</li></ul>\
-                <strong>2. Add Group Management Page</strong>\
-                <ul><li>Family heads can now customize family information at the Group Management Page</li></ul>\
-                <strong>3. Bio maximum words changed from 500 to 1000</strong>\
-                "
-            },
-            fuzz: null,
-            options:null,
+                    "match-rule":"<p class='font-weight-bold'>Add to Favorite</p> \
+                    <p>1. Click on Mentee/Mentor Profile based on your role and you can add them to your favorte list by clicking the <strong>add to favorite</strong> button \
+                    <br>2. Please note that the favorite list has a preference ranking based on the order you add others to your list. \
+                    <br>3. The first one should be the one you prefer the most and so on for the rest.</p>\
+                    <p class='font-weight-bold'>How are Mentees and Mentors Matched?</p>\
+                    <p>1. This is done by the mentor program chair, feel free to contact him if you have any question.(WeChat Id: zgt19991026)</p>\
+                    ",
+                    
+                    "updates":"<p class='font-weight-bold'>2019-05-31</p> \
+                    <strong>1. Family page updated</strong><br><br>\
+                    <p class='font-weight-bold'>2019-05-27</p> \
+                    <strong>1. Fuzzy search algorithm changed for specific fields</strong><br>\
+                    <strong>2. Number of trending tags changed from 50 to 75</strong><br>\
+                    <strong>3. Family page title fixed</strong><br><br>\
+                    <p class='font-weight-bold'>2019-05-23</p> \
+                    <strong>1. Add Family Page</strong> \
+                    <ul><li>Mentees can now like up to 3 families</li></ul>\
+                    <strong>2. Add Group Management Page</strong>\
+                    <ul><li>Family heads can now customize family information at the Group Management Page</li></ul>\
+                    <strong>3. Bio maximum words changed from 500 to 1000</strong>\
+                    "
+                },
+                fuzz: null,
+                options:null,
             }
         },
         computed:{
@@ -336,6 +342,24 @@
             },
         },
         methods:{
+            year_str(year){
+                if(year.length == 0) return "";
+                if(year == 1){
+                    return "1st year";
+                }
+                else if(year == 2){
+                    return "2nd year";
+                }
+                else if(year == 3){
+                    return "3rd year";
+                }
+                else if(year == 4){
+                    return "4th year";
+                }
+                else{
+                    return "";
+                }
+            },
             addToFav(user){
                 if (this.following.length >= this.flw_limit){
                         $('#follow-btn').popover({
@@ -376,7 +400,7 @@
                 let sLen = 0;
                 try{
                     //先将回车换行符做特殊处理
-                    let tmpstr = str.replace(/(\r\n+|\s+|　+)/g,"龘");
+                    let tmpstr = str.replace(/(\r\n+|\s+| +)/g,"龘");
                     //处理英文字符数字，连续字母、数字、英文符号视为一个单词
                     tmpstr = tmpstr.replace(/[\x00-\xff]/g,"m");
                     //合并字符m，连续字母、数字、英文符号视为一个单词
@@ -604,20 +628,9 @@
             this.request_user.role = this.request_user_role;
             this.request_user.pk = this.request_user_pk;
             axios.get('/ajax/get_home_page_basic_info/',{params: {}}).then(response => {
-                // console.log(response.data.all_users);
-                let data = response.data.all_info;
-                this.home_url = data.home_url;
-                this.tags_url = data.tags_url;
-                this.family_url = data.family_url;
-                this.group_manage_url = data.group_manage_url;
-                this.trending_tags_url = data.trending_tags_url;
-                this.brand_pic = data.brand_pic;
-                this.profile = data.profile;
-                this.update_profile = data.update_profile;
-                this.logout = data.logout;
-                this.request_user.username = data.request_user_username;
-                this.request_user.pk = data.request_user_pk;
-                this.request_user.role = data.request_user_role;
+                let data = response.data;
+                this.urls = data.urls;
+                this.request_uesr = data.request_user;
             });
             axios.get('/skills/ajax/get_all_users/',{params: {}}).then(response => {
                 // console.log(response.data.all_users);

@@ -139,7 +139,7 @@
                                             v-for="(course, index_course) in trending_courses[i]"
                                             :href="'/courses/'+ course.course_pk + '/' ">
                                             <v-list-item-avatar
-                                                color="orange lighten-2">
+                                                color="teal lighten-1">
                                                 <span style="color:#fff;">{{index_course + 1}}</span>
                                             </v-list-item-avatar>
                                             <v-list-item-content two-line>
@@ -166,7 +166,7 @@
                                         v-for="(user, index_review) in review_users"
                                         :href="'/users/'+ user.username + '/' ">
                                         <v-list-item-avatar
-                                            color="orange lighten-2"
+                                            color="teal lighten-1"
                                             >
                                             <span style="color:#fff;">{{index_review + 1}}</span>
                                         </v-list-item-avatar>
