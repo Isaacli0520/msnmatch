@@ -16,7 +16,6 @@ from users.models import MatchingHistory
 from .forms import UserForm, ProfileForm
 from .models import MatchRequest
 from msnmatch import settings
-from hashlib import md5
 
 @login_required
 def update_profile(request, username):
@@ -83,7 +82,3 @@ def profile(request, username):
 
 	return render(request, 'profile.html', ctx)
 
-def custom_md5(pwd, salt):
-    obj = md5()
-    obj.update((pwd + salt).encode('utf-8'))
-    return obj.hexdigest()

@@ -37,7 +37,7 @@
                     <v-flex xs12 sm12 md4 lg4 xl4>
                         <v-card
                             :elevation="cardElevation">
-                            <v-card-title>Trash Can</v-card-title>
+                            <v-card-title>Toolbox</v-card-title>
                             <v-divider></v-divider>
                             <v-card-text>
                                 <v-list>

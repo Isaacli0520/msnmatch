@@ -19,6 +19,95 @@
                 </div>
             </div>
         </div>
+        <div class="modal fade" id="user-modal" tabindex="-1" role="dialog" aria-labelledby="user-modal-label" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="user-modal-label">{{modal_user.first_name}} {{modal_user.last_name}}</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <img :src="modal_user.picture" class="card-img-top" alt="None">
+                    <div class="skill-tags">
+                        <template v-for="(skills_of_type, skills_type_name) in modal_user.skills">
+                            <tag-span v-for="skill in skills_of_type"
+                                :key="skills_type_name + skill.skill_pk"
+                                :skill="skill"
+                                :clickable="'href'"
+                            />
+                        </template>
+                    </div>
+                    <div>
+                        <table class="table table-user-information">
+                            <tbody>
+                                <tr>
+                                    <td class="field-title">Email</td>
+                                    <td>{{modal_user.email}}</td>
+                                </tr>
+                                <tr>
+                                    <td class="field-title">Year</td>
+                                    <td>{{modal_user.year}}</td>
+                                </tr>
+                                <tr v-if="modal_user.major">
+                                    <td class="field-title">Major</td>
+                                    <td>{{modal_user.major}}</td>
+                                </tr>
+                                <tr v-if="modal_user.major_two">
+                                    <td class="field-title">Second Major</td>
+                                    <td>{{modal_user.major_two}}</td>
+                                </tr>
+                                <tr v-if="modal_user.minor">
+                                    <td class="field-title">Minor</td>
+                                    <td>{{modal_user.minor}}</td>
+                                </tr>
+                                <tr v-if="modal_user.role">
+                                    <td class="field-title">Role</td>
+                                    <td>{{modal_user.role}}</td>
+                                </tr>
+                                <tr v-if="modal_user.wechat">
+                                    <td class="field-title">WeChat ID</td>
+                                    <td>{{modal_user.wechat}}</td>
+                                </tr>
+                                <tr v-if="modal_user.birth_date">
+                                    <td class="field-title">Birth Date</td>
+                                    <td>{{modal_user.birth_date}}</td>
+                                </tr>
+                                <tr v-if="modal_user.sex">
+                                    <td class="field-title">Gender</td>
+                                    <td>{{modal_user.sex}}</td>
+                                </tr>
+                                <tr v-if="modal_user.location">
+                                    <td class="field-title">Location</td>
+                                    <td>{{modal_user.location}}</td>
+                                </tr>
+                                <tr v-if="modal_user.bio">
+                                    <td class="field-title">Bio</td>
+                                    <td>{{modal_user.bio}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                        <div v-if="modal_user.video.length">
+                            <video width="100%" controls :src="modal_user.video">
+                                Your Browser does not support video tags lol
+                            </video>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" id="follow-btn" v-if="request_user.role != '' 
+                        && modal_user.role != ''
+                        && !modal_user.follow 
+                        && modal_user.role != request_user.role 
+                        && request_user.pk != modal_user.pk " 
+                        class="btn btn-Primary" @click.stop="addToFav(modal_user)"
+                        >Add to Favorites</button>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div id="wrap">
             <main>
                 <div class="main">
@@ -66,8 +155,7 @@
                                         </li>
                                         <follow-list
                                         v-bind:following="following"
-                                        @update-following-list="update_following_list"
-                                        />
+                                        @update-following-list="update_following_list"/>
                                     <li class="nav-item dropdown">
                                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown-user" role="button" data-toggle="dropdown" aria-haspopup="true">
                                             <i class="fas fa-user"></i>
@@ -102,11 +190,36 @@
                         </div>
                         <div v-if="!load_complete" class="lds-ring"><div></div><div></div><div></div><div></div></div>
                         <div class="col-xs-12 col-sm-12 col-md-10 col-lg-10 col-xs-offset-0 col-sm-offset-0 mb-5" style="width:100%; margin: 0 auto;">
-                            <user-list
-                                v-bind:allUsers="all_users"
-                                v-bind:requestUser="request_user"
-                                v-bind:following="following"
-                                @update-following-list="update_following_list"/>
+                            <div class="card-columns">
+                                <div class="card user-card" :key="card_user.pk" v-for="card_user in users_with_roles">
+                                    <div class="user-card-inner">
+                                        <div id="show-modal" @click="openUserModal(card_user)">
+                                            <progressive-img v-if="card_user.picture" 
+                                                :src="card_user.picture" 
+                                                :placeholder="card_user.avatar"/>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="title d-flex w-100 justify-content-between">
+                                                <h5 class="mb-1 font-weight-bold">
+                                                    {{card_user.first_name}} {{card_user.last_name}}
+                                                </h5>
+                                                <small style="float:right;">{{ card_user.year }}</small>
+                                            </div>
+                                            <div class="title d-flex w-100 justify-content-between">
+                                                <small v-if="card_user.major" class="text-muted">Major: {{ card_user.major }}</small>
+                                            </div>
+                                            <div class="user-id-tags">
+                                                <span v-if="card_user.role" class="user-id-tag" :class="card_user.role">{{ card_user.role }}</span>
+                                                <span v-if="card_user.video.length" class="user-id-tag user-id-tag-video">Video</span>
+                                                <span v-if="card_user.bio && wordCount(card_user.bio) > 100" class="user-id-tag user-id-tag-bio">百字Bio</span>
+                                                <span v-if="card_user.follow" class="user-id-tag user-id-tag-fav">Like</span>
+                                                <span v-if="card_user.matched" class="user-id-tag user-id-tag-match">Matched</span>
+                                            </div>
+                                            <small v-if="card_user.score && card_user.score > 0" class="score-text">Similarity: {{ card_user.score }}%</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -115,28 +228,24 @@
         <home-footer
             v-bind:home_url="home_url"
             v-bind:tags_url="tags_url"
-            v-bind:profile="profile"
-        />
+            v-bind:profile="profile"/>
     </div>
 </template>
 
 
 <script>
-    import UserList from '../components/UserList'
     import FollowList from '../components/FollowList'
     import SearchHome from '../components/SearchHome'
     import HomeFooter from '../components/HomeFooter'
+    import TagSpan from '../components/TagSpan'
     import axios from 'axios'
 
     export default{
-        props:{
-            
-        },
         components:{
-            UserList,
             FollowList,
-            SearchHome,
-            HomeFooter,
+            SearchHome, 
+            HomeFooter, 
+            TagSpan,
         },
         data: function (){ 
             return{
@@ -152,11 +261,27 @@
             backup_all_users:[],
             all_users:[],
             following:[],
+            flw_limit : 3,
             load_complete: false,
             request_user:{
                 "username":"",
                 "pk":"",
                 "role":"",
+            },
+            modal_user: {
+                "pk": "",
+                "user_url": "",
+                "picture": "",
+                "first_name": "",
+                "last_name": "",
+                "email": "",
+                "bio": "",
+                "birth_date": "",
+                "location": "",
+                "year": "",
+                "major": "",
+                "skills":"",
+                "video":"",
             },
             modal_title:"",
             modal_title_dist:{
@@ -203,11 +328,66 @@
             options:null,
             }
         },
+        computed:{
+            users_with_roles(){
+                return this.all_users.filter(obj => {
+                    return obj.role != '';
+                })
+            },
+        },
         methods:{
+            addToFav(user){
+                if (this.following.length >= this.flw_limit){
+                        $('#follow-btn').popover({
+                            trigger: 'focus',
+                            placement: 'top',
+                            container: 'body',
+                            html: true,
+                            content: "Don't be too 花心 <br /> You can only like 3 users",
+                        });
+                        $('#follow-btn').popover('show')
+                    }
+                else{
+                    $('#follow-btn').popover('disable')
+                    axios.get('/skills/ajax/add_to_list/',{params: {user_pk:user.pk}}).then(response => {
+                        $('#user-modal').modal('hide');
+                        var tmp_fav = {
+                            "pk": user.pk,
+                            "user_url": user.user_url,
+                            "first_name": user.first_name,
+                            "last_name": user.last_name,
+                        }
+                        if(response.data.success == 1){
+                            this.update_following_list(tmp_fav, 1);
+                        }
+                    });
+                }
+            },
+            openUserModal(user){
+                this.modal_user = user;
+                $('#user-modal').modal('show');
+            },
             openModal(key){
                 this.modal_title = this.modal_title_dist[key];
                 this.modal_content = this.modal_content_dist[key];
                 $('#modal-intruction').modal('show');
+            },
+            wordCount(str){
+                let sLen = 0;
+                try{
+                    //先将回车换行符做特殊处理
+                    let tmpstr = str.replace(/(\r\n+|\s+|　+)/g,"龘");
+                    //处理英文字符数字，连续字母、数字、英文符号视为一个单词
+                    tmpstr = tmpstr.replace(/[\x00-\xff]/g,"m");
+                    //合并字符m，连续字母、数字、英文符号视为一个单词
+                    tmpstr = tmpstr.replace(/m+/g,"*");
+                    //去掉回车换行符
+                    tmpstr = tmpstr.replace(/龘+/g,"");
+                    //返回字数
+                    sLen = tmpstr.length;
+                }catch(e){
+                }
+                return sLen;
             },
             update_request_user_role(user_role){
                 this.request_user.role = user_role;
@@ -455,15 +635,109 @@
 </script>
 
 <style lang="css">
+    /* User Card CSS */
+    .user-card {
+        /* margin:10px; */
+        margin: 3px 3px 0.75em 3px;
+        flex: 1 0 auto;
+        overflow:hidden;
+        /* width: 30%; */
+    }
+
+    .user-id-tags{
+        margin: 0px 0px 3px 0px;
+        display: flex;
+        flex-flow: row wrap;
+        width:100%;
+    }
+
+    .user-id-tag{
+        font-size: 12px;
+        font-weight: 500;
+        padding: 2px 6px 2px 6px;
+        margin: 5px 4px 0px 0px;
+        border-radius: 4px;
+    }
+
+    .user-id-tag-fav{
+        color:#ffffff;
+        background: rgba(255, 0, 43, 0.993);
+    }
+
+    .user-id-tag-video{
+        color:#ffffff;
+        background: #de21f0;
+    }
+
+    .user-id-tag-bio{
+        color:#ffffff;
+        background: #f0d121;
+    }
+
+    .user-id-tag-match{
+        color:#ffffff;
+        background: #f07421ea;
+    }
+
+    .Mentor{
+        color:#ffffff;
+        background: rgba(26, 158, 235, 0.781);
+    }
+
+    .Mentee{
+        color:#ffffff;
+        background: rgba(9, 194, 40, 0.781);
+    }
+
+    .score-text{
+        color:#2b9761;
+        font-weight: 550;
+    }
+
+    /* User Modal CSS */
+    td{
+        word-wrap:break-word;
+        white-space: pre-line;
+    }
+    .skill-tags{
+        display: flex;
+        flex-flow: row wrap;
+        width:100%;
+        margin: 5px 0px 20px 0px;
+        }
+
+    .skill-tag{
+        padding: 5px 9px 5px 9px;
+        border-radius: 5px;
+        margin: 5px 4px 5px 0px;
+        font-family: Gill Sans, sans-serif;
+        box-shadow: 0 6px 8px rgba(0, 0, 0, 0.175);
+    }
+    .field-title{
+        font-weight: 670;
+        width:30%;
+    }
+
+    .table-user-information{
+        table-layout: fixed;
+    }
+
+    .modal-body{
+        padding: 16px 16px 0px 16px;
+    }
+
     .custom-drop-menu{
         box-shadow: 0 2px 5px 0px rgba(0,0,0,.16), 0 2px 10px 0px rgba(0,0,0,.12);
     }
+
+    /* Loading Ring CSS */
 
     .lds-ring {
         margin: 0 auto;
         width: 80px;
         height: 80px;
-        }
+    }
+
     .lds-ring div {
         box-sizing: border-box;
         display: block;
@@ -476,15 +750,19 @@
         animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
         border-color: #35a39a transparent transparent transparent;
     }
+
     .lds-ring div:nth-child(1) {
         animation-delay: -0.45s;
     }
+
     .lds-ring div:nth-child(2) {
         animation-delay: -0.3s;
     }
+
     .lds-ring div:nth-child(3) {
         animation-delay: -0.15s;
     }
+
     @keyframes lds-ring {
         0% {
             transform: rotate(0deg);
@@ -494,7 +772,6 @@
         }
     }
 
-
     *{
         box-sizing: border-box;
     }
@@ -503,209 +780,178 @@
         flex-direction:column;
     }
 
-
     #wrap {
         min-height: 100%;
     }
     
     #main {
         overflow: auto;
-        /* padding-bottom: 311px; */
-        /* must be same height as the footer */
     }
+
     .user-list-div{
-    /* width:100%;
-    height: 100%;
-    position:relative;
-    background: url('images/cloud_01.jpg') no-repeat;
-    background-attachment: fixed;
-    background-position: center center;
-    background-size: cover; */
-    padding-top: 48px;
-    
+        padding-top: 48px;
     }
 
     .line-break {
-    width: 80%; 
-    text-align: center; 
-    border-bottom: 1px solid rgb(134, 130, 130); 
-    line-height: 0.1em;
-    margin: 0 auto; 
+        width: 80%; 
+        text-align: center; 
+        border-bottom: 1px solid rgb(134, 130, 130); 
+        line-height: 0.1em;
+        margin: 0 auto; 
     } 
 
     .line-break span { 
-    color:#2ea49a;
-    font-weight: 350;
-    font-family: Baskerville, "Baskerville Old Face", sans-serif;
-    background:#fff; 
-    padding:0 20px; 
-    margin: 5px 0px 2px 0px;
+        color:#2ea49a;
+        font-weight: 350;
+        font-family: Baskerville, "Baskerville Old Face", sans-serif;
+        background:#fff; 
+        padding:0 20px; 
+        margin: 5px 0px 2px 0px;
     }
 
     #header-wrapper {
-    position: relative;
-    /* z-index: -5; */
-    padding: 0px 0px 40px 0px;
-    /* background-image: url("images/header.svg");
-    background-image: url("images/overlay.png"), url("images/header.svg"),  -moz-linear-gradient(75deg, #FF7088 15%, #F2B69D 55%);
-    background-image: url("images/overlay.png"), url("images/header.svg"), -webkit-linear-gradient(75deg, #FF7088 15%, #F2B69D 55%);
-    background-image: url("images/overlay.png"), url("images/header.svg"), -ms-linear-gradient(75deg, #FF7088 15%, #F2B69D 55%);
-    background-image: url("images/overlay.png"), url("images/header.svg"), linear-gradient(75deg, #FF7088 15%, #F2B69D 55%);
-    background-size: 100% 180%;
-    background-size: 128px 128px, 100% 180%, auto;
-    background-repeat: repeat, no-repeat, no-repeat;
-    background-color: #e5e2e29c;
-    background-attachment: fixed;
-    background-position: center center; */
-    color:#000000;
-    width:100%;
-    /* height: 100%; */
-    position:relative;
-    background: url('../assets/static/css/images/cloud_new_09.jpg') no-repeat;
-    background-attachment: fixed;
-    background-position: center center;
-    background-size: cover;
+        position: relative;
+        padding: 0px 0px 40px 0px;
+        color:#000000;
+        width:100%;
+        position:relative;
+        background: url('../assets/static/css/images/cloud_new_09.jpg') no-repeat;
+        background-attachment: fixed;
+        background-position: center center;
+        background-size: cover;
 
-    -webkit-box-shadow: inset 0 -3px 3px 0px rgba(0,0,0,.13), inset 0 -7px 7px 0px rgba(0,0,0,.12);
-    box-shadow: inset 0 -3px 3px 0px rgba(0,0,0,.13), inset 0 -7px 7px 0px rgba(0,0,0,.12);
-    /* padding: 0; */
+        -webkit-box-shadow: inset 0 -3px 3px 0px rgba(0,0,0,.13), inset 0 -7px 7px 0px rgba(0,0,0,.12);
+        box-shadow: inset 0 -3px 3px 0px rgba(0,0,0,.13), inset 0 -7px 7px 0px rgba(0,0,0,.12);
     }
 
 
 
 
     .main-title{
-    margin-top: 100px;
-    margin-bottom: 30px;
-    color:#32a49a;
-    font-weight: 800 !important;
-    /* font-family: Baskerville, "Baskerville Old Face", sans-serif; */
-    text-transform: uppercase;
-    font-family: "Raleway", Helvetica, sans-serif;
-    /* font-family: Optima, sans-serif; */
-    font-size: 45px;
-    letter-spacing: 0.02em;
-    /* text-shadow: 1px 2px 4px rgb(155, 155, 155); */
+        margin-top: 100px;
+        margin-bottom: 30px;
+        color:#32a49a;
+        font-weight: 800 !important;
+        /* font-family: Baskerville, "Baskerville Old Face", sans-serif; */
+        text-transform: uppercase;
+        font-family: "Raleway", Helvetica, sans-serif;
+        /* font-family: Optima, sans-serif; */
+        font-size: 45px;
+        letter-spacing: 0.02em;
+        /* text-shadow: 1px 2px 4px rgb(155, 155, 155); */
     }
 
     .sub-title{
-    color:#ffffff;
+        color:#ffffff;
     }
 
-
-
-
     .loader {
-    border: 16px solid #f3f3f3;
-    border-radius: 50%;
-    border-top: 16px solid #3498db;
-    width: 100px;
-    height: 100px;
-    -webkit-animation: spin 2s linear infinite; /* Safari */
-    animation: spin 2s linear infinite;
-    margin:0 auto;
+        border: 16px solid #f3f3f3;
+        border-radius: 50%;
+        border-top: 16px solid #3498db;
+        width: 100px;
+        height: 100px;
+        -webkit-animation: spin 2s linear infinite; /* Safari */
+        animation: spin 2s linear infinite;
+        margin:0 auto;
     }
 
     /* Safari */
     @-webkit-keyframes spin {
-    0% { -webkit-transform: rotate(0deg); }
-    100% { -webkit-transform: rotate(360deg); }
+        0% { -webkit-transform: rotate(0deg); }
+        100% { -webkit-transform: rotate(360deg); }
     }
 
     @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
     }
 
 
 
 
     .user-card-inner:hover .progressive-image {
-    opacity: 0.3;
-    transition: .5s ease;
+        opacity: 0.3;
+        transition: .5s ease;
     }
 
 
     .progressive-image {
-    transition: .5s ease;
-    position: relative;
-    overflow: hidden;
-    width: 100%;
-    display: inline-block;
-    
+        transition: .5s ease;
+        position: relative;
+        overflow: hidden;
+        width: 100%;
+        display: inline-block;
     }
+
     .progressive-image-canvas {
-    visibility: hidden;
-    position: absolute;
-    top: 0;
-    left: 0;
+        visibility: hidden;
+        position: absolute;
+        top: 0;
+        left: 0;
     }
+
     .progressive-image-main {
-    border-top-left-radius: calc(.25rem - 1px);
-    border-top-right-radius: calc(.25rem - 1px);
-    opacity: 1;
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    width: 100%;
-    height: auto;
-    z-index: 1;
-    transition-duration: 0.5s;
-    transition-property: all;
-    transition-timing-function: ease-out;
-    transform: translateZ(0);
+        border-top-left-radius: calc(.25rem - 1px);
+        border-top-right-radius: calc(.25rem - 1px);
+        opacity: 1;
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        width: 100%;
+        height: auto;
+        z-index: 1;
+        transition-duration: 0.5s;
+        transition-property: all;
+        transition-timing-function: ease-out;
+        transform: translateZ(0);
     }
-    .progressive-image-before-enter {
-    /* opacity: 1; */
-    }
-    /* .progressive-image-enter {
-    opacity: 0.3;
-    transition: .5s ease;
-    } */
+
     .progressive-image-placeholder {
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    z-index: 0;
-    overflow: hidden;
-    transition-duration: 300ms;
-    transition-property: all;
-    transition-timing-function: ease-out;
-    backface-visibility: hidden;
-    transform: translateZ(0) scale(1.1);
-    width: 100%;
-    height: 100%;
-    background-size: cover;
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        z-index: 0;
+        overflow: hidden;
+        transition-duration: 300ms;
+        transition-property: all;
+        transition-timing-function: ease-out;
+        backface-visibility: hidden;
+        transform: translateZ(0) scale(1.1);
+        width: 100%;
+        height: 100%;
+        background-size: cover;
     }
+
     .progressive-image-placeholder-out {
-    transition-duration: inherit;
-    transition-property: all;
-    transition-timing-function: ease-out;
-    /**
-    * the transitioon delay needs to be longer than the
-    * .progressive-image-main transition-duration, otherwise it will flick
-    * because there won't be a background.
-    */
-    transition-delay: 0.4s;
-    opacity: 0;
+        transition-duration: inherit;
+        transition-property: all;
+        transition-timing-function: ease-out;
+        /**
+        * the transitioon delay needs to be longer than the
+        * .progressive-image-main transition-duration, otherwise it will flick
+        * because there won't be a background.
+        */
+        transition-delay: 0.4s;
+        opacity: 0;
     }
     .progressive-image-preloader {
-    pointer-events: none;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 2;
+        pointer-events: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 2;
     }
 
     #navbar-left-div ul li a {
-    border-bottom: 0;
-    font-family: "Raleway", Helvetica, sans-serif;
-    font-size: 0.8em;
-    font-weight: 320;
-    letter-spacing: 0.20em;
-    text-transform: uppercase;
+        border-bottom: 0;
+        font-family: "Raleway", Helvetica, sans-serif;
+        font-size: 0.8em;
+        font-weight: 320;
+        letter-spacing: 0.20em;
+        text-transform: uppercase;
     }
 
     .navbar-nav .nav-item .nav-link .fav-dropdown{
@@ -713,24 +959,24 @@
     }
 
     .navbar-nav .nav-item .nav-link {
-    color:rgb(0, 0, 0);
+        color:rgb(0, 0, 0);
     }
 
     .navbar-msn .navbar-toggler span {
-    color:#000000;
+        color:#000000;
     }
 
     .navbar-msn .dropdown-item {
-    font-family: "Raleway", Helvetica, sans-serif;
-    text-transform: uppercase;
-    font-size: 13px !important;
-    font-weight: 340 !important;
-    letter-spacing: 0.08em !important;
-    /* color: #ffffff; */
+        font-family: "Raleway", Helvetica, sans-serif;
+        text-transform: uppercase;
+        font-size: 13px !important;
+        font-weight: 340 !important;
+        letter-spacing: 0.08em !important;
+        /* color: #ffffff; */
     }
 
     .fa-heart {
-    color:#ee184d;
+        color:#ee184d;
     }
 
     .navbar-msn .nav-item.active .nav-link,
@@ -739,11 +985,8 @@
     }
 
     .navbar-msn{
-    background-color: #ffffff;
-    /* background:transparent; */
+        background-color: #ffffff;
     }
-
-
 
     #navbar-left-div ul li {
         border-left: solid 1px rgba(197, 197, 197, 0.945);
@@ -753,9 +996,9 @@
     }
 
     #navbar-left-div ul li:first-child {
-    border-left: 0;
-    margin-left: 0;
-    padding-left: 0;
+        border-left: 0;
+        margin-left: 0;
+        padding-left: 0;
     }
 
 
@@ -765,9 +1008,9 @@
     ##Screen = 1281px to higher resolution desktops
     */
     @media (min-width: 1281px) { 
-    .card-columns{
-        column-count: 5 !important; 
-    }
+        .card-columns{
+            column-count: 5 !important; 
+        }
     }
 
     /* 
@@ -775,9 +1018,9 @@
     ##Screen = B/w 1025px to 1280px
     */
     @media (min-width: 1025px) and (max-width: 1280px) {
-    .card-columns{
-        column-count: 4 !important;
-    }
+        .card-columns{
+            column-count: 4 !important;
+        }
     }
 
     /* 
@@ -786,13 +1029,13 @@
     */
 
     @media (min-width: 768px) and (max-width: 1024px) {
-    .card-columns{
-        column-count: 3 !important;
-    }
+        .card-columns{
+            column-count: 3 !important;
+        }
 
-    .main-title{
-        font-size: 45px;
-    }
+        .main-title{
+            font-size: 45px;
+        }
     }
 
     /* 
@@ -801,13 +1044,13 @@
     */
 
     @media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
-    .card-columns{
-        column-count: 3 !important;
-    }
+        .card-columns{
+            column-count: 3 !important;
+        }
 
-    .main-title{
-        font-size: 36px;
-    }
+        .main-title{
+            font-size: 36px;
+        }
     }
 
     /* 
@@ -816,31 +1059,15 @@
     */
 
     @media (min-width: 481px) and (max-width: 767px) {
-    .card-columns{
-        column-count: 2 !important;
-    }
-    /* 
-    #header-wrapper {
-        position: relative;
-        padding: 0px 0px 40px 0px;
-        background-image: url("images/header.svg");
-        background-image: url("images/overlay.png"), url("images/header.svg"),  -moz-linear-gradient(55deg, #FF7088 15%, #F2B69D 55%);
-        background-image: url("images/overlay.png"), url("images/header.svg"), -webkit-linear-gradient(55deg, #FF7088 15%, #F2B69D 55%);
-        background-image: url("images/overlay.png"), url("images/header.svg"), -ms-linear-gradient(55deg, #FF7088 15%, #F2B69D 55%);
-        background-image: url("images/overlay.png"), url("images/header.svg"), linear-gradient(55deg, #FF7088 15%, #F2B69D 55%);
-        background-color: #ffffff;
-        background-size: 100% 100%;
-        background-size: 128px 128px, 100% 100%, auto;
-        background-repeat: repeat, no-repeat, no-repeat;
-        padding: 0;
-    } */
+        .card-columns{
+            column-count: 2 !important;
+        }
 
-    .main-title{
-        margin-top: 60px;
-        margin-bottom: 30px;
-        font-size: 30px;
-    }
-
+        .main-title{
+            margin-top: 60px;
+            margin-bottom: 30px;
+            font-size: 30px;
+        }
     }
 
     /* 
@@ -849,32 +1076,15 @@
     */
 
     @media (min-width: 320px) and (max-width: 480px) {
-    .card-columns{
-        column-count: 1 !important;
-    }
+        .card-columns{
+            column-count: 1 !important;
+        }
 
-    /* #header-wrapper {
-        position: relative;
-        padding: 0px 0px 40px 0px;
-        background-image: url("images/header.svg");
-        background-image: url("images/overlay.png"), url("images/header.svg"),  -moz-linear-gradient(70deg, #FF7088 15%, #F2B69D 55%);
-        background-image: url("images/overlay.png"), url("images/header.svg"), -webkit-linear-gradient(70deg, #FF7088 15%, #F2B69D 55%);
-        background-image: url("images/overlay.png"), url("images/header.svg"), -ms-linear-gradient(70deg, #FF7088 15%, #F2B69D 55%);
-        background-image: url("images/overlay.png"), url("images/header.svg"), linear-gradient(70deg, #FF7088 15%, #F2B69D 55%);
-        background-color: #ffffff;
-        background-size: 100% 100%;
-        background-size: 128px 128px, 100% 100%, auto;
-        background-repeat: repeat, no-repeat, no-repeat;
-        padding: 0;
-    } */
-
-    .main-title{
-        margin-top: 60px;
-        margin-bottom: 30px;
-        font-size: 28px;
-    }
-
-    
+        .main-title{
+            margin-top: 60px;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
     }
 
     @media (min-width: 10px) and (max-width: 319px) {

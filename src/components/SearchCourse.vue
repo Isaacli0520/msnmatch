@@ -60,13 +60,16 @@ export default {
         },
         search(val) {
             // Items have already been loaded
-            if (val.length < 2) return
+
+            if (val == null || val.length == 0){
+                this.entries = [];
+                this.lastTime += 1;
+                return;
+            }
+
+            if (val.length < 2) return;
 
             this.lastTime += 1;
-            if (val == null || val.length == 0){
-                this.entries = []
-                return
-            }
 
             // Items have already been requested
             // if (this.isLoading) return

@@ -17,6 +17,7 @@ from PIL import ImageFilter
 from friendship.models import Follow
 from django.contrib import admin
 from msnmatch import settings
+from msnmatch.utils import custom_md5
 
 YEAR_CHOICES = (
 			('1st year', '1st year'),
@@ -186,6 +187,7 @@ class Profile(models.Model):
 		# delete old file when replacing by updating the file
 		try:
 			this = Profile.objects.get(pk=self.pk)
+			self.credential = custom_md5(settings.SECRET_KEY + self.user.username, settings.SECRET_KEY)
 			if self.picture and this.picture != self.picture:
 				# this.picture.delete(save=False)
 				tmp_picture = self.picture

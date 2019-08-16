@@ -14,7 +14,7 @@ import uuid
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from friendship.models import Follow
 from groups.models import Group
-from users.views import custom_md5
+from msnmatch.utils import custom_md5
 from msnmatch import settings
 
 

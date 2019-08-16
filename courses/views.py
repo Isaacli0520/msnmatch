@@ -20,7 +20,7 @@ import json
 from django.urls import reverse
 from msnmatch import settings
 from users.models import MAJOR_CHOICES
-from users.views import custom_md5
+from msnmatch.utils import custom_md5
 from users.models import PlanProfile
 from functools import cmp_to_key
 import time
@@ -659,6 +659,7 @@ def get_basic_info(request):
 		"update_profile":reverse('update_profile', args=[request.user.username]),
 		"my_courses":reverse('my_courses', args=[request.user.username]),
 		"logout":reverse('logout'),
+		"match_url":reverse('match'),
 	}
 	return JsonResponse({
 		"all_info":tmp,

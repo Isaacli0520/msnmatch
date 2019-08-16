@@ -1,9 +1,7 @@
 <template>
     <div>
         <v-navigation-drawer
-            v-if="navDrawer"
             fixed
-            :clipped="$vuetify.breakpoint.mdAndUp"
             app
             v-model="drawer">
             <v-list dense>
@@ -66,15 +64,28 @@
             app
             light
             absolute
-            :clipped-left="$vuetify.breakpoint.mdAndUp"
             fixed>
-            <v-app-bar-nav-icon v-if="navDrawer" @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
+            <v-app-bar-nav-icon v-if="$vuetify.breakpoint.smAndDown" @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
             <a class="navbar-brand" :href="urls.courses_url">
                 <img :src="urls.brand_pic" style="margin:5px 0px 0px 0px;" width="35" height="35" class="d-inline-block align-center" alt="">
             </a>
-            <v-toolbar-title class="nav-bar-title ml-0 mr-2 pl-3">
+            <!-- <v-toolbar-title class="nav-bar-title ml-0 mr-2 pl-3">
                 HoosMyProfessor
-            </v-toolbar-title>
+            </v-toolbar-title> -->
+            <v-toolbar-items v-if="$vuetify.breakpoint.mdAndUp">
+                <template v-for="item in navBarItems">
+                    <v-btn 
+                        :key="item.text + '-btn' "
+                        :href="item.href"
+                        text>
+                        {{item.text}}
+                    </v-btn>
+                    <v-divider
+                        :key="item.text + '-divider' "
+                        inset
+                        vertical></v-divider>
+                </template>
+            </v-toolbar-items>
             <v-spacer></v-spacer>
             <search-course
                 v-if="searchBool"></search-course>
@@ -122,6 +133,18 @@ export default{
         return {
             navDrawer:false,
             drawer: false,
+            navBarItems:[
+                {
+                    text:"HoosMyProfessor",
+                    href:"",
+                    diabled:true,
+                },
+                {
+                    text:"Match",
+                    href:"",
+                    diabled:true,
+                },
+            ],
             user_items:[
                 { title:"Profile", icon:"fas fa-user" },
                 { title:"Edit Profile", icon:"fas fa-biohazard" },
@@ -136,6 +159,7 @@ export default{
                 logout:"",
                 my_courses:"",
                 courses_url:"",
+                match_url:"",
             },
             old_items: [
                 //   {  icon: 'contacts', text: 'Contacts' },
@@ -163,9 +187,8 @@ export default{
                 //       { text: 'Other contacts' }
                 //     ]
                 //   },
-                { icon: 'settings', text: 'Settings' },
-                { icon: 'chat_bubble', text: 'Send feedback' },
-                { icon: 'help', text: 'Help' },
+                { icon: 'fas fa-book', text: 'HoosMyProfessor' },
+                { icon: 'fas fa-user', text: 'Match' },
                 ],
         }
     },
@@ -183,7 +206,12 @@ export default{
             return a.number.toString(10) - b.number.toString(10);
         },
         navAsideMethod(item){
-            
+            if(item.text == "HoosMyProfessor"){
+                this.goToHref(this.urls.courses_url);
+            }
+            else if(item.text == "Match"){
+                this.goToHref(this.urls.match_url);
+            }
         },
         navMethod(item){
             if(item.title=="Profile"){
@@ -202,6 +230,16 @@ export default{
         get_basic_info(){
             axios.get('/courses/ajax/get_basic_info/',{params: {}}).then(response => {
                 this.urls = response.data.all_info;
+                this.navBarItems[0] = {
+                    text:"HoosMyProfessor",
+                    href:this.urls.courses_url,
+                    diabled:false,
+                };
+                this.navBarItems[1] = {
+                    text:"Match",
+                    href:this.urls.match_url,
+                    diabled:false,
+                };
             });
         },
         goToHref(text){
@@ -216,6 +254,7 @@ export default{
 
 
 <style lang="css">
+
 
     .theme--light.v-text-field--solo-inverted.v-text-field--solo.v-input--is-focused > .v-input__control > .v-input__slot .v-label, .theme--light.v-text-field--solo-inverted.v-text-field--solo.v-input--is-focused > .v-input__control > .v-input__slot input {
         color: #000000 !important;
