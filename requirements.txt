@@ -21,3 +21,4 @@ numpy
 scipy
 django-webpack-loader
 django-cors-headers
+python-decouple
