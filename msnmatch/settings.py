@@ -15,10 +15,10 @@ import os
 import psycopg2
 import dj_database_url
 import sys
+from decouple import config, Csv
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
@@ -26,22 +26,20 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'f@hcb!l&kpn_4u+iz)6j4w(5j4$b2!)-=*j(9&(x_0a-j8o6)5'
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = config("DEBUG",cast=bool)
 
 SECURE_SSL_REDIRECT = not DEBUG
 # SESSION_COOKIE_SECURE = not DEBUG
 # CSRF_COOKIE_SECURE = not DEBUG
 
-# ALLOWED_HOSTS = ['msn-match-test.herokuapp.com', 'match.msnatuva.org','localhost']
-ALLOWED_HOSTS = ['drx0170jym8dn.cloudfront.net','d1ixiphwkdejqh.cloudfront.net', 'msn-match.herokuapp.com', 'match.msnatuva.org']
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
 
-DEBUG_PROPAGATE_EXCEPTIONS = True
+DEBUG_PROPAGATE_EXCEPTIONS = config('DEBUG_PROPAGATE_EXCEPTIONS', cast=bool)
 
 BUILD_VERSION = "msnmatch-alpha-0.206"
 
-CURRENT_YEAR = 2020
-CURRENT_SEMESTER = "2019Fall"
+CURRENT_YEAR = config('CURRENT_YEAR', cast=int)
+CURRENT_SEMESTER = config('CURRENT_SEMESTER')
 
 # Application definition
 
@@ -110,11 +108,11 @@ WSGI_APPLICATION = 'msnmatch.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'msnmatch',
-        'USER': 'msn',
-        'PASSWORD': 'msnatuva',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'NAME': config("DB_NAME"),
+        'USER': config("DB_USER"),
+        'PASSWORD': config("DB_PASSWORD"),
+        'HOST': config("DB_HOST"),
+        'PORT': config("DB_PORT"),
     }
 }
 
@@ -124,11 +122,11 @@ AUTHENTICATION_BACKENDS = (
     'social_core.backends.google.GoogleOAuth2',
     'django.contrib.auth.backends.ModelBackend',)
 
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '490419116742-ms0u7ogu2ng11drtqofgscvqhmt8o7vu.apps.googleusercontent.com'
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'pfR-vOTg6Zhb20TmLds5RgeX'
-SOCIAL_AUTH_URL_NAMESPACE = 'social'
-SOCIAL_AUTH_GOOGLE_OAUTH2_WHITELISTED_DOMAINS = ['virginia.edu']
-SOCIAL_AUTH_GOOGLE_OAUTH2_WHITELISTED_EMAILS = ['fz233ubw@gmail.com', 'mango.cs3240@gmail.com']
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = config('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY')
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = config('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET')
+SOCIAL_AUTH_URL_NAMESPACE = config('SOCIAL_AUTH_URL_NAMESPACE')
+SOCIAL_AUTH_GOOGLE_OAUTH2_WHITELISTED_DOMAINS = config('SOCIAL_AUTH_GOOGLE_OAUTH2_WHITELISTED_DOMAINS', cast=Csv())
+SOCIAL_AUTH_GOOGLE_OAUTH2_WHITELISTED_EMAILS = config('SOCIAL_AUTH_GOOGLE_OAUTH2_WHITELISTED_EMAILS', cast=Csv())
 
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'home'
@@ -173,30 +171,21 @@ DATE_INPUT_FORMATS = ['%m/%d/%Y']
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 
-CORS_ORIGIN_WHITELIST = (
-    'https://127.0.0.1:8080',
-    'http://127.0.0.1:8080',
-    'https://localhost:8080', 
-    'http://localhost:8080', 
-    'https://plannable.gitee.io',
-    'http://plannable.gitee.io',
-)
+CORS_ORIGIN_WHITELIST = config("CORS_ORIGIN_WHITELIST", cast=Csv())
 CORS_ALLOW_CREDENTIALS = True
 
 # AWS_DEFAULT_ACL = None
 
-AWS_ACCESS_KEY_ID = 'AKIAS2S3QXP6X5BJWVNA'
-AWS_SECRET_ACCESS_KEY = '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'
-AWS_STORAGE_BUCKET_NAME = 'mango-orange'
-AWS_CLOUDFRONT_DOMAIN = 'drx0170jym8dn.cloudfront.net'
+AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME')
+AWS_CLOUDFRONT_DOMAIN = config('AWS_CLOUDFRONT_DOMAIN')
 # AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
 
 AWS_S3_OBJECT_PARAMETERS = {
     'CacheControl': 'max-age=31536000',
 }
 
-
-# STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 AWS_LOCATION = 'static'
 
 # STATIC_URL = 'https://' + AWS_S3_CUSTOM_DOMAIN + '/' + AWS_LOCATION + '/'
@@ -204,7 +193,7 @@ AWS_LOCATION = 'static'
 # STATICFILES_STORAGE = 'msnmatch.storage_backends.StaticStorage'
 DEFAULT_FILE_STORAGE = 'msnmatch.storage_backends.MediaStorage' 
 
-STATIC_HOST = 'https://d1ixiphwkdejqh.cloudfront.net' if not DEBUG else ''
+STATIC_HOST = config('STATIC_HOST') if not DEBUG else ''
 # STATIC_HOST = ""
 STATIC_URL = STATIC_HOST + '/static/'
 
