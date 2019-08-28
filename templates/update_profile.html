@@ -1,0 +1,88 @@
+<!-- templates/update_profile.html -->
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+{% bootstrap_css %}
+{% load widget_tweaks %}
+
+{% block title %}Update Profile{% endblock %}
+
+{% block content %}
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bs-custom-file-input/dist/bs-custom-file-input.js"></script>
+<div class="container">
+	<div class="col-xs-12 col-sm-12 col-md-10 col-lg-8 col-xs-offset-0 col-sm-offset-0 toppad " style="width:100%; margin: 0 auto;">
+		<div class="card mt-3 mb-3">
+			<h2 class="card-header">Update Profile </h2>
+			<div class="card-body">
+				<form method="post" enctype="multipart/form-data" novalidate>
+					{% csrf_token %}
+
+					{% if user_form.non_field_errors %}
+						<div class="alert alert-danger" role="alert">
+							{% for error in user_form.non_field_errors %}
+								{{ error }}
+							{% endfor %}
+						</div>
+					{% endif %}
+
+					{% if profile_form.non_field_errors %}
+						<div class="alert alert-danger" role="alert">
+							{% for error in profile_form.non_field_errors %}
+								{{ error }}
+							{% endfor %}
+						</div>
+					{% endif %}
+
+					<div class="form-row">
+						<div class="form-group col">
+							{% include 'base_form.html' with form=user_form field=user_form.first_name %}
+						</div>
+						<div class="form-group col">
+							{% include 'base_form.html' with form=user_form field=user_form.last_name %}
+						</div>		
+					</div>
+					{% for field in profile_form %}
+						{% if field != profile_form.picture and field != profile_form.video %}
+							<div class="form-group">
+								{% include 'base_form.html' with form=profile_form field=field %}
+							</div>
+						{% endif %}
+					{% endfor %}
+					<div class="form-group">
+						<label for="{{ profile_form.picture.id_for_label }}">Upload Image:</label>
+						<div class="input-group mb-3">
+							<div class="input-group-prepend">
+								<span class="input-group-text" id="inputGroupFileAddon01">Upload</span>
+							</div>
+							<div class="custom-file">
+								<input type="file" class="custom-file-input" name="picture" accept="image/*" id="{{ profile_form.picture.id_for_label }}" aria-describedby="inputGroupFileAddon01">
+								<label class="custom-file-label" for="{{ profile_form.picture.id_for_label }}"></label>
+							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="{{ profile_form.video.id_for_label }}">Upload Video:</label>
+						<div class="input-group">
+							<div class="input-group-prepend">
+								<span class="input-group-text" id="inputGroupFileAddon02">Upload</span>
+							</div>
+							<div class="custom-file">
+								<input type="file" class="custom-file-input" name="video" accept="video/mp4,video/x-m4v,video/*" id="{{ profile_form.video.id_for_label }}" aria-describedby="inputGroupFileAddon02">
+								<label class="custom-file-label" for="{{ profile_form.video.id_for_label }}"></label>
+							</div>
+						</div>
+					</div>
+					<div class="container" style="overflow:hidden; padding:0px;">
+						<button class="btn-primary btn btn" type="submit" style="float: right; margin:18px 0px 18px 0px;">Update</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+	$(document).ready(function () {
+	  bsCustomFileInput.init()
+	})
+</script>
+{% endblock %}

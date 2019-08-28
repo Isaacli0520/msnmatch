@@ -1,0 +1,94 @@
+﻿Name,Introduction,Type
+Science fiction,Literature Genre,Books
+Detective fiction,Literature Genre,Books
+Fantasy,Literature Genre,Books
+Wuxia Novel,Literature Genre,Books
+Nonfiction,Literature Genre,Books
+Classics,Literature Genre,Books
+Mystery,Literature Genre,Books
+LOTR (Middle Earth),Great Works,Books
+Harry Potter,Great Works,Books
+A Song of Ice and Fire,Great Works,Books
+Sci-Fi,Movie Genre,Film and TV
+Fantasy,Movie Genre,Film and TV
+War,Movie Genre,Film and TV
+Horror,Movie Genre,Film and TV
+Movies,Video,Film and TV
+Korean drama,Video,Film and TV
+Anime,Video,Film and TV
+Reality show,Video,Film and TV
+Art History,,Academic
+Astronomy ,,Academic
+Biology ,,Academic
+Chemistry ,,Academic
+Cognitive Science ,,Academic
+Literature ,,Academic
+Computer Science,,Academic
+Economics ,,Academic
+Environmental Sciences ,,Academic
+History ,,Academic
+Philosophy ,,Academic
+Physics ,,Academic
+Politics,,Academic
+International Affairs,,Academic
+Psychology ,,Academic
+Geography,,Academic
+Soccer,Ball game,Sport
+Basketball,Ball game,Sport
+Volleyball,Ball game,Sport
+Tennis,Ball game,Sport
+Badminton,Ball game,Sport
+Pingpong,Ball game,Sport
+Baseball,Ball game,Sport
+Football,Ball game,Sport
+Pool,Ball game,Sport
+Workout,Non-ball game,Sport
+Rock Climbing,Non-ball game,Sport
+Swimming,Non-ball game,Sport
+Skiing,Non-ball game,Sport
+Fencing,Non-ball game,Sport
+Hiking,Non-ball game,Sport
+Frisbee,Non-ball game,Sport
+Pop,Music Genre,Music
+Jazz,Music Genre,Music
+Rock,Music Genre,Music
+Hip hop,Music Genre,Music
+Classical Music,Music Genre,Music
+Folk song,Music Genre,Music
+Rap,Music Genre,Music
+K-Pop,Music Genre,Music
+Mandopop,Music Genre,Music
+Cantopop,Music Genre,Music
+Dota,Specific game,Game
+LOL,Specific game,Game
+PUBG,Specific game,Game
+CsGo,Specific game,Game
+R6,Specific game,Game
+FortNight,Specific game,Game
+FPS,Game Type,Game
+MOBA,Game Type,Game
+MMORPG,Game Type,Game
+Grand Strategy,Game Type,Game
+Mobile game,Game Type,Game
+Board game,Game Type,Game
+Steam,Game platform,Game
+Linguistics,,Language
+French ,,Language
+Japanese,,Language
+Spanish ,,Language
+German,,Language
+Italian,,Language
+Korean,,Language
+Latin,,Language
+Drawing,Art,General
+Photography,Art,General
+Dancing,Art,General
+Singing,Art,General
+Drama,Art,General
+Gourmet,Lifestyle,General
+Cooking,Lifestyle,General
+Hopping,Life,General
+Shopping,Life,General
+Pet keeping,Life,General
+Travelling,Lifestyle,General
+Socialize,Lifestyle,General
