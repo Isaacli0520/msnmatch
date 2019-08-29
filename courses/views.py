@@ -20,7 +20,7 @@ import json
 from django.urls import reverse
 from msnmatch import settings
 from users.models import MAJOR_CHOICES
-from msnmatch.utils import custom_md5
+from msnmatch.utils import custom_md5, cmp_semester
 from users.models import PlanProfile
 from functools import cmp_to_key
 import time
@@ -350,12 +350,10 @@ def get_trending_courses(request):
 	trending_courses = {}
 	for cs_user in CourseUser.objects.all():
 		tmp_course = cs_user.course
-		if tmp_course.pk not in trending_courses:
+		if tmp_course.pk not in trending_courses and tmp_course.last_taught == settings.CURRENT_SEMESTER:
 			trending_courses[tmp_course.pk] = {"taking":0, "taken":0,}
-		if cs_user.take == "taking":
-			trending_courses[tmp_course.pk]["taking"] += 1
-		elif cs_user.take == "taken":
-			trending_courses[tmp_course.pk]["taken"] += 1
+		if tmp_course.pk in trending_courses:
+			trending_courses[tmp_course.pk][cs_user.take] += 1
 	tmp_courses = []
 	for cs_pk, take in trending_courses.items():
 		tmp_course = get_object_or_404(Course, pk = cs_pk)
@@ -369,20 +367,10 @@ def get_trending_courses(request):
 		})
 	taking_courses = sorted(tmp_courses, key=lambda x:(x["taking"]), reverse=True)
 	taken_courses = sorted(tmp_courses, key=lambda x:(x["taken"]), reverse=True)
-	final_taking_courses = []
-	for cs in taking_courses:
-		cs_instr_arr = [cs_instr.semester for cs_instr in CourseInstructor.objects.filter(course=get_object_or_404(Course, pk=cs["course_pk"]))]
-		if settings.CURRENT_SEMESTER in cs_instr_arr and cs["taking"] > 0:
-			final_taking_courses.append(cs)
 
-	final_taken_courses = []
-	for cs in taken_courses:
-		cs_instr_arr = [cs_instr.semester for cs_instr in CourseInstructor.objects.filter(course=get_object_or_404(Course, pk=cs["course_pk"]))]
-		if settings.CURRENT_SEMESTER in cs_instr_arr and cs["taken"] > 0:
-			final_taken_courses.append(cs)
-	
-	# taking_courses = [cs for cs in taking_courses if cs["taking"] > 0]
-	# taken_courses = [cs for cs in taken_courses if cs["taken"] > 0]
+	final_taking_courses = [cs for cs in taking_courses if cs["taking"] > 0]
+	final_taken_courses = [cs for cs in taken_courses if cs["taken"] > 0]
+
 	return JsonResponse({
 		"taking_courses":final_taking_courses[:10],
 		"taken_courses":final_taken_courses[:10],
@@ -587,31 +575,6 @@ def get_json_of_courses(queryset):
 		return [get_json_of_course(cs) for cs in queryset]
 	else:
 		return []
-
-def cmp_int(a,b):
-	if a > b:
-		return 1
-	elif a < b:
-		return -1
-	else:
-		return 0
-
-
-def cmp_semester(a,b):
-	if a == b:
-		return 0
-	elif a == "":
-		return -1
-	elif b == "":
-		return 1
-	elif a[:4] != b[:4]:
-		return cmp_int( int(a[:4]), int(b[:4]) )
-	elif a[:4] == b[:4]:
-		if a[4:] == "Fall":
-			return 1
-		elif b[4:] == "Fall":
-			return -1
-	return 0
 
 def cmp_semester_key(a,b):
 	return cmp_semester(a["semester"], b["semester"])

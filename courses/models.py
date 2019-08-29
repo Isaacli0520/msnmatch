@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from msnmatch.utils import cmp_semester
 
 class Instructor(models.Model):
   first_name = models.CharField(max_length=255, default="Null")
@@ -27,6 +28,7 @@ class Course(models.Model):
   type=models.CharField(max_length=100, blank=True)
   rating = models.FloatField(null=True, blank=True)
   department = models.ForeignKey(Department, on_delete=models.CASCADE, default=get_department)
+  last_taught = models.CharField(max_length=100, default="")
 
   def __str__(self):
     return self.mnemonic + str(self.number) + str(self.title) + '--' + str(self.units)
@@ -37,6 +39,12 @@ class CourseInstructor(models.Model):
   course = models.ForeignKey(Course, on_delete=models.CASCADE)
   semester = models.CharField(max_length=100, default="Null")
   topic = models.CharField(max_length=500, blank=True)
+  
+  def save(self, *args, **kwargs):
+    this = CourseInstructor.objects.get(pk = self.pk)
+    if cmp_semester(self.semester, this.course.last_taught) > 0:
+      self.course.last_taught = self.semester
+    super(CourseInstructor, self).save(*args, **kwargs)
 
 
 class CourseUser(models.Model):
