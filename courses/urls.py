@@ -9,14 +9,8 @@ urlpatterns = [
 	path('instructors/<instructor_number>/', views.instructor, name="instructor"),
 	path('<course_number>/', views.course, name='course'),
 	path('departments/<department_number>/', views.department, name="department"),
-	path('<course_number>/<instructor_number>/', views.course_instructor, name='course_instructor'),
 
-    path('api/get_list_of_plannable_profiles/', views.get_list_of_plannable_profiles, name='get_list_of_plannable_profiles'),
-	path('api/get_plannable_profile/', views.get_plannable_profile, name='get_plannable_profile'),
-	path('api/save_plannable_profile/', views.save_plannable_profile, name='save_plannable_profile'),
-    path('api/edit_plannable_profile/', views.edit_plannable_profile, name="edit_plannable_profile"),
-	
-    path('ajax/save_take/', views.save_take, name='save_take'),
+	path('ajax/save_take/', views.save_take, name='save_take'),
 	path('ajax/course_search_result/', views.course_search_result, name='course_search_result'),
 	path('ajax/get_course/', views.get_course, name='get_course'),
 	path('ajax/get_course_instructor/', views.get_course_instructor, name='get_course_instructor'),
@@ -34,4 +28,11 @@ urlpatterns = [
 	path('ajax/get_credential/', views.get_credential, name='get_credential'),
 	path('ajax/get_reviews/', views.get_reviews, name='get_reviews'),
 	path('ajax/submit_review/', views.submit_review, name='submit_review'),
+
+	path('<course_number>/<instructor_number>/', views.course_instructor, name='course_instructor'),
+
+    path('api/get_list_of_plannable_profiles/', views.get_list_of_plannable_profiles, name='get_list_of_plannable_profiles'),
+	path('api/get_plannable_profile/', views.get_plannable_profile, name='get_plannable_profile'),
+	path('api/save_plannable_profile/', views.save_plannable_profile, name='save_plannable_profile'),
+    path('api/edit_plannable_profile/', views.edit_plannable_profile, name="edit_plannable_profile"),
 ]
