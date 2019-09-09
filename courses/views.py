@@ -1,3 +1,7 @@
+import re
+import time
+import json
+
 from django.shortcuts import render
 from django.urls import reverse_lazy, reverse
 from django.views import generic
@@ -6,24 +10,21 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.contrib.auth.models import User
-from .models import Course, CourseUser, CourseInstructor, Instructor, Department
 from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector, TrigramSimilarity
 from django.db.models import Q, F
 from django.db.models.functions import Lower, Substr, Length
 from django.http import JsonResponse
-from django.core import serializers
-from django.core.serializers.json import DjangoJSONEncoder
-from fuzzywuzzy import fuzz, process
-import re
 from django.shortcuts import get_object_or_404
-import json
 from django.urls import reverse
+
+from fuzzywuzzy import fuzz, process
 from msnmatch import settings
-from users.models import MAJOR_CHOICES
+
 from msnmatch.utils import custom_md5, cmp_semester
-from users.models import PlanProfile
 from functools import cmp_to_key
-import time
+
+from users.models import MAJOR_CHOICES, PlanProfile
+from .models import Course, CourseUser, CourseInstructor, Instructor, Department
 
 mnemonics = ['AAS', 'MATH', 'ANTH', 'SWAH', 'MDST', 'ARAD', 'ARAH', 'ARTH', 'ARTS',
 'ARAB', 'ARTR', 'HEBR', 'HIND', 'MESA', 'MEST', 'PERS', 'SANS', 'SAST', 'SATR', 'URDU', 'ASTR',
@@ -42,9 +43,6 @@ mnemonics = ['AAS', 'MATH', 'ANTH', 'SWAH', 'MDST', 'ARAD', 'ARAH', 'ARTH', 'ART
  'GCOM', 'MICR', 'PATH', 'PHAR', 'PHY', 'COMM', 'GCNL', 'GNUR', 'NUIP', 'NURS', 'ENTP', 'LPPA',
  'LPPL', 'LPPP', 'LPPS', 'DS', 'AIR', 'AIRS', 'CASS', 'EDNC', 'HSCI', 'IMP', 'MISC', 'NAS',
  'NASC', 'PPL', 'UNST', "ESL",]
-
-MAXIMUM_COURSES = 12
-DEBUGGG = False
 
 @login_required
 def courses(request):
@@ -83,22 +81,57 @@ def department(request, department_number):
 def courses_admin(request):
 	return render(request, 'courses_admin.html')
 
+@login_required
+def get_basic_info(request):
+	tmp = {
+		"home_url":reverse('home'),
+		"courses_url": reverse('courses'),
+		"brand_pic": settings.STATIC_URL + "css/images/brand_compressed.png",
+		"profile": reverse('profile', args=[request.user.username]),
+		"update_profile":reverse('update_profile', args=[request.user.username]),
+		"my_courses":reverse('my_courses', args=[request.user.username]),
+		"logout":reverse('logout'),
+		"match_url":reverse('match'),
+	}
+	return JsonResponse({
+		"all_info":tmp,
+	})
+
+"""
+	Get the users with top reviews(sorted by review counts from maximum to minimum).
+
+	HttpRequest Method: GET
+
+	API Parameters:
+		None
+
+	Returns:
+		JsonResponse:
+			review_users: list
+				pk: user pk
+				username: user username
+				name: user name
+				reviews: user review count
+
+"""
+@login_required
 def get_top_review_users(request):
 	users = []
 	for user in User.objects.all():
-		tmp_review = user.courseuser_set.annotate(length=Length("text")).filter(length__gt=0).count()
-		if tmp_review > 0:
+		user_review_num = user.courseuser_set.annotate(length=Length("text")).filter(length__gt=0).count()
+		if user_review_num > 0:
 			users.append({
 				"pk":user.pk,
 				"username":user.username,
 				"name":user.first_name + " " + user.last_name,
-				"reviews":tmp_review,
+				"reviews":user_review_num,
 			})
 	users = sorted(users, key=lambda x:x["reviews"], reverse=True)[:10]
 	return JsonResponse({
 		"review_users":users,
 	})
 
+@login_required
 def get_course_instructors(request):
 	course_pk, instructor_pk = request.GET.get("course_pk"), request.GET.get("instructor_pk")
 	course = get_object_or_404(Course, pk=course_pk)
@@ -116,6 +149,7 @@ def get_course_instructors(request):
 		"course_instructors":course_instructor_relations,
 	})
 
+@login_required
 def get_reviews(request):
 	cs_users = CourseUser.objects.filter(user=request.user, take="taken")
 	reviews_arr = [cs_user for cs_user in cs_users if cs_user.text]
@@ -139,6 +173,7 @@ def get_json_of_review(review):
 		"course_instructor_pk":review.course_instructor.pk,
 	}
 
+@login_required
 def get_list_of_plannable_profiles(request):
 	username, credential = request.GET.get("username"), request.GET.get("credential")
 	user = get_object_or_404(User, username=username)
@@ -154,6 +189,7 @@ def get_list_of_plannable_profiles(request):
 		"profiles":ret_profiles,
 	})
 
+@login_required
 def get_instructor(request):
 	instructor_pk = request.GET.get("instructor_pk")
 	instructor = get_object_or_404(Instructor, pk=instructor_pk)
@@ -180,12 +216,14 @@ def get_instructor(request):
 		"courses":all_courses,
 	})
 
+@login_required
 def get_my_courses(request):
 	return JsonResponse({
 		"taking_courses":get_take_courses(request.user, "taking"),
 		"taken_courses":get_take_courses(request.user, "taken"),
 	})
 
+@login_required
 def get_taking_courses(request):
 	return JsonResponse({
 		"taking_courses":get_take_courses(request.user, "taking")
@@ -206,6 +244,7 @@ def get_take_courses(user, take):
 		})
 	return final_courses
 
+@login_required
 def get_credential(request):
 	return JsonResponse({
 		"credential":request.user.profile.credential,
@@ -281,6 +320,7 @@ def save_plannable_profile(request):
 		"success":success,
 	})
 
+@login_required
 def get_recommendations(request):
 	year, semester, major = request.GET.get('year'), request.GET.get('semester'), request.GET.get('major')
 	users_pk = [sth.pk for sth in User.objects.filter(profile__major=major).exclude(username="admin")]
@@ -318,20 +358,18 @@ def get_recommendations(request):
 		"rcm_courses":courses,
 	})
 
+@login_required
 def get_major_options(request):
 	major = ""
 	semester = settings.CURRENT_SEMESTER[4:]
 	year = 0
+	majors = [{"text":item[0], "value":item[0]} for item in MAJOR_CHOICES]
+
 	if request.user.profile.major:
 		major = request.user.profile.major
 	if request.user.profile.graduate_year:
 		year = int(settings.CURRENT_YEAR) + 4 - int(request.user.profile.graduate_year)
-	majors = []
-	for item in MAJOR_CHOICES:
-		majors.append({
-			"text":item[0],
-			"value":item[0],
-		})
+
 	return JsonResponse({
 		"major_options":majors,
 		"major":major,
@@ -339,6 +377,16 @@ def get_major_options(request):
 		"semester":semester,
 	})
 
+"""
+Seperate the year and semester of the input string, and the year is incremented if semester is Fall
+
+Parameters:
+	ys(String): String with format like "2019Fall"
+
+Returns:
+	int: The year part of ys
+	string: The semester part of ys
+"""
 def year_and_semester(ys):
 	year, semester = ys[:4], ys[4:]
 	if semester == "Fall":
@@ -346,6 +394,7 @@ def year_and_semester(ys):
 	else:
 		return int(year), semester
 
+@login_required
 def get_trending_courses(request):
 	trending_courses = {}
 	for cs_user in CourseUser.objects.all():
@@ -376,6 +425,7 @@ def get_trending_courses(request):
 		"taken_courses":final_taken_courses[:10],
 	})
 
+@login_required
 def get_departments(request):
 	all_departments = Department.objects.all().exclude(name="")
 	departments = []
@@ -389,6 +439,7 @@ def get_departments(request):
 		"departments":departments,
 	})
 
+@login_required
 def get_department(request):
 	department_pk = request.GET.get("department_pk")
 	department = get_object_or_404(Department, pk=department_pk)
@@ -402,6 +453,7 @@ def get_department(request):
 		"courses":ret_courses,
 	})
 
+@login_required
 def submit_review(request):
 	if request.method == "POST":
 		post = json.loads(request.body)
@@ -440,6 +492,7 @@ def submit_review(request):
 		"success":success,
 	})
 
+@login_required
 def save_take(request):
 	now_instructor_pk, now_semester, now_take = "", "", ""
 	if request.method == "POST":
@@ -474,6 +527,7 @@ def save_take(request):
 		},
 	})
 
+@login_required
 def get_course(request):
 	pk = request.GET.get("pk")
 	course = get_object_or_404(Course, pk=pk)
@@ -481,12 +535,14 @@ def get_course(request):
 		"course":get_detailed_json_of_course(course, request.user,with_take=True, with_instructors=True),
 	})
 
+@login_required
 def get_course_instructor(request):
 	course_pk, instructor_pk = request.GET.get("course_pk"), request.GET.get("instructor_pk")
 	course = get_object_or_404(Course, pk=course_pk)
 	instructor = get_object_or_404(Instructor, pk=instructor_pk)
 	return JsonResponse(get_detailed_json_of_course_instructor(course, instructor, request.user))
 
+@login_required
 def course_search_result(request):
 	# time_start = time.time()
 	# score_cutoff = 85
@@ -573,8 +629,7 @@ def get_json_of_search_result(queryset):
 def get_json_of_courses(queryset):
 	if len(queryset) > 0:
 		return [get_json_of_course(cs) for cs in queryset]
-	else:
-		return []
+	return []
 
 def cmp_semester_key(a,b):
 	return cmp_semester(a["semester"], b["semester"])
@@ -612,22 +667,6 @@ def get_json_of_course(course):
 		"last_taught":last_taught,
 		"type":"course",
 	}
-
-def get_basic_info(request):
-	tmp = {
-		"home_url":reverse('home'),
-		"courses_url": reverse('courses'),
-		"brand_pic": settings.STATIC_URL + "css/images/brand_compressed.png",
-		"profile": reverse('profile', args=[request.user.username]),
-		"update_profile":reverse('update_profile', args=[request.user.username]),
-		"my_courses":reverse('my_courses', args=[request.user.username]),
-		"logout":reverse('logout'),
-		"match_url":reverse('match'),
-	}
-	return JsonResponse({
-		"all_info":tmp,
-	})
-
 
 def get_detailed_json_of_course_instructor(course, instructor, user):
 	course_instructor_relations = []
