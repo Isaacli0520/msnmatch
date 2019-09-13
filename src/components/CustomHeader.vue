@@ -60,10 +60,12 @@
             </v-list>
         </v-navigation-drawer>
         <v-app-bar
-            color="white"
+            color="blue-grey darken-1"
             app
-            light
+            dark
+            height="56"
             absolute
+            elevation="0"
             fixed>
             <v-app-bar-nav-icon v-if="$vuetify.breakpoint.smAndDown" @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
             <a class="navbar-brand" :href="urls.courses_url">
@@ -255,13 +257,6 @@ export default{
 
     .theme--light.v-text-field--solo-inverted.v-text-field--solo.v-input--is-focused > .v-input__control > .v-input__slot .v-label, .theme--light.v-text-field--solo-inverted.v-text-field--solo.v-input--is-focused > .v-input__control > .v-input__slot input {
         color: #000000 !important;
-    }
-
-    
-    .nav-bar-title{
-        font-family: "Raleway", Helvetica, sans-serif;
-        font-weight: 300;
-        letter-spacing: 0.07em;
     }
 
 </style>

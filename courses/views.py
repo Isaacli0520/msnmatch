@@ -635,14 +635,7 @@ def cmp_semester_key(a,b):
 	return cmp_semester(a["semester"], b["semester"])
 
 def get_json_of_instructor(instructor):
-	cs_instr_arr = [cs_instr.semester for cs_instr in CourseInstructor.objects.filter(instructor=instructor)]
-	cs_instr_arr = sorted(cs_instr_arr, key=cmp_to_key(cmp_semester))
-	if settings.CURRENT_SEMESTER not in cs_instr_arr and len(cs_instr_arr) > 0:
-		last_taught = cs_instr_arr[-1]
-	elif settings.CURRENT_SEMESTER in cs_instr_arr:
-		last_taught = settings.CURRENT_SEMESTER
-	else:
-		last_taught = ""
+	last_taught = get_last_taught_of_course_instructors(CourseInstructor.objects.filter(instructor=instructor))
 	return {
 		"pk":instructor.pk,
 		"name": instructor.__str__(),
@@ -651,14 +644,7 @@ def get_json_of_instructor(instructor):
 	}
 
 def get_json_of_course(course):
-	cs_instr_arr = [cs_instr.semester for cs_instr in CourseInstructor.objects.filter(course=course)]
-	cs_instr_arr = sorted(cs_instr_arr, key=cmp_to_key(cmp_semester))
-	if settings.CURRENT_SEMESTER not in cs_instr_arr and len(cs_instr_arr) > 0:
-		last_taught = cs_instr_arr[-1]
-	elif settings.CURRENT_SEMESTER in cs_instr_arr:
-		last_taught = settings.CURRENT_SEMESTER
-	else:
-		last_taught = ""
+	last_taught = get_last_taught_of_course_instructors(CourseInstructor.objects.filter(course=course))
 	return {
 		"pk":course.pk,
 		"mnemonic":course.mnemonic,
@@ -667,6 +653,17 @@ def get_json_of_course(course):
 		"last_taught":last_taught,
 		"type":"course",
 	}
+
+def get_last_taught_of_course_instructors(queryset):
+	cs_instr_arr = [cs_instr.semester for cs_instr in queryset]
+	cs_instr_arr = sorted(cs_instr_arr, key=cmp_to_key(cmp_semester))
+	if settings.CURRENT_SEMESTER not in cs_instr_arr and len(cs_instr_arr) > 0:
+		last_taught = cs_instr_arr[-1]
+	elif settings.CURRENT_SEMESTER in cs_instr_arr:
+		last_taught = settings.CURRENT_SEMESTER
+	else:
+		last_taught = ""
+	return last_taught
 
 def get_detailed_json_of_course_instructor(course, instructor, user):
 	course_instructor_relations = []
@@ -760,30 +757,27 @@ def get_instructors_of_course(course):
 			rating_instructor, rating_instructor_counter = get_rating_of_instructor_with_course(cs_instructor.instructor, course)
 			if tmp_name not in instructors:
 				tmp_cs_user_query = CourseUser.objects.filter(course=course, instructor=cs_instructor.instructor)
-				instructors[tmp_name] = {"semesters":[{
-					"semester":cs_instructor.semester,
-					"course_instructor_pk":cs_instructor.pk,
-					"topic":cs_instructor.topic,
-				}]}
-				instructors[tmp_name]["pk"] = cs_instructor.instructor.pk
-				instructors[tmp_name]["rating_instructor"] = rating_instructor
-				# instructors[tmp_name]["rating_instructor_counter"] = rating_instructor_counter
-				instructors[tmp_name]["taking"] = tmp_cs_user_query.filter(take="taking").count()
-				instructors[tmp_name]["taken"] = tmp_cs_user_query.filter(take="taken").count()
-			else:
-				instructors[tmp_name]["semesters"].append({
-					"semester":cs_instructor.semester,
-					"course_instructor_pk":cs_instructor.pk,
-					"topic":cs_instructor.topic,
-				})
-		for k,v in instructors.items():
+				instructors[tmp_name] = {
+					"semesters":[],
+					"pk":cs_instructor.instructor.pk,
+					"rating_instructor":rating_instructor,
+					# "rating_instructor_counter":rating_instructor_counter,
+					"taking":tmp_cs_user_query.filter(take="taking").count(),
+					"taken":tmp_cs_user_query.filter(take="taken").count(),
+				}
+			instructors[tmp_name]["semesters"].append({
+				"semester":cs_instructor.semester,
+				"course_instructor_pk":cs_instructor.pk,
+				"topic":cs_instructor.topic,
+			})
+		for instructor_name,v in instructors.items():
 			topic = ""
 			if len(v["semesters"]) > 0:
 				v["semesters"] = sorted(v["semesters"], key=cmp_to_key(cmp_semester_key), reverse=True)
 				topic = v["semesters"][0]["topic"]
 			
 			final_instructors.append({
-				"name":k,
+				"name":instructor_name,
 				"semesters":v["semesters"],
 				"topic":topic,
 				"pk":v["pk"],
@@ -795,36 +789,24 @@ def get_instructors_of_course(course):
 	return final_instructors
 
 def get_rating_of_course(course):
-	allCourseUser_course_query = CourseUser.objects.filter(course=course)
-	rating_course_arr = []
-	counter = [0,0,0,0,0,0]
-	for cs_user in allCourseUser_course_query:
-		if cs_user.rating_course != None and cs_user.rating_course > 0 and cs_user.rating_course <= 5:
-			counter[int(cs_user.rating_course)] += 1
-			rating_course_arr.append(cs_user.rating_course)
-	if len(rating_course_arr) > 0:
-		rating_course = sum(rating_course_arr)/len(rating_course_arr)
-	else:
-		rating_course = 0
-	return round(rating_course, 2), counter
+	return get_rating(CourseUser.objects.filter(course=course), "rating_course")
 
 def get_rating_of_instructor_with_course(instructor, course):
-	allCourseUser_instructor_query = CourseUser.objects.filter(course=course, instructor = instructor)
-	return get_rating(allCourseUser_instructor_query)
+	return get_rating(CourseUser.objects.filter(course=course, instructor = instructor), "rating_instructor")
 
 def get_rating_of_instructor(instructor):
-	allCourseUser_instructor_query = CourseUser.objects.filter(instructor = instructor)
-	return get_rating(allCourseUser_instructor_query)
+	return get_rating(CourseUser.objects.filter(instructor = instructor), "rating_instructor")
 
-def get_rating(course_user_queryset):
-	rating_instructor_arr = []
+def get_rating(course_user_queryset, attr_name):
+	rating_arr = []
 	counter = [0,0,0,0,0,0]
 	for cs_user in course_user_queryset:
-		if cs_user.rating_instructor != None and cs_user.rating_instructor > 0 and cs_user.rating_instructor <= 5:
-			rating_instructor_arr.append(cs_user.rating_instructor)
-			counter[int(cs_user.rating_instructor)] += 1
-	if len(rating_instructor_arr) > 0:
-		rating_instructor = sum(rating_instructor_arr)/len(rating_instructor_arr)
+		tmp_user_rating = getattr(cs_user, attr_name)
+		if tmp_user_rating != None and tmp_user_rating > 0 and tmp_user_rating <= 5:
+			rating_arr.append(tmp_user_rating)
+			counter[int(tmp_user_rating)] += 1
+	if len(rating_arr) > 0:
+		rating_instructor = sum(rating_arr)/len(rating_arr)
 	else:
 		rating_instructor = 0
 	return round(rating_instructor,2), counter
