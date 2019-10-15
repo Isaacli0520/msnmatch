@@ -5,7 +5,7 @@
         <v-container fluid grid-list-lg>
             <v-layout>
                 <v-flex>
-                    <v-breadcrumbs class="cus-breadcrumbs" :items="navItems" divider=">"></v-breadcrumbs>
+                    <custom-breadcrumb :items="navItems"></custom-breadcrumb>
                 </v-flex>
             </v-layout>
             <v-layout mb-3>
@@ -63,6 +63,7 @@
 import axios from 'axios'
 import CustomHeader from '../components/CustomHeader'
 import CustomFooter from '../components/CustomFooter'
+import CustomBreadcrumb from '../components/CustomBreadcrumb'
 axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 axios.defaults.xsrfCookieName = "csrftoken";
 
@@ -82,6 +83,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
     components:{
         CustomHeader,
         CustomFooter,
+        CustomBreadcrumb,
     },
     watch: {
       

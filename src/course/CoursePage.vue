@@ -20,7 +20,8 @@
         <v-container v-if="loaded" fluid grid-list-lg>
             <v-layout>
                 <v-flex>
-                    <v-breadcrumbs class="cus-breadcrumbs" :items="navItems" divider="/"></v-breadcrumbs>
+                    <!-- <v-breadcrumbs class="cus-breadcrumbs" :items="navItems" divider="/"></v-breadcrumbs> -->
+                    <custom-breadcrumb :items="navItems"></custom-breadcrumb>
                 </v-flex>
             </v-layout>
             <v-layout mb-1>
@@ -182,6 +183,7 @@ import axios from 'axios'
 import CustomHeader from '../components/CustomHeader'
 import CustomRating from '../components/CustomRating'
 import CustomFooter from '../components/CustomFooter'
+import CustomBreadcrumb from '../components/CustomBreadcrumb'
 axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 axios.defaults.xsrfCookieName = "csrftoken";
 
@@ -229,6 +231,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
         CustomHeader,
         CustomRating,
         CustomFooter,
+        CustomBreadcrumb,
     },
     watch: {
       
@@ -407,13 +410,13 @@ axios.defaults.xsrfCookieName = "csrftoken";
         font-weight: 500;
     }
 
-    .v-breadcrumbs li{
+    /* .v-breadcrumbs li{
         font-size:20px !important;
     }
 
     .cus-breadcrumbs{
         padding-left: 4px !important;
-    }
+    } */
 
     .taking{
         background-color: rgb(11, 105, 92);

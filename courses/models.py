@@ -6,7 +6,7 @@ class Instructor(models.Model):
   first_name = models.CharField(max_length=255, default="Null")
   last_name = models.CharField(max_length=255, default="Null")
   def __str__(self):
-    return self.first_name + " " + self.last_name;
+    return self.first_name + " " + self.last_name
 
 class Department(models.Model):
   name = models.CharField(max_length=255, default="")

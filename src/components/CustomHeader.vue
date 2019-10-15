@@ -60,22 +60,12 @@
             </v-list>
         </v-navigation-drawer> -->
         <v-navigation-drawer
-            class="cus-drawer"
             light
             app
             v-model="drawer"
             :clipped="$vuetify.breakpoint.mdAndUp"
             >
             <v-list>
-                <!-- <v-list-item class="mb-4">
-                    <v-list-item-avatar>
-                        
-                    </v-list-item-avatar>
-                    <v-list-item-content>
-                        <v-list-item-title class="font-weight-bold">Hoosmyprofessor</v-list-item-title>
-                    </v-list-item-content>
-                </v-list-item>
-                <v-divider class="mb-4"></v-divider> -->
                 <v-list-item
                     :key="index_item + '-trash' " 
                     v-for="(item, index_item) in trash_items"
@@ -119,7 +109,7 @@
                 </template>
             </v-toolbar-items> -->
             <v-img max-height="46" max-width="46" :src="urls.brand_pic" alt=""></v-img>
-            <v-toolbar-items>
+            <v-toolbar-items v-if="$vuetify.breakpoint.mdAndUp">
                 <v-btn 
                     :href="urls.courses_url"
                     text>HoosMyProfessor</v-btn>
@@ -256,7 +246,7 @@ export default{
                 {
                     "title":"Home",
                     "icon":"fas fa-home",
-                    "href":"/",
+                    "href":"/courses/",
                     "target":"",
                 },
             ],
@@ -377,9 +367,6 @@ export default{
 
 
 <style lang="css">
-    .cus-drawer{
-        border:white !important;
-    }
 
     .theme--light.v-text-field--solo-inverted.v-text-field--solo.v-input--is-focused > .v-input__control > .v-input__slot .v-label, .theme--light.v-text-field--solo-inverted.v-text-field--solo.v-input--is-focused > .v-input__control > .v-input__slot input {
         color: #000000 !important;
