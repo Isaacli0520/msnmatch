@@ -1,6 +1,6 @@
 <template>
     <div>
-        <v-navigation-drawer
+        <!-- <v-navigation-drawer
             fixed
             app
             v-model="drawer">
@@ -58,18 +58,53 @@
                     </v-list-item>
                 </template>
             </v-list>
+        </v-navigation-drawer> -->
+        <v-navigation-drawer
+            class="cus-drawer"
+            light
+            app
+            v-model="drawer"
+            :clipped="$vuetify.breakpoint.mdAndUp"
+            >
+            <v-list>
+                <!-- <v-list-item class="mb-4">
+                    <v-list-item-avatar>
+                        
+                    </v-list-item-avatar>
+                    <v-list-item-content>
+                        <v-list-item-title class="font-weight-bold">Hoosmyprofessor</v-list-item-title>
+                    </v-list-item-content>
+                </v-list-item>
+                <v-divider class="mb-4"></v-divider> -->
+                <v-list-item
+                    :key="index_item + '-trash' " 
+                    v-for="(item, index_item) in trash_items"
+                    :href="item.href"
+                    :target="item.target">
+                    <v-list-item-avatar
+                        v-if="item.icon">
+                        <v-icon>{{ item.icon }}</v-icon>
+                    </v-list-item-avatar>
+                    <v-list-item-content>
+                        <v-list-item-title class="font-weight-bold">{{ item.title }}</v-list-item-title>
+                    </v-list-item-content>
+                </v-list-item>
+            </v-list>
         </v-navigation-drawer>
+        <!-- color="blue-grey darken-1" -->
         <v-app-bar
-            color="white"
+            :clipped-left="$vuetify.breakpoint.mdAndUp"
             app
             light
-            absolute
-            fixed>
-            <v-app-bar-nav-icon v-if="$vuetify.breakpoint.smAndDown" @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
-            <a class="navbar-brand" :href="urls.courses_url">
+            height="62"
+            
+            elevation="1"
+            >
+            <v-app-bar-nav-icon  @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
+            <!-- <a class="navbar-brand" :href="urls.courses_url">
                 <img :src="urls.brand_pic" style="margin:5px 0px 0px 0px;" width="35" height="35" class="d-inline-block align-center" alt="">
-            </a>
-            <v-toolbar-items v-if="$vuetify.breakpoint.mdAndUp">
+            </a> -->
+            <!-- <v-toolbar-items v-if="$vuetify.breakpoint.mdAndUp">
                 <template v-for="item in navBarItems">
                     <v-btn 
                         :key="item.text + '-btn' "
@@ -82,11 +117,40 @@
                         inset
                         vertical></v-divider>
                 </template>
+            </v-toolbar-items> -->
+            <v-img max-height="46" max-width="46" :src="urls.brand_pic" alt=""></v-img>
+            <v-toolbar-items>
+                <v-btn 
+                    :href="urls.courses_url"
+                    text>HoosMyProfessor</v-btn>
             </v-toolbar-items>
-            <v-spacer></v-spacer>
             <search-course
                 v-if="searchBool"></search-course>
-            <v-spacer></v-spacer>
+            <v-spacer v-if="!searchBool"></v-spacer>
+            <v-menu offset-y
+                class="mx-auto"
+                min-width="170">
+                <template v-slot:activator="{ on }">
+                    <v-btn
+                        icon
+                        v-on="on">
+                        <v-icon>mdi-apps</v-icon>
+                    </v-btn>
+                </template>
+                <v-list dense rounded>
+                    <v-list-item
+                        v-for="(item, index) in app_items"
+                        :key="index + '-app'"
+                        @click="navMethod(item)">
+                        <v-list-item-icon>
+                            <v-icon dense v-text="item.icon"></v-icon>
+                        </v-list-item-icon>
+                        <v-list-item-content>
+                            <v-list-item-title>{{ item.title }}</v-list-item-title>
+                        </v-list-item-content>
+                    </v-list-item>
+                </v-list>
+            </v-menu>
             <v-menu offset-y
                 class="mx-auto"
                 min-width="170">
@@ -129,7 +193,10 @@ export default{
     data: function () {
         return {
             navDrawer:false,
-            drawer: false,
+            drawer: null,
+            credential:"",
+            plannableURL:"",
+            username:"",
             navBarItems:[
                 {
                     text:"HoosMyProfessor",
@@ -148,6 +215,9 @@ export default{
                 { title:"My Courses", icon:"fas fa-list-ol" },
                 { title:"Log Out", icon:"fas fa-angry"},
             ],
+            app_items:[
+                { title:"Match", icon:"fas fa-user-friends" },
+            ],
             urls:{
                 home_url:"",
                 brand_pic:"",
@@ -158,6 +228,38 @@ export default{
                 courses_url:"",
                 match_url:"",
             },
+            trash_items:[
+                {
+                    "title":"Departments",
+                    "icon":"fas fa-list-ol",
+                    "href":"/courses/departments/",
+                    "target":"",
+                },
+                {
+                    "title":"Courses",
+                    "icon":"fas fa-user-circle",
+                    "href":"",
+                    "target":"",
+                },
+                {
+                    "title":"Reviews",
+                    "icon":"fas fa-book",
+                    "href":"/courses/reviews/",
+                    "target":"",
+                },
+                {
+                    "title":"Plannable",
+                    "icon":"fas fa-paper-plane",
+                    "href":"https://plannable.gitee.io",
+                    "target":"_blank",
+                },
+                {
+                    "title":"Home",
+                    "icon":"fas fa-home",
+                    "href":"/",
+                    "target":"",
+                },
+            ],
             old_items: [
                 //   {  icon: 'contacts', text: 'Contacts' },
                 //   { icon: 'history', text: 'Frequently contacted' },
@@ -193,7 +295,13 @@ export default{
         SearchCourse,
     },
     watch:{
-
+        credential(){
+            this.getPlannableURL();
+        },
+        username(){
+            this.getPlannableURL();
+            this.trash_items[1].href = "/users/" + this.username + "/courses/";
+        },
     },
     computed:{
 
@@ -223,6 +331,9 @@ export default{
             else if(item.title=="My Courses"){
                 this.goToHref(this.urls.my_courses)
             }
+            else if(item.title=="Match"){
+                this.goToHref(this.urls.match_url)
+            }
         },
         get_basic_info(){
             axios.get('/courses/ajax/get_basic_info/',{params: {}}).then(response => {
@@ -242,8 +353,23 @@ export default{
         goToHref(text){
             window.location.href = text;
         },
+        getCredential(){
+            axios.get('/courses/ajax/get_credential/',{params: {}}).then(response => {
+                this.credential = response.data.credential;
+                this.username = response.data.username;
+            }).catch( err => {
+                this.credential = "";
+                this.username = "";
+            });
+        },
+        getPlannableURL(){
+            // var preHref = "localhost:8080"
+            var preHref = "https://plannable.gitee.io"
+            this.trash_items[3].href = preHref + "/?courses=" + this.plannableURL + "&username=" + this.username + "&credential=" + this.credential + "";
+        },
     },
     mounted(){
+        this.getCredential();
         this.get_basic_info();
     },
 }
@@ -251,17 +377,12 @@ export default{
 
 
 <style lang="css">
-
+    .cus-drawer{
+        border:white !important;
+    }
 
     .theme--light.v-text-field--solo-inverted.v-text-field--solo.v-input--is-focused > .v-input__control > .v-input__slot .v-label, .theme--light.v-text-field--solo-inverted.v-text-field--solo.v-input--is-focused > .v-input__control > .v-input__slot input {
         color: #000000 !important;
-    }
-
-    
-    .nav-bar-title{
-        font-family: "Raleway", Helvetica, sans-serif;
-        font-weight: 300;
-        letter-spacing: 0.07em;
     }
 
 </style>

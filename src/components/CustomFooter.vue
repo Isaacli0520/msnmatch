@@ -1,5 +1,8 @@
 <template>
     <v-footer
+        app
+        padless
+        absolute
         class="custom-footer">
         <v-card
         flat
@@ -52,7 +55,7 @@
 
 <style>
     .custom-footer{
-        padding:50px 0px 0px 0px !important;
+        /* padding:50px 0px 0px 0px !important; */
         background-color:#fff !important;
         color:#fff !important;
     }

@@ -55,7 +55,7 @@
             </v-layout>
         </v-container>
     </v-content>
-    <custom-footer></custom-footer>
+    <!-- <custom-footer></custom-footer> -->
   </v-app>
 </template>
 

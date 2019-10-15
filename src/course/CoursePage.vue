@@ -20,7 +20,7 @@
         <v-container v-if="loaded" fluid grid-list-lg>
             <v-layout>
                 <v-flex>
-                    <v-breadcrumbs class="cus-breadcrumbs" :items="navItems" divider=">"></v-breadcrumbs>
+                    <v-breadcrumbs class="cus-breadcrumbs" :items="navItems" divider="/"></v-breadcrumbs>
                 </v-flex>
             </v-layout>
             <v-layout mb-1>
@@ -130,7 +130,7 @@
                                                     color="deep-purple accent-4"
                                                     @click="goToHref('/courses/'+course.course_pk+'/'+instructor.pk+'/')"
                                                     >
-                                                    Ratings, Reviews & More
+                                                    Reviews & More
                                                 </v-chip>
                                                 <v-chip
                                                     class="ma-1"
@@ -173,7 +173,7 @@
             </v-card>
         </v-dialog>
     </v-content>
-    <custom-footer></custom-footer>
+    <!-- <custom-footer></custom-footer> -->
   </v-app>
 </template>
 
@@ -213,7 +213,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
                 "rating_course":0,
                 "rating_course_counter":[],
             },
-            currentSemester:"2019Fall",
+            currentSemester:"2020Spring",
 
             loaded:false,
             navItems:[],

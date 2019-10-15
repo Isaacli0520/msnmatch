@@ -7,12 +7,13 @@ import csv
 
 class Command(BaseCommand):
 	def handle(self, *args, **kwargs):
-		for cs in Course.objects.all():
-			cs.delete()
+		# for cs in Course.objects.all():
+		# 	cs.delete()
 		data = []
 		for path, subdirs, files in os.walk("data"):
 			for file in files:
-				if file[:5] == "Class":
+				# if file[:5] == "Class":
+				if file == "Class2020Spring.csv":
 					data.extend(read_course_data(os.path.join(path, file), file))
 		for cs in data:
 			course_query = Course.objects.filter(number=cs['Number'], mnemonic=cs['Mnemonic'],
@@ -41,7 +42,6 @@ class Command(BaseCommand):
 						final_instructors.append(inner_instructor.strip().split())
 				elif len(instructor) > 2:
 					final_instructors.append(instructor)
-					
 			for instructor in final_instructors:
 				if len(instructor) == 1:
 					tmp_first_name = instructor[0]
@@ -54,11 +54,9 @@ class Command(BaseCommand):
 					tmp_instr = Instructor.objects.create(first_name=tmp_first_name, last_name=tmp_last_name)
 				else:
 					tmp_instr = instr_query.first()
-				
 				cs_instr_query = CourseInstructor.objects.filter(instructor=tmp_instr, course=tmp_course, topic=cs["Topic"],  semester=cs["Semester"])
 				if cs_instr_query.first() == None:
 					CourseInstructor.objects.create(instructor=tmp_instr, course=tmp_course, topic=cs["Topic"], semester=cs["Semester"])
-			
 
 
 def read_course_data(path, filename):

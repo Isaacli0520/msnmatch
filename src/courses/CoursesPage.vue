@@ -3,66 +3,18 @@
         <custom-header
             :searchBool="false"></custom-header>
         <v-content>
-            <v-carousel v-if="with_carousel">
-                <v-carousel-item
-                    v-for="(color, i) in colors"
-                    :key="color"
-                >
-                    <v-sheet
-                    :color="color"
-                    height="100%"
-                    tile
-                    >
-                    <v-layout
-                        align-center
-                        fill-height
-                        justify-center
-                    >
-                        <div class="display-3">Slide {{ i + 1 }}</div>
-                    </v-layout>
-                    </v-sheet>
-                </v-carousel-item>
-            </v-carousel>
-            <div class="upper-div">
-                <div class="container mb-1 text-center">
-                    <h1 class="main-title">HoosMyProfessor</h1>
-                </div>   
-                <div class="search-courses">
-                    <search-course class="custom-search"
-                        background_color="white"></search-course>
-                </div>
-            </div>
-            <v-container fluid grid-list-xl class="courses-main"> 
+            <v-container fluid grid-list-xl class="courses-main">
                 <v-layout wrap>
-                    <v-flex xs12 sm12 md4 lg4 xl4>
-                        <v-card
-                            :elevation="cardElevation">
-                            <v-card-title>Toolbox</v-card-title>
-                            <v-divider></v-divider>
-                            <v-card-text>
-                                <v-list>
-                                    <v-list-item
-                                        style="width:100%;"
-                                        :key="index_item + '-trash' " 
-                                        v-for="(item, index_item) in trash_items"
-                                        :href="item.href"
-                                        :target="item.target">
-                                        <v-list-item-avatar
-                                            v-if="item.icon">
-                                            <v-icon>{{ item.icon }}</v-icon>
-                                        </v-list-item-avatar>
-                                        <v-list-item-content>
-                                            <v-list-item-title>{{ item.title }}</v-list-item-title>
-                                        </v-list-item-content>
-                                    </v-list-item>
-                                </v-list>
-                            </v-card-text>
-                            <v-card-actions></v-card-actions>
-                        </v-card>
+                    <v-flex d-flex xs12 sm12 md12 lg12 xl12>
+                        <search-course class="custom-search"
+                            background_color="white"></search-course>
                     </v-flex>
-                    <v-flex child-flex d-flex xs12 sm12 md8 lg8 xl8>
+                </v-layout>
+                <v-layout wrap>
+                    <v-flex child-flex d-flex xs12 sm12 md12 lg12 xl12>
                         <v-card
-                            :elevation="cardElevation"
+                            outlined
+                            hover
                             :loading="!recommendation_loaded">
                             <v-card-title>Recommendations</v-card-title>
                             <v-divider></v-divider>
@@ -124,7 +76,7 @@
                             </v-card-text>
                         </v-card>
                     </v-flex>
-                    <template v-for="i in ['Taking', 'Taken']">
+                    <!-- <template v-for="i in ['Taking', 'Taken']">
                         <v-flex child-flex d-flex :key="i + '-taking-taken' " xs12 sm4 md4 lg4 xl4>
                             <v-card 
                                 :elevation="cardElevation"
@@ -178,11 +130,48 @@
                                 </v-list>
                             </v-card-text>
                         </v-card>
-                    </v-flex>
+                    </v-flex> -->
+                </v-layout>
+                <v-layout row wrap>
+                    <template v-for="(course, index) in trending_courses['Taken']">
+                        <v-flex xs12 sm12 md12 lg12 xl12 :key="index" child-flex  d-flex>
+                            <v-card
+                                outlined
+                                hover
+                                :href="'/courses/' + course.course_pk + '/' ">
+                                <v-card-title>{{course.mnemonic}}{{course.number}} {{ course.title }}</v-card-title>
+                                <v-card-text>
+                                    <div>
+                                        <!-- <v-chip
+                                            class="ma-1" color="teal lighten-2" label small text-color="white">
+                                            Rating: {{course.rating_course}}
+                                        </v-chip> -->
+                                        <v-chip
+                                            class="ma-1" color="teal lighten-2" label small text-color="white">
+                                            Taking: {{course.taking}}
+                                        </v-chip>
+                                        <v-chip
+                                            class="ma-1" color="teal lighten-2" label small text-color="white">
+                                            Taken: {{course.taken}}
+                                        </v-chip>
+                                        <!-- <v-chip
+                                            v-if=" taking_or_taken(course) != '' "
+                                            class="ma-1" color="orange darken-1" label small text-color="white">
+                                            {{taking_or_taken(course)}}
+                                        </v-chip> -->
+                                    </div>
+                                    <v-flex d-flex>
+                                        {{ course.description }}
+                                    </v-flex>
+                                </v-card-text>
+                            </v-card>
+                        </v-flex>
+                        <!-- <v-spacer :key="index+'spacer'"></v-spacer> -->
+                    </template>
                 </v-layout>
             </v-container>
         </v-content>
-        <custom-footer></custom-footer>
+        <!-- <custom-footer></custom-footer> -->
     </v-app>
 </template>
 
@@ -207,10 +196,20 @@ import CustomFooter from '../components/CustomFooter'
             plannableURL:"",
             username:"",
             year:1,
-            semester:"Fall",
+            semester:"Spring",
             major:null,
             major_options:[],
             taking_courses:[],
+            urls:{
+                home_url:"",
+                brand_pic:"",
+                profile:"",
+                update_profile:"",
+                logout:"",
+                my_courses:"",
+                courses_url:"",
+                match_url:"",
+            },
             year_options:[
                 {
                     "text":"1",
@@ -247,31 +246,31 @@ import CustomFooter from '../components/CustomFooter'
             rcm_courses:[],
             trash_items:[
                 {
-                    "title":"Browse by Departments",
+                    "title":"Departments",
                     "icon":"fas fa-list-ol",
                     "href":"/courses/departments/",
                     "target":"",
                 },
                 {
-                    "title":"My Courses",
+                    "title":"Courses",
                     "icon":"fas fa-user-circle",
                     "href":"",
                     "target":"",
                 },
                 {
-                    "title":"My Reviews",
+                    "title":"Reviews",
                     "icon":"fas fa-book",
                     "href":"/courses/reviews/",
                     "target":"",
                 },
                 {
-                    "title":"Go to Plannable",
+                    "title":"Plannable",
                     "icon":"fas fa-paper-plane",
                     "href":"https://plannable.gitee.io",
                     "target":"_blank",
                 },
                 {
-                    "title":"Home Page",
+                    "title":"Home",
                     "icon":"fas fa-home",
                     "href":"/",
                     "target":"",
@@ -418,7 +417,8 @@ import CustomFooter from '../components/CustomFooter'
     .main-title{
         margin-top: 100px;
         margin-bottom: 30px;
-        color:#32a49a;
+        /* color:#32a49a; */
+        color:rgb(0, 0, 0);
         font-weight: 800 !important;
         /* font-family: Baskerville, "Baskerville Old Face", sans-serif; */
         /* text-transform: uppercase; */
@@ -430,18 +430,19 @@ import CustomFooter from '../components/CustomFooter'
 
     .upper-div{
         position: relative;
-        padding: 0px 0px 40px 0px;
+        padding: 75px 0px 20px 0px;
         color:#000000;
+        background-color: #fff;
         width:100%;
         /* height: 100%; */
         position:relative;
-        background: url('../assets/static/css/images/cloud_new_09.jpg') no-repeat;
+        /* background: url('../assets/static/css/images/cloud_new_09.jpg') no-repeat;
         background-attachment: fixed;
         background-position: center center;
-        background-size: cover;
+        background-size: cover; */
 
-        -webkit-box-shadow: inset 0 -3px 3px 0px rgba(0,0,0,.13), inset 0 -7px 7px 0px rgba(0,0,0,.12);
-        box-shadow: inset 0 -3px 3px 0px rgba(0,0,0,.13), inset 0 -7px 7px 0px rgba(0,0,0,.12);
+        /* -webkit-box-shadow: inset 0 -3px 3px 0px rgba(0,0,0,.13), inset 0 -7px 7px 0px rgba(0,0,0,.12);
+        box-shadow: inset 0 -3px 3px 0px rgba(0,0,0,.13), inset 0 -7px 7px 0px rgba(0,0,0,.12); */
         /* padding: 0; */
     }
 

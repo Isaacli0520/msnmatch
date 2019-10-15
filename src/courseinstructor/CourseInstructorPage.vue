@@ -219,7 +219,7 @@
             </v-card-actions>
         </v-card>
     </v-dialog>
-    <custom-footer></custom-footer>
+    <!-- <custom-footer></custom-footer> -->
     </v-app>
 </template>
 
