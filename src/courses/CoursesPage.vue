@@ -3,114 +3,78 @@
         <custom-header
             :searchBool="false"></custom-header>
         <v-content>
-            <v-carousel v-if="with_carousel">
-                <v-carousel-item
-                    v-for="(color, i) in colors"
-                    :key="color"
-                >
-                    <v-sheet
-                    :color="color"
-                    height="100%"
-                    tile
-                    >
-                    <v-layout
-                        align-center
-                        fill-height
-                        justify-center
-                    >
-                        <div class="display-3">Slide {{ i + 1 }}</div>
-                    </v-layout>
-                    </v-sheet>
-                </v-carousel-item>
-            </v-carousel>
-            <div class="upper-div">
-                <!-- <div class="container mb-1 text-center">
-                    <h1 class="main-title">HoosMyProfessor</h1>
-                </div>    -->
-                <div class="search-courses">
-                    <search-course class="custom-search"
-                        background_color="white"></search-course>
-                </div>
-            </div>
-            <v-container fluid grid-list-xl class="courses-main"> 
+            <v-container fluid grid-list-xl class="courses-main">
                 <v-layout wrap>
-                    <v-flex child-flex d-flex xs12 sm12 md8 lg8 xl8>
-                        <div>
-                        <v-layout row wrap>
-                            <v-flex xs6 sm6 md4 lg4 xl4 d-flex>
-                                <v-select
-                                    v-model="year"
-                                    :items="year_options"
-                                    label="Year"
-                                    hide-details
-                                    :menu-props="{ offsetY: true }"
-                                    outlined>
-                                </v-select>
-                            </v-flex>
-                            <v-flex xs6 sm6 md4 lg4 xl4 d-flex>
-                                <v-select
-                                    v-model="semester"
-                                    :items="semester_options"
-                                    label="Semester"
-                                    hide-details
-                                    :menu-props="{ offsetY: true }"
-                                    outlined>
-                                </v-select>
-                            </v-flex>
-                            <v-flex xs12 sm12 md4 lg4 xl4 d-flex>
-                                <v-select
-                                    v-model="major"
-                                    :items="major_options"
-                                    label="Major"
-                                    hide-details
-                                    :menu-props="{ offsetY: true }"
-                                    outlined>
-                                </v-select>
-                            </v-flex>
-                        </v-layout>
-                        <div class="recommendation-div"
-                            v-if="recommendation_loaded">
-                            <template v-if="rcm_courses.length>0">
-                                <v-list-item
-                                    style="width:100%;"
-                                    :key="index_course + '-rcm-course' " 
-                                    v-for="(course, index_course) in rcm_courses"
-                                    :href="'/courses/'+ course.course_pk + '/' ">
-                                    <v-list-item-avatar
-                                        color="orange lighten-2">
-                                        <span style="color:#fff;">{{index_course + 1}}</span>
-                                    </v-list-item-avatar>
-                                    <v-list-item-content two-line>
-                                        <v-list-item-title>{{course.mnemonic}}{{course.number}} {{course.title}}</v-list-item-title>
-                                        <v-list-item-subtitle>Taken: {{ course.taken }}</v-list-item-subtitle>
-                                    </v-list-item-content>
-                                </v-list-item>
-                            </template>
-                            <div v-else>
-                                Recommendations are not available for this setting.
-                            </div>
-                        </div>
-                        </div>
+                    <v-flex d-flex xs12 sm12 md12 lg12 xl12>
+                        <search-course class="custom-search"
+                            background_color="white"></search-course>
                     </v-flex>
-                    <v-flex xs12 sm12 md4 lg4 xl4>
-                        <span class="div-title">ToolBox</span>
-                        <v-divider></v-divider>
-                        <v-list>
-                            <v-list-item
-                                style="width:100%;"
-                                :key="index_item + '-trash' " 
-                                v-for="(item, index_item) in trash_items"
-                                :href="item.href"
-                                :target="item.target">
-                                <v-list-item-avatar
-                                    v-if="item.icon">
-                                    <v-icon>{{ item.icon }}</v-icon>
-                                </v-list-item-avatar>
-                                <v-list-item-content>
-                                    <v-list-item-title>{{ item.title }}</v-list-item-title>
-                                </v-list-item-content>
-                            </v-list-item>
-                        </v-list>
+                </v-layout>
+                <v-layout wrap>
+                    <v-flex child-flex d-flex xs12 sm12 md12 lg12 xl12>
+                        <v-card
+                            outlined
+                            hover
+                            :loading="!recommendation_loaded">
+                            <v-card-title>Recommendations</v-card-title>
+                            <v-divider></v-divider>
+                            <v-card-text>
+                                <v-layout row wrap>
+                                    <v-flex xs6 sm6 md4 lg4 xl4 d-flex>
+                                        <v-select
+                                            v-model="year"
+                                            :items="year_options"
+                                            label="Year"
+                                            hide-details
+                                            :menu-props="{ offsetY: true }"
+                                            outlined>
+                                        </v-select>
+                                    </v-flex>
+                                    <v-flex xs6 sm6 md4 lg4 xl4 d-flex>
+                                        <v-select
+                                            v-model="semester"
+                                            :items="semester_options"
+                                            label="Semester"
+                                            hide-details
+                                            :menu-props="{ offsetY: true }"
+                                            outlined>
+                                        </v-select>
+                                    </v-flex>
+                                    <v-flex xs12 sm12 md4 lg4 xl4 d-flex>
+                                        <v-select
+                                            v-model="major"
+                                            :items="major_options"
+                                            label="Major"
+                                            hide-details
+                                            :menu-props="{ offsetY: true }"
+                                            outlined>
+                                        </v-select>
+                                    </v-flex>
+                                </v-layout>
+                                    <div class="recommendation-div"
+                                        v-if="recommendation_loaded">
+                                        <template v-if="rcm_courses.length>0">
+                                            <v-list-item
+                                                style="width:100%;"
+                                                :key="index_course + '-rcm-course' " 
+                                                v-for="(course, index_course) in rcm_courses"
+                                                :href="'/courses/'+ course.course_pk + '/' ">
+                                                <v-list-item-avatar
+                                                    color="orange lighten-2">
+                                                    <span style="color:#fff;">{{index_course + 1}}</span>
+                                                </v-list-item-avatar>
+                                                <v-list-item-content two-line>
+                                                    <v-list-item-title>{{course.mnemonic}}{{course.number}} {{course.title}}</v-list-item-title>
+                                                    <v-list-item-subtitle>Taken: {{ course.taken }}</v-list-item-subtitle>
+                                                </v-list-item-content>
+                                            </v-list-item>
+                                        </template>
+                                        <div v-else>
+                                            Recommendations are not available for this setting.
+                                        </div>
+                                    </div>
+                            </v-card-text>
+                        </v-card>
                     </v-flex>
                     <!-- <template v-for="i in ['Taking', 'Taken']">
                         <v-flex child-flex d-flex :key="i + '-taking-taken' " xs12 sm4 md4 lg4 xl4>
@@ -168,9 +132,46 @@
                         </v-card>
                     </v-flex> -->
                 </v-layout>
+                <v-layout row wrap>
+                    <template v-for="(course, index) in trending_courses['Taken']">
+                        <v-flex xs12 sm12 md12 lg12 xl12 :key="index" child-flex  d-flex>
+                            <v-card
+                                outlined
+                                hover
+                                :href="'/courses/' + course.course_pk + '/' ">
+                                <v-card-title>{{course.mnemonic}}{{course.number}} {{ course.title }}</v-card-title>
+                                <v-card-text>
+                                    <div>
+                                        <!-- <v-chip
+                                            class="ma-1" color="teal lighten-2" label small text-color="white">
+                                            Rating: {{course.rating_course}}
+                                        </v-chip> -->
+                                        <v-chip
+                                            class="ma-1" color="teal lighten-2" label small text-color="white">
+                                            Taking: {{course.taking}}
+                                        </v-chip>
+                                        <v-chip
+                                            class="ma-1" color="teal lighten-2" label small text-color="white">
+                                            Taken: {{course.taken}}
+                                        </v-chip>
+                                        <!-- <v-chip
+                                            v-if=" taking_or_taken(course) != '' "
+                                            class="ma-1" color="orange darken-1" label small text-color="white">
+                                            {{taking_or_taken(course)}}
+                                        </v-chip> -->
+                                    </div>
+                                    <v-flex d-flex>
+                                        {{ course.description }}
+                                    </v-flex>
+                                </v-card-text>
+                            </v-card>
+                        </v-flex>
+                        <!-- <v-spacer :key="index+'spacer'"></v-spacer> -->
+                    </template>
+                </v-layout>
             </v-container>
         </v-content>
-        <custom-footer></custom-footer>
+        <!-- <custom-footer></custom-footer> -->
     </v-app>
 </template>
 
@@ -195,10 +196,20 @@ import CustomFooter from '../components/CustomFooter'
             plannableURL:"",
             username:"",
             year:1,
-            semester:"Fall",
+            semester:"Spring",
             major:null,
             major_options:[],
             taking_courses:[],
+            urls:{
+                home_url:"",
+                brand_pic:"",
+                profile:"",
+                update_profile:"",
+                logout:"",
+                my_courses:"",
+                courses_url:"",
+                match_url:"",
+            },
             year_options:[
                 {
                     "text":"1",
@@ -235,31 +246,31 @@ import CustomFooter from '../components/CustomFooter'
             rcm_courses:[],
             trash_items:[
                 {
-                    "title":"Browse by Departments",
+                    "title":"Departments",
                     "icon":"fas fa-list-ol",
                     "href":"/courses/departments/",
                     "target":"",
                 },
                 {
-                    "title":"My Courses",
+                    "title":"Courses",
                     "icon":"fas fa-user-circle",
                     "href":"",
                     "target":"",
                 },
                 {
-                    "title":"My Reviews",
+                    "title":"Reviews",
                     "icon":"fas fa-book",
                     "href":"/courses/reviews/",
                     "target":"",
                 },
                 {
-                    "title":"Go to Plannable",
+                    "title":"Plannable",
                     "icon":"fas fa-paper-plane",
                     "href":"https://plannable.gitee.io",
                     "target":"_blank",
                 },
                 {
-                    "title":"Home Page",
+                    "title":"Home",
                     "icon":"fas fa-home",
                     "href":"/",
                     "target":"",
@@ -388,15 +399,6 @@ import CustomFooter from '../components/CustomFooter'
 </script>
 
 <style>
-    .v-divider{
-        margin:auto;
-    }
-
-    .div-title{
-        font-size: 25px;
-
-    }
-
     .custom-search{
         box-shadow: 0 2px 5px 0 rgba(0,0,0,.16), 0 2px 10px 0 rgba(0,0,0,.12);
     }
@@ -428,7 +430,7 @@ import CustomFooter from '../components/CustomFooter'
 
     .upper-div{
         position: relative;
-        padding: 55px 0px 30px 0px;
+        padding: 75px 0px 20px 0px;
         color:#000000;
         background-color: #fff;
         width:100%;

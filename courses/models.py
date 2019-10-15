@@ -41,9 +41,10 @@ class CourseInstructor(models.Model):
   topic = models.CharField(max_length=500, blank=True)
   
   def save(self, *args, **kwargs):
-    this = CourseInstructor.objects.get(pk = self.pk)
-    if cmp_semester(self.semester, this.course.last_taught) > 0:
-      self.course.last_taught = self.semester
+    if self.pk != None:
+      this = CourseInstructor.objects.get(pk = self.pk)
+      if cmp_semester(self.semester, this.course.last_taught) > 0:
+        self.course.last_taught = self.semester
     super(CourseInstructor, self).save(*args, **kwargs)
 
 

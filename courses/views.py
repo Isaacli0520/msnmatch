@@ -411,6 +411,7 @@ def get_trending_courses(request):
 			"title":tmp_course.title,
 			"mnemonic":tmp_course.mnemonic,
 			"number":tmp_course.number,
+			"description":tmp_course.description,
 			"taking":take["taking"],
 			"taken":take["taken"],
 		})
