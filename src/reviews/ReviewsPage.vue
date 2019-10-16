@@ -5,7 +5,7 @@
             <v-container fluid grid-list-lg>
                 <v-layout>
                     <v-flex>
-                        <v-breadcrumbs class="cus-breadcrumbs" :items="navItems" divider=">"></v-breadcrumbs>
+                        <custom-breadcrumb :items="navItems"></custom-breadcrumb>
                     </v-flex>
                 </v-layout>
                 <v-layout mb-3>
@@ -119,7 +119,7 @@
                                     v-model="review_course_instructor_pk"
                                     :items="course_instructors"
                                     :loading="cs_instr_load"
-                                    item-text="semester"
+                                    item-text="text"
                                     item-value="course_instructor_pk"
                                     label="Semester"
                                     :menu-props="{ offsetY: true }"
@@ -154,12 +154,14 @@
 <script>
 import axios from 'axios'
 import CustomHeader from '../components/CustomHeader'
+import CustomBreadcrumb from '../components/CustomBreadcrumb'
 axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 axios.defaults.xsrfCookieName = "csrftoken";
 
   export default {
 	data() {
 	    return {
+            currentSemester:"",
             reviewDialog:false,
             navItems:[],
             reviews:[],
@@ -175,7 +177,8 @@ axios.defaults.xsrfCookieName = "csrftoken";
 	    }
 	},
 	components:{
-	  CustomHeader,
+      CustomHeader,
+      CustomBreadcrumb,
 	},
 	watch: {
 
@@ -184,6 +187,11 @@ axios.defaults.xsrfCookieName = "csrftoken";
 	  
 	},
 	methods: {
+        getCurrentSemester(){
+            axios.get('/courses/ajax/get_current_semester/',{params: {}}).then(response => {
+                this.currentSemester = response.data.year + response.data.semester;
+            });
+        },
         sortBySemester(a, b){
             if(a.substring(0,4) != b.substring(0,4)){
                 return b.substring(0,4).toString(10) - a.substring(0,4).toString(10);
@@ -215,8 +223,18 @@ axios.defaults.xsrfCookieName = "csrftoken";
         },
         getCourseInstructors(course_pk, instructor_pk){
             this.cs_instr_load = true;
+            var tmp_cs_instr = [];
             axios.get('/courses/ajax/get_course_instructors/',{params: {course_pk:course_pk, instructor_pk:instructor_pk}}).then(response => {
                 this.course_instructors = response.data.course_instructors.sort(this.sortBySemesterKey);
+                for(let i = 0; i < this.course_instructors.length; i++){
+                    if(this.course_instructors[i].semester != this.currentSemester){
+                        tmp_cs_instr.push({
+                            "course_instructor_pk":this.course_instructors[i].course_instructor_pk,
+                            "text":this.course_instructors[i].semester + " " + this.course_instructors[i].topic,
+                            });
+                    }
+                }
+                this.course_instructors = tmp_cs_instr;
                 this.cs_instr_load = false;
             });
         },
@@ -269,6 +287,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
                 href: '',
             },
         ];
+        this.getCurrentSemester();
         this.getReviews();
 	},
   };
@@ -297,9 +316,9 @@ axios.defaults.xsrfCookieName = "csrftoken";
 		font-size: 2.1em;
 		font-weight: 300;
 		color:rgb(0, 0, 0);
-		padding: 7px 12px 7px 3px;
+		padding: 1px 12px 7px 3px;
 		border-radius: 5px;
-		line-height: 2.0;
+		line-height: 1.0;
 	}
 
     @media (min-width: 1025px) {

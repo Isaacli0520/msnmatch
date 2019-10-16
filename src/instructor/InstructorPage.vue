@@ -5,7 +5,7 @@
             <v-container fluid grid-list-lg>
                 <v-layout>
                     <v-flex>
-                        <v-breadcrumbs class="cus-breadcrumbs" :items="navItems" divider=">"></v-breadcrumbs>
+                        <custom-breadcrumb :items="navItems"></custom-breadcrumb>
                     </v-flex>
                 </v-layout>
                 <v-layout mb-3>
@@ -87,6 +87,7 @@ import axios from 'axios'
 import CustomHeader from '../components/CustomHeader'
 import CustomRating from '../components/CustomRating'
 import CustomFooter from '../components/CustomFooter'
+import CustomBreadcrumb from '../components/CustomBreadcrumb'
 
   export default {
 	data() {
@@ -109,6 +110,7 @@ import CustomFooter from '../components/CustomFooter'
         CustomHeader,
         CustomRating,
         CustomFooter,
+        CustomBreadcrumb,
 	},
 	watch: {
 
@@ -199,7 +201,7 @@ import CustomFooter from '../components/CustomFooter'
 		color:rgb(0, 0, 0);
 		padding: 7px 12px 7px 3px;
 		border-radius: 5px;
-		line-height: 2.0;
+		line-height: 1.0;
 	}
 
     @media (min-width: 1025px) {

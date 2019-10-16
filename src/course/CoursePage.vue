@@ -20,7 +20,8 @@
         <v-container v-if="loaded" fluid grid-list-lg>
             <v-layout>
                 <v-flex>
-                    <v-breadcrumbs class="cus-breadcrumbs" :items="navItems" divider="/"></v-breadcrumbs>
+                    <!-- <v-breadcrumbs class="cus-breadcrumbs" :items="navItems" divider="/"></v-breadcrumbs> -->
+                    <custom-breadcrumb :items="navItems"></custom-breadcrumb>
                 </v-flex>
             </v-layout>
             <v-layout mb-1>
@@ -85,7 +86,7 @@
                                                         small
                                                         text-color="white"
                                                         color="orange lighten-1">
-                                                        {{course.take.take}}
+                                                        {{takeToText(course.take.take)}}
                                                     </v-chip>
                                                     <v-chip
                                                         class="ma-1"
@@ -138,7 +139,7 @@
                                                     color="deep-purple accent-4" 
                                                     outlined
                                                     >
-                                                    Taking/Taken
+                                                    Planning/Taken
                                                 </v-chip>
                                             </v-card-actions>
                                         </v-card>
@@ -182,6 +183,7 @@ import axios from 'axios'
 import CustomHeader from '../components/CustomHeader'
 import CustomRating from '../components/CustomRating'
 import CustomFooter from '../components/CustomFooter'
+import CustomBreadcrumb from '../components/CustomBreadcrumb'
 axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 axios.defaults.xsrfCookieName = "csrftoken";
 
@@ -213,7 +215,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
                 "rating_course":0,
                 "rating_course_counter":[],
             },
-            currentSemester:"2020Spring",
+            currentSemester:"",
 
             loaded:false,
             navItems:[],
@@ -229,6 +231,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
         CustomHeader,
         CustomRating,
         CustomFooter,
+        CustomBreadcrumb,
     },
     watch: {
       
@@ -275,6 +278,22 @@ axios.defaults.xsrfCookieName = "csrftoken";
         },
     },
     methods: {
+        takeToText(txt){
+            if(txt == "taking"){
+                return "planning";
+            }
+            else if(txt == "taken"){
+                return "taken";
+            }
+            else{
+                return "null";
+            }
+        },
+        getCurrentSemester(){
+            axios.get('/courses/ajax/get_current_semester/',{params: {}}).then(response => {
+                this.currentSemester = response.data.year + response.data.semester;
+            });
+        },
         sortBySemester(a, b){
             if(a.substring(0,4) != b.substring(0,4)){
                 return b.substring(0,4).toString(10) - a.substring(0,4).toString(10);
@@ -339,7 +358,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
                         var tmp_label = " Taken";
                         var tmp_take = "taken";
                         if(this.course.instructors[i].semesters[j].semester == this.currentSemester){
-                            tmp_label = " Currently Taking";
+                            tmp_label = " Plan on Taking";
                             tmp_take = "taking";
                         }
                         var tmp_topic = ""
@@ -395,6 +414,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
         },
     },
     mounted(){
+        this.getCurrentSemester();
         this.getCourse();
     },
   };
@@ -407,13 +427,13 @@ axios.defaults.xsrfCookieName = "csrftoken";
         font-weight: 500;
     }
 
-    .v-breadcrumbs li{
+    /* .v-breadcrumbs li{
         font-size:20px !important;
     }
 
     .cus-breadcrumbs{
         padding-left: 4px !important;
-    }
+    } */
 
     .taking{
         background-color: rgb(11, 105, 92);

@@ -98,7 +98,7 @@
     }
 
     .rating-div > .v-rating > .v-icon{
-        padding: 6px;
+        padding: 5px;
     }
 
     .rating-num-span{
