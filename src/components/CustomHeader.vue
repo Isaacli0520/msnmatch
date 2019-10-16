@@ -187,6 +187,7 @@ export default{
             credential:"",
             plannableURL:"",
             username:"",
+            taking_courses:[],
             navBarItems:[
                 {
                     text:"HoosMyProfessor",
@@ -198,6 +199,19 @@ export default{
                     href:"",
                     diabled:true,
                 },
+            ],
+            courseTypes:[
+                'Clinical',
+                'Discussion',
+                'Drill',
+                'Independent Study',
+                'Laboratory',
+                'Lecture',
+                'Practicum',
+                'Seminar',
+                'Studio',
+                'Workshop',
+                '',
             ],
             user_items:[
                 { title:"Profile", icon:"fas fa-user" },
@@ -240,7 +254,7 @@ export default{
                 {
                     "title":"Plannable",
                     "icon":"fas fa-paper-plane",
-                    "href":"https://plannable.gitee.io",
+                    "href":"https://plannable.org",
                     "target":"_blank",
                 },
                 {
@@ -291,6 +305,14 @@ export default{
         username(){
             this.getPlannableURL();
             this.trash_items[1].href = "/users/" + this.username + "/courses/";
+        },
+        taking_courses(val){
+            var tmp_arr = [];
+            for(let i = 0; i < val.length; i++){
+                tmp_arr.push(val[i].mnemonic.toLowerCase() + val[i].number+this.courseTypes.indexOf(val[i].type).toString(10))
+            }
+            this.plannableURL = JSON.stringify(tmp_arr);
+            this.getPlannableURL();
         },
     },
     computed:{
@@ -352,15 +374,21 @@ export default{
                 this.username = "";
             });
         },
+        getTakingCourses(){
+            axios.get('/courses/ajax/get_taking_courses/',{params: {}}).then(response => {
+                this.taking_courses = response.data.taking_courses;
+            });
+        },
         getPlannableURL(){
             // var preHref = "localhost:8080"
-            var preHref = "https://plannable.gitee.io"
+            var preHref = "https://plannable.org"
             this.trash_items[3].href = preHref + "/?courses=" + this.plannableURL + "&username=" + this.username + "&credential=" + this.credential + "";
         },
     },
     mounted(){
         this.getCredential();
         this.get_basic_info();
+        this.getTakingCourses();
     },
 }
 </script>

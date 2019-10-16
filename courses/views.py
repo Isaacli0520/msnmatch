@@ -82,6 +82,13 @@ def courses_admin(request):
 	return render(request, 'courses_admin.html')
 
 @login_required
+def get_current_semester(request):
+	return JsonResponse({
+		"year":settings.CURRENT_SEMESTER[:4],
+		"semester":settings.CURRENT_SEMESTER[4:],
+	})
+
+@login_required
 def get_basic_info(request):
 	tmp = {
 		"home_url":reverse('home'),
@@ -143,6 +150,7 @@ def get_course_instructors(request):
 		course_instructor_relations.append({
 			"course_instructor_pk":course_instructor.pk,
 			"semester":course_instructor.semester,
+			"topic":course_instructor.topic,
 			})
 
 	return JsonResponse({
@@ -514,7 +522,7 @@ def save_take(request):
 		if past_query.first() != None:
 			past_query.first().delete()
 		if not delete:
-			cs_user = CourseUser.objects.create(user=request.user, course = course, instructor = instructor, take = take, course_instructor = cs_instr)
+			cs_user = CourseUser.objects.create(user=request.user, course = course, instructor = instructor, course_instructor = cs_instr)
 			now_instructor_pk, now_semester, now_take = cs_user.course_instructor.instructor.pk, cs_user.course_instructor.semester, cs_user.take
 		success = True
 	else:

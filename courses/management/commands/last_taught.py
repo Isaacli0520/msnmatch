@@ -13,5 +13,9 @@ class Command(BaseCommand):
 		for cs in Course.objects.all():
 			cs_instr_arr = [cs_instr.semester for cs_instr in CourseInstructor.objects.filter(course=cs)]
 			cs_instr_arr = sorted(cs_instr_arr, key=cmp_to_key(cmp_semester))
-			cs.last_taught = cs_instr_arr[-1]
+			if len(cs_instr_arr) >= 1:
+				cs.last_taught = cs_instr_arr[-1]
+			else:
+				print("class:",cs.mnemonic,cs.number,"last_taught:",cs.last_taught)
+				cs.last_taught = ""
 			cs.save()

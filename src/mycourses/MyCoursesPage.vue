@@ -19,7 +19,7 @@
                 <v-layout wrap>
                     <v-flex d-flex child-flex xs12 sm12 md12 lg12 xl12>
                         <v-card>
-                            <v-card-title>Taking Courses</v-card-title>
+                            <v-card-title>Courses Planning</v-card-title>
                             <v-card-text>
                                 <v-layout row wrap v-if="taking_courses.length > 0">
                                     <v-flex 
@@ -183,7 +183,7 @@ import CustomBreadcrumb from '../components/CustomBreadcrumb'
 		color:rgb(0, 0, 0);
 		padding: 7px 12px 7px 3px;
 		border-radius: 5px;
-		line-height: 2.0;
+		line-height: 1.0;
 	}
 
     @media (min-width: 1025px) {

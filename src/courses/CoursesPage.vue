@@ -196,7 +196,7 @@ import CustomFooter from '../components/CustomFooter'
             plannableURL:"",
             username:"",
             year:1,
-            semester:"Spring",
+            semester:"",
             major:null,
             major_options:[],
             taking_courses:[],
@@ -266,7 +266,7 @@ import CustomFooter from '../components/CustomFooter'
                 {
                     "title":"Plannable",
                     "icon":"fas fa-paper-plane",
-                    "href":"https://plannable.gitee.io",
+                    "href":"https://plannable.org",
                     "target":"_blank",
                 },
                 {
@@ -304,21 +304,6 @@ import CustomFooter from '../components/CustomFooter'
         CustomFooter,
 	},
 	watch: {
-        taking_courses(val){
-            var tmp_arr = [];
-            for(let i = 0; i < val.length; i++){
-                tmp_arr.push(val[i].mnemonic.toLowerCase() + val[i].number+this.courseTypes.indexOf(val[i].type).toString(10))
-            }
-            this.plannableURL = JSON.stringify(tmp_arr);
-            this.getPlannableURL();
-        },
-        credential(){
-            this.getPlannableURL();
-        },
-        username(){
-            this.getPlannableURL();
-            this.trash_items[1].href = "/users/" + this.username + "/courses/";
-        },
         year(){
             this.recommendation_loaded = false;
             this.getRecommendations();
@@ -335,6 +320,11 @@ import CustomFooter from '../components/CustomFooter'
 	computed:{
 	},
 	methods: {
+        getCurrentSemester(){
+            axios.get('/courses/ajax/get_current_semester/',{params: { }}).then(response => {
+                this.semester = response.data.semester;
+            });
+        },
 		goToHref(text){
 			window.location.href = text;
         },
@@ -373,27 +363,13 @@ import CustomFooter from '../components/CustomFooter'
                 this.taking_courses = response.data.taking_courses;
             });
         },
-        getCredential(){
-            axios.get('/courses/ajax/get_credential/',{params: {}}).then(response => {
-                this.credential = response.data.credential;
-                this.username = response.data.username;
-            }).catch( err => {
-                this.credential = "";
-                this.username = "";
-            });
-        },
-        getPlannableURL(){
-            // var preHref = "localhost:8080"
-            var preHref = "https://plannable.gitee.io"
-            this.trash_items[3].href = preHref + "/?courses=" + this.plannableURL + "&username=" + this.username + "&credential=" + this.credential + "";
-        },
 	},
 	mounted(){
-        this.getCredential();
         this.getTrendingCourses();
         this.getMajorOptions();
         this.getTakingCourses();
         this.getReviewUsers();
+        this.getCurrentSemester();
 	},
   };
 </script>

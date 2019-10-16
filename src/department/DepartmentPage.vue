@@ -236,7 +236,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
         color:rgb(0, 0, 0);
         padding: 7px 12px 7px 3px;
         border-radius: 5px;
-        line-height: 2.0;
+        line-height: 1.0;
         box-decoration-break: clone;
 
     }

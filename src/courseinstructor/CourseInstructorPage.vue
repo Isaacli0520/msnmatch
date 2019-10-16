@@ -35,7 +35,9 @@
             <v-layout> <!-- Instructor Name -->
                 <v-flex>
                     <div class="instructor-name">
-                        <a :href="' /courses/instructors/' + instructor.instructor_pk + '/' ">{{instructor.name}}</a>
+                        <v-btn color="teal darken-1" outlined x-large :href="' /courses/instructors/' + instructor.instructor_pk + '/' ">
+                            <v-icon class="instructor-icon" color="black" medium left>fas fa-user-tie</v-icon>{{instructor.name}}
+                        </v-btn>
                     </div>
                 </v-flex>
                 <v-spacer></v-spacer>
@@ -50,13 +52,13 @@
                 </v-flex>
             </v-layout>
             <v-layout wrap> <!-- Prereq and Rate -->
-                <v-flex lg8 md6 sm12 xs12 d-flex child-flex>
+                <v-flex xl7 lg7 md6 sm12 xs12 d-flex child-flex>
                     <v-card>
                         <v-card-title>Description</v-card-title>
                         <v-card-text>{{course.description}}</v-card-text>
                     </v-card>
                 </v-flex>
-                <v-flex lg4 md6 sm12 xs12 d-flex child-flex>
+                <v-flex xl5 lg5 md6 sm12 xs12 d-flex child-flex>
                     <custom-rating
                         :rating="instructor.rating_instructor"
                         :counter="instructor.rating_instructor_counter"
@@ -67,7 +69,7 @@
             <v-layout> <!-- Users Taking -->
                 <v-flex>
                     <v-card>
-                        <v-card-title>Users Taking {{course.mnemonic}} {{course.number}}</v-card-title>
+                        <v-card-title>Users Planning on Taking {{course.mnemonic}} {{course.number}}</v-card-title>
                         <v-card-text v-if="users_taking.length > 0">
                             <v-chip 
                             color="teal darken-1"
@@ -89,7 +91,7 @@
             <v-layout>
                 <v-flex>
                     <v-card>
-                        <v-card-title>Users who have Taken {{course.mnemonic}} {{course.number}}</v-card-title>
+                        <v-card-title>Users Who Have Taken {{course.mnemonic}} {{course.number}}</v-card-title>
                         <v-card-text v-if="users_taken.length > 0">
                             <v-chip 
                             color="teal darken-1"
@@ -187,7 +189,7 @@
                             <v-select
                                 v-model="review_course_instructor_pk"
                                 :items="course_instructors"
-                                item-text="semester"
+                                item-text="text"
                                 item-value="course_instructor_pk"
                                 label="Semester"
                                 :menu-props="{ offsetY: true }"
@@ -237,11 +239,9 @@ axios.defaults.xsrfCookieName = "csrftoken";
       return {
         loaded:false,
         currentSemester:"2019Fall",
-        selected_course:null,
         courseNameLimit:40,
         isLoading: false,
         entries:[],
-        search: null,
         home_url:"",
         brand_pic:"",
         profile:"",
@@ -320,34 +320,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
         CustomBreadcrumb,
     },
     watch: {
-      selected_course(val){
-        if(val != null){
-          this.goToHref("/courses/" + val.value + "/");
-        }
-      },
-      search (val) {
-        // Items have already been loaded
-        if (val == null || val.length == 0){
-          this.entries = []
-          return
-        }
-        if (val.length < 2) return
 
-        // Items have already been requested
-        if (this.isLoading) return
-
-        this.isLoading = true
-
-        // Lazily load input items
-        axios.get('/courses/ajax/course_search_result/',{params: {query:val, }}).then(response => {
-                this.entries = response.data.course_result; 
-          })
-          .catch(err => {
-            console.log("error: ",err)
-          })
-          .finally(() => {this.isLoading = false})
-          ;
-      },
     },
     computed:{
         users_with_review(){
@@ -415,6 +388,11 @@ axios.defaults.xsrfCookieName = "csrftoken";
         },
     },
     methods: {
+        getCurrentSemester(){
+            axios.get('/courses/ajax/get_current_semester/',{params: {pk:this.course_pk, }}).then(response => {
+                this.currentSemester = response.data.year + response.data.semester;
+            });
+        },
         sortBySemester(a, b){
             if(a.substring(0,4) != b.substring(0,4)){
                 return b.substring(0,4).toString(10) - a.substring(0,4).toString(10);
@@ -456,10 +434,20 @@ axios.defaults.xsrfCookieName = "csrftoken";
         getCourseInstructor(){
             axios.get('/courses/ajax/get_course_instructor/',{params: {course_pk:this.course_pk, instructor_pk:this.instructor_pk, }}).then(response => {
                 let data = response.data;
+                var tmp_cs_instr = [];
                 this.course = data.course;
                 document.title = this.course.mnemonic + this.course.number;
                 this.course_instructors = data.course_instructors;
                 this.course_instructors = this.course_instructors.sort(this.sortBySemesterKey);
+                for(let i = 0; i < this.course_instructors.length; i++){
+                    if(this.course_instructors[i].semester != this.currentSemester){
+                        tmp_cs_instr.push({
+                            "course_instructor_pk":this.course_instructors[i].course_instructor_pk,
+                            "text":this.course_instructors[i].semester + " " + this.course_instructors[i].topic,
+                            });
+                    }
+                }
+                this.course_instructors = tmp_cs_instr;
                 this.instructor = data.instructor;
                 this.course_users = data.course_users;
                 this.navItems = [
@@ -503,6 +491,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
     },
     mounted(){
         this.getCourseInstructor();
+        this.getCurrentSemester();
     },
   };
 </script>
@@ -532,6 +521,10 @@ axios.defaults.xsrfCookieName = "csrftoken";
 
     .review-title{
         margin: 0px 12px 0px 0px;
+    }
+
+    .instructor-icon{
+        padding-right: 5px;
     }
 
     .instructor-topic{
@@ -583,7 +576,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
         color:rgb(0, 0, 0);
         padding: 7px 12px 7px 12px;
         border-radius: 0px 5px 5px 0px;
-        line-height: 2.0;
+        line-height: 1.0;
         box-decoration-break: clone;
 
     }
