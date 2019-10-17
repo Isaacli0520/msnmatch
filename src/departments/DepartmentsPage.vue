@@ -18,23 +18,21 @@
             </v-layout>
             <v-layout row wrap>
                 <v-flex d-flex xs12 sm12 lg12 md12 xl12 :key="index_school + 'school' " v-for="(departments, school, index_school) in departments_dict">
-                    <v-card>
+                    <v-card elevation="3">
                         <v-card-title>{{ school }}</v-card-title>
                         <v-divider></v-divider>
                         <v-card-text class="text--primary">
                             <v-layout row wrap>
                                 <v-flex
-                                    pa-1
+                                    pa-2
                                     xs12 sm6 md6 lg6 xl6
                                     :key="index_d + 'department' " 
                                     v-for="(department, index_d) in departments">
-                                    <v-list-item
-                                        dense
-                                        :href="'/courses/departments/'+ department.department_pk + '/' ">
-                                        <v-list-item-content>
-                                            <v-list-item-title>{{department.name}}</v-list-item-title>
-                                        </v-list-item-content>
-                                    </v-list-item>
+                                        <v-chip
+                                            :href="'/courses/departments/'+ department.department_pk + '/' "
+                                            outlined 
+                                            
+                                            color="teal darken-1">{{department.name}}</v-chip>
                                 </v-flex>
                             </v-layout>
                         </v-card-text>

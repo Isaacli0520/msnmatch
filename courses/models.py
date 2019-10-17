@@ -49,6 +49,7 @@ class CourseInstructor(models.Model):
 		# 		self.course.last_taught = self.semester
 		if cmp_semester(self.semester, self.course.last_taught) > 0:
 			self.course.last_taught = self.semester
+			self.course.save()
 		super(CourseInstructor, self).save(*args, **kwargs)
 
 
