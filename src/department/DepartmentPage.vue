@@ -20,6 +20,7 @@
                 <template v-for="(course, index) in courses">
                     <v-flex xs12 sm12 md12 lg12 xl12 :key="index" child-flex  d-flex>
                         <v-card
+                            :ripple="false"
                             :href="'/courses/' + course.course_pk + '/' ">
                             <v-card-title>{{course.mnemonic}}{{course.number}} {{ course.title }}</v-card-title>
                             <v-card-text>

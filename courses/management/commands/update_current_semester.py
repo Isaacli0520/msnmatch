@@ -124,8 +124,8 @@ class Command(BaseCommand):
 				else:
 					old_cs_instrs_dict[cs_instr_query.first()] = 0
 				
-		for k, v in old_cs_instrs_dict.items():
+		for old_cs_instr, v in old_cs_instrs_dict.items():
 			if v == 0:
-				print("cs instr", k)
+				print("old cs instr", old_cs_instr.course.mnemonic, old_cs_instr.course.number, old_cs_instr.course.title)
 
 
