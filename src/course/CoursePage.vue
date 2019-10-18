@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <custom-header></custom-header>
+    <custom-header :headerUpdate="header_update"></custom-header>
     <v-content>
         <v-container v-if="!loaded" fluid fill-height>
             <v-layout 
@@ -190,6 +190,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
   export default {
     data() {
         return {
+            header_update:false,
             rating_default:[5,4,3,2,1],
             tmp_num:0,
             course:{
@@ -343,6 +344,9 @@ axios.defaults.xsrfCookieName = "csrftoken";
                         type: 'success'
                     });
                 }
+                this.header_update = !this.header_update;
+                this.takeCourse = null;
+                this.takeItemKey = "";
                 this.getCourse();
             });
             this.dialogTake = false;

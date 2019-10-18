@@ -179,6 +179,10 @@ export default{
             type:Boolean,
             default:true,
         },
+        headerUpdate:{
+            type:Boolean,
+            default:false,
+        },
     },
     data: function () {
         return {
@@ -299,6 +303,9 @@ export default{
         SearchCourse,
     },
     watch:{
+        headerUpdate(val){
+            this.getTakingCourses();
+        },
         credential(){
             this.getPlannableURL();
         },

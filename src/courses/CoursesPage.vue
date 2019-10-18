@@ -416,10 +416,10 @@ import CustomFooter from '../components/CustomFooter'
 
     .courses-main{
         /* background-color: #fff; */
-        background: url('../assets/static/css/images/cloud_new_11.jpg') no-repeat;
+        /* background: url('../assets/static/css/images/cloud_new_11.jpg') no-repeat;
         background-attachment: fixed;
         background-position: center center;
-        background-size: cover;
+        background-size: cover; */
     }
 
     .main-title{
