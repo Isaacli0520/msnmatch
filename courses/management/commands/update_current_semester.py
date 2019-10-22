@@ -22,15 +22,41 @@ type_dict = {
 }
 class Command(BaseCommand):
 	def handle(self, *args, **kwargs):
+		# post_data = {
+		# 	"Semester": settings.SEMESTER_ID,
+		# 	"Group": 'CS',
+		# 	"Description": 'Yes',
+		# 	"submit": 'Submit Data Request',
+		# 	"Extended": 'No'
+		# }
 		post_data = {
-			"Semester": settings.SEMESTER_ID,
-			"Group": 'CS',
-			"Description": 'Yes',
-			"submit": 'Submit Data Request',
-			"Extended": 'No'
+			"iGroup":"", 
+			"iMnemonic":"", 
+			"iNumber":"", 
+			"iStatus":"", 
+			"iType":"", 
+			"iInstructor":"", 
+			"iBuilding":"", 
+			"iRoom":"", 
+			"iDays":"", 
+			"iTime":"", 
+			"iDates":"", 
+			"iUnits":"", 
+			"iTitle":"", 
+			"iTopic":"", 
+			"iDescription":"", 
+			"iDiscipline":"", 
+			"iMinPosEnroll":"", 
+			"iMaxPosEnroll":"", 
+			"iMinCurEnroll":"", 
+			"iMaxCurEnroll":"", 
+			"iMinCurWaitlist":"", 
+			"iMaxCurWaitlist":"",
+			"Request CSV Data": "Request CSV data",
 		}
 		data, lines = [], []
-		with requests.post('https://rabi.phys.virginia.edu/mySIS/CS2/deliverData.php', data=post_data, stream=True) as r:
+		with requests.post('https://rabi.phys.virginia.edu/mySIS/CS2/deliverSearchData.php' + '?Semester=' + settings.SEMESTER_ID, data=post_data, stream=True) as r:
+		# with requests.post('https://rabi.phys.virginia.edu/mySIS/CS2/deliverData.php', data=post_data, stream=True) as r:
 			csv_reader = csv.reader(codecs.iterdecode(r.iter_lines(), 'utf-8'))
 			headers = next(csv_reader) 
 			print("headers",headers)
@@ -90,8 +116,7 @@ class Command(BaseCommand):
 				tmp_course.description = cs["Description"]
 				tmp_course.prerequisite = cs["Prerequisite"]
 				tmp_course.save()
-					
-			tmp_instructors = [ins.strip().split() for ins in cs["Instructor"].split(',')]
+			tmp_instructors = [ins.strip().split() for ins in cs["Instructor(s)"].split(',')]
 			final_instructors = []
 			for instructor in tmp_instructors:
 				if len(instructor) >= 1 and len(instructor) <= 3:
@@ -117,15 +142,15 @@ class Command(BaseCommand):
 				else:
 					tmp_instr = instr_query.first()
 				cs_instr_query = CourseInstructor.objects.filter(instructor=tmp_instr, course=tmp_course, topic=cs["Topic"],  semester=cs["Semester"])
-				
 				if cs_instr_query.first() == None:
 					print("NEW cs instructor found")
+					print("instructor",tmp_instr.first_name,tmp_instr.last_name, "course", tmp_course.mnemonic, tmp_course.number,)
 					CourseInstructor.objects.create(instructor=tmp_instr, course=tmp_course, topic=cs["Topic"], semester=cs["Semester"])
 				else:
+					# print("OLDDDD", old_cs_instrs_dict[cs_instr_query.first()])
 					old_cs_instrs_dict[cs_instr_query.first()] = 0
-				
 		for old_cs_instr, v in old_cs_instrs_dict.items():
-			if v == 0:
+			if v == 1:
 				print("old cs instr", old_cs_instr.course.mnemonic, old_cs_instr.course.number, old_cs_instr.course.title)
-
-
+				old_cs_instr.delete()
+		print('total length:', len(old_cs_instrs_dict))

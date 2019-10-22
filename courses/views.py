@@ -133,7 +133,7 @@ def get_top_review_users(request):
 				"name":user.first_name + " " + user.last_name,
 				"reviews":user_review_num,
 			})
-	users = sorted(users, key=lambda x:x["reviews"], reverse=True)[:10]
+	users = sorted(users, key=lambda x:x["reviews"], reverse=True)[:30]
 	return JsonResponse({
 		"review_users":users,
 	})

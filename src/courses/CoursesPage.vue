@@ -186,6 +186,35 @@
                         <!-- <v-spacer :key="index+'spacer'"></v-spacer> -->
                     </template>
                 </v-layout>
+                <v-layout>
+                    <v-flex xs12 sm12 md12 lg12 xl12 child-flex d-flex>
+                        <v-card 
+                            :elevation="cardElevation"
+                            :loading="!review_user_load">
+                            <v-card-title>Top 30 Users</v-card-title>
+                            <v-divider></v-divider>
+                            <v-card-text>
+                                <v-list v-if="review_user_load">
+                                    <v-list-item
+                                        style="width:100%;"
+                                        :key="index_review + '-review_user' " 
+                                        v-for="(user, index_review) in review_users"
+                                        :href="'/users/'+ user.username + '/' ">
+                                        <v-list-item-avatar
+                                            color="teal lighten-1"
+                                            >
+                                            <span style="color:#fff;">{{index_review + 1}}</span>
+                                        </v-list-item-avatar>
+                                        <v-list-item-content two-line>
+                                            <v-list-item-title>{{user.name}}</v-list-item-title>
+                                            <v-list-item-subtitle>Reviews: {{user.reviews}}</v-list-item-subtitle>
+                                        </v-list-item-content>
+                                    </v-list-item>
+                                </v-list>
+                            </v-card-text>
+                        </v-card>
+                    </v-flex>
+                </v-layout>
             </v-container>
         </v-content>
         <!-- <custom-footer></custom-footer> -->
