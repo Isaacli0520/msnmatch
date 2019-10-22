@@ -4,17 +4,26 @@
             :searchBool="false"></custom-header>
         <v-content>
             <v-container fluid grid-list-xl class="courses-main">
+                <v-layout row wrap>
+                        <div class="headline-div-center">
+                            <span class="cus-headline-title-text">Search Courses</span>
+                        </div>
+                        <v-spacer></v-spacer>
+                </v-layout>
                 <v-layout wrap>
-                    <v-flex d-flex xs12 sm12 md12 lg12 xl12>
+                    <v-spacer></v-spacer>
+                    <v-flex d-flex xs10 sm10 md8 lg8 xl8>
                         <search-course class="custom-search"
                             background_color="white"></search-course>
                     </v-flex>
+                    <v-spacer></v-spacer>
                 </v-layout>
+                <v-layout class="spacer-layout"></v-layout>
                 <v-layout wrap>
                     <v-flex child-flex d-flex xs12 sm12 md12 lg12 xl12>
                         <v-card
                             outlined
-                            hover
+                            elevation="3"
                             :loading="!recommendation_loaded">
                             <v-card-title>Recommendations</v-card-title>
                             <v-divider></v-divider>
@@ -133,11 +142,19 @@
                     </v-flex> -->
                 </v-layout>
                 <v-layout row wrap>
+                    <v-flex> 
+                        <div class="headline-div">
+                        <span class="cus-headline-text">Popular Courses</span>
+                        </div>
+                    </v-flex>
+                    <v-spacer></v-spacer>
+                </v-layout>
+                <v-layout row wrap>
                     <template v-for="(course, index) in trending_courses['Taken']">
                         <v-flex xs12 sm12 md12 lg12 xl12 :key="index" child-flex  d-flex>
                             <v-card
                                 outlined
-                                hover
+                                elevation="3"
                                 :href="'/courses/' + course.course_pk + '/' ">
                                 <v-card-title>{{course.mnemonic}}{{course.number}} {{ course.title }}</v-card-title>
                                 <v-card-text>
@@ -168,6 +185,35 @@
                         </v-flex>
                         <!-- <v-spacer :key="index+'spacer'"></v-spacer> -->
                     </template>
+                </v-layout>
+                <v-layout>
+                    <v-flex xs12 sm12 md12 lg12 xl12 child-flex d-flex>
+                        <v-card 
+                            :elevation="cardElevation"
+                            :loading="!review_user_load">
+                            <v-card-title>Top 30 Users</v-card-title>
+                            <v-divider></v-divider>
+                            <v-card-text>
+                                <v-list v-if="review_user_load">
+                                    <v-list-item
+                                        style="width:100%;"
+                                        :key="index_review + '-review_user' " 
+                                        v-for="(user, index_review) in review_users"
+                                        :href="'/users/'+ user.username + '/' ">
+                                        <v-list-item-avatar
+                                            color="teal lighten-1"
+                                            >
+                                            <span style="color:#fff;">{{index_review + 1}}</span>
+                                        </v-list-item-avatar>
+                                        <v-list-item-content two-line>
+                                            <v-list-item-title>{{user.name}}</v-list-item-title>
+                                            <v-list-item-subtitle>Reviews: {{user.reviews}}</v-list-item-subtitle>
+                                        </v-list-item-content>
+                                    </v-list-item>
+                                </v-list>
+                            </v-card-text>
+                        </v-card>
+                    </v-flex>
                 </v-layout>
             </v-container>
         </v-content>
@@ -375,6 +421,17 @@ import CustomFooter from '../components/CustomFooter'
 </script>
 
 <style>
+    .spacer-layout{
+        padding: 10px 5px 50px 5px;
+    }
+
+    .headline-div-center{
+        width:100%;
+        margin: 0 auto;
+        text-align: center; 
+        padding: 22px 12px 32px 12px;
+    }
+
     .custom-search{
         box-shadow: 0 2px 5px 0 rgba(0,0,0,.16), 0 2px 10px 0 rgba(0,0,0,.12);
     }
@@ -387,7 +444,11 @@ import CustomFooter from '../components/CustomFooter'
     }
 
     .courses-main{
-        background-color: #fff;
+        /* background-color: #fff; */
+        /* background: url('../assets/static/css/images/cloud_new_11.jpg') no-repeat;
+        background-attachment: fixed;
+        background-position: center center;
+        background-size: cover; */
     }
 
     .main-title{
@@ -427,6 +488,16 @@ import CustomFooter from '../components/CustomFooter'
         max-height: 248px;
     }
 
+    .cus-headline-title-text{
+		font-family: "Roboto", sans-serif;
+		font-size: 2.1em;
+		font-weight: 300;
+		color:rgb(0, 0, 0);
+		padding: 7px 12px 7px 3px;
+		border-radius: 5px;
+		line-height: 1.0;
+	}
+
 	.cus-headline-text{
 		font-family: "Roboto", sans-serif;
 		font-size: 2.1em;
@@ -434,7 +505,7 @@ import CustomFooter from '../components/CustomFooter'
 		color:rgb(0, 0, 0);
 		padding: 7px 12px 7px 3px;
 		border-radius: 5px;
-		line-height: 2.0;
+		line-height: 1.0;
 	}
 
     @media (min-width: 1025px) {
@@ -456,6 +527,12 @@ import CustomFooter from '../components/CustomFooter'
 
 
     @media (min-width: 10px) and (max-width: 767px) {
+        .cus-headline-title-text{
+            font-size:1.7em;
+        }
+
+        .
+
         .main-title{
             font-size: 28px;
             margin-top: 60px;

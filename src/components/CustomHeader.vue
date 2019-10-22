@@ -179,6 +179,10 @@ export default{
             type:Boolean,
             default:true,
         },
+        headerUpdate:{
+            type:Boolean,
+            default:false,
+        },
     },
     data: function () {
         return {
@@ -234,6 +238,12 @@ export default{
             },
             trash_items:[
                 {
+                    "title":"Home",
+                    "icon":"fas fa-home",
+                    "href":"/courses/",
+                    "target":"",
+                },
+                {
                     "title":"Departments",
                     "icon":"fas fa-list-ol",
                     "href":"/courses/departments/",
@@ -256,12 +266,6 @@ export default{
                     "icon":"fas fa-paper-plane",
                     "href":"https://plannable.org",
                     "target":"_blank",
-                },
-                {
-                    "title":"Home",
-                    "icon":"fas fa-home",
-                    "href":"/courses/",
-                    "target":"",
                 },
             ],
             old_items: [
@@ -299,12 +303,15 @@ export default{
         SearchCourse,
     },
     watch:{
+        headerUpdate(val){
+            this.getTakingCourses();
+        },
         credential(){
             this.getPlannableURL();
         },
         username(){
             this.getPlannableURL();
-            this.trash_items[1].href = "/users/" + this.username + "/courses/";
+            this.trash_items[2].href = "/users/" + this.username + "/courses/";
         },
         taking_courses(val){
             var tmp_arr = [];
@@ -382,7 +389,7 @@ export default{
         getPlannableURL(){
             // var preHref = "localhost:8080"
             var preHref = "https://plannable.org"
-            this.trash_items[3].href = preHref + "/?courses=" + this.plannableURL + "&username=" + this.username + "&credential=" + this.credential + "";
+            this.trash_items[4].href = preHref + "/?courses=" + this.plannableURL + "&username=" + this.username + "&credential=" + this.credential + "";
         },
     },
     mounted(){

@@ -133,7 +133,7 @@ def get_top_review_users(request):
 				"name":user.first_name + " " + user.last_name,
 				"reviews":user_review_num,
 			})
-	users = sorted(users, key=lambda x:x["reviews"], reverse=True)[:10]
+	users = sorted(users, key=lambda x:x["reviews"], reverse=True)[:30]
 	return JsonResponse({
 		"review_users":users,
 	})
@@ -742,6 +742,7 @@ def get_detailed_json_of_course(course, user, with_instructors=False, with_take=
 		"prerequisite":course.prerequisite,
 		"type":course.type,
 		"take":take,
+		"last_taught":course.last_taught,
 		"department":{
 			"name":course.department.name,
 			"department_pk":course.department.pk,

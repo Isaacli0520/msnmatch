@@ -9,7 +9,7 @@ class CourseInstructorRelationInline(admin.TabularInline):
     model = Course.instructors.through
 
 class CustomCourseAdmin(admin.ModelAdmin):
-    inlines = (CourseInstructorRelationInline, CourseUserRelationInline) #CourseUserRelationInline,
+    inlines = (CourseInstructorRelationInline,) #CourseUserRelationInline,
     list_display = ['get_courseNum','type','units', 'title']
     list_filter = ('type','mnemonic', 'units',)
     search_fields = ["mnemonic", "number", "title"]

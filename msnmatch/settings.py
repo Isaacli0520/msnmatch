@@ -40,6 +40,7 @@ BUILD_VERSION = "msnmatch-alpha-0.206"
 
 CURRENT_YEAR = config('CURRENT_YEAR', cast=int)
 CURRENT_SEMESTER = config('CURRENT_SEMESTER')
+SEMESTER_ID = config('SEMESTER_ID')
 
 # Application definition
 

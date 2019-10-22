@@ -20,6 +20,7 @@
                 <template v-for="(course, index) in courses">
                     <v-flex xs12 sm12 md12 lg12 xl12 :key="index" child-flex  d-flex>
                         <v-card
+                            :ripple="false"
                             :href="'/courses/' + course.course_pk + '/' ">
                             <v-card-title>{{course.mnemonic}}{{course.number}} {{ course.title }}</v-card-title>
                             <v-card-text>
@@ -35,6 +36,10 @@
                                     <v-chip
                                         class="ma-1" color="teal lighten-2" label small text-color="white">
                                         Taken: {{course.taken}}
+                                    </v-chip>
+                                    <v-chip
+                                        class="ma-1" :color=" course.last_taught == currentSemester ? 'cyan lighten-2' : 'blue-grey lighten-3' " label small text-color="white">
+                                        Last Taught: {{course.last_taught}}
                                     </v-chip>
                                     <v-chip
                                         v-if=" taking_or_taken(course) != '' "
@@ -75,7 +80,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
             school:"",
         },
         courses:[],
-
+        currentSemester:"",
         navItems:[],
         
       }
@@ -95,6 +100,11 @@ axios.defaults.xsrfCookieName = "csrftoken";
         },
     },
     methods: {
+        getCurrentSemester(){
+            axios.get('/courses/ajax/get_current_semester/',{params: { }}).then(response => {
+                this.currentSemester = response.data.year + response.data.semester;
+            });
+        },
         taking_or_taken(course){
             if(course.take.take == "taking"){
                 return "Taking"
@@ -146,6 +156,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
         },
     },
     mounted(){
+        this.getCurrentSemester();
         this.getDepartment();
     },
   };
