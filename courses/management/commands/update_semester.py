@@ -22,25 +22,27 @@ type_dict = {
 	"WKS":"Workshop",
 }
 semester_ids = {
-	"1168":"2016Fall",
-	"1172":"2017Spring",
-	"1178":"2017Fall",
-	"1182":"2018Spring",
-	"1188":"2018Fall",
-	"1192":"2019Spring",
-	"1198":"2019Fall",
-	"1202":"2020Spring",
+	"2016Fall":"1168",
+	"2017Spring":"1172",
+	"2017Fall":"1178",
+	"2018Spring":"1182",
+	"2018Fall":"1188",
+	"2019Spring":"1192",
+	"2019Fall":"1198",
+	"2020Spring":"1202",
 }
+
 
 class Command(BaseCommand):
 	def add_arguments(self, parser):
 		parser.add_argument('semester_id')
 
 	def handle(self, *args, **kwargs):
-		semester_id = kwargs["semester_id"]
-		if semester_id not in semester_ids:
-			print("Wrong semester id")
+		semester = kwargs["semester_id"]
+		if semester not in semester_ids:
+			print("Wrong semester")
 			return
+		semester_id = semester_ids[semester]
 		post_data = {
 			"iGroup":"", 
 			"iMnemonic":"", 
@@ -68,9 +70,9 @@ class Command(BaseCommand):
 		}
 		data, lines = [], []
 		with requests.post('https://rabi.phys.virginia.edu/mySIS/CS2/deliverSearchData.php' + '?Semester=' + semester_id, data=post_data, stream=True) as r:
-		# with requests.post('https://rabi.phys.virginia.edu/mySIS/CS2/deliverData.php', data=post_data, stream=True) as r:
 			csv_reader = csv.reader(codecs.iterdecode(r.iter_lines(), 'utf-8'))
 			headers = next(csv_reader) 
+			print("Semester:", semester, "Semester ID:", semester_id)
 			print("headers",headers)
 			for row in csv_reader:
 				lines.append(row)
@@ -103,11 +105,11 @@ class Command(BaseCommand):
 					tmp_data["Prerequisite"] =tmp_data['Description'][tmp_data['Description'].index("Prerequisite:"):]
 				else:
 					tmp_data["Prerequisite"] = ""
-				tmp_data["Semester"] = semester_ids[semester_id]
+				tmp_data["Semester"] = semester
 				data.append(tmp_data)
 			print("data:",len(data))
 
-		old_cs_instrs = CourseInstructor.objects.filter(semester = semester_ids[semester_id])
+		old_cs_instrs = CourseInstructor.objects.filter(semester = semester)
 		old_cs_instrs_dict = {}
 		for old_cs_instr in old_cs_instrs:
 			old_cs_instrs_dict[old_cs_instr] = 1
@@ -115,19 +117,16 @@ class Command(BaseCommand):
 		for cs in data:
 			if cs["Type"] in type_dict:
 				cs['Type'] = type_dict[cs['Type']]
-			course_query = Course.objects.filter(number=cs['Number'], mnemonic=cs['Mnemonic'],
-			title=cs['Title'], type=cs['Type'])
 
-			if course_query.first() == None:
-				tmp_course = Course.objects.create(number=cs['Number'], mnemonic=cs['Mnemonic'], units=cs['Units'],
-				title=cs['Title'],description=cs["Description"], type=cs['Type'],
-				prerequisite=cs['Prerequisite'])
-			else:
-				tmp_course = course_query.first()
-				tmp_course.units = cs["Units"]
-				tmp_course.description = cs["Description"]
-				tmp_course.prerequisite = cs["Prerequisite"]
-				tmp_course.save()
+			try:
+				course = Course.objects.get(number=cs['Number'], mnemonic=cs['Mnemonic'], title=cs['Title'], type=cs['Type'])
+				course.units = cs["Units"]
+				course.description = cs["Description"]
+				course.prerequisite = cs["Prerequisite"]
+				course.save()
+			except Course.DoesNotExist:
+				course = Course.objects.create(number=cs['Number'], mnemonic=cs['Mnemonic'], units=cs['Units'], title=cs['Title'],description=cs["Description"], type=cs['Type'], prerequisite=cs['Prerequisite'])
+
 			tmp_instructors = [ins.strip().split() for ins in cs["Instructor(s)"].split(',')]
 			final_instructors = []
 			for instructor in tmp_instructors:
@@ -141,28 +140,27 @@ class Command(BaseCommand):
 						final_instructors.append(inner_instructor.strip().split())
 				elif len(instructor) > 2:
 					final_instructors.append(instructor)
+
 			for instructor in final_instructors:
-				if len(instructor) == 1:
-					tmp_first_name = instructor[0]
-					tmp_last_name = ""
-				else:
-					tmp_first_name = instructor[0]
-					tmp_last_name = instructor[-1]
-				instr_query = Instructor.objects.filter(first_name=tmp_first_name, last_name=tmp_last_name)
-				if instr_query.first() == None:
-					tmp_instr = Instructor.objects.create(first_name=tmp_first_name, last_name=tmp_last_name)
-				else:
-					tmp_instr = instr_query.first()
-				cs_instr_query = CourseInstructor.objects.filter(instructor=tmp_instr, course=tmp_course, topic=cs["Topic"],  semester=cs["Semester"])
-				if cs_instr_query.first() == None:
-					print("NEW cs instructor found")
-					print("instructor",tmp_instr.first_name,tmp_instr.last_name, "course", tmp_course.mnemonic, tmp_course.number,)
-					CourseInstructor.objects.create(instructor=tmp_instr, course=tmp_course, topic=cs["Topic"], semester=cs["Semester"])
-				else:
-					# print("OLDDDD", old_cs_instrs_dict[cs_instr_query.first()])
-					old_cs_instrs_dict[cs_instr_query.first()] = 0
+				if len(instructor) == 0:
+					print("Empty Instructor Name")
+					return
+				tmp_first_name = instructor[0]
+				tmp_last_name = "" if len(instructor) == 1 else instructor[-1]
+
+				try:
+					instr = Instructor.objects.get(first_name=tmp_first_name, last_name=tmp_last_name)
+				except Instructor.DoesNotExist:
+					instr = Instructor.objects.create(first_name=tmp_first_name, last_name=tmp_last_name)
+				
+				try:
+					cs_instr = CourseInstructor.objects.get(instructor=instr, course=course, topic=cs["Topic"], semester=cs["Semester"])
+					old_cs_instrs_dict[cs_instr] = 0
+				except CourseInstructor.DoesNotExist:
+					print("NEW Course Instructor Relation found -", "Instructor:",instr.first_name,instr.last_name, "Course:", course.mnemonic, course.number,)
+					cs_instr = CourseInstructor.objects.create(instructor=instr, course=course, topic=cs["Topic"], semester=cs["Semester"])
+				
 		for old_cs_instr, v in old_cs_instrs_dict.items():
 			if v == 1:
-				print("old cs instr", old_cs_instr.course.mnemonic, old_cs_instr.course.number, old_cs_instr.course.title)
+				print("Old Course Instructor Relation Deleted -", "Instructor:",old_cs_instr.instructor.first_name, old_cs_instr.instructor.last_name, "Course:", old_cs_instr.course.mnemonic, old_cs_instr.course.number, old_cs_instr.course.title)
 				old_cs_instr.delete()
-		print('total length:', len(old_cs_instrs_dict))
