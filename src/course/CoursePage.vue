@@ -57,95 +57,91 @@
                         ></custom-rating>
                 </v-flex>
             </v-layout>
-            <v-layout wrap>
+            <v-layout row wrap>
                 <template v-for="i in 2">
-                    <v-flex mb-3 :key="i + '-instructor-card' " xs12 sm12 md12 lg12 xl12 d-flex child-flex>
+                    <v-flex :key="i + '-instructor-card' " xs12 sm12 md12 lg12 xl12 d-flex child-flex>
                         <v-card>
                             <v-card-title> {{ i==1 ? 'Instructors teaching this semester': 'Past semesters' }} </v-card-title>
+                        </v-card>
+                    </v-flex>
+                    <v-flex 
+                    xs12 sm6 md4 lg4 xl4
+                    d-flex 
+                    :key="index_instr + (i == 1 ? '-teaching' : '-not-teaching') "
+                    v-for="(instructor, index_instr) in i == 1 ? teaching_instructors : not_teaching_instructors">
+                        <v-card style="width:100%;">
+                            <v-card-title>
+                                <div>
+                                    <div>{{instructor.name}}</div>
+                                    <div v-if="instructor.topic" class="subtitle-1 grey--text">   {{instructor.topic}}</div>
+                                </div>
+                            </v-card-title>
+                            <v-divider></v-divider>
                             <v-card-text>
-                                <v-layout :key="i + 100000" row wrap>
-                                    <v-flex 
-                                    xs12 sm6 md4 lg4 xl4
-                                    d-flex 
-                                    :key="index_instr + (i == 1 ? '-teaching' : '-not-teaching') "
-                                    v-for="(instructor, index_instr) in i == 1 ? teaching_instructors : not_teaching_instructors">
-                                        <v-card style="width:100%;">
-                                            <v-card-title>
-                                                <div>
-                                                    <div>{{instructor.name}}</div>
-                                                    <div v-if="instructor.topic" class="subtitle-1 grey--text">   {{instructor.topic}}</div>
-                                                </div>
-                                            </v-card-title>
-                                            <v-divider></v-divider>
-                                            <v-card-text>
-                                                <div style="margin: 0px 0px 6px 0px">
-                                                    <v-chip 
-                                                        class="ma-1"
-                                                        v-if="course.take.instructor_pk == instructor.pk"
-                                                        label
-                                                        small
-                                                        text-color="white"
-                                                        color="orange lighten-1">
-                                                        {{takeToText(course.take.take)}}
-                                                    </v-chip>
-                                                    <v-chip
-                                                        class="ma-1"
-                                                        label
-                                                        small
-                                                        text-color="white"
-                                                        color="teal darken-1">
-                                                        Semesters Taught:{{instructor.semesters.length}}
-                                                    </v-chip>
-                                                    <v-chip
-                                                        class="ma-1"
-                                                        label
-                                                        small
-                                                        text-color="white"
-                                                        color="teal darken-1">
-                                                        Taking:{{instructor.taking}}
-                                                    </v-chip>
-                                                    <v-chip
-                                                        class="ma-1"
-                                                        label
-                                                        small
-                                                        text-color="white"
-                                                        color="teal darken-1">
-                                                        Taken:{{instructor.taken}}
-                                                    </v-chip>
-                                                </div>
-                                                <div style="margin-left:4px;">
-                                                    <span>Rating: {{instructor.rating_instructor}}</span>
-                                                    <v-rating 
-                                                    color="yellow darken-3"
-                                                    background-color="grey darken-1"
-                                                    half-increments
-                                                    v-model="instructor.rating_instructor"
-                                                    readonly></v-rating>
-                                                </div>
-                                            </v-card-text>
-                                            <v-divider class=""></v-divider>
-                                            <v-card-actions class="instructor-card-action">
-                                                <v-chip
-                                                    class="ma-1"
-                                                    outlined
-                                                    color="deep-purple accent-4"
-                                                    @click="goToHref('/courses/'+course.course_pk+'/'+instructor.pk+'/')"
-                                                    >
-                                                    Reviews & More
-                                                </v-chip>
-                                                <v-chip
-                                                    class="ma-1"
-                                                    @click="openDialogTake(instructor)"
-                                                    color="deep-purple accent-4" 
-                                                    outlined
-                                                    >
-                                                    Planning/Taken
-                                                </v-chip>
-                                            </v-card-actions>
-                                        </v-card>
-                                    </v-flex>
-                                </v-layout>
+                                <div style="margin: 0px 0px 6px 0px">
+                                    <v-chip 
+                                        class="ma-1"
+                                        v-if="course.take.instructor_pk == instructor.pk"
+                                        label
+                                        small
+                                        text-color="white"
+                                        color="orange lighten-1">
+                                        {{takeToText(course.take.take)}}
+                                    </v-chip>
+                                    <v-chip
+                                        class="ma-1"
+                                        label
+                                        small
+                                        text-color="white"
+                                        color="teal darken-1">
+                                        Semesters Taught:{{instructor.semesters.length}}
+                                    </v-chip>
+                                    <v-chip
+                                        class="ma-1"
+                                        label
+                                        small
+                                        text-color="white"
+                                        color="teal darken-1">
+                                        Taking:{{instructor.taking}}
+                                    </v-chip>
+                                    <v-chip
+                                        class="ma-1"
+                                        label
+                                        small
+                                        text-color="white"
+                                        color="teal darken-1">
+                                        Taken:{{instructor.taken}}
+                                    </v-chip>
+                                </div>
+                                <div style="margin-left:4px;">
+                                    <span>Rating: {{instructor.rating_instructor}}</span>
+                                    <v-rating 
+                                    color="yellow darken-3"
+                                    background-color="grey darken-1"
+                                    half-increments
+                                    v-model="instructor.rating_instructor"
+                                    readonly></v-rating>
+                                </div>
                             </v-card-text>
+                            <v-divider class=""></v-divider>
+                            <v-card-actions class="instructor-card-action">
+                                <v-chip
+                                    class="ma-1"
+                                    outlined
+                                    color="deep-purple accent-4"
+                                    @click="goToHref('/courses/'+course.course_pk+'/'+instructor.pk+'/')"
+                                    >
+                                    Reviews & More
+                                </v-chip>
+                                <v-chip
+                                    class="ma-1"
+                                    @click="openDialogTake(instructor)"
+                                    color="deep-purple accent-4" 
+                                    outlined
+                                    >
+                                    Planning/Taken
+                                </v-chip>
+                            </v-card-actions>
                         </v-card>
                     </v-flex>
                 </template>
