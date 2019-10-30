@@ -29,7 +29,7 @@
                                         <v-list-item
                                             :href="'/courses/'+ course.course_pk + '/' ">
                                             <v-list-item-avatar
-                                                color="orange lighten-2">
+                                                color="teal lighten-2">
                                                 <span style="color:#fff;">{{index_course + 1}}</span>
                                             </v-list-item-avatar>
                                             <v-list-item-content>
@@ -55,7 +55,7 @@
                                         <v-list-item
                                             :href="'/courses/'+ course.course_pk + '/' ">
                                             <v-list-item-avatar
-                                                color="orange lighten-2">
+                                                color="teal lighten-2">
                                                 <span style="color:#fff;">{{index_course + 1}}</span>
                                             </v-list-item-avatar>
                                             <v-list-item-content>

@@ -4,21 +4,28 @@
             :searchBool="false"></custom-header>
         <v-content>
             <v-container fluid grid-list-xl class="courses-main">
-                <v-layout row wrap>
-                        <div class="headline-div-center">
-                            <span class="cus-headline-title-text">Search Courses</span>
-                        </div>
-                        <v-spacer></v-spacer>
-                </v-layout>
                 <v-layout wrap>
-                    <v-spacer></v-spacer>
-                    <v-flex d-flex xs10 sm10 md8 lg8 xl8>
-                        <search-course class="custom-search"
-                            background_color="white"></search-course>
+                    <v-flex child-flex d-flex xs12 sm12 md12 lg12 xl12>
+                    <v-card
+                        outlined
+                        elevation="3">
+
+                            <div class="headline-div-center">
+                                <span class="cus-headline-title-text">Search Courses</span>
+                            </div>
+                        <v-layout row wrap>
+                            <v-spacer></v-spacer>
+                            <v-flex d-flex xs10 sm10 md8 lg8 xl8>
+                                <search-course class="custom-search"
+                                    background_color="white"></search-course>
+                            </v-flex>
+                            <v-spacer></v-spacer>
+                        </v-layout>
+                        <v-layout class="spacer-layout"></v-layout>
+                        <v-spacer></v-spacer>
+                    </v-card>
                     </v-flex>
-                    <v-spacer></v-spacer>
                 </v-layout>
-                <v-layout class="spacer-layout"></v-layout>
                 <v-layout wrap>
                     <v-flex child-flex d-flex xs12 sm12 md12 lg12 xl12>
                         <v-card
@@ -69,7 +76,7 @@
                                                 v-for="(course, index_course) in rcm_courses"
                                                 :href="'/courses/'+ course.course_pk + '/' ">
                                                 <v-list-item-avatar
-                                                    color="orange lighten-2">
+                                                    color="teal lighten-2">
                                                     <span style="color:#fff;">{{index_course + 1}}</span>
                                                 </v-list-item-avatar>
                                                 <v-list-item-content two-line>
