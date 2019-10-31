@@ -37,7 +37,7 @@
                 <v-flex child-flex d-flex>
                     <v-card>
                         <v-card-title>Prerequisite</v-card-title>
-                        <v-card-text v-if="course.prerequisite">{{course.prerequisite.substring(13).trim()}}</v-card-text>
+                        <v-card-text v-if="course.prerequisite">{{course.prerequisite.trim()}}</v-card-text>
                         <v-card-text v-else>No prereq is specified for this course(Please check on SIS)</v-card-text>
                     </v-card>
                 </v-flex>

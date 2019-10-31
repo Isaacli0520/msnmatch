@@ -101,10 +101,15 @@ class Command(BaseCommand):
 						if re.match(pattern, line[i]):
 							tmp_data[headers[15]].append(line[i])
 					tmp_data[headers[-1]] = line[-1]
-				if "Prerequisite:" in tmp_data['Description'].split(' '):
-					tmp_data["Prerequisite"] =tmp_data['Description'][tmp_data['Description'].index("Prerequisite:"):]
-				else:
-					tmp_data["Prerequisite"] = ""
+				# if "Prerequisite:" in tmp_data['Description'].split(' '):
+				# 	tmp_data["Prerequisite"] =tmp_data['Description'][tmp_data['Description'].index("Prerequisite:"):]
+				# elif "Prerequisites:" in tmp_data['Description'].split(' '):
+				# 	tmp_data["Prerequisite"] =tmp_data['Description'][(tmp_data['Description'].index("Prerequisites:") + 1):]
+				split_description = tmp_data['Description'].split(' ')
+				tmp_data["Prerequisite"] = ""
+				for prereq_key in ["Prerequisite:", "Prerequisites:", "Prerequisite", "Prerequisites"]:
+					if prereq_key in split_description:
+						tmp_data["Prerequisite"] =tmp_data['Description'][(tmp_data['Description'].index(prereq_key) + len(prereq_key)):]
 				tmp_data["Semester"] = semester
 				data.append(tmp_data)
 			print("data:",len(data))
