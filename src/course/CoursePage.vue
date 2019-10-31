@@ -289,6 +289,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
         getCurrentSemester(){
             axios.get('/courses/ajax/get_current_semester/',{params: {}}).then(response => {
                 this.currentSemester = response.data.year + response.data.semester;
+                this.getCourse();
             });
         },
         sortBySemester(a, b){
@@ -415,7 +416,6 @@ axios.defaults.xsrfCookieName = "csrftoken";
     },
     mounted(){
         this.getCurrentSemester();
-        this.getCourse();
     },
   };
 </script>

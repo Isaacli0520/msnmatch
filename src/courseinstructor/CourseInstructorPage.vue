@@ -238,7 +238,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
     data() {
       return {
         loaded:false,
-        currentSemester:"2019Fall",
+        currentSemester:"",
         courseNameLimit:40,
         isLoading: false,
         entries:[],
@@ -391,6 +391,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
         getCurrentSemester(){
             axios.get('/courses/ajax/get_current_semester/',{params: {pk:this.course_pk, }}).then(response => {
                 this.currentSemester = response.data.year + response.data.semester;
+                this.getCourseInstructor();
             });
         },
         sortBySemester(a, b){
@@ -490,7 +491,6 @@ axios.defaults.xsrfCookieName = "csrftoken";
         },
     },
     mounted(){
-        this.getCourseInstructor();
         this.getCurrentSemester();
     },
   };
