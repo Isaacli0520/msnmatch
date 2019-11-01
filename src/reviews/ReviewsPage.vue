@@ -83,7 +83,7 @@
                                 </v-card>
                             </v-flex>
                         </v-layout>
-                        <span v-else>You have no reviews.</span>
+                        <span class="grey--text" v-else>You have no reviews :(</span>
                     </v-flex>
                 </v-layout>
             </v-container>
@@ -143,8 +143,24 @@
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer></v-spacer>
+                    <v-btn color="red darken-1" text @click="deleteDialog = true">Delete</v-btn>
                     <v-btn color="blue darken-1" text @click="reviewDialog = false">Close</v-btn>
                     <v-btn color="blue darken-1" text @click="submitReview()">Submit</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+        <v-dialog v-model="deleteDialog" persistent max-width="400px">
+            <v-card>
+                <v-card-title>
+                    <span class="headline">Confirmation</span>
+                </v-card-title>
+                <v-card-text>
+                    <span>Do you really want to DELETE this review?</span>
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="blue darken-1" text @click="deleteDialog = false">No</v-btn>
+                    <v-btn color="blue darken-1" text @click="deleteReview()">Yes</v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
@@ -163,6 +179,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
 	    return {
             currentSemester:"",
             reviewDialog:false,
+            deleteDialog:false,
             navItems:[],
             reviews:[],
             review_text:"",
@@ -248,8 +265,33 @@ axios.defaults.xsrfCookieName = "csrftoken";
             this.review_course_pk = review.course.course_pk;
             this.review_instructor_pk = review.instructor_pk;
         },
+        deleteReview(){
+            axios.post("/courses/ajax/save_take/",{
+                    "course_pk":this.review_course_pk,
+                    "instructor_pk":this.review_instructor_pk,
+                    "course_instructor_pk":this.review_course_instructor_pk,
+                    "semester":"", 
+                    "take":"",
+                    "delete":true
+                }).then(response => {
+                if(response.data.success){
+                    this.$message({
+                        message: "Updated",
+                        type: "success"
+                    });
+                    this.getReviews();
+                }else{
+                    this.$message({
+                        message: 'Sth is wrong baby~',
+                        type: 'error'
+                    });
+                }
+            });
+            this.deleteDialog = false,
+            this.reviewDialog = false;
+        },
         submitReview(){
-            axios.post('/courses/ajax/submit_review/', {
+            axios.post("/courses/ajax/submit_review/", {
                 "text":this.review_text,
                 "rating_course":this.review_rating_course,
                 "rating_instructor":this.review_rating_instructor,

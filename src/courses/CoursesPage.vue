@@ -193,7 +193,7 @@
                         <!-- <v-spacer :key="index+'spacer'"></v-spacer> -->
                     </template>
                 </v-layout>
-                <v-layout>
+                <!-- <v-layout>
                     <v-flex xs12 sm12 md12 lg12 xl12 child-flex d-flex>
                         <v-card 
                             :elevation="cardElevation"
@@ -221,7 +221,7 @@
                             </v-card-text>
                         </v-card>
                     </v-flex>
-                </v-layout>
+                </v-layout> -->
             </v-container>
         </v-content>
         <!-- <custom-footer></custom-footer> -->

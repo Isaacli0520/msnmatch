@@ -83,12 +83,12 @@
                             </v-chip>
                         </v-card-text>
                         <v-card-text v-else>
-                            No user is taking this class
+                            No user is planning on taking this class
                         </v-card-text>
                     </v-card>
                 </v-flex>
             </v-layout>
-            <v-layout>
+            <v-layout v-if="taken_users_enable">
                 <v-flex>
                     <v-card>
                         <v-card-title>Users Who Have Taken {{course.mnemonic}} {{course.number}}</v-card-title>
@@ -192,6 +192,7 @@
                                 item-text="text"
                                 item-value="course_instructor_pk"
                                 label="Semester"
+                                :error-messages="semester_error_messages"
                                 :menu-props="{ offsetY: true }"
                                 outlined>
                             </v-select>
@@ -204,6 +205,7 @@
                                 label="Write Your Review"
                                 auto-grow
                                 outlined
+                                :error-messages="review_error_messages"
                                 rows="5"
                                 row-height="20"
                             ></v-textarea>
@@ -211,7 +213,7 @@
                     </v-layout>
                 </v-container>
                 <p v-else>
-                    You can't review this instructor and you know why.
+                    You can't review this instructor.
                 </p>
             </v-card-text>
             <v-card-actions>
@@ -238,9 +240,14 @@ axios.defaults.xsrfCookieName = "csrftoken";
     data() {
       return {
         loaded:false,
+        taken_users_enable:false,
         currentSemester:"",
         courseNameLimit:40,
         isLoading: false,
+        semester_error_messages:[],
+        review_error_messages:[],
+        course_rating_error_messages:[],
+        instructor_rating_error_messages:[],
         entries:[],
         home_url:"",
         brand_pic:"",
@@ -269,8 +276,8 @@ axios.defaults.xsrfCookieName = "csrftoken";
         },
 
         reviewDialog:false,
-        review_rating_course:0,
-        review_rating_instructor:0,
+        review_rating_course:1,
+        review_rating_instructor:1,
         review_text:"",
         review_course_instructor_pk:null,
 
@@ -320,7 +327,16 @@ axios.defaults.xsrfCookieName = "csrftoken";
         CustomBreadcrumb,
     },
     watch: {
-
+        review_course_instructor_pk(val){
+            if(val != null){
+                this.semester_error_messages = []
+            }
+        },
+        review_text(val){
+            if(val != null){
+                this.review_error_messages = []
+            }
+        },
     },
     computed:{
         users_with_review(){
@@ -414,6 +430,24 @@ axios.defaults.xsrfCookieName = "csrftoken";
             return this.sortBySemester(a["semester"], b["semester"]);
         },
         submitReview(){
+            let error_flag = false;
+            if(this.review_course_instructor_pk == null){
+                this.semester_error_messages.push("Choose a Semester");
+                error_flag = true;
+            }
+            if(this.review_text == ""){
+                this.review_error_messages.push("Write Sth");
+                error_flag = true;
+            }
+            // if(this.review_rating_course == 0){
+            //     this.course_rating_error_messages.push("Can't be 0");
+            //     error_flag = true;
+            // }
+            // if(this.review_rating_instructor == 0){
+            //     this.instructor_rating_error_messages.push("Can't be 0");
+            //     error_flag = true;
+            // }
+            if(!error_flag){
             axios.post('/courses/ajax/submit_review/', {
                 "text":this.review_text,
                 "rating_course":this.review_rating_course,
@@ -431,6 +465,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
                 }
             });
             this.reviewDialog = false;
+            }
         },
         getCourseInstructor(){
             axios.get('/courses/ajax/get_course_instructor/',{params: {course_pk:this.course_pk, instructor_pk:this.instructor_pk, }}).then(response => {

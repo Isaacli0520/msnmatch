@@ -152,6 +152,7 @@
                 <v-card-title>Select Semester</v-card-title>
                 <v-divider></v-divider>
                 <v-card-text style="height: 300px;">
+                    <p class="mt-3 grey--text">Some semesters may not appear in the following list :(</p>
                     <v-checkbox 
                         v-model="takeCourse" 
                         :key="item.value.course_instructor_pk" 
