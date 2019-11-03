@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Course, CourseInstructor, Instructor
+from .models import Course, CourseInstructor, Instructor, CourseUser
 # Register your models here.
 
 class CourseUserRelationInline(admin.TabularInline):
@@ -23,6 +23,10 @@ class CustomCourseInstructorAdmin(admin.ModelAdmin):
     list_filter = ('semester',)
     autocomplete_fields = ['course','instructor',]
 
+class CustomCourseUserAdmin(admin.ModelAdmin):
+    list_display = ['course','user', 'instructor','take', 'text']
+    list_filter = ('take',)
+
 class CustomInstructorAdmin(admin.ModelAdmin):
     list_display = ['first_name', 'last_name']
     search_fields = ['first_name','last_name']
@@ -31,3 +35,4 @@ class CustomInstructorAdmin(admin.ModelAdmin):
 admin.site.register(CourseInstructor, CustomCourseInstructorAdmin)
 admin.site.register(Instructor, CustomInstructorAdmin)
 admin.site.register(Course, CustomCourseAdmin)
+admin.site.register(CourseUser, CustomCourseUserAdmin)

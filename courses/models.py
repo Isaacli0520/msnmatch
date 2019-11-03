@@ -33,7 +33,7 @@ class Course(models.Model):
 	last_taught = models.CharField(max_length=100, default="")
 
 	def __str__(self):
-		return self.mnemonic + str(self.number) + str(self.title) + '--' + str(self.units)
+		return self.mnemonic + str(self.number) + " " + str(self.title)
 
 
 class CourseInstructor(models.Model):
