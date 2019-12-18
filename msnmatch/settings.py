@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     'skills',
     'webpack_loader',
     'groups',
+    'comments',
 ]
 
 MIDDLEWARE = [
