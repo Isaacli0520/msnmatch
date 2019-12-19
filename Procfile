@@ -1,2 +1,3 @@
 release: python manage.py migrate
-web: python manage.py collectstatic --no-input; gunicorn msnmatch.wsgi --preload --timeout 60
+web: python manage.py collectstatic --no-input; daphne mango.asgi:application --port $PORT --bind 0.0.0.0 -v2
+worker: python manage.py runworker -v2
