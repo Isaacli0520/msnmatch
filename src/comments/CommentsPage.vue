@@ -92,7 +92,7 @@ import CommentsHeader from '../components/CommentsHeader'
             var tmp_comment = {
                 "mode":data.mode,
                 "text":data.text,
-                "stime":data.time - ref.startTime + 100,
+                "stime":data.time - ref.startTime + 1000,
                 "size":data.size,
                 "color":parseInt(data.color.replace(/^#/, ''), 16),
             };
