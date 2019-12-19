@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import CommentsPage from './CommentsPage.vue'
+import CommentFilterPage from './CommentFilterPage.vue'
 import Vuetify from 'vuetify/lib'
 import {Message} from 'element-ui'
 
@@ -9,7 +9,7 @@ Vue.use(Vuetify);
 Vue.prototype.$message = Message;
 
 new Vue({
-  render: h => h(CommentsPage),
+  render: h => h(CommentFilterPage),
   vuetify: new Vuetify(vuetifyOptions),
-  components: { CommentsPage }
-}).$mount('#comments-page');
+  components: { CommentFilterPage }
+}).$mount('#comment-filter-page');

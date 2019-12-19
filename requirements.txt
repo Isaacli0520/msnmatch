@@ -1,4 +1,4 @@
-Django==2.1.11
+Django==2.2.8
 gunicorn
 django-heroku
 django-bootstrap4
@@ -22,3 +22,4 @@ scipy
 django-webpack-loader
 django-cors-headers
 python-decouple
+channels

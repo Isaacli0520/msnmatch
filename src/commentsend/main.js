@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import CommentsPage from './CommentsPage.vue'
+import CommentSendPage from './CommentSendPage.vue'
 import Vuetify from 'vuetify/lib'
 import {Message} from 'element-ui'
 
@@ -9,7 +9,7 @@ Vue.use(Vuetify);
 Vue.prototype.$message = Message;
 
 new Vue({
-  render: h => h(CommentsPage),
+  render: h => h(CommentSendPage),
   vuetify: new Vuetify(vuetifyOptions),
-  components: { CommentsPage }
-}).$mount('#comments-page');
+  components: { CommentSendPage }
+}).$mount('#comment-send-page');
