@@ -134,6 +134,11 @@ import CommentsHeader from '../components/CommentsHeader'
                     mode:this.comment_mode,
                     time:Date.now(),
                     size:this.sizes[this.comment_size]}));
+                this.$message({
+                    message: 'Comment Sent',
+                    type: 'success'
+                });
+                this.comment_text = "";
             }
         },
 	},
