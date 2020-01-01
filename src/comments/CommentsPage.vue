@@ -1,13 +1,20 @@
 <template>
 	<v-app>
-		<comments-header></comments-header>
 		<v-content>
-			<v-container fluid grid-list-lg>
-				<div id="my-player" class="abp" style="width:100%; height:500px; background:#000;">
-                    <div id="my-comment-stage" class="container"></div>
-                </div>
-                <div><span>{{global_time}}</span></div>
-			</v-container>
+			<div style="top:0; left:0; bottom:0; right:0; width:100%; height:100%; position:absolute;">
+				<div class = "abp" style="width:100%; height:100%;">
+					<div id="my-comment-stage" style="height:100%; width:100%; padding:0;" class="container">
+					<iframe 
+						v-if="slide_url != undefined"
+						:src="slide_url + 'embed?rm=minimal'"
+						frameborder="0" width="100%" height="100%"
+						style="z-index:-999;overflow:hidden;"
+						allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"
+					>
+					</iframe>
+					</div>
+				</div>
+			</div>
 		</v-content>
 	</v-app>
 </template>
@@ -17,34 +24,37 @@ import axios from 'axios'
 
 import CommentsHeader from '../components/CommentsHeader'
 
-  export default {
+export default {
 	data() {
 		return {
-            taking_courses:[],
-            global_time: undefined,
+			global_time: undefined,
+			slide_url: undefined,
 		}
 	},
 	components:{
 		CommentsHeader,
 	},
 	watch: {
-
 	},
 	computed:{
+		slide_pk: function(){
+            let url = window.location.pathname.split('/');
+            return url[url.length - 2];
+        },
 	},
 	methods: {
 		goToHref(text){
 			window.location.href = text;
 		},
-		getMyCourses(){
-			axios.get('/courses/ajax/get_my_courses/',{params: {}}).then(response => {
-				this.taking_courses = response.data.taking_courses;
-				this.taken_courses = response.data.taken_courses;
-				this.taken_courses_semester = this.seperateSemesters(this.taken_courses);
+		getURL(){
+			axios.get('/comments/api/get_slide/',{params: {slide_pk:this.slide_pk}}).then(response => {
+				this.slide_url = response.data.url;
 			});
 		},
 	},
 	mounted(){
+		this.getURL();
+        var ref = this;
         var CM = new CommentManager(document.getElementById('my-comment-stage'));
 		CM.init();
         console.log('Start');
@@ -52,53 +62,83 @@ import CommentsHeader from '../components/CommentsHeader'
 		// 	{
 		// 		"mode":1,
 		// 		"text":"Hello World",
-		// 		"stime":0,
+		// 		"stime":5000,
 		// 		"size":25,
 		// 		"color":0xffffff
-		// 	}
+        //     },
+        //     {
+		// 		"mode":1,
+		// 		"text":"Hello World",
+		// 		"stime":5000,
+		// 		"size":20,
+		// 		"color":0xf2ff2f
+        //     },
+        //     {
+		// 		"mode":1,
+		// 		"text":"Hello World",
+		// 		"stime":5010,
+		// 		"size":34,
+		// 		"color":0xf2f3ff
+        //     },
+        //     {
+		// 		"mode":4,
+		// 		"text":"Hello World",
+		// 		"stime":5020,
+		// 		"size":25,
+		// 		"color":0xffffff
+		// 	},
+		// 	{
+		// 		"mode":1,
+		// 		"text":"Hello World",
+		// 		"stime":5050,
+		// 		"size":25,
+		// 		"color":0xff4ff3
+		// 	},
 		// ];
 		// CM.load(danmakuList);
 
         CM.start();
         var iVal = -1;
-        this.startTime = Date.now(); // 设定起始时间
+        this.startTime = Date.now();
 		if(iVal >= 0){
-			clearInterval(iVal); // 如果之前就有定时器，把它停掉
+			clearInterval(iVal);
         }
-        var ref = this;
         iVal = setInterval(function(){
-			ref.global_time = Date.now() - ref.startTime; // 用起始时间和现在时间的差模拟播放
-			CM.time(ref.global_time); // 通报播放时间
+			ref.global_time = Date.now() - ref.startTime;
+			CM.time(ref.global_time);
         }, 100);
-        
-        // var someDanmakuAObj = {
-        //         "mode":1,
-        //         "text":"Hello CommentCoreLibrary",
-        //         "stime":Date.now()+ 1000 - ref.startTime,
-        //         "size":30,
-        //         "color":0xff0000
-        //     };
-        //     CM.insert(someDanmakuAObj);
 
         var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
-        this.socketSocket = new ReconnectingWebSocket(ws_scheme + '://' + 
+        this.commentSocket = new ReconnectingWebSocket(ws_scheme + '://' + 
             window.location.host + "/ws/send_to_comments/");
-        
-        this.socketSocket.onclose = function(e) {
-            console.error('Chat socket closed unexpectedly');
+		
+		this.commentSocket.send(JSON.stringify({
+			command:'join',
+			slide_pk:this.slide_pk,
+		}));
+
+		window.onbeforeunload = function() {
+			ref.commentSocket.close();
+		};
+
+        this.commentSocket.onclose = function(e) {
+            console.error('Comment socket closed unexpectedly');
         };
-        this.socketSocket.onmessage = function(comment) {
-            var data = JSON.parse(comment.data);
-            var tmp_comment = {
-                "mode":data.mode,
-                "text":data.text,
-                "stime":data.time - ref.startTime + 1000,
-                "size":data.size,
-                "color":parseInt(data.color.replace(/^#/, ''), 16),
-            };
-            console.log("comment received");
-            console.log(tmp_comment);
-            CM.insert(tmp_comment);
+        this.commentSocket.onmessage = function(comment) {
+			var data = JSON.parse(comment.data);
+			if(data.type == 'join'){
+				console.log("Connected to " + data.slide_pk)
+			}
+			else if(data.type == 'comment_filtered'){
+				var tmp_comment = {
+					"mode":data.mode,
+					"text":data.text,
+					"stime":data.time - ref.startTime + 1000,
+					"size":data.size,
+					"color":parseInt(data.color.replace(/^#/, ''), 16),
+				};
+				CM.insert(tmp_comment);
+			}
         };
         
 	},
@@ -106,11 +146,34 @@ import CommentsHeader from '../components/CommentsHeader'
 </script>
 
 <style>
+	.lala{
+		height:20px;
+		width:20px;
+		background-color:red;
+		z-index: 100000;
+	}
+
+    .cus-container{
+        border: 0;
+        display: block;
+        margin: 0;
+        overflow: hidden;
+        position: absolute;
+        z-index: 9999;
+		bottom: 0;
+		top: 0;
+		left: 0;
+		right: 0;
+    }
 
 	@media (min-width: 1025px) {
 		
 	}
-
+	@media (min-width: 960px){
+		.container{
+			max-width:2000000px !important;
+		}
+	}
 
 	@media (min-width: 768px) and (max-width: 1024px) {
 		

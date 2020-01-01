@@ -115,6 +115,16 @@ module.exports = {
 			template: 'templates/commentfilter.html',
 			filename: 'commentfilter.html',
 		},
+		commentcreatepage: {
+			entry: 'src/commentcreate/main.js',
+			template: 'templates/commentcreate.html',
+			filename: 'commentcreate.html',
+		},
+		testpage: {
+			entry: 'src/test/main.js',
+			template: 'templates/test.html',
+			filename: 'test.html',
+		},
 		match: {
 			entry: 'src/match/main.js',
 			template: 'templates/match.html',

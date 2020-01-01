@@ -3,6 +3,20 @@
 		<comments-header></comments-header>
 		<v-content>
 			<v-container fluid grid-list-lg>
+                <v-layout class="ma-2">
+                    <v-flex xs12 sm12 md4 lg3 xl2>
+                        <v-select
+                            v-model="slide_pk"
+                            :items="slides"
+                            :loading="slides_load"
+                            item-text="name"
+                            item-value="pk"
+                            label="Slides"
+                            :menu-props="{ offsetY: true }"
+                            outlined>
+                        </v-select>
+                    </v-flex>
+                </v-layout>
                 <v-layout class="custom-layout ma-3" row wrap>
                     <v-flex class="ma-1" xl6 lg6 md6 sm12 xs12 :key="comment_index" v-for="(comment, comment_index) in comments">
                         <span class="comment-span">{{comment.text}}</span>
@@ -41,6 +55,9 @@ import CommentsHeader from '../components/CommentsHeader'
   export default {
 	data() {
 		return {
+            slides_load:true,
+            slide_pk:undefined,
+            slides:[],
             comments:[],
             filter_socket_open:false,
             comment_socket_open:false,
@@ -53,7 +70,12 @@ import CommentsHeader from '../components/CommentsHeader'
 		CommentsHeader,
 	},
 	watch: {
-
+        slide_pk(val){
+            if(val){
+                this.initFilterSocket(val);
+                this.initCommentSocket(val);
+            }
+        },
 	},
 	computed:{
         to_do_comments(){
@@ -90,11 +112,66 @@ import CommentsHeader from '../components/CommentsHeader'
                 this.comments_sent_num += 1;
             }
         },
+        initFilterSocket(val){
+            var ref = this;
+            this.filterSocket = new ReconnectingWebSocket(this.ws_scheme + '://' + 
+                window.location.host + "/ws/send_to_filter/");
+            this.filterSocket.onopen = function(event){
+                console.log("filter socket open");
+                ref.filter_socket_open = true;
+            }
+            this.filterSocket.onclose = function(e) {
+                console.error('filter socket closed unexpectedly');
+            };
+            this.filterSocket.onmessage = function(comment) {
+                var data = JSON.parse(comment.data);
+                console.log(data);
+                if(data.type=="join"){
+                    console.log("Filter connected to " + data.slide_pk);
+                }
+                else if(data.type=="comment_unfiltered"){
+                    ref.comments.push(data);
+                    ref.total_comments += 1;
+                }
+            };
+            this.filterSocket.send(JSON.stringify({
+                command:'join',
+                slide_pk:val,
+            }));
+        },
+        initCommentSocket(val){
+            var ref = this;
+            this.commentSocket = new ReconnectingWebSocket(this.ws_scheme + '://' + 
+                window.location.host + "/ws/send_to_comments/");
+            this.commentSocket.onopen = function(event){
+                console.log("comment socket open");
+                ref.comment_socket_open = true;
+            }
+            this.commentSocket.onclose = function(e) {
+                console.error('Chat socket closed unexpectedly');
+            };
+            this.commentSocket.onmessage = function(comment) {
+                var data = JSON.parse(comment.data);
+                if(data.type=="join"){
+                    console.log("Comment connected to " + data.slide_pk);
+                }
+            };
+            this.commentSocket.send(JSON.stringify({
+                command:'join',
+                slide_pk:val,
+            }));
+        },
 		getMyCourses(){
 			axios.get('/courses/ajax/get_my_courses/',{params: {}}).then(response => {
 				this.taking_courses = response.data.taking_courses;
 				this.taken_courses = response.data.taken_courses;
 				this.taken_courses_semester = this.seperateSemesters(this.taken_courses);
+			});
+        },
+        getSlides(){
+			axios.get('/comments/api/get_slides/',{params: {}}).then(response => {
+                this.slides = response.data.slides;
+                this.slides_load = false;
 			});
 		},
     },
@@ -112,37 +189,8 @@ import CommentsHeader from '../components/CommentsHeader'
         };
     },
 	mounted(){
-        var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
-        var ref = this;
-        this.filterSocket = new ReconnectingWebSocket(ws_scheme + '://' + 
-            window.location.host + "/ws/send_to_filter/");
-        this.filterSocket.onopen = function(event){
-            console.log("filter socket open");
-            ref.filter_socket_open = true;
-        }
-        this.filterSocket.onclose = function(e) {
-            console.error('Chat socket closed unexpectedly');
-        };
-        this.filterSocket.onmessage = function(comment) {
-            var data = JSON.parse(comment.data);
-            ref.comments.push(data);
-            ref.total_comments += 1;
-        };
-        this.commentSocket = new ReconnectingWebSocket(ws_scheme + '://' + 
-            window.location.host + "/ws/send_to_comments/");
-        this.commentSocket.onopen = function(event){
-            console.log("comment socket open");
-            ref.comment_socket_open = true;
-        }
-        this.commentSocket.onclose = function(e) {
-            console.error('Chat socket closed unexpectedly');
-        };
-        this.commentSocket.onmessage = function(comment) {
-
-        };
-
-		
-        
+        this.getSlides();
+        this.ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
 	},
 };
 </script>

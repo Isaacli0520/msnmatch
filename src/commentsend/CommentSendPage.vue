@@ -59,7 +59,7 @@
                     <v-flex xl12 lg12 md12 sm12 xs12>
                         <v-row>
                             <v-spacer></v-spacer>
-                            <v-btn class="ma-2" right @click="sendComment()">Send</v-btn>
+                            <v-btn outlined color="green" class="ma-2" :disabled="slide_pk_loading" right @click="sendComment()">Send</v-btn>
                         </v-row>
                     </v-flex>
                 </v-layout>
@@ -101,6 +101,7 @@ import CommentsHeader from '../components/CommentsHeader'
             comment_mode:undefined,
             comment_size:undefined,
             comment_error_messages:[],
+            slide_pk_loading:true,
 		}
 	},
 	components:{
@@ -121,6 +122,32 @@ import CommentsHeader from '../components/CommentsHeader'
 		},
         selectColor(color){
             this.comment_color = color;
+        },
+        getActiveSlide(){
+            axios.get('/comments/api/get_active_slide/',{params: {}}).then(response => {
+                this.slide_pk = response.data.slide_pk;
+                this.slide_pk_loading = false;
+                this.initFilterSocket(this.slide_pk);
+            });
+        },
+        initFilterSocket(slide_pk){
+            var ref = this;
+            this.filterSocket = new ReconnectingWebSocket(this.ws_scheme + '://' + 
+                window.location.host + "/ws/send_to_filter/");
+            
+            this.filterSocket.onclose = function(e) {
+                console.error('Chat socket closed unexpectedly');
+            };
+            this.filterSocket.onmessage = function(comment) {
+                var data = JSON.parse(comment.data);
+                if(data.type=="join"){
+                    console.log("Connected to "+data.slide_pk);
+                }
+            };
+            this.filterSocket.send(JSON.stringify({
+                command:'join',
+                slide_pk:slide_pk,
+            }));
         },
         sendComment(){
             if(this.comment_text.length == 0){
@@ -144,14 +171,8 @@ import CommentsHeader from '../components/CommentsHeader'
 	},
 	mounted(){
         this.comment_color = this.colors[0];
-        var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
-        this.filterSocket = new ReconnectingWebSocket(ws_scheme + '://' + 
-            window.location.host + "/ws/send_to_filter/");
-        
-        this.filterSocket.onclose = function(e) {
-            console.error('Chat socket closed unexpectedly');
-        };
-        
+        this.ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
+        this.getActiveSlide();
 	},
   };
 </script>

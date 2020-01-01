@@ -15,10 +15,10 @@ class FilterConsumer(AsyncWebsocketConsumer):
         self.user = self.scope["user"]
         self.group_name = "filter_group"
 
-        await self.channel_layer.group_add(
-            self.group_name,
-            self.channel_name,
-        )
+        # await self.channel_layer.group_add(
+        #     self.group_name,
+        #     self.channel_name,
+        # )
         await self.accept()
 
     async def disconnect(self, close_code):
@@ -32,8 +32,18 @@ class FilterConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
         command = text_data_json['command']
-        print("data received", text_data_json)
-        if command == 'send':
+        # print("data received", text_data_json)
+        if command == 'join':
+            self.group_name = "filter-" + str(text_data_json['slide_pk'])
+            await self.channel_layer.group_add(
+                self.group_name,
+                self.channel_name
+            )
+            await self.send(text_data=json.dumps({
+                'type':'join',
+                'slide_pk':text_data_json['slide_pk'],
+            }))
+        elif command == 'send':
             await self.channel_layer.group_send(
                 self.group_name,
                 {
@@ -66,10 +76,10 @@ class CommentsConsumer(AsyncWebsocketConsumer):
         self.user = self.scope["user"]
         self.group_name = "comments_group"
 
-        await self.channel_layer.group_add(
-            self.group_name,
-            self.channel_name,
-        )
+        # await self.channel_layer.group_add(
+        #     self.group_name,
+        #     self.channel_name,
+        # )
         await self.accept()
 
     async def disconnect(self, close_code):
@@ -83,7 +93,17 @@ class CommentsConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
         command = text_data_json['command']
-        if command == 'send':
+        if command == 'join':
+            self.group_name = "comments-" + str(text_data_json['slide_pk'])
+            await self.channel_layer.group_add(
+                self.group_name,
+                self.channel_name
+            )
+            await self.send(text_data=json.dumps({
+                'type':'join',
+                'slide_pk':text_data_json['slide_pk'],
+            }))
+        elif command == 'send':
             await self.channel_layer.group_send(
                 self.group_name,
                 {
