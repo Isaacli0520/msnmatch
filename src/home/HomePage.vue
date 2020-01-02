@@ -9,12 +9,13 @@
                 justify-center>
                     <v-flex
                         xs12
-                        sm8
-                        md4>
+                        sm10
+                        md6>
                         <v-card>
                             <v-card-title>Super Cool Main Page</v-card-title>
                             <v-card-text>
-                                <v-layout wrap>
+                                <v-layout row wrap>
+                                    <v-spacer></v-spacer>
                                     <v-flex d-flex>
                                         <v-btn @click="goToHref('/match/')" color="primary">Match</v-btn>
                                     </v-flex>
@@ -22,6 +23,11 @@
                                     <v-flex d-flex>
                                         <v-btn @click="goToHref('/courses/')" color="primary">Hoosmyprofessor</v-btn>
                                     </v-flex>
+                                    <v-spacer></v-spacer>
+                                    <v-flex d-flex>
+                                        <v-btn @click="goToHref('/comments/send/')" color="primary">Comments</v-btn>
+                                    </v-flex>
+                                    <v-spacer></v-spacer>
                                 </v-layout>
                             </v-card-text>
                         </v-card>

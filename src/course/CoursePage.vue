@@ -171,15 +171,14 @@
             </v-card>
         </v-dialog>
     </v-content>
-    <!-- <custom-footer></custom-footer> -->
   </v-app>
 </template>
 
 <script>
+
 import axios from 'axios'
 import CustomHeader from '../components/CustomHeader'
 import CustomRating from '../components/CustomRating'
-import CustomFooter from '../components/CustomFooter'
 import CustomBreadcrumb from '../components/CustomBreadcrumb'
 axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 axios.defaults.xsrfCookieName = "csrftoken";
@@ -228,7 +227,6 @@ axios.defaults.xsrfCookieName = "csrftoken";
     components:{
         CustomHeader,
         CustomRating,
-        CustomFooter,
         CustomBreadcrumb,
     },
     watch: {
@@ -314,8 +312,9 @@ axios.defaults.xsrfCookieName = "csrftoken";
             this.dialogTake = true;
         },
         takeSave(){
+            var tmp_params = {}
             if(this.takeCourse != null){
-                var params = {
+                tmp_params = {
                     'course_pk':this.takeCourse.course_pk,
                     'instructor_pk':this.takeCourse.instructor_pk,
                     'semester':this.takeCourse.semester, 
@@ -325,7 +324,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
                 }
             }
             else{
-                var params = {
+                tmp_params = {
                     'course_pk':this.course.course_pk,
                     'instructor_pk':"",
                     'course_instructor_pk':"",
@@ -335,7 +334,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
                 }
             }
             axios.post('/courses/ajax/save_take/',
-            params,).then(response => {
+            tmp_params,).then(response => {
                 if(response.data.success){
                     this.$message({
                         message: 'Updated',

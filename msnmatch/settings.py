@@ -28,7 +28,8 @@ SECRET_KEY = config('SECRET_KEY')
 
 DEBUG = config("DEBUG",cast=bool)
 
-SECURE_SSL_REDIRECT = not DEBUG
+# SECURE_SSL_REDIRECT = not DEBUG
+# SECURE_PROXY_SSL_HEADER = ('X-Forwarded-Proto', 'https')
 # SESSION_COOKIE_SECURE = not DEBUG
 # CSRF_COOKIE_SECURE = not DEBUG
 
@@ -45,6 +46,7 @@ SEMESTER_ID = config('SEMESTER_ID')
 # Application definition
 
 INSTALLED_APPS = [
+    'channels',
     'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -62,6 +64,7 @@ INSTALLED_APPS = [
     'skills',
     'webpack_loader',
     'groups',
+    'comments',
 ]
 
 MIDDLEWARE = [
@@ -101,6 +104,19 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'msnmatch.wsgi.application'
+
+ASGI_APPLICATION = 'msnmatch.routing.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [os.environ.get('REDIS_URL', 'redis://localhost:6379')],
+            # "hosts": [('mango-student-matching', 6379)],
+            # "hosts": [('127.0.0.1', 6379)],
+        },
+    },
+}
 
 
 # Database
