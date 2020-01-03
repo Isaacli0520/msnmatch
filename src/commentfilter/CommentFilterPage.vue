@@ -118,15 +118,18 @@ import CommentsHeader from '../components/CommentsHeader'
                 window.location.host + "/ws/send_to_filter/");
             this.filterSocket.onopen = function(event){
                 console.log("filter socket open");
-                ref.filter_socket_open = true;
+                ref.filterSocket.send(JSON.stringify({
+                    command:'join',
+                    slide_pk:val,
+                }));
             }
             this.filterSocket.onclose = function(e) {
                 console.error('filter socket closed unexpectedly');
             };
             this.filterSocket.onmessage = function(comment) {
                 var data = JSON.parse(comment.data);
-                console.log(data);
                 if(data.type=="join"){
+                    ref.filter_socket_open = true;
                     console.log("Filter connected to " + data.slide_pk);
                 }
                 else if(data.type=="comment_unfiltered"){
@@ -134,10 +137,6 @@ import CommentsHeader from '../components/CommentsHeader'
                     ref.total_comments += 1;
                 }
             };
-            this.filterSocket.send(JSON.stringify({
-                command:'join',
-                slide_pk:val,
-            }));
         },
         initCommentSocket(val){
             var ref = this;
@@ -145,7 +144,10 @@ import CommentsHeader from '../components/CommentsHeader'
                 window.location.host + "/ws/send_to_comments/");
             this.commentSocket.onopen = function(event){
                 console.log("comment socket open");
-                ref.comment_socket_open = true;
+                ref.commentSocket.send(JSON.stringify({
+                    command:'join',
+                    slide_pk:val,
+                }));
             }
             this.commentSocket.onclose = function(e) {
                 console.error('Chat socket closed unexpectedly');
@@ -154,12 +156,9 @@ import CommentsHeader from '../components/CommentsHeader'
                 var data = JSON.parse(comment.data);
                 if(data.type=="join"){
                     console.log("Comment connected to " + data.slide_pk);
+                    ref.comment_socket_open = true;
                 }
             };
-            this.commentSocket.send(JSON.stringify({
-                command:'join',
-                slide_pk:val,
-            }));
         },
 		getMyCourses(){
 			axios.get('/courses/ajax/get_my_courses/',{params: {}}).then(response => {

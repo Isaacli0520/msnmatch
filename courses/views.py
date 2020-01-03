@@ -93,6 +93,7 @@ def get_basic_info(request):
 	tmp = {
 		"home_url":reverse('home'),
 		"courses_url": reverse('courses'),
+		"comment_url": reverse('comments:comments_send'),
 		"brand_pic": settings.STATIC_URL + "css/images/brand_compressed.png",
 		"profile": reverse('profile', args=[request.user.username]),
 		"update_profile":reverse('update_profile', args=[request.user.username]),

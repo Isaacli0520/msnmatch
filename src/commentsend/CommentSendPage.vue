@@ -59,7 +59,7 @@
                     <v-flex xl12 lg12 md12 sm12 xs12>
                         <v-row>
                             <v-spacer></v-spacer>
-                            <v-btn outlined color="green" class="ma-2" :disabled="slide_pk_loading" right @click="sendComment()">Send</v-btn>
+                            <v-btn outlined color="green" class="ma-2" :disabled="ws_connecting" right @click="sendComment()">Send</v-btn>
                         </v-row>
                     </v-flex>
                 </v-layout>
@@ -101,7 +101,7 @@ import CommentsHeader from '../components/CommentsHeader'
             comment_mode:undefined,
             comment_size:undefined,
             comment_error_messages:[],
-            slide_pk_loading:true,
+            ws_connecting:true,
 		}
 	},
 	components:{
@@ -126,7 +126,7 @@ import CommentsHeader from '../components/CommentsHeader'
         getActiveSlide(){
             axios.get('/comments/api/get_active_slide/',{params: {}}).then(response => {
                 this.slide_pk = response.data.slide_pk;
-                this.slide_pk_loading = false;
+                this.ws_connecting = false;
                 this.initFilterSocket(this.slide_pk);
             });
         },
@@ -134,20 +134,25 @@ import CommentsHeader from '../components/CommentsHeader'
             var ref = this;
             this.filterSocket = new ReconnectingWebSocket(this.ws_scheme + '://' + 
                 window.location.host + "/ws/send_to_filter/");
-            
+            this.filterSocket.onopen = function(val){
+                console.log("Filter Socket Opened");
+                ref.filterSocket.send(JSON.stringify({
+                    command:'join',
+                    slide_pk:slide_pk,
+                }));
+            }
             this.filterSocket.onclose = function(e) {
+                ref.ws_connecting = true;
                 console.error('Chat socket closed unexpectedly');
             };
             this.filterSocket.onmessage = function(comment) {
                 var data = JSON.parse(comment.data);
                 if(data.type=="join"){
+                    ref.ws_connecting = false;
                     console.log("Connected to "+data.slide_pk);
                 }
             };
-            this.filterSocket.send(JSON.stringify({
-                command:'join',
-                slide_pk:slide_pk,
-            }));
+            
         },
         sendComment(){
             if(this.comment_text.length == 0){

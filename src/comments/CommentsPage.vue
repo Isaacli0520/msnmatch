@@ -29,12 +29,11 @@ export default {
 		return {
 			global_time: undefined,
 			slide_url: undefined,
+			word_bank:["6666", "awsl", "toxic", "Hello World!", "hhhh", "lol", "PHP is the best!!", "For the Horde!!", "For the Alliance!!", "Testing Testing~~"],
 		}
 	},
 	components:{
 		CommentsHeader,
-	},
-	watch: {
 	},
 	computed:{
 		slide_pk: function(){
@@ -43,6 +42,72 @@ export default {
         },
 	},
 	methods: {
+		initCommentManager(){
+			var ref = this;
+			this.CM = new CommentManager(document.getElementById('my-comment-stage'));
+			this.CM.init();
+			console.log('Comment Manager Init');
+			var commentList = []
+			let word_bank_len = this.word_bank.length;
+			for(let i = 0; i < 180; i += 1){
+				let tmp_mode = 3;
+				while(tmp_mode == 3)
+					tmp_mode = Math.floor(1 + Math.random()*5);
+				commentList.push({
+					"mode":tmp_mode,
+					"text":this.word_bank[Math.floor(Math.random() * word_bank_len)],
+					"stime":3000 + Math.random() * 17000,
+					"size":Math.floor(25 + Math.random()*15),
+					"color":parseInt(Math.floor(Math.random()*16777216), 16),
+				})
+			}
+			this.CM.load(commentList);
+			this.CM.start();
+			var iVal = -1;
+			this.startTime = Date.now();
+			if(iVal >= 0){
+				clearInterval(iVal);
+			}
+			iVal = setInterval(function(){
+				ref.global_time = Date.now() - ref.startTime;
+				ref.CM.time(ref.global_time);
+			}, 10);
+		},
+		initCommentSocket(){
+			var ref = this;
+        	var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
+			this.commentSocket = new ReconnectingWebSocket(ws_scheme + '://' + 
+				window.location.host + "/ws/send_to_comments/");
+			window.onbeforeunload = function() {
+				ref.commentSocket.close();
+			};
+			this.commentSocket.onopen = function(e) {
+				console.log('Comment socket open');
+				ref.commentSocket.send(JSON.stringify({
+					command:'join',
+					slide_pk:ref.slide_pk,
+				}));
+			};
+			this.commentSocket.onclose = function(e) {
+				console.error('Comment socket closed unexpectedly');
+			};
+			this.commentSocket.onmessage = function(comment) {
+				var data = JSON.parse(comment.data);
+				if(data.type == 'join'){
+					console.log("Connected to " + data.slide_pk)
+				}
+				else if(data.type == 'comment_filtered'){
+					var tmp_comment = {
+						"mode":data.mode,
+						"text":data.text,
+						"stime":data.time - ref.startTime + 1000,
+						"size":data.size,
+						"color":parseInt(data.color.replace(/^#/, ''), 16),
+					};
+					CM.insert(tmp_comment);
+				}
+			};
+		},
 		goToHref(text){
 			window.location.href = text;
 		},
@@ -51,96 +116,12 @@ export default {
 				this.slide_url = response.data.url;
 			});
 		},
+
 	},
 	mounted(){
 		this.getURL();
-        var ref = this;
-        var CM = new CommentManager(document.getElementById('my-comment-stage'));
-		CM.init();
-        console.log('Start');
-		// var danmakuList = [
-		// 	{
-		// 		"mode":1,
-		// 		"text":"Hello World",
-		// 		"stime":5000,
-		// 		"size":25,
-		// 		"color":0xffffff
-        //     },
-        //     {
-		// 		"mode":1,
-		// 		"text":"Hello World",
-		// 		"stime":5000,
-		// 		"size":20,
-		// 		"color":0xf2ff2f
-        //     },
-        //     {
-		// 		"mode":1,
-		// 		"text":"Hello World",
-		// 		"stime":5010,
-		// 		"size":34,
-		// 		"color":0xf2f3ff
-        //     },
-        //     {
-		// 		"mode":4,
-		// 		"text":"Hello World",
-		// 		"stime":5020,
-		// 		"size":25,
-		// 		"color":0xffffff
-		// 	},
-		// 	{
-		// 		"mode":1,
-		// 		"text":"Hello World",
-		// 		"stime":5050,
-		// 		"size":25,
-		// 		"color":0xff4ff3
-		// 	},
-		// ];
-		// CM.load(danmakuList);
-
-        CM.start();
-        var iVal = -1;
-        this.startTime = Date.now();
-		if(iVal >= 0){
-			clearInterval(iVal);
-        }
-        iVal = setInterval(function(){
-			ref.global_time = Date.now() - ref.startTime;
-			CM.time(ref.global_time);
-        }, 100);
-
-        var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
-        this.commentSocket = new ReconnectingWebSocket(ws_scheme + '://' + 
-            window.location.host + "/ws/send_to_comments/");
-		
-		this.commentSocket.send(JSON.stringify({
-			command:'join',
-			slide_pk:this.slide_pk,
-		}));
-
-		window.onbeforeunload = function() {
-			ref.commentSocket.close();
-		};
-
-        this.commentSocket.onclose = function(e) {
-            console.error('Comment socket closed unexpectedly');
-        };
-        this.commentSocket.onmessage = function(comment) {
-			var data = JSON.parse(comment.data);
-			if(data.type == 'join'){
-				console.log("Connected to " + data.slide_pk)
-			}
-			else if(data.type == 'comment_filtered'){
-				var tmp_comment = {
-					"mode":data.mode,
-					"text":data.text,
-					"stime":data.time - ref.startTime + 1000,
-					"size":data.size,
-					"color":parseInt(data.color.replace(/^#/, ''), 16),
-				};
-				CM.insert(tmp_comment);
-			}
-        };
-        
+		this.initCommentSocket();
+		this.initCommentManager();
 	},
   };
 </script>

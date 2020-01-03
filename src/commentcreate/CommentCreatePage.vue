@@ -118,6 +118,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
                             type: 'success'
                         });
                         this.getSlides();
+                        this.createSlideDialog = false;
                     }
                 });
             }
