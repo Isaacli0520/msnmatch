@@ -16,6 +16,9 @@ def test(request):
 def create(request):
     return render(request, 'commentcreate.html')
 
+@login_required
+def question(request):
+    return render(request, 'commentquestion.html')
 
 @login_required
 def comments(request, slide_pk):
@@ -51,6 +54,17 @@ def create_slide(request):
         name, url = post["name"], post["url"]
         url = url[:url.find('pub?')]
         Slide.objects.create(user = request.user, name = name, url = url)
+        return JsonResponse({"success":True})
+    return JsonResponse({"success":False})
+
+
+@login_required
+def delete_slide(request):
+    if request.method == "POST":
+        post = json.loads(request.body)
+        slide_pk= post["slide_pk"]
+        slide = get_object_or_404(Slide, pk = slide_pk)
+        slide.delete()
         return JsonResponse({"success":True})
     return JsonResponse({"success":False})
 

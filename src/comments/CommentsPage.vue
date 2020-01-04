@@ -30,6 +30,14 @@ export default {
 			global_time: undefined,
 			slide_url: undefined,
 			word_bank:["6666", "awsl", "toxic", "Hello World!", "hhhh", "lol", "PHP is the best!!", "For the Horde!!", "For the Alliance!!", "Testing Testing~~"],
+			colors:[
+                '#FFFFFF','#000000',
+                '#FF0000', '#AA0000', '#550000',
+                '#FFFF00', '#AAAA00', '#555500',
+                '#00FF00', '#00AA00', '#005500',
+                '#00FFFF', '#00AAAA', '#005555',
+                '#0000FF', '#0000AA', '#000055',
+            ],
 		}
 	},
 	components:{
@@ -49,6 +57,7 @@ export default {
 			console.log('Comment Manager Init');
 			var commentList = []
 			let word_bank_len = this.word_bank.length;
+			let color_len = this.colors.length;
 			for(let i = 0; i < 100; i += 1){
 				let tmp_mode = 3;
 				while(tmp_mode == 3)
@@ -58,7 +67,8 @@ export default {
 					"text":this.word_bank[Math.floor(Math.random() * word_bank_len)],
 					"stime":2000 + Math.random() * 7000,
 					"size":Math.floor(25 + Math.random()*15),
-					"color":parseInt(Math.floor(Math.random()*16777216), 16),
+					"color":parseInt(this.colors[Math.floor(Math.random() * color_len)].replace(/^#/, ''),16),
+					// "color":parseInt(Math.floor(Math.random()*16777216), 16),
 				})
 			}
 			this.CM.load(commentList);
@@ -118,9 +128,11 @@ export default {
 
 	},
 	mounted(){
-		this.getURL();
-		this.initCommentSocket();
-		this.initCommentManager();
+		if(!isNaN(this.slide_pk)){
+			this.getURL();
+			this.initCommentSocket();
+			this.initCommentManager();
+		}
 	},
   };
 </script>

@@ -44,6 +44,17 @@
                         <v-divider></v-divider>
                     </v-flex>
                     <v-flex xl12 lg12 md12 sm12 xs12>
+                        <span class="title-text">Comment or Question</span>
+                    </v-flex>
+                    <v-flex xl12 lg12 md12 sm12 xs12>
+                        <v-radio-group v-model="comment_type" mandatory>
+                            <v-radio :label="type.text" :value="type.value" :key="type_index" v-for="(type, type_index) in types"></v-radio>
+                        </v-radio-group>
+                    </v-flex>
+                    <v-flex xl12 lg12 md12 sm12 xs12>
+                        <v-divider></v-divider>
+                    </v-flex>
+                    <v-flex xl12 lg12 md12 sm12 xs12>
                         <span class="title-text">Write Your Comment</span>
                     </v-flex>
                     <v-flex xl12 lg12 md12 sm12 xs12>
@@ -77,13 +88,20 @@ import CommentsHeader from '../components/CommentsHeader'
 	data() {
 		return {
             colors:[
-                 '#FF0000', '#AA0000', '#550000',
-                 '#FFFF00', '#AAAA00', '#555500',
-                 '#00FF00', '#00AA00', '#005500',
-                 '#00FFFF', '#00AAAA', '#005555',
-                 '#0000FF', '#0000AA', '#000055',
+                '#FFFFFF','#000000',
+                '#FF0000', '#AA0000', '#550000',
+                '#FFFF00', '#AAAA00', '#555500',
+                '#00FF00', '#00AA00', '#005500',
+                '#00FFFF', '#00AAAA', '#005555',
+                '#0000FF', '#0000AA', '#000055',
             ],
             sizes:[20, 28, 35],
+            types:[
+                {text:"Comment",
+                 value:0,},
+                {text:"Question",
+                 value:1,}
+            ],
             modes:[
                 {"mode":1,
                  "text":"Top-anchored Scrolling"},
@@ -96,6 +114,7 @@ import CommentsHeader from '../components/CommentsHeader'
                 {"mode":6,
                  "text":"Top-anchored Reverse"},
             ],
+            comment_type:0,
             comment_text:"",
             comment_color:"",
             comment_mode:undefined,
@@ -164,6 +183,7 @@ import CommentsHeader from '../components/CommentsHeader'
                     text:this.comment_text,
                     color:this.comment_color,
                     mode:this.comment_mode,
+                    message_type:this.comment_type,
                     time:Date.now(),
                     size:this.sizes[this.comment_size]}));
                 this.$message({
@@ -184,7 +204,7 @@ import CommentsHeader from '../components/CommentsHeader'
 
 <style>
     .custom-btn{
-        border-color: white !important;
+        border-color: rgb(154, 156, 143) !important;
         border-width: thick !important;
         border-style: solid !important;
     }
