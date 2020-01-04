@@ -4,16 +4,23 @@
 			<div style="top:0; left:0; bottom:0; right:0; width:100%; height:100%; position:absolute;">
 				<div class = "abp" style="width:100%; height:100%;">
 					<div id="my-comment-stage" style="height:100%; width:100%; padding:0;" class="container">
-					<iframe 
-						v-if="slide_url != undefined"
-						:src="slide_url + 'embed?rm=minimal'"
-						frameborder="0" width="100%" height="100%"
-						style="z-index:-999;overflow:hidden;"
-						allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"
-					>
-					</iframe>
+						<iframe 
+							v-if="slide_url != undefined"
+							:src="slide_url + 'embed?rm=minimal'"
+							frameborder="0" width="100%" height="100%"
+							style="z-index:-999;overflow:hidden;"
+							allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"
+						>
+						</iframe>
 					</div>
 				</div>
+			</div>
+			<div class="question-div">
+				<v-col>
+					<v-flex class="ma-2" :key="i" v-for="(question, i) in questions">
+						<span class="question-span">{{ i }}. {{question.text}}</span>
+					</v-flex>
+				</v-col>
 			</div>
 		</v-content>
 	</v-app>
@@ -27,8 +34,13 @@ import CommentsHeader from '../components/CommentsHeader'
 export default {
 	data() {
 		return {
+			question_icon: "fas fa-question",
 			global_time: undefined,
 			slide_url: undefined,
+			questions:[
+				{text:"Hello world??"},
+				{text:"why did you do that???"},
+			],
 			word_bank:["6666", "awsl", "toxic", "Hello World!", "hhhh", "lol", "PHP is the best!!", "For the Horde!!", "For the Alliance!!", "Testing Testing~~"],
 			colors:[
                 '#FFFFFF','#000000',
@@ -106,6 +118,9 @@ export default {
 				if(data.type == 'join'){
 					console.log("Connected to " + data.slide_pk)
 				}
+				else if(data.message_type == 1){
+					ref.questions.push(data);
+				}
 				else if(data.type == 'comment_filtered'){
 					ref.CM.insert({
 						"mode":data.mode,
@@ -138,25 +153,31 @@ export default {
 </script>
 
 <style>
-	.lala{
-		height:20px;
-		width:20px;
-		background-color:red;
-		z-index: 100000;
-	}
 
-    .cus-container{
-        border: 0;
-        display: block;
-        margin: 0;
-        overflow: hidden;
-        position: absolute;
-        z-index: 9999;
-		bottom: 0;
+	.question-div{
+		z-index: 99999;
+		margin: 0 auto;
+		width: 75%;
+		position: fixed;
 		top: 0;
+		bottom: 0;
 		left: 0;
 		right: 0;
-    }
+		justify-content: center;
+		display: flex;
+		align-items: center;
+	}
+
+	.question-span{
+		align-items: center;
+		justify-content: center;
+		font-size: 33px;
+		color: rgb(246, 230, 236);
+		padding: 8px;
+		border-radius: 10px;
+		font-family: "Century Gothic", CenturyGothic, AppleGothic, sans-serif;
+		/* background-color: rgb(246, 230, 236); */
+	}
 
 	@media (min-width: 1025px) {
 		

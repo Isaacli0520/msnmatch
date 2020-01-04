@@ -111,13 +111,13 @@ import CommentsHeader from '../components/CommentsHeader'
 			window.location.href = text;
         },
         keyLeft(){
-            if(this.message_type == 0 && this.comment_socket_open && this.filter_socket_open && this.comments.length > 0){
+            if(this.comment_socket_open && this.filter_socket_open && this.comments.length > 0){
                 this.comments.splice(0,1);
                 this.comments_deleted_num += 1;
             }
         },
         keyRight(){
-            if(this.message_type == 0 && this.comment_socket_open && this.filter_socket_open && this.comments.length > 0){
+            if(this.comment_socket_open && this.filter_socket_open && this.comments.length > 0){
                 var tmp_comment = this.comments[0];
                 this.commentSocket.send(JSON.stringify({
                     command:"send",
