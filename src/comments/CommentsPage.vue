@@ -49,14 +49,14 @@ export default {
 			console.log('Comment Manager Init');
 			var commentList = []
 			let word_bank_len = this.word_bank.length;
-			for(let i = 0; i < 180; i += 1){
+			for(let i = 0; i < 100; i += 1){
 				let tmp_mode = 3;
 				while(tmp_mode == 3)
 					tmp_mode = Math.floor(1 + Math.random()*5);
 				commentList.push({
 					"mode":tmp_mode,
 					"text":this.word_bank[Math.floor(Math.random() * word_bank_len)],
-					"stime":3000 + Math.random() * 17000,
+					"stime":2000 + Math.random() * 7000,
 					"size":Math.floor(25 + Math.random()*15),
 					"color":parseInt(Math.floor(Math.random()*16777216), 16),
 				})
