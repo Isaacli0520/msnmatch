@@ -97,14 +97,13 @@ export default {
 					console.log("Connected to " + data.slide_pk)
 				}
 				else if(data.type == 'comment_filtered'){
-					var tmp_comment = {
+					ref.CM.insert({
 						"mode":data.mode,
 						"text":data.text,
 						"stime":data.time - ref.startTime + 1000,
 						"size":data.size,
 						"color":parseInt(data.color.replace(/^#/, ''), 16),
-					};
-					CM.insert(tmp_comment);
+					});
 				}
 			};
 		},
