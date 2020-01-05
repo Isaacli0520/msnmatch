@@ -43,6 +43,7 @@ export default {
 			global_time: undefined,
 			slide_url: undefined,
 			hide_question:false,
+			questions:[],
 			word_bank:["6666", "awsl", "toxic", "Hello World!", "hhhh", "lol", "PHP is the best!!", "For the Horde!!", "For the Alliance!!", "Testing Testing~~"],
 			colors:[
                 '#FFFFFF','#000000',
