@@ -5,6 +5,7 @@
 				<div class = "abp" style="width:100%; height:100%;">
 					<div id="my-comment-stage" style="height:100%; width:100%; padding:0;" class="container">
 						<iframe 
+							id="google-slide"
 							v-if="slide_url != undefined"
 							:src="slide_url + 'embed?rm=minimal'"
 							frameborder="0" width="100%" height="100%"
@@ -16,11 +17,15 @@
 				</div>
 			</div>
 			<div class="question-div">
-				<v-col>
-					<v-flex class="ma-2" :key="i" v-for="(question, i) in questions">
-						<span class="question-span">{{ i }}. {{question.text}}</span>
-					</v-flex>
-				</v-col>
+					<div style="width:17.65%;height:100%;" @click="hide_question=!hide_question">
+					</div>
+					<div style="width:82.35%;">
+						<v-col v-if="!hide_question">
+							<v-flex class="ma-2" :key="i" v-for="(question, i) in questions">
+								<span class="question-span">{{ i + 1 }}. {{question.text}}</span>
+							</v-flex>
+						</v-col>
+					</div>
 			</div>
 		</v-content>
 	</v-app>
@@ -37,10 +42,7 @@ export default {
 			question_icon: "fas fa-question",
 			global_time: undefined,
 			slide_url: undefined,
-			questions:[
-				{text:"Hello world??"},
-				{text:"why did you do that???"},
-			],
+			hide_question:false,
 			word_bank:["6666", "awsl", "toxic", "Hello World!", "hhhh", "lol", "PHP is the best!!", "For the Horde!!", "For the Alliance!!", "Testing Testing~~"],
 			colors:[
                 '#FFFFFF','#000000',
@@ -62,6 +64,27 @@ export default {
         },
 	},
 	methods: {
+		keyLeft(){
+            if(this.comment_socket_open && this.filter_socket_open && this.comments.length > 0){
+                this.comments.splice(0,1);
+                this.comments_deleted_num += 1;
+            }
+        },
+        keyRight(){
+            if(this.comment_socket_open && this.filter_socket_open && this.comments.length > 0){
+                var tmp_comment = this.comments[0];
+                this.commentSocket.send(JSON.stringify({
+                    command:"send",
+                    text:tmp_comment.text,
+                    color:tmp_comment.color,
+                    time:Date.now(),
+                    message_type:tmp_comment.message_type,
+                    mode:tmp_comment.mode,
+                    size:tmp_comment.size}));
+                this.comments.splice(0,1);
+                this.comments_sent_num += 1;
+            }
+        },
 		initCommentManager(){
 			var ref = this;
 			this.CM = new CommentManager(document.getElementById('my-comment-stage'));
@@ -138,11 +161,15 @@ export default {
 		getURL(){
 			axios.get('/comments/api/get_slide/',{params: {slide_pk:this.slide_pk}}).then(response => {
 				this.slide_url = response.data.url;
+				var ref = this;
 			});
 		},
 
 	},
+	created(){
+    },
 	mounted(){
+		var ref = this;
 		if(!isNaN(this.slide_pk)){
 			this.getURL();
 			this.initCommentSocket();
@@ -157,12 +184,13 @@ export default {
 	.question-div{
 		z-index: 99999;
 		margin: 0 auto;
-		width: 75%;
+		width: 85%;
+		height: 100%;
 		position: fixed;
 		top: 0;
 		bottom: 0;
 		left: 0;
-		right: 0;
+		/* right: 0; */
 		justify-content: center;
 		display: flex;
 		align-items: center;
@@ -171,7 +199,7 @@ export default {
 	.question-span{
 		align-items: center;
 		justify-content: center;
-		font-size: 33px;
+		font-size: 31px;
 		color: rgb(246, 230, 236);
 		padding: 8px;
 		border-radius: 10px;
