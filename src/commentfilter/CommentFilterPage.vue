@@ -16,6 +16,17 @@
                             outlined>
                         </v-select>
                     </v-flex>
+                    <v-flex xs12 sm12 md4 lg3 xl2>
+                        <v-select
+                            v-model="message_type"
+                            :items="message_types"
+                            item-text="text"
+                            item-value="value"
+                            label="Type"
+                            :menu-props="{ offsetY: true }"
+                            outlined>
+                        </v-select>
+                    </v-flex>
                 </v-layout>
                 <v-layout class="custom-layout ma-3" row wrap>
                     <v-flex class="ma-1" xl6 lg6 md6 sm12 xs12 :key="comment_index" v-for="(comment, comment_index) in comments">
@@ -57,6 +68,13 @@ import CommentsHeader from '../components/CommentsHeader'
 		return {
             slides_load:true,
             slide_pk:undefined,
+            message_type:0,
+            message_types:[
+                {text:"Comment",
+                 value:0},
+                {text:"Question",
+                 value:1},
+            ],
             slides:[],
             comments:[],
             filter_socket_open:false,
@@ -106,6 +124,7 @@ import CommentsHeader from '../components/CommentsHeader'
                     text:tmp_comment.text,
                     color:tmp_comment.color,
                     time:Date.now(),
+                    message_type:tmp_comment.message_type,
                     mode:tmp_comment.mode,
                     size:tmp_comment.size}));
                 this.comments.splice(0,1);
@@ -118,26 +137,25 @@ import CommentsHeader from '../components/CommentsHeader'
                 window.location.host + "/ws/send_to_filter/");
             this.filterSocket.onopen = function(event){
                 console.log("filter socket open");
-                ref.filter_socket_open = true;
+                ref.filterSocket.send(JSON.stringify({
+                    command:'join',
+                    slide_pk:val,
+                }));
             }
             this.filterSocket.onclose = function(e) {
                 console.error('filter socket closed unexpectedly');
             };
             this.filterSocket.onmessage = function(comment) {
                 var data = JSON.parse(comment.data);
-                console.log(data);
                 if(data.type=="join"){
+                    ref.filter_socket_open = true;
                     console.log("Filter connected to " + data.slide_pk);
                 }
-                else if(data.type=="comment_unfiltered"){
+                else if(data.type=="comment_unfiltered" && data.message_type==ref.message_type){
                     ref.comments.push(data);
                     ref.total_comments += 1;
                 }
             };
-            this.filterSocket.send(JSON.stringify({
-                command:'join',
-                slide_pk:val,
-            }));
         },
         initCommentSocket(val){
             var ref = this;
@@ -145,7 +163,10 @@ import CommentsHeader from '../components/CommentsHeader'
                 window.location.host + "/ws/send_to_comments/");
             this.commentSocket.onopen = function(event){
                 console.log("comment socket open");
-                ref.comment_socket_open = true;
+                ref.commentSocket.send(JSON.stringify({
+                    command:'join',
+                    slide_pk:val,
+                }));
             }
             this.commentSocket.onclose = function(e) {
                 console.error('Chat socket closed unexpectedly');
@@ -154,19 +175,9 @@ import CommentsHeader from '../components/CommentsHeader'
                 var data = JSON.parse(comment.data);
                 if(data.type=="join"){
                     console.log("Comment connected to " + data.slide_pk);
+                    ref.comment_socket_open = true;
                 }
             };
-            this.commentSocket.send(JSON.stringify({
-                command:'join',
-                slide_pk:val,
-            }));
-        },
-		getMyCourses(){
-			axios.get('/courses/ajax/get_my_courses/',{params: {}}).then(response => {
-				this.taking_courses = response.data.taking_courses;
-				this.taken_courses = response.data.taken_courses;
-				this.taken_courses_semester = this.seperateSemesters(this.taken_courses);
-			});
         },
         getSlides(){
 			axios.get('/comments/api/get_slides/',{params: {}}).then(response => {

@@ -53,6 +53,7 @@ class FilterConsumer(AsyncWebsocketConsumer):
                     'size': text_data_json['size'],
                     'time': text_data_json['time'],
                     'mode': text_data_json['mode'],
+                    'message_type':text_data_json['message_type'],
                 }
             )
 
@@ -66,6 +67,7 @@ class FilterConsumer(AsyncWebsocketConsumer):
             'size': text_data['size'],
             'time': text_data['time'],
             'mode': text_data['mode'],
+            'message_type':text_data['message_type'],
         }))
 
 class CommentsConsumer(AsyncWebsocketConsumer):
@@ -113,6 +115,7 @@ class CommentsConsumer(AsyncWebsocketConsumer):
                     'size': text_data_json['size'],
                     'time': text_data_json['time'],
                     'mode': text_data_json['mode'],
+                    'message_type':text_data_json['message_type'],
                 }
             )
 
@@ -126,4 +129,5 @@ class CommentsConsumer(AsyncWebsocketConsumer):
             'size': text_data['size'],
             'time': text_data['time'],
             'mode': text_data['mode'],
+            'message_type':text_data['message_type'],
         }))

@@ -225,6 +225,7 @@ export default{
             ],
             app_items:[
                 { title:"Match", icon:"fas fa-user-friends" },
+                { title:"Live Comments", icon:"fas fa-comment" },
             ],
             urls:{
                 home_url:"",
@@ -235,6 +236,7 @@ export default{
                 my_courses:"",
                 courses_url:"",
                 match_url:"",
+                comment_url:"",
             },
             trash_items:[
                 {
@@ -352,6 +354,9 @@ export default{
             }
             else if(item.title=="Match"){
                 this.goToHref(this.urls.match_url)
+            }
+            else if(item.title=="Live Comments"){
+                this.goToHref(this.urls.comment_url)
             }
         },
         get_basic_info(){

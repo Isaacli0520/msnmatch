@@ -4,16 +4,28 @@
 			<div style="top:0; left:0; bottom:0; right:0; width:100%; height:100%; position:absolute;">
 				<div class = "abp" style="width:100%; height:100%;">
 					<div id="my-comment-stage" style="height:100%; width:100%; padding:0;" class="container">
-					<iframe 
-						v-if="slide_url != undefined"
-						:src="slide_url + 'embed?rm=minimal'"
-						frameborder="0" width="100%" height="100%"
-						style="z-index:-999;overflow:hidden;"
-						allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"
-					>
-					</iframe>
+						<iframe 
+							id="google-slide"
+							v-if="slide_url != undefined"
+							:src="slide_url + 'embed?rm=minimal'"
+							frameborder="0" width="100%" height="100%"
+							style="z-index:-999;overflow:hidden;"
+							allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"
+						>
+						</iframe>
 					</div>
 				</div>
+			</div>
+			<div class="question-div">
+					<div style="width:17.65%;height:100%;" @click="hide_question=!hide_question">
+					</div>
+					<div style="width:82.35%;">
+						<v-col v-if="!hide_question">
+							<v-flex class="ma-2" :key="i" v-for="(question, i) in questions">
+								<span class="question-span">{{ i + 1 }}. {{question.text}}</span>
+							</v-flex>
+						</v-col>
+					</div>
 			</div>
 		</v-content>
 	</v-app>
@@ -27,14 +39,24 @@ import CommentsHeader from '../components/CommentsHeader'
 export default {
 	data() {
 		return {
+			question_icon: "fas fa-question",
 			global_time: undefined,
 			slide_url: undefined,
+			hide_question:false,
+			questions:[],
+			word_bank:["6666", "awsl", "toxic", "Hello World!", "hhhh", "lol", "PHP is the best!!", "For the Horde!!", "For the Alliance!!", "Testing Testing~~"],
+			colors:[
+                '#FFFFFF','#000000',
+                '#FF0000', '#AA0000', '#550000',
+                '#FFFF00', '#AAAA00', '#555500',
+                '#00FF00', '#00AA00', '#005500',
+                '#00FFFF', '#00AAAA', '#005555',
+                '#0000FF', '#0000AA', '#000055',
+            ],
 		}
 	},
 	components:{
 		CommentsHeader,
-	},
-	watch: {
 	},
 	computed:{
 		slide_pk: function(){
@@ -43,128 +65,148 @@ export default {
         },
 	},
 	methods: {
+		keyLeft(){
+            if(this.comment_socket_open && this.filter_socket_open && this.comments.length > 0){
+                this.comments.splice(0,1);
+                this.comments_deleted_num += 1;
+            }
+        },
+        keyRight(){
+            if(this.comment_socket_open && this.filter_socket_open && this.comments.length > 0){
+                var tmp_comment = this.comments[0];
+                this.commentSocket.send(JSON.stringify({
+                    command:"send",
+                    text:tmp_comment.text,
+                    color:tmp_comment.color,
+                    time:Date.now(),
+                    message_type:tmp_comment.message_type,
+                    mode:tmp_comment.mode,
+                    size:tmp_comment.size}));
+                this.comments.splice(0,1);
+                this.comments_sent_num += 1;
+            }
+        },
+		initCommentManager(){
+			var ref = this;
+			this.CM = new CommentManager(document.getElementById('my-comment-stage'));
+			this.CM.init();
+			console.log('Comment Manager Init');
+			var commentList = []
+			let word_bank_len = this.word_bank.length;
+			let color_len = this.colors.length;
+			for(let i = 0; i < 100; i += 1){
+				let tmp_mode = 3;
+				while(tmp_mode == 3)
+					tmp_mode = Math.floor(1 + Math.random()*5);
+				commentList.push({
+					"mode":tmp_mode,
+					"text":this.word_bank[Math.floor(Math.random() * word_bank_len)],
+					"stime":2000 + Math.random() * 7000,
+					"size":Math.floor(25 + Math.random()*15),
+					"color":parseInt(this.colors[Math.floor(Math.random() * color_len)].replace(/^#/, ''),16),
+					// "color":parseInt(Math.floor(Math.random()*16777216), 16),
+				})
+			}
+			this.CM.load(commentList);
+			this.CM.start();
+			var iVal = -1;
+			this.startTime = Date.now();
+			if(iVal >= 0){
+				clearInterval(iVal);
+			}
+			iVal = setInterval(function(){
+				ref.global_time = Date.now() - ref.startTime;
+				ref.CM.time(ref.global_time);
+			}, 10);
+		},
+		initCommentSocket(){
+			var ref = this;
+        	var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
+			this.commentSocket = new ReconnectingWebSocket(ws_scheme + '://' + 
+				window.location.host + "/ws/send_to_comments/");
+			window.onbeforeunload = function() {
+				ref.commentSocket.close();
+			};
+			this.commentSocket.onopen = function(e) {
+				console.log('Comment socket open');
+				ref.commentSocket.send(JSON.stringify({
+					command:'join',
+					slide_pk:ref.slide_pk,
+				}));
+			};
+			this.commentSocket.onclose = function(e) {
+				console.error('Comment socket closed unexpectedly');
+			};
+			this.commentSocket.onmessage = function(comment) {
+				var data = JSON.parse(comment.data);
+				if(data.type == 'join'){
+					console.log("Connected to " + data.slide_pk)
+				}
+				else if(data.message_type == 1){
+					ref.questions.push(data);
+				}
+				else if(data.type == 'comment_filtered'){
+					ref.CM.insert({
+						"mode":data.mode,
+						"text":data.text,
+						"stime":data.time - ref.startTime + 1000,
+						"size":data.size,
+						"color":parseInt(data.color.replace(/^#/, ''), 16),
+					});
+				}
+			};
+		},
 		goToHref(text){
 			window.location.href = text;
 		},
 		getURL(){
 			axios.get('/comments/api/get_slide/',{params: {slide_pk:this.slide_pk}}).then(response => {
 				this.slide_url = response.data.url;
+				var ref = this;
 			});
 		},
+
 	},
+	created(){
+    },
 	mounted(){
-		this.getURL();
-        var ref = this;
-        var CM = new CommentManager(document.getElementById('my-comment-stage'));
-		CM.init();
-        console.log('Start');
-		// var danmakuList = [
-		// 	{
-		// 		"mode":1,
-		// 		"text":"Hello World",
-		// 		"stime":5000,
-		// 		"size":25,
-		// 		"color":0xffffff
-        //     },
-        //     {
-		// 		"mode":1,
-		// 		"text":"Hello World",
-		// 		"stime":5000,
-		// 		"size":20,
-		// 		"color":0xf2ff2f
-        //     },
-        //     {
-		// 		"mode":1,
-		// 		"text":"Hello World",
-		// 		"stime":5010,
-		// 		"size":34,
-		// 		"color":0xf2f3ff
-        //     },
-        //     {
-		// 		"mode":4,
-		// 		"text":"Hello World",
-		// 		"stime":5020,
-		// 		"size":25,
-		// 		"color":0xffffff
-		// 	},
-		// 	{
-		// 		"mode":1,
-		// 		"text":"Hello World",
-		// 		"stime":5050,
-		// 		"size":25,
-		// 		"color":0xff4ff3
-		// 	},
-		// ];
-		// CM.load(danmakuList);
-
-        CM.start();
-        var iVal = -1;
-        this.startTime = Date.now();
-		if(iVal >= 0){
-			clearInterval(iVal);
-        }
-        iVal = setInterval(function(){
-			ref.global_time = Date.now() - ref.startTime;
-			CM.time(ref.global_time);
-        }, 100);
-
-        var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
-        this.commentSocket = new ReconnectingWebSocket(ws_scheme + '://' + 
-            window.location.host + "/ws/send_to_comments/");
-		
-		this.commentSocket.send(JSON.stringify({
-			command:'join',
-			slide_pk:this.slide_pk,
-		}));
-
-		window.onbeforeunload = function() {
-			ref.commentSocket.close();
-		};
-
-        this.commentSocket.onclose = function(e) {
-            console.error('Comment socket closed unexpectedly');
-        };
-        this.commentSocket.onmessage = function(comment) {
-			var data = JSON.parse(comment.data);
-			if(data.type == 'join'){
-				console.log("Connected to " + data.slide_pk)
-			}
-			else if(data.type == 'comment_filtered'){
-				var tmp_comment = {
-					"mode":data.mode,
-					"text":data.text,
-					"stime":data.time - ref.startTime + 1000,
-					"size":data.size,
-					"color":parseInt(data.color.replace(/^#/, ''), 16),
-				};
-				CM.insert(tmp_comment);
-			}
-        };
-        
+		var ref = this;
+		if(!isNaN(this.slide_pk)){
+			this.getURL();
+			this.initCommentSocket();
+			this.initCommentManager();
+		}
 	},
   };
 </script>
 
 <style>
-	.lala{
-		height:20px;
-		width:20px;
-		background-color:red;
-		z-index: 100000;
+
+	.question-div{
+		z-index: 99999;
+		margin: 0 auto;
+		width: 85%;
+		height: 100%;
+		position: fixed;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		/* right: 0; */
+		justify-content: center;
+		display: flex;
+		align-items: center;
 	}
 
-    .cus-container{
-        border: 0;
-        display: block;
-        margin: 0;
-        overflow: hidden;
-        position: absolute;
-        z-index: 9999;
-		bottom: 0;
-		top: 0;
-		left: 0;
-		right: 0;
-    }
+	.question-span{
+		align-items: center;
+		justify-content: center;
+		font-size: 31px;
+		color: rgb(246, 230, 236);
+		padding: 8px;
+		border-radius: 10px;
+		font-family: "Century Gothic", CenturyGothic, AppleGothic, sans-serif;
+		/* background-color: rgb(246, 230, 236); */
+	}
 
 	@media (min-width: 1025px) {
 		
