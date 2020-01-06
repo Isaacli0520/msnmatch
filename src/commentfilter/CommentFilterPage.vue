@@ -196,7 +196,6 @@ import CommentsHeader from '../components/CommentsHeader'
             else if(key == 39){
                 ref.keyRight();
             }
-
         };
     },
 	mounted(){

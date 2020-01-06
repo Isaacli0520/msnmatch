@@ -5,43 +5,40 @@
 			<v-container fluid grid-list-lg>
 				<v-layout col wrap>
                     <v-flex xl12 lg12 md12 sm12 xs12>
-                        <span class="title-text">Choose a Mode</span>
+                        <span class="title-text">Mode</span>
                     </v-flex>
                     <v-flex xl12 lg12 md12 sm12 xs12>
-                        <v-radio-group v-model="comment_mode" mandatory>
-                            <v-radio :label="mode.text" :value="mode.mode" :key="mode_index" v-for="(mode, mode_index) in modes"></v-radio>
-                        </v-radio-group>
+                        <v-select
+                            v-model="comment_mode"
+                            :items="modes"
+                            item-text="text"
+                            item-value="mode"
+                            label="Comment Modes"
+                            hide-details
+                            :menu-props="{ offsetY: true }"
+                            outlined>
+                        </v-select>
                     </v-flex>
                     <v-flex xl12 lg12 md12 sm12 xs12>
-                        <v-divider></v-divider>
-                    </v-flex>
-                    <v-flex xl12 lg12 md12 sm12 xs12>
-                        <span class="title-text">Choose a Color</span>
+                        <span class="title-text">Color</span>
                     </v-flex>
                     <v-flex>
                         <v-row>
-                            <v-btn class="ma-2" @click="selectColor(color)" :class="[color == comment_color ? 'custom-btn' : '']"  :height="30" :width="10" :color="color" :key="key_color" v-for="(color, key_color) in colors">
+                            <v-btn class="ma-1" @click="selectColor(color)" :class="[color == comment_color ? 'custom-btn' : '']"  height="30" width="5" :color="color" :key="key_color" v-for="(color, key_color) in colors">
                             </v-btn>
                         </v-row>
                     </v-flex>
                     <v-flex xl12 lg12 md12 sm12 xs12>
-                        <v-divider></v-divider>
-                    </v-flex>
-                    <v-flex xl12 lg12 md12 sm12 xs12>
-                        <span class="title-text">Choose a Size</span>
+                        <span class="title-text">Size</span>
                     </v-flex>
                     <v-flex xl12 lg12 md12 sm12 xs12>
                         <v-btn-toggle
                             v-model="comment_size"
-                            mandatory
-                        >
-                        <v-btn :height="30" :width="10" :key="key_size" v-for="(size, key_size) in sizes">
+                            mandatory>
+                        <v-btn height="30" width="10" :key="key_size" v-for="(size, key_size) in sizes">
                             {{size}}
                         </v-btn>
                         </v-btn-toggle>
-                    </v-flex>
-                    <v-flex xl12 lg12 md12 sm12 xs12>
-                        <v-divider></v-divider>
                     </v-flex>
                     <v-flex xl12 lg12 md12 sm12 xs12>
                         <span class="title-text">Comment or Question</span>
@@ -52,9 +49,6 @@
                         </v-radio-group>
                     </v-flex>
                     <v-flex xl12 lg12 md12 sm12 xs12>
-                        <v-divider></v-divider>
-                    </v-flex>
-                    <v-flex xl12 lg12 md12 sm12 xs12>
                         <span class="title-text">Write Your Comment</span>
                     </v-flex>
                     <v-flex xl12 lg12 md12 sm12 xs12>
@@ -62,6 +56,7 @@
                             v-model="comment_text"
                             auto-grow
                             outlined
+                            hide-details
                             :error-messages="comment_error_messages"
                             rows="5"
                             row-height="20"
@@ -88,12 +83,10 @@ import CommentsHeader from '../components/CommentsHeader'
 	data() {
 		return {
             colors:[
-                '#FFFFFF','#000000',
-                '#FF0000', '#AA0000', '#550000',
-                '#FFFF00', '#AAAA00', '#555500',
-                '#00FF00', '#00AA00', '#005500',
-                '#00FFFF', '#00AAAA', '#005555',
-                '#0000FF', '#0000AA', '#000055',
+                '#FFFFFF','#000000','#FF0000','#AA0000',
+                '#FFFF00', 
+                '#00FF00', '#00FFFF',
+                '#0000FF', '#0000AA',
             ],
             sizes:[20, 28, 35],
             types:[
@@ -117,7 +110,7 @@ import CommentsHeader from '../components/CommentsHeader'
             comment_type:0,
             comment_text:"",
             comment_color:"",
-            comment_mode:undefined,
+            comment_mode:1,
             comment_size:undefined,
             comment_error_messages:[],
             ws_connecting:true,
