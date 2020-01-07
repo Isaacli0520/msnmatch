@@ -17,12 +17,12 @@
 				</div>
 			</div>
 			<div class="question-div">
-					<div style="width:17.65%;height:100%;" @click="hide_question=!hide_question">
+					<div style="width:25%;height:100%;" @click="hide_question=!hide_question">
 					</div>
-					<div style="width:82.35%;">
+					<div style="width:75%;">
 						<v-col v-if="!hide_question">
-							<v-flex class="ma-2" :key="i" v-for="(question, i) in questions">
-								<span class="question-span">{{ i + 1 }}. {{question.text}}</span>
+							<v-flex class="align-center justify-center ma-2" :key="i" v-for="(question, i) in questions">
+									<div class="question-span">{{ i + 1 }}. {{question.text}}</div>
 							</v-flex>
 						</v-col>
 					</div>
@@ -33,8 +33,6 @@
 
 <script>
 import axios from 'axios'
-
-import CommentsHeader from '../components/CommentsHeader'
 
 export default {
 	data() {
@@ -54,9 +52,6 @@ export default {
                 '#0000FF', '#0000AA', '#000055',
             ],
 		}
-	},
-	components:{
-		CommentsHeader,
 	},
 	computed:{
 		slide_pk: function(){
@@ -185,7 +180,7 @@ export default {
 	.question-div{
 		z-index: 99999;
 		margin: 0 auto;
-		width: 85%;
+		width: 80%;
 		height: 100%;
 		position: fixed;
 		top: 0;
@@ -198,10 +193,11 @@ export default {
 	}
 
 	.question-span{
+		text-align:center;
 		align-items: center;
 		justify-content: center;
 		font-size: 31px;
-		color: rgb(246, 230, 236);
+		color: rgb(236, 154, 184);
 		padding: 8px;
 		border-radius: 10px;
 		font-family: "Century Gothic", CenturyGothic, AppleGothic, sans-serif;
