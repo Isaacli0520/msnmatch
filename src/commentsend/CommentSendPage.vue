@@ -23,12 +23,13 @@
                         <span class="title-text">Color</span>
                     </v-flex>
                     <v-flex>
-                        <v-row>
-                            <v-btn class="ma-1" @click="selectColor(color)" :class="[color == comment_color ? 'custom-btn' : '']"  height="30" width="5" :color="color" :key="key_color" v-for="(color, key_color) in colors">
+                        <v-row class="ml-1">
+                            <v-btn class="mt-1 mr-1 mb-1" @click="selectColor(color)" height="30" width="5" :color="color" :key="key_color" v-for="(color, key_color) in colors">
+                                <v-icon color="teal darken-2" v-if="color == comment_color">fas fa-check</v-icon>
                             </v-btn>
                         </v-row>
                     </v-flex>
-                    <v-flex xl12 lg12 md12 sm12 xs12>
+                    <!-- <v-flex xl12 lg12 md12 sm12 xs12>
                         <span class="title-text">Size</span>
                     </v-flex>
                     <v-flex xl12 lg12 md12 sm12 xs12>
@@ -39,12 +40,12 @@
                             {{size}}
                         </v-btn>
                         </v-btn-toggle>
-                    </v-flex>
+                    </v-flex> -->
                     <v-flex xl12 lg12 md12 sm12 xs12>
                         <span class="title-text">Comment or Question</span>
                     </v-flex>
                     <v-flex xl12 lg12 md12 sm12 xs12>
-                        <v-radio-group v-model="comment_type" mandatory>
+                        <v-radio-group hide-details dense v-model="comment_type" mandatory>
                             <v-radio :label="type.text" :value="type.value" :key="type_index" v-for="(type, type_index) in types"></v-radio>
                         </v-radio-group>
                     </v-flex>
@@ -83,7 +84,7 @@ import CommentsHeader from '../components/CommentsHeader'
 	data() {
 		return {
             colors:[
-                '#FFFFFF','#000000','#FF0000','#AA0000',
+                '#FFFFFF','#000000','#FF0000','#FF69B4','#AA0000',
                 '#FFFF00', 
                 '#00FF00', '#00FFFF',
                 '#0000FF', '#0000AA',
@@ -111,7 +112,7 @@ import CommentsHeader from '../components/CommentsHeader'
             comment_text:"",
             comment_color:"",
             comment_mode:1,
-            comment_size:undefined,
+            comment_size:2,
             comment_error_messages:[],
             ws_connecting:true,
 		}
@@ -129,6 +130,13 @@ import CommentsHeader from '../components/CommentsHeader'
 	computed:{
 	},
 	methods: {
+        btn_text(color){
+            if(color == this.comment_color){
+                return "S"
+            }
+            else
+                return ""
+        },
 		goToHref(text){
 			window.location.href = text;
 		},
@@ -196,8 +204,12 @@ import CommentsHeader from '../components/CommentsHeader'
 </script>
 
 <style>
-    .custom-btn{
-        border-color: rgb(154, 156, 143) !important;
+    .v-input--selection-controls{
+        margin-top: 0px !important;
+    }
+
+    .active-btn{
+        border-color: rgb(112, 243, 236) !important;
         border-width: thick !important;
         border-style: solid !important;
     }

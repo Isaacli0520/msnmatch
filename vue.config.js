@@ -120,11 +120,6 @@ module.exports = {
 			template: 'templates/commentcreate.html',
 			filename: 'commentcreate.html',
 		},
-		commentquestionpage: {
-			entry: 'src/commentquestion/main.js',
-			template: 'templates/commentquestion.html',
-			filename: 'commentquestion.html',
-		},
 		testpage: {
 			entry: 'src/test/main.js',
 			template: 'templates/test.html',

@@ -8,7 +8,6 @@ urlpatterns = [
     path('create/',views.create, name='create'),
     path('send/',views.comments_send, name='comments_send'),
     path('filter/',views.comments_filter, name='comments_filter'),
-    path('question/',views.question, name='question'),
 
 	path('<slide_pk>/',views.comments, name='comments'),
 

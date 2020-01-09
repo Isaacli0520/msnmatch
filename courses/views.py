@@ -88,21 +88,30 @@ def get_current_semester(request):
 		"semester":settings.CURRENT_SEMESTER[4:],
 	})
 
-@login_required
+# @login_required
 def get_basic_info(request):
-	tmp = {
-		"home_url":reverse('home'),
-		"courses_url": reverse('courses'),
-		"comment_url": reverse('comments:comments_send'),
-		"brand_pic": settings.STATIC_URL + "css/images/brand_compressed.png",
-		"profile": reverse('profile', args=[request.user.username]),
-		"update_profile":reverse('update_profile', args=[request.user.username]),
-		"my_courses":reverse('my_courses', args=[request.user.username]),
-		"logout":reverse('logout'),
-		"match_url":reverse('match'),
-	}
+	if request.user.is_authenticated:
+		info = {
+			"home_url":reverse('home'),
+			"courses_url": reverse('courses'),
+			"comment_url": reverse('comments:comments_send'),
+			"brand_pic": settings.STATIC_URL + "css/images/brand_compressed.png",
+			"profile": reverse('profile', args=[request.user.username]),
+			"update_profile":reverse('update_profile', args=[request.user.username]),
+			"my_courses":reverse('my_courses', args=[request.user.username]),
+			"logout":reverse('logout'),
+			"match_url":reverse('match'),
+		}
+	else:
+		info = {
+			"home_url":reverse('home'),
+			"courses_url": reverse('courses'),
+			"comment_url": reverse('comments:comments_send'),
+			"brand_pic": settings.STATIC_URL + "css/images/brand_compressed.png",
+			"match_url":reverse('match'),
+		}
 	return JsonResponse({
-		"all_info":tmp,
+		"all_info":info,
 	})
 
 """
