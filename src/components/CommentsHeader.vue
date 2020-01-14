@@ -31,7 +31,7 @@
                     text>Comments</v-btn>
             </v-toolbar-items>
             <v-spacer></v-spacer>
-            <v-menu offset-y
+            <!-- <v-menu offset-y
                 class="mx-auto"
                 min-width="170">
                 <template v-slot:activator="{ on }">
@@ -78,7 +78,7 @@
                         </v-list-item-content>
                     </v-list-item>
                 </v-list>
-            </v-menu>
+            </v-menu> -->
         </v-app-bar>
     </div>
 </template>

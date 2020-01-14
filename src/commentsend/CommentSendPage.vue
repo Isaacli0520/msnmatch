@@ -130,13 +130,6 @@ import CommentsHeader from '../components/CommentsHeader'
 	computed:{
 	},
 	methods: {
-        btn_text(color){
-            if(color == this.comment_color){
-                return "S"
-            }
-            else
-                return ""
-        },
 		goToHref(text){
 			window.location.href = text;
 		},

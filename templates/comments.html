@@ -27,7 +27,13 @@
 	</head>
 
 <body>
-    <div id="comments-page"></div>
+    {% if request.user.is_superuser %}
+        <div id="comments-page"></div>
+    {% else %}
+        <div>
+            <h1>Error</h1>
+        </div>
+    {% endif %}
     {% render_bundle 'commentspage' %}
 </body>
 
