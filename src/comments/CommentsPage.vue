@@ -186,7 +186,7 @@ export default {
 		align-items: center;
 		justify-content: center;
 		font-size: 31px;
-		color: rgb(236, 154, 184);
+		color: #f6e6ec;
 		padding: 8px;
 		border-radius: 10px;
 		font-family: "Century Gothic", CenturyGothic, AppleGothic, sans-serif;
