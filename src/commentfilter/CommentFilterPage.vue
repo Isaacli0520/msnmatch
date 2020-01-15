@@ -38,6 +38,12 @@
                             outlined>
                         </v-select>
                     </v-flex>
+                    <v-flex xs12 sm12 md4 lg3 xl2>
+                        <div>
+                            <div>{{filter_socket_status}}</div>
+                            <div>{{comment_socket_status}}</div>
+                        </div>
+                    </v-flex>
                 </v-layout>
                 <v-layout class="custom-layout ma-3" row wrap>
                     <v-flex class="ma-1" xl6 lg6 md6 sm12 xs12 :key="comment_index" v-for="(comment, comment_index) in comments">
@@ -54,8 +60,10 @@
                         </v-progress-linear>
                     </v-flex>
                     <v-flex xl6 lg6 md6 sm12 xs12>
-                        <h3>Left Arrow: Delete a comment</h3>
-                        <h3>Right Arrow: Send a comment</h3>
+                        <h3><code>W</code> Previous Page</h3>
+                        <h3><code>S</code> Next Page</h3>
+                        <h3><code>A</code> Delete a Comment</h3>
+                        <h3><code>D</code> Send a Comment</h3>
                     </v-flex>
                     <v-flex xl6 lg6 md6 sm12 xs12>
                         <h3>Comments to be Processed:{{to_do_comments}}</h3>
@@ -109,6 +117,12 @@ import CommentsHeader from '../components/CommentsHeader'
         },
 	},
 	computed:{
+        filter_socket_status(){
+            return this.filter_socket_open ? "Filter Socket Connected" : "Filter Socket Disconnected";
+        },
+        comment_socket_status(){
+            return this.comment_socket_open ? "Comment Socket Connected" : "Comment Socket Disconnected";
+        },
         to_do_comments(){
             return this.total_comments - this.comments_sent_num - this.comments_deleted_num;
         },
@@ -250,6 +264,18 @@ import CommentsHeader from '../components/CommentsHeader'
 </script>
 
 <style>
+    .connected-span{
+        width:7px;
+        height: 15px;
+        color:green;
+    }
+
+    .disconnected-span{
+        width:7px;
+        height: 15px;
+        color:red;
+    }
+
     .custom-layout{
         height: 300px;
         overflow-y: auto;

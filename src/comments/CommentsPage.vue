@@ -17,15 +17,11 @@
 				</div>
 			</div>
 			<div class="question-div">
-				<div style="width:25%;height:100%;" @click="hide_question=!hide_question">
-				</div>
-				<div style="width:75%;">
-					<v-col v-if="!hide_question">
-						<v-flex class="align-center justify-center ma-2" :key="i" v-for="(question, i) in questions[question_id]">
-								<div class="question-span">{{ i + 1 }}. {{question.text}}</div>
-						</v-flex>
-					</v-col>
-				</div>
+				<v-col v-if="!hide_question">
+					<v-flex class="align-center justify-center ma-2" :key="i" v-for="(question, i) in questions[question_id]">
+							<div class="question-span">{{ i + 1 }}. {{question.text}}</div>
+					</v-flex>
+				</v-col>
 			</div>
 		</v-content>
 	</v-app>
@@ -173,13 +169,13 @@ export default {
 	.question-div{
 		z-index: 99999;
 		margin: 0 auto;
-		width: 80%;
+		width: 65%;
 		height: 100%;
 		position: fixed;
 		top: 0;
 		bottom: 0;
 		left: 0;
-		/* right: 0; */
+		right: 0;
 		justify-content: center;
 		display: flex;
 		align-items: center;

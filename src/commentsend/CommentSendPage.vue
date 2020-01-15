@@ -57,7 +57,6 @@
                             v-model="comment_text"
                             auto-grow
                             outlined
-                            hide-details
                             :error-messages="comment_error_messages"
                             rows="5"
                             row-height="20"
@@ -170,6 +169,9 @@ import CommentsHeader from '../components/CommentsHeader'
         sendComment(){
             if(this.comment_text.length == 0){
                 this.comment_error_messages.push("You can't send an empty comment");
+            }
+            else if(this.comment_text.length > 50){
+                this.comment_error_messages.push("Comment is toooo long TAT");
             }
             else{
                 this.filterSocket.send(JSON.stringify({
