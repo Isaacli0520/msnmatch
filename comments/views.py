@@ -17,14 +17,10 @@ def create(request):
     return render(request, 'commentcreate.html')
 
 @login_required
-def question(request):
-    return render(request, 'commentquestion.html')
-
-@login_required
 def comments(request, slide_pk):
     return render(request, 'comments.html')
 
-@login_required
+# @login_required
 def comments_send(request):
     return render(request, 'commentsend.html')
 
@@ -68,7 +64,7 @@ def delete_slide(request):
         return JsonResponse({"success":True})
     return JsonResponse({"success":False})
 
-@login_required
+# @login_required
 def get_active_slide(request):
     if request.method == "GET":
         slide = Slide.objects.filter(active=True)

@@ -1,45 +1,23 @@
 <template>
     <v-app>
         <v-content>
-            <v-container
-                fluid
-                fill-height>
-                <v-layout
-                align-center
-                justify-center>
-                    <v-flex
-                        xs12
-                        sm10
-                        md6>
-                        <v-card>
-                            <v-card-title>Super Cool Main Page</v-card-title>
-                            <v-card-text>
-                                <v-layout row wrap>
-                                    <v-spacer></v-spacer>
-                                    <v-flex d-flex>
-                                        <v-btn @click="goToHref('/match/')" color="primary">Match</v-btn>
-                                    </v-flex>
-                                    <v-spacer></v-spacer>
-                                    <v-flex d-flex>
-                                        <v-btn @click="goToHref('/courses/')" color="primary">Hoosmyprofessor</v-btn>
-                                    </v-flex>
-                                    <v-spacer></v-spacer>
-                                    <v-flex d-flex>
-                                        <v-btn @click="goToHref('/comments/send/')" color="primary">Comments</v-btn>
-                                    </v-flex>
-                                    <v-spacer></v-spacer>
-                                </v-layout>
-                            </v-card-text>
-                        </v-card>
-                    </v-flex>
+            <v-container fluid fill-height>
+                <v-layout justify-center align-center>
+                    <v-card outlined>
+                        <v-card-text>
+                            <v-btn class="ma-3 d-flex flex-column justify-center" outlined @click="goToHref('/match/')" color="pink lighten-2">Match</v-btn>
+                            <v-btn class="ma-3 d-flex flex-column justify-center" outlined @click="goToHref('/courses/')" color="teal darken-2">Hoosmyprofessor</v-btn>
+                            <v-btn class="ma-3 d-flex flex-column justify-center" outlined @click="goToHref('/comments/send/')" color="Purple lighten-2">If You Are The One</v-btn>
+                        </v-card-text>
+                    </v-card>
                 </v-layout>
-        </v-container>
+            </v-container>
         </v-content>
     </v-app>
 </template>
 
 <script>
-import axios from 'axios'
+// import axios from 'axios'
 
   export default {
     data() {
@@ -78,5 +56,15 @@ import axios from 'axios'
 </script>
 
 <style>
+
+.cus-main{
+    /* top:0;
+    bottom:0;
+    left:0;
+    right:0; */
+    margin: 0 auto;
+    width: 100%;
+    height: 100%;
+}
   
 </style>

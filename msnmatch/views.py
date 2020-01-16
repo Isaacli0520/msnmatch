@@ -100,17 +100,17 @@ def superadmin(request):
 def match(request):
 	return render(request, 'match.html')
 
-@login_required
+# @login_required
 def home(request):
-	if request.method == 'POST':
-		print("request",request.POST)
-		print("role", request.user.profile.role)
-		if "Mentor" in request.POST and request.user.profile.role == "":
-			request.user.profile.role = "Mentor"
-			request.user.save()
-		elif "Mentee" in request.POST and request.user.profile.role == "":
-			request.user.profile.role = "Mentee"
-			request.user.save()
+	# if request.method == 'POST':
+	# 	print("request",request.POST)
+	# 	print("role", request.user.profile.role)
+	# 	if "Mentor" in request.POST and request.user.profile.role == "":
+	# 		request.user.profile.role = "Mentor"
+	# 		request.user.save()
+	# 	elif "Mentee" in request.POST and request.user.profile.role == "":
+	# 		request.user.profile.role = "Mentee"
+	# 		request.user.save()
 	return render(request, 'home.html')
 
 	# if 'q' in request.GET:

@@ -114,10 +114,26 @@ class CommentsConsumer(AsyncWebsocketConsumer):
                     'color': text_data_json['color'],
                     'size': text_data_json['size'],
                     'time': text_data_json['time'],
+                    'question_id':text_data_json['question_id'],
                     'mode': text_data_json['mode'],
                     'message_type':text_data_json['message_type'],
                 }
             )
+        elif command == 'question_page':
+            await self.channel_layer.group_send(
+                self.group_name,
+                {
+                    'type':"question_command",
+                    'direction':text_data_json['direction'],
+                }
+            )
+
+    async def question_command(self, text_data):
+        # Send message to WebSocket
+        await self.send(text_data=json.dumps({
+            'type':"question_command",
+            'direction':text_data['direction'],
+        }))
 
     async def comment_filtered(self, text_data):
 
@@ -128,6 +144,7 @@ class CommentsConsumer(AsyncWebsocketConsumer):
             'color': text_data['color'],
             'size': text_data['size'],
             'time': text_data['time'],
+            'question_id':text_data['question_id'],
             'mode': text_data['mode'],
             'message_type':text_data['message_type'],
         }))

@@ -31,7 +31,7 @@
                     text>Comments</v-btn>
             </v-toolbar-items>
             <v-spacer></v-spacer>
-            <v-menu offset-y
+            <!-- <v-menu offset-y
                 class="mx-auto"
                 min-width="170">
                 <template v-slot:activator="{ on }">
@@ -78,14 +78,13 @@
                         </v-list-item-content>
                     </v-list-item>
                 </v-list>
-            </v-menu>
+            </v-menu> -->
         </v-app-bar>
     </div>
 </template>
 
 <script>
 import axios from 'axios'
-import SearchCourse from './SearchCourse'
 
 export default{
     props: {
@@ -98,7 +97,7 @@ export default{
             default:false,
         },
     },
-    data: function () {
+    data(){
         return {
             navDrawer:false,
             drawer: null,
@@ -117,19 +116,6 @@ export default{
                     href:"",
                     diabled:true,
                 },
-            ],
-            courseTypes:[
-                'Clinical',
-                'Discussion',
-                'Drill',
-                'Independent Study',
-                'Laboratory',
-                'Lecture',
-                'Practicum',
-                'Seminar',
-                'Studio',
-                'Workshop',
-                '',
             ],
             user_items:[
                 { title:"Profile", icon:"fas fa-user" },
@@ -152,91 +138,15 @@ export default{
                 match_url:"",
                 comment_url:"",
             },
-            trash_items:[
-                {
-                    "title":"Home",
-                    "icon":"fas fa-home",
-                    "href":"/courses/",
-                    "target":"",
-                },
-                {
-                    "title":"Departments",
-                    "icon":"fas fa-list-ol",
-                    "href":"/courses/departments/",
-                    "target":"",
-                },
-                {
-                    "title":"Courses",
-                    "icon":"fas fa-user-circle",
-                    "href":"",
-                    "target":"",
-                },
-                {
-                    "title":"Reviews",
-                    "icon":"fas fa-book",
-                    "href":"/courses/reviews/",
-                    "target":"",
-                },
-                {
-                    "title":"Plannable",
-                    "icon":"fas fa-paper-plane",
-                    "href":"https://plannable.org",
-                    "target":"_blank",
-                },
-            ],
             old_items: [
-                //   {  icon: 'contacts', text: 'Contacts' },
-                //   { icon: 'history', text: 'Frequently contacted' },
-                //   { icon: 'content_copy', text: 'Duplicates' },
-                //   {
-                //     icon: 'keyboard_arrow_up',
-                //     'icon-alt': 'keyboard_arrow_down',
-                //     text: 'Labels',
-                //     model: true,
-                //     children: [
-                //       { icon: 'add', text: 'Create label' }
-                //     ]
-                //   },
-                //   {
-                //     icon: 'keyboard_arrow_up',
-                //     'icon-alt': 'keyboard_arrow_down',
-                //     text: 'More',
-                //     model: false,
-                //     children: [
-                //       { text: 'Import' },
-                //       { text: 'Export' },
-                //       { text: 'Print' },
-                //       { text: 'Undo changes' },
-                //       { text: 'Other contacts' }
-                //     ]
-                //   },
                 { icon: 'fas fa-book', text: 'HoosMyProfessor' },
                 { icon: 'fas fa-user', text: 'Match' },
                 ],
         }
     },
     components:{
-        SearchCourse,
     },
     watch:{
-        headerUpdate(val){
-            this.getTakingCourses();
-        },
-        credential(){
-            this.getPlannableURL();
-        },
-        username(){
-            this.getPlannableURL();
-            this.trash_items[2].href = "/users/" + this.username + "/courses/";
-        },
-        taking_courses(val){
-            var tmp_arr = [];
-            for(let i = 0; i < val.length; i++){
-                tmp_arr.push(val[i].mnemonic.toLowerCase() + val[i].number+this.courseTypes.indexOf(val[i].type).toString(10))
-            }
-            this.plannableURL = JSON.stringify(tmp_arr);
-            this.getPlannableURL();
-        },
     },
     computed:{
 
@@ -254,19 +164,7 @@ export default{
             }
         },
         navMethod(item){
-            if(item.title=="Profile"){
-                this.goToHref(this.urls.profile)
-            }
-            else if(item.title=="Edit Profile"){
-                this.goToHref(this.urls.update_profile)
-            }
-            else if(item.title=="Log Out"){
-                this.goToHref(this.urls.logout)
-            }
-            else if(item.title=="My Courses"){
-                this.goToHref(this.urls.my_courses)
-            }
-            else if(item.title=="Match"){
+            if(item.title=="Match"){
                 this.goToHref(this.urls.match_url)
             }
             else if(item.title=="Live Comments"){
@@ -291,30 +189,9 @@ export default{
         goToHref(text){
             window.location.href = text;
         },
-        getCredential(){
-            axios.get('/courses/ajax/get_credential/',{params: {}}).then(response => {
-                this.credential = response.data.credential;
-                this.username = response.data.username;
-            }).catch( err => {
-                this.credential = "";
-                this.username = "";
-            });
-        },
-        getTakingCourses(){
-            axios.get('/courses/ajax/get_taking_courses/',{params: {}}).then(response => {
-                this.taking_courses = response.data.taking_courses;
-            });
-        },
-        getPlannableURL(){
-            // var preHref = "localhost:8080"
-            var preHref = "https://plannable.org"
-            this.trash_items[4].href = preHref + "/?courses=" + this.plannableURL + "&username=" + this.username + "&credential=" + this.credential + "";
-        },
     },
     mounted(){
-        this.getCredential();
         this.get_basic_info();
-        this.getTakingCourses();
     },
 }
 </script>
