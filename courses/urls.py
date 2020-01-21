@@ -6,9 +6,9 @@ urlpatterns = [
 	path('', views.courses, name='courses'),
 	path('departments/', views.departments, name="departments"),
 	path('reviews/', views.reviews, name="reviews"),
-	path('instructors/<instructor_number>/', views.instructor, name="instructor"),
-	path('<course_number>/', views.course, name='course'),
-	path('departments/<department_number>/', views.department, name="department"),
+	path('instructors/<int:instructor_number>/', views.instructor, name="instructor"),
+	path('<int:course_number>/', views.course, name='course'),
+	path('departments/<int:department_number>/', views.department, name="department"),
 
 	path('ajax/save_take/', views.save_take, name='save_take'),
 	path('ajax/course_search_result/', views.course_search_result, name='course_search_result'),
@@ -30,7 +30,7 @@ urlpatterns = [
 	path('ajax/get_reviews/', views.get_reviews, name='get_reviews'),
 	path('ajax/submit_review/', views.submit_review, name='submit_review'),
 
-	path('<course_number>/<instructor_number>/', views.course_instructor, name='course_instructor'),
+	path('<int:course_number>/<int:instructor_number>/', views.course_instructor, name='course_instructor'),
 
     path('api/get_list_of_plannable_profiles/', views.get_list_of_plannable_profiles, name='get_list_of_plannable_profiles'),
 	path('api/get_plannable_profile/', views.get_plannable_profile, name='get_plannable_profile'),

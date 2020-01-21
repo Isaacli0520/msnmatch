@@ -88,15 +88,15 @@ export default {
 			}
 			this.CM.load(commentList);
 			this.CM.start();
-			var iVal = -1;
+			this.iVal = -1;
 			this.startTime = Date.now();
-			if(iVal >= 0){
-				clearInterval(iVal);
+			if(this.iVal >= 0){
+				clearInterval(this.iVal);
 			}
-			iVal = setInterval(function(){
+			this.iVal = setInterval(function(){
 				ref.global_time = Date.now() - ref.startTime;
 				ref.CM.time(ref.global_time);
-			}, 10);
+			}, 100);
 		},
 		initCommentSocket(){
 			var ref = this;
@@ -107,7 +107,7 @@ export default {
 				ref.commentSocket.close();
 			};
 			this.commentSocket.onopen = function(e) {
-				console.log('Comment socket open');
+				console.log('Comment socket open, Connecting to Slide');
 				ref.commentSocket.send(JSON.stringify({
 					command:'join',
 					slide_pk:ref.slide_pk,
@@ -149,10 +149,7 @@ export default {
 				this.slide_url = response.data.url;
 			});
 		},
-
 	},
-	created(){
-    },
 	mounted(){
 		this.initQuestion(10);
 		if(!isNaN(this.slide_pk)){
