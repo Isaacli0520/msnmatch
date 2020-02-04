@@ -1,6 +1,6 @@
-# msnmatch
+# Mainland Student Network Website
 
-This is a website designed for UVa(University of Virginia) Students with following features
+This is a website designed for UVa(University of Virginia) Students with three main functions
 - Student matching
 - Reviews and ratings of courses and professors
 - Live comments + Google slide
