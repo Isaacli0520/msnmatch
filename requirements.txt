@@ -1,9 +1,7 @@
 Django==2.2.9
 gunicorn
 django-heroku
-django-bootstrap4
 social-auth-app-django
-django-widget-tweaks
 whitenoise
 django-friendship
 boto3
@@ -13,7 +11,7 @@ channels
 channels_redis
 django-model-utils
 dj-database-url
-psycopg2-binary
+psycopg2==2.8.4
 pandas
 fuzzywuzzy
 python-Levenshtein
@@ -22,4 +20,3 @@ scipy
 django-webpack-loader
 django-cors-headers
 python-decouple
-channels
