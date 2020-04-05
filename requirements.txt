@@ -2,6 +2,7 @@ Django==2.2.10
 gunicorn
 django-heroku
 social-auth-app-django
+django-bootstrap4
 whitenoise
 django-friendship
 boto3
