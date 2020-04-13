@@ -125,6 +125,26 @@ module.exports = {
 			template: 'templates/test.html',
 			filename: 'test.html',
 		},
+		market_page: {
+			entry: 'src/market/main.js',
+			template: 'templates/market.html',
+			filename: 'market.html',
+		},
+		market_item_page: {
+			entry: 'src/market_item/main.js',
+			template: 'templates/market_item.html',
+			filename: 'market_item.html',
+		},
+		market_my_items_page: {
+			entry: 'src/market_my_items/main.js',
+			template: 'templates/market_my_items.html',
+			filename: 'market_my_items.html',
+		},
+		market_category_page: {
+			entry: 'src/market_category/main.js',
+			template: 'templates/market_category.html',
+			filename: 'market_category.html',
+		},
 		match: {
 			entry: 'src/match/main.js',
 			template: 'templates/match.html',
