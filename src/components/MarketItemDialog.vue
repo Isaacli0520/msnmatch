@@ -1,39 +1,53 @@
 <template>
     <v-dialog v-model="itemDialog" v-if='d_item' min-width="350px">
         <v-card>
-            <v-layout>
-                <v-flex xs12 sm12 md8 lg8 xl8>
+            <v-row no-gutters>
+                <v-col xs="12" sm="12" md="8" lg="8" xl="8">
                 <v-img 
                 aspect-ratio="1.3"
                 contain  
                 :src="d_item.image">
                 </v-img>
-                </v-flex>
-                <v-divider vertical ml-3></v-divider>
-                <v-flex xs12 sm12 md4 lg4 xl4>
+                </v-col>
+
+                <v-col  xs="12" sm="12" md="4" lg="4" xl="4">
                 <div>
-                    <v-card-title class="head-text">{{d_item.name}}</v-card-title>
+                    <v-card-title class="dialog-head-text">{{d_item.name}}</v-card-title>
                     <v-divider></v-divider>
                     <v-card-text>
-                        <v-simple-table>
-                            <template v-slot:default>
+                        <div style="padding:0px 5px 8px 16px;" class="table-title">Item Details</div>
+                        <table class="cus-table">
                             <tbody>
                                 <tr>
                                     <td>Price</td>
-                                    <td>${{ d_item.price }}</td>
+                                    <td style="font-size:18px !important; color:red !important;" class="cus-td">${{ d_item.price }}</td>
                                 </tr>
                                 <tr>
                                     <td>Condition</td>
-                                    <td>{{ d_item.condition }}</td>
+                                    <td class="cus-td">{{ condition_dict[d_item.condition] }}</td>
                                 </tr>
+                                <!-- <tr>
+                                    <td>Category</td>
+                                    <td>{{ category_dict[d_item.category] }}</td>
+                                </tr> -->
                                 <tr>
                                     <td>Pickup</td>
-                                    <td>{{ d_item.pickup ? 'Available' : 'Not Available' }}</td>
+                                    <td :class="['cus-td',d_item.pickup ? 'available' : 'unavailable']">{{ d_item.pickup ? 'Available' : 'Not Available' }}</td>
                                 </tr>
                                 <tr>
                                     <td>Delivery</td>
-                                    <td>{{ d_item.delivery ? 'Available' : 'Not Available' }}</td>
+                                    <td :class="['cus-td',d_item.delivery ? 'available' : 'unavailable']">{{ d_item.delivery ? 'Available' : 'Not Available' }}</td>
                                 </tr>
+                                <tr>
+                                    <td style="vertical-align:top; padding: 4px 16px 15px 16px !important;">Description</td>
+                                    <td class="description-td">{{ d_item.description }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <v-divider></v-divider>
+                        <div style="padding:13px 5px 8px 16px;" class="table-title">Seller Info</div>
+                        <table class="cus-table">
+                            <tbody>
                                 <tr>
                                     <td>Seller</td>
                                     <td>{{ d_item.seller_name }}</td>
@@ -46,13 +60,8 @@
                                     <td>Email</td>
                                     <td>{{ d_item.email }}</td>
                                 </tr>
-                                <tr>
-                                    <td>Description</td>
-                                    <td>{{ d_item.description }}</td>
-                                </tr>
                             </tbody>
-                            </template>
-                        </v-simple-table>
+                        </table>
                     </v-card-text>
                     <v-divider></v-divider>
                     <v-card-actions>
@@ -63,8 +72,8 @@
                         <v-btn color="blue darken-1" outlined @click="closeDialog">Close</v-btn>
                     </v-card-actions>
                 </div>
-                </v-flex>
-            </v-layout>
+                </v-col>
+            </v-row>
         </v-card>
     </v-dialog>
 </template>
@@ -88,6 +97,22 @@ export default{
     },
     data(){
         return{
+            condition_dict:{
+                "slightlyused":"Slightly Used",
+                "new":"New",
+                "dysfunctional":"Dysfunctional",
+                "used":"Used",
+            },
+            category_dict:{
+                "electronics":"Electronics",
+                "housing":"Housing",
+                "pets":"Pets",
+                "miscellaneous":"Miscellaneous",
+                "clothing":"Clothing",
+                "textbooks":"Textbooks",
+                "schoolsupplies":"School Supplies"
+            }
+
         }
     },
     components:{
@@ -95,7 +120,16 @@ export default{
     watch:{
     },
     computed:{
-        
+        verticalBool () {
+            switch (this.$vuetify.breakpoint.name) {
+            case 'xs': return false
+            case 'sm': return false
+            case 'md': return true
+            case 'lg': return true
+            case 'xl': return true
+            }
+            return false;
+        },
     },
     methods:{
         openEditDialog(){
@@ -119,4 +153,45 @@ export default{
 
 <style lang="css">
 
+    .cus-table{
+         /* font-family: "Times New Roman", Times, serif !important; */
+    }
+
+    .description-td{
+        padding: 4px 16px 15px 16px !important;
+        /* font-family: "Times New Roman", Times, serif !important; */
+    }
+
+    .available{
+        color: rgb(14, 179, 14);
+    }
+
+    .unavailable{
+        color: rgb(172, 168, 168);
+    }
+
+    .table-title{
+        font-size:20px !important;
+        font-weight: 700 !important;
+    }
+    .cus-td{
+        font-weight: 600 !important;
+    }
+
+    .v-card__text td{
+        font-size: 15px !important;
+        padding: 4px 16px;
+    }
+
+    td:not(.cus-td){
+        font-family: "Times New Roman", Times, serif !important; 
+        font-size: 15px !important;
+        padding: 4px 16px;
+    }
+
+    .dialog-head-text{
+        /* font-family: "Times New Roman", Times, serif !important;  */
+        font-size: 28px !important;
+        font-weight:700 !important;
+    }
 </style>

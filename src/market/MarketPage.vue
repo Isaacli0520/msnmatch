@@ -22,7 +22,11 @@
                     <v-col
                     v-for="(item, i) in items"
                     :key="i"
-                    cols="3"
+                    xs="12"
+                    sm="12"
+                    md="4"
+                    lg="4"
+                    xl="3"
                     >
                     <market-item-card @open-item-dialog="openItemDialog(item)" :item="item"></market-item-card>
                     </v-col>
@@ -77,7 +81,7 @@ import MarketItemCard from '../components/MarketItemCard'
 	},
 	methods: {
         openItemDialog(item){
-            this.d_item = item;
+            this.d_item = JSON.parse(JSON.stringify(item));
             this.itemDialog = true;
         },
         getAllItems(){
@@ -85,8 +89,8 @@ import MarketItemCard from '../components/MarketItemCard'
                 this.items = response.data.items;
             });
         },
-        getSearchResult(query){
-            axios.get('/market/api/item_search_result/',{params: {"query":query}}).then(response => {
+        getSearchResult(query, category){
+            axios.get('/market/api/item_search_result/',{params: {"query":query, "category":category}}).then(response => {
                 this.items = response.data.items;
             });
         }
@@ -94,10 +98,8 @@ import MarketItemCard from '../components/MarketItemCard'
 	mounted(){
         let url = new URL(window.location.href);
         let query = url.searchParams.get("q");
-        if(query != null)
-            this.getSearchResult(query);
-        else
-            this.getAllItems();
+        let category = url.searchParams.get("c");
+        this.getSearchResult(query, category);
         
 	},
   };

@@ -501,11 +501,6 @@ axios.defaults.xsrfCookieName = "csrftoken";
 </script>
 
 <style>
-    .v-card__title{
-        font-family: "Roboto", sans-serif !important;
-        font-weight: 700 !important;
-    }
-
     .item-tags{
         margin: 0px 0px 3px 0px;
         display: flex;

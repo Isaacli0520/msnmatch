@@ -50,7 +50,7 @@
             <v-img max-height="46" max-width="46" :src="urls.brand_pic" alt=""></v-img>
             <v-toolbar-items v-if="$vuetify.breakpoint.mdAndUp">
                 <v-btn 
-                    :href="urls.courses_url"
+                    :href="urls.market_url"
                     text>Market</v-btn>
             </v-toolbar-items>
             <v-text-field
@@ -173,6 +173,7 @@ export default{
                 update_profile:"",
                 logout:"",
                 my_courses:"",
+                market_url:"",
                 courses_url:"",
                 match_url:"",
                 comment_url:"",
@@ -194,43 +195,43 @@ export default{
                 {
                     "title":"Electronics",
                     "icon":"fas fa-bolt",
-                    "href":"/market/electronics/",
+                    "href":"/market/?c=electronics",
                     "target":"",
                 },
                 {
                     "title":"Textbooks",
                     "icon":"fas fa-book",
-                    "href":"/market/textbooks/",
+                    "href":"/market/?c=textbooks",
                     "target":"",
                 },
                 {
                     "title":"School Supplies",
                     "icon":"fas fa-school",
-                    "href":"/market/schoolsupplies/",
+                    "href":"/market/?c=schoolsupplies",
                     "target":"",
                 },
                 {
                     "title":"Pets",
                     "icon":"fas fa-cat",
-                    "href":"/market/pets/",
+                    "href":"/market/?c=pets",
                     "target":"",
                 },
                 {
                     "title":"Clothing",
                     "icon":"fas fa-tshirt",
-                    "href":"/market/clothing/",
+                    "href":"/market/?c=clothing",
                     "target":"",
                 },
                 {
                     "title":"Housing",
                     "icon":"fas fa-bed",
-                    "href":"/market/housing/",
+                    "href":"/market/?c=housing",
                     "target":"",
                 },
                 {
                     "title":"Miscellaneous",
                     "icon":"fas fa-question",
-                    "href":"/market/miscellaneous/",
+                    "href":"/market/?c=miscellaneous",
                     "target":"",
                 },
             ],

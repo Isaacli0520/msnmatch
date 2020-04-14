@@ -100,12 +100,14 @@ def get_basic_info(request):
 			"update_profile":reverse('update_profile', args=[request.user.username]),
 			"my_courses":reverse('my_courses', args=[request.user.username]),
 			"logout":reverse('logout'),
+			"market_url":reverse('market:market'),
 			"match_url":reverse('match'),
 		}
 	else:
 		info = {
 			"home_url":reverse('home'),
 			"courses_url": reverse('courses'),
+			"market_url":reverse('market:market'),
 			"comment_url": reverse('comments:comments_send'),
 			"brand_pic": settings.STATIC_URL + "css/images/brand_compressed.png",
 			"match_url":reverse('match'),

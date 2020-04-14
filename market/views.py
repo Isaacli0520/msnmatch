@@ -54,19 +54,27 @@ def get_my_items(request):
 
 @login_required
 def item_search_result(request):
-    query = request.GET.get("query").strip().lower()
+    query = request.GET.get("query")
     category = request.GET.get("category")
-    if category:
-    # query_time = request.GET.get("time")
-        tmp_item_queryset = Item.objects.filter(sold=False, category=category).annotate(
-                similarity_name=TrigramSimilarity('name',query),
-                similarity_description=TrigramSimilarity('description',query)).filter(Q(similarity_name__gt=0.3) | Q(similarity_description__gt=0.15))
-    else:
+    if query:
+        query = query.strip().lower()
+    if not query and not category:
+        tmp_item_queryset = Item.objects.filter(sold=False)
+        retrieved_items = sorted(tmp_item_queryset, key=lambda c: c.updated.timestamp(), reverse=True)
+    elif not query and category:
+        tmp_item_queryset = Item.objects.filter(sold=False, category=category)
+        retrieved_items = sorted(tmp_item_queryset, key=lambda c: c.updated.timestamp(), reverse=True)
+    elif query and not category:
         tmp_item_queryset = Item.objects.filter(sold=False).annotate(
                 similarity_name=TrigramSimilarity('name',query),
                 similarity_description=TrigramSimilarity('description',query)).filter(Q(similarity_name__gt=0.3) | Q(similarity_description__gt=0.15))
-    retrieved_items = sorted(tmp_item_queryset, key=lambda c: (-c.similarity_name,-c.similarity_description))
-    retrieved_items = [item_json(item) for item in retrieved_items[:10]]
+        retrieved_items = sorted(tmp_item_queryset, key=lambda c: (-c.similarity_name,-c.similarity_description))
+    else:
+        tmp_item_queryset = Item.objects.filter(sold=False, category=category).annotate(
+                similarity_name=TrigramSimilarity('name',query),
+                similarity_description=TrigramSimilarity('description',query)).filter(Q(similarity_name__gt=0.3) | Q(similarity_description__gt=0.15))
+        retrieved_items = sorted(tmp_item_queryset, key=lambda c: (-c.similarity_name,-c.similarity_description))
+    retrieved_items = [item_json(item) for item in retrieved_items]
 
     return JsonResponse({
         "items": retrieved_items,

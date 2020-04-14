@@ -9,7 +9,7 @@
         :src="item.image">
         </v-img>
         <v-card-title>{{shortenString(item.name)}}</v-card-title>
-        <v-card-subtitle >${{item.price}}</v-card-subtitle>
+        <v-card-subtitle class="cus-subtitle">${{item.price}}</v-card-subtitle>
         <v-card-text>
             <div class="item-tags">
                 <span v-if="item.sold" class="item-tag item-tag-sold">Sold</span>
@@ -64,6 +64,16 @@ export default{
 
 
 <style lang="css">
+    .v-card__title{
+        font-family: "Roboto", sans-serif !important;
+        font-weight: 700 !important;
+    }
+    
+    .cus-subtitle{
+        /* font-weight: 600 !important; */
+        font-size:17px !important;
+    }
+
     .item-tags{
         margin: -3px 0px 0px 0px;
         display: flex;
