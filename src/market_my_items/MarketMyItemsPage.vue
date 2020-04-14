@@ -3,26 +3,30 @@
         <market-header></market-header>
         <v-content>
             <v-container fluid grid-list-lg>
-                <v-layout mb-3 mr-3>
-                    <v-flex > 
+                <v-row mb-3 mr-3>
+                    <v-col> 
                         <div>
                             <span class="cus-headline-text">My Items</span>
                         </div>
-                    </v-flex>
+                    </v-col>
                     <v-spacer></v-spacer>
-                    <v-btn color="teal lighten-1" @click="openCreateItemDialog()" outlined d-flex>Sell an Item</v-btn>
-                </v-layout>
-                <v-layout mb-3>
-                    <v-row dense>
-                        <v-col
-                        v-for="(item, i) in items"
-                        :key="i"
-                        cols="3"
-                        >
-                        <market-item-card @open-item-dialog="openItemDialog(item)" :item="item"></market-item-card>
-                        </v-col>
-                    </v-row>
-                </v-layout>
+                    <v-col>
+                        <v-btn style="float: right;" color="teal lighten-1" @click="openCreateItemDialog()" outlined d-flex>Sell an Item</v-btn>
+                    </v-col>
+                </v-row>
+                <v-row dense>
+                    <v-col
+                    v-for="(item, i) in items"
+                    :key="i"
+                    xs="12"
+                    sm="12"
+                    md="4"
+                    lg="4"
+                    xl="3"
+                    >
+                    <market-item-card @open-item-dialog="openItemDialog(item)" :item="item"></market-item-card>
+                    </v-col>
+                </v-row>
             </v-container>
             <v-dialog v-model="createItemDialog" scrollable min-width="350px" max-width="600px">
                 <v-card>
@@ -116,7 +120,7 @@
 
                             <v-text-field
                                 v-model="edit_item.price"
-                                label="Price (Dollars)"
+                                label="Price (Dollars)"  
                                 :rules="[v => (v!=undefined && v >= 0) || 'Price is required']"
                                 required
                                 type="number"

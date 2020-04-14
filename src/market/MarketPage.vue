@@ -10,6 +10,7 @@
                     <v-spacer></v-spacer>
                     <v-col>
                         <v-select
+                        dense
                         v-model="sortMethod"
                         :items="sortOptions"
                         label="Sort By"

@@ -252,8 +252,11 @@ export default{
             let tmp_url = window.location.pathname.substr(0,window.location.pathname.lastIndexOf('/'));
             if(tmp_url == "/market/items")
                 this.goToHref('/market/' + '?q=' + query);
-            else
-                this.goToHref(tmp_url + '/?q=' + query);
+            else{
+                let url = new URL(window.location.href);
+                url.searchParams.set('q', query);
+                this.goToHref(url);
+            }
         },
         navAsideMethod(item){
             if(item.text == "HoosMyProfessor"){

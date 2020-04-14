@@ -1,16 +1,18 @@
 <template>
     <v-dialog v-model="itemDialog" v-if='d_item' min-width="350px">
         <v-card>
-            <v-row no-gutters>
-                <v-col xs="12" sm="12" md="8" lg="8" xl="8">
+            <v-layout>
+                <!-- xs="12" sm="12" md="8" lg="8" xl="8" -->
+                <v-flex xs12 sm12 md8 lg8 xl8>
                 <v-img 
                 aspect-ratio="1.3"
                 contain  
                 :src="d_item.image">
                 </v-img>
-                </v-col>
-
-                <v-col  xs="12" sm="12" md="4" lg="4" xl="4">
+                </v-flex>
+                <v-divider :vertical="verticalBool"></v-divider>
+                <!-- xs="12" sm="12" md="4" lg="4" xl="4" -->
+                <v-flex  xs12 sm12 md4 lg4 xl4>
                 <div>
                     <v-card-title class="dialog-head-text">{{d_item.name}}</v-card-title>
                     <v-divider></v-divider>
@@ -40,7 +42,7 @@
                                 </tr>
                                 <tr>
                                     <td style="vertical-align:top; padding: 4px 16px 15px 16px !important;">Description</td>
-                                    <td class="description-td">{{ d_item.description }}</td>
+                                    <td class="description-td description-text">{{ d_item.description }}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -72,8 +74,8 @@
                         <v-btn color="blue darken-1" outlined @click="closeDialog">Close</v-btn>
                     </v-card-actions>
                 </div>
-                </v-col>
-            </v-row>
+                </v-flex>
+            </v-layout>
         </v-card>
     </v-dialog>
 </template>
@@ -183,7 +185,7 @@ export default{
         padding: 4px 16px;
     }
 
-    td:not(.cus-td){
+    td:not(.cus-td):not(.description-text){
         font-family: "Times New Roman", Times, serif !important; 
         font-size: 15px !important;
         padding: 4px 16px;

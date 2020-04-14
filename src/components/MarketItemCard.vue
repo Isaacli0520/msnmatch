@@ -8,9 +8,10 @@
         contain
         :src="item.image">
         </v-img>
+        <v-divider></v-divider>
         <v-card-title>{{shortenString(item.name)}}</v-card-title>
         <v-card-subtitle class="cus-subtitle">${{item.price}}</v-card-subtitle>
-        <v-card-text>
+        <!-- <v-card-text>
             <div class="item-tags">
                 <span v-if="item.sold" class="item-tag item-tag-sold">Sold</span>
                 <template v-if="!item.sold">
@@ -20,7 +21,7 @@
                     <span v-if="item.delivery" class="item-tag item-tag-delivery">Delivery</span>
                 </template>
             </div>
-        </v-card-text>
+        </v-card-text> -->
     </v-card>
 </template>
 
@@ -68,7 +69,7 @@ export default{
         font-family: "Roboto", sans-serif !important;
         font-weight: 700 !important;
     }
-    
+
     .cus-subtitle{
         /* font-weight: 600 !important; */
         font-size:17px !important;
