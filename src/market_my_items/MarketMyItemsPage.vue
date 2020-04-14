@@ -10,7 +10,7 @@
                         </div>
                     </v-flex>
                     <v-spacer></v-spacer>
-                    <v-btn @click="openCreateItemDialog()" d-flex>Sell an Item</v-btn>
+                    <v-btn color="teal lighten-1" @click="openCreateItemDialog()" outlined d-flex>Sell an Item</v-btn>
                 </v-layout>
                 <v-layout mb-3>
                     <v-row dense>
@@ -19,27 +19,7 @@
                         :key="i"
                         cols="3"
                         >
-                        <v-card
-                            color="white"
-                            light
-                            @click="openItemDialog(item)"
-                        >
-                            <v-img 
-                            aspect-ratio="1.5"
-                            contain
-                            :src="item.image">
-                            </v-img>
-                            <v-card-title v-text="item.name"></v-card-title>
-                            <v-card-subtitle >${{item.price}}</v-card-subtitle>
-                            <v-card-text>
-                                <div class="item-tags">
-                                    <span v-if="item.condition=='new'" class="item-tag item-tag-new">New</span>
-                                    <span v-if="item.condition=='slightlyused'" class="item-tag item-tag-slightly-used">Slightly Used</span>
-                                    <span v-if="item.pickup" class="item-tag item-tag-pickup">Pickup</span>
-                                    <span v-if="item.delivery" class="item-tag item-tag-delivery">Delivery</span>
-                                </div>
-                            </v-card-text>
-                        </v-card>
+                        <market-item-card @open-item-dialog="openItemDialog(item)" :item="item"></market-item-card>
                         </v-col>
                     </v-row>
                 </v-layout>
@@ -50,9 +30,8 @@
                     <v-divider></v-divider>
                     <v-card-text style="height: 600px;">
                         <v-form
-                            ref="form"
-                            v-model="create_item_form_valid"
-                            lazy-validation>
+                            ref="create_form"
+                            v-model="create_item_form_valid">
                             <v-text-field
                             v-model="item.name"
                             :counter="25"
@@ -87,6 +66,7 @@
 
                             <v-file-input 
                             v-model="item.image"
+                            accept="image/*"
                             label="Image"></v-file-input>
 
                             <v-checkbox
@@ -113,65 +93,123 @@
                     <v-divider></v-divider>
                     <v-card-actions>
                         <v-spacer></v-spacer>
-                        <v-btn color="blue darken-1" text @click="createItemDialog = false">Close</v-btn>
-                        <v-btn color="Green darken-1" text @click="createItem()">Create</v-btn>
+                        <v-btn color="green darken-1" :loading="createItemBtnLoading" outlined @click.prevent="createItem(item)">Create</v-btn>   
+                        <v-btn color="blue darken-1" outlined @click="createItemDialog = false">Close</v-btn> 
                     </v-card-actions>
                 </v-card>
             </v-dialog>
-            <v-dialog v-model="itemDialog" v-if='d_item' scrollable min-width="350px">
+            <v-dialog v-model="editItemDialog" v-if="edit_item" scrollable min-width="350px" max-width="600px">
                 <v-card>
-                    <!-- <div class="d-flex flex-no-wrap justify-space-between"> -->
-                    <v-layout>
-                        <v-flex xs12 sm12 md8 lg8 xl8>
-                        <v-img 
-                        aspect-ratio="1.3"
-                        contain  
-                        :src="d_item.image">
-                        </v-img>
-                        </v-flex>
-                        <v-divider vertical ml-3></v-divider>
-                        <v-flex xs12 sm12 md4 lg4 xl4>
-                        <div>
-                            <v-card-title class="head-text">{{d_item.name}}</v-card-title>
-                            <v-card-text>
-                                <v-simple-table>
-                                    <template v-slot:default>
-                                    <tbody>
-                                        <tr>
-                                            <td>Price</td>
-                                            <td>{{ d_item.price }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Condition</td>
-                                            <td>{{ d_item.condition }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Pickup</td>
-                                            <td>{{ d_item.pickup ? 'Available' : 'Not Available' }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Delivery</td>
-                                            <td>{{ d_item.delivery ? 'Available' : 'Not Available' }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Description</td>
-                                            <td>{{ d_item.description }}</td>
-                                        </tr>
-                                    </tbody>
-                                    </template>
-                                </v-simple-table>
-                            </v-card-text>
-                            <v-divider></v-divider>
-                            <v-card-actions>
-                                <v-spacer></v-spacer>
-                                <v-btn color="blue darken-1" text @click="itemDialog = false">Close</v-btn>
-                            </v-card-actions>
-                        </div>
-                        </v-flex>
-                    </v-layout>
-                    <!-- </div> -->
+                    <v-card-title>Edit Your Item</v-card-title>
+                    <v-divider></v-divider>
+                    <v-card-text style="height: 600px;">
+                        <v-form
+                            ref="edit_form"
+                            v-model="edit_item_form_valid">
+                            <v-text-field
+                            v-model="edit_item.name"
+                            :counter="25"
+                            :rules="nameRules"
+                            label="Name"
+                            required
+                            ></v-text-field>
+
+                            <v-text-field
+                                v-model="edit_item.price"
+                                label="Price (Dollars)"
+                                :rules="[v => (v!=undefined && v >= 0) || 'Price is required']"
+                                required
+                                type="number"
+                            />
+
+                            <v-select
+                            v-model="edit_item.condition"
+                            :items="conditions"
+                            :rules="[v => !!v || 'Condition is required']"
+                            label="Condition"
+                            required
+                            ></v-select>
+
+                            <v-select
+                            v-model="edit_item.category"
+                            :items="categories"
+                            :rules="[v => !!v || 'Category is required']"
+                            label="Category"
+                            required
+                            ></v-select>
+
+                            <v-file-input 
+                            v-model="edit_item_image"
+                            accept="image/*"
+                            label="Upload a different image"></v-file-input>
+
+                            <v-checkbox
+                            v-model="edit_item.pickup"
+                            label="Pickup"
+                            ></v-checkbox>
+
+                            <v-checkbox
+                            v-model="edit_item.delivery"
+                            label="Delivery"
+                            ></v-checkbox>
+
+                            <v-textarea
+                                v-model="edit_item.description"
+                                label="Description"
+                                outlined
+                                :rules="descriptionRules"
+                                required
+                                rows="3"
+                                row-height="20"
+                            ></v-textarea>
+                        </v-form>
+                    </v-card-text>
+                    <v-divider></v-divider>
+                    <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn color="green darken-1" :loading="editItemBtnLoading" outlined @click.prevent="editItem(edit_item, edit_item_image)">Edit</v-btn>
+                        <v-btn color="blue darken-1" outlined @click="editItemDialog = false">Close</v-btn>
+                    </v-card-actions>
                 </v-card>
             </v-dialog>
+            <v-dialog v-model="deleteItemDialog" v-if="delete_item" scrollable min-width="200px" max-width="600px">
+                <v-card>
+                    <v-card-title>Deletion</v-card-title>
+                    <v-divider></v-divider>
+                    <v-card-text style="margin-top:21px; font-size:20px;font-weight:500;">
+                        Do you really want to delete {{delete_item.name}}?
+                    </v-card-text>
+                    <v-divider></v-divider>
+                    <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn color="red darken-1" :loading="deleteItemBtnLoading" outlined @click="deleteItem(delete_item)">Delete</v-btn>
+                        <v-btn color="blue darken-1" outlined @click="deleteItemDialog = false">Close</v-btn>
+                    </v-card-actions>
+                </v-card>
+            </v-dialog>
+            <v-dialog v-model="soldItemDialog" v-if="sold_item" scrollable min-width="200px" max-width="600px">
+                <v-card>
+                    <v-card-title>Sold</v-card-title>
+                    <v-divider></v-divider>
+                    <v-card-text style="margin-top:21px; font-size:20px;font-weight:500;">
+                        Is {{sold_item.name}} really sold?
+                    </v-card-text>
+                    <v-divider></v-divider>
+                    <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn color="yellow darken-1" :loading="soldItemBtnLoading" outlined @click="sellItem(sold_item)">Yes, it is sold</v-btn>
+                        <v-btn color="blue darken-1" outlined @click="soldItemDialog = false">Close</v-btn>
+                    </v-card-actions>
+                </v-card>
+            </v-dialog>
+            <market-item-dialog 
+                :edit="true"
+                :d_item="d_item" 
+                :itemDialog="itemDialog"
+                @open-edit-dialog="openEditItemDialog" 
+                @open-delete-dialog="openDeleteItemDialog"
+                @open-sold-dialog="openSoldItemDialog"
+                @close-dialog="itemDialog=false"></market-item-dialog>
         </v-content>
     </v-app>
 </template>
@@ -179,16 +217,34 @@
 <script>
 import axios from 'axios'
 import MarketHeader from '../components/MarketHeader'
+import MarketItemDialog from '../components/MarketItemDialog'
+import MarketItemCard from '../components/MarketItemCard'
 axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 axios.defaults.xsrfCookieName = "csrftoken";
 
   export default {
 	data() {
         return {
-            createItemDialog:false,
+            edit_item_form_valid:true,
             create_item_form_valid:true,
+
+            createItemBtnLoading:false,
+            editItemBtnLoading:false,
+            deleteItemBtnLoading:false,
+            soldItemBtnLoading:false,
+
+            createItemDialog:false,
+            editItemDialog:false,
+            soldItemDialog:false,
+            deleteItemDialog:false,
             itemDialog:false,
+
             d_item:null,
+            sold_item:null,
+            delete_item:null,
+            edit_item:null,
+            edit_item_image:null,
+
             conditions:[
                 {   
                     'value':'new',
@@ -260,6 +316,8 @@ axios.defaults.xsrfCookieName = "csrftoken";
 	},
 	components:{
         MarketHeader,
+        MarketItemDialog,
+        MarketItemCard
 	},
 	computed:{
 	},
@@ -276,14 +334,131 @@ axios.defaults.xsrfCookieName = "csrftoken";
         openCreateItemDialog(){
             this.createItemDialog = true;
         },
-        createItem(){
-            this.$refs.form.validate();
+        openSoldItemDialog(item){
+            this.sold_item = item;
+            this.itemDialog = false;
+            this.soldItemDialog = true;
+        },
+        openDeleteItemDialog(item){
+            this.delete_item = item;
+            this.itemDialog = false;
+            this.deleteItemDialog = true;
+        },
+        openEditItemDialog(item){
+            this.edit_item = JSON.parse(JSON.stringify(item));
+            this.itemDialog = false;
+            this.editItemDialog = true;
+        },
+        sellItem(item){
+            this.soldItemBtnLoading = true;
+            let formData = new FormData();
+            for(var key in item){
+                if(key != "image"){
+                    formData.append(key, item[key]);
+                }
+            }
+            axios.post('/market/api/sell_item/',formData,
+            {
+                headers:{
+                    'Content-Type': 'multipart/form-data',
+                }
+            }).then(response => {
+                if(response.data.success){
+                    this.$message({
+                        message: 'Item Sold',
+                        type: 'success'
+                    });
+                    this.soldItemBtnLoading = false;
+                    this.getMyItems();
+                    this.soldItemDialog = false;
+                    this.sold_item = null;
+                }else{
+                    this.$message({
+                        message: 'Sth is wrong',
+                        type: 'error'
+                    });
+                }
+            });
+        },
+        deleteItem(item){
+            this.deleteItemBtnLoading = true;
+            let formData = new FormData();
+            for(var key in item){
+                if(key != "image"){
+                    formData.append(key, item[key]);
+                }
+            }
+            axios.post('/market/api/delete_item/',formData,
+            {
+                headers:{
+                    'Content-Type': 'multipart/form-data',
+                }
+            }).then(response => {
+                if(response.data.success){
+                    this.$message({
+                        message: 'Item Deleted',
+                        type: 'success'
+                    });
+                    this.deleteItemBtnLoading = false;
+                    this.getMyItems();
+                    this.deleteItemDialog = false;
+                    this.delete_item = null;
+                }else{
+                    this.$message({
+                        message: 'Sth is wrong',
+                        type: 'error'
+                    });
+                }
+            });
+        },
+        editItem(item, edit_item_image){
+            this.$refs.edit_form.validate();
+            if(!this.edit_item_form_valid)
+                return;
+            this.editItemBtnLoading = true;
+            let formData = new FormData();
+            formData.append('image', edit_item_image);
+            for(var key in item){
+                if(key != "image"){
+                    formData.append(key, item[key]);
+                }
+            }
+            axios.post('/market/api/edit_item/',formData,
+            {
+                headers:{
+                    'Content-Type': 'multipart/form-data',
+                }
+            }).then(response => {
+                if(response.data.success){
+                    this.$message({
+                        message: 'Item Updated',
+                        type: 'success'
+                    });
+                    this.editItemBtnLoading = false;
+                    this.getMyItems();
+                    this.editItemDialog = false;
+                    this.edit_item = null;
+                    this.edit_item_image = null;
+                    // this.$refs.edit_form.resetValidation();
+                }else{
+                    this.$message({
+                        message: 'Sth is wrong',
+                        type: 'error'
+                    });
+                }
+            });
+        },
+        createItem(item){
+            this.$refs.create_form.validate();
             if(!this.create_item_form_valid)
                 return;
+            this.createItemBtnLoading = true;
             let formData = new FormData();
-            formData.append('image',this.item.image);
-            for(var key in this.item){
-                formData.append(key, this.item[key]);
+            formData.append('image',item.image);
+            for(var key in item){
+                if(key != "image"){
+                    formData.append(key, item[key]);
+                }
             }
             axios.post('/market/api/create_item/',formData,
             {
@@ -296,6 +471,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
                         message: 'Item Posted',
                         type: 'success'
                     });
+                    this.createItemBtnLoading = false;
                     this.getMyItems();
                     this.createItemDialog = false;
                     this.item = {
@@ -308,7 +484,12 @@ axios.defaults.xsrfCookieName = "csrftoken";
                         description:"",
                         image:null,
                     };
-                    this.$refs.form.resetValidation();
+                    this.$refs.create_form.resetValidation();
+                }else{
+                    this.$message({
+                        message: 'Sth is wrong',
+                        type: 'error'
+                    });
                 }
             });
         },

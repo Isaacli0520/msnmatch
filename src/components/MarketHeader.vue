@@ -53,8 +53,21 @@
                     :href="urls.courses_url"
                     text>Market</v-btn>
             </v-toolbar-items>
-            <search-course
-                v-if="searchBool"></search-course>
+            <v-text-field
+                label="Search Item"
+                v-model="query"
+                v-on:keyup.enter="searchItem(query)"
+                color="grey darken-2"
+                background-color="white"
+                clearable
+                light
+                solo-inverted
+                no-filter
+                flat
+                hide-no-data
+                hide-selected
+                hide-details
+            ></v-text-field>
             <v-spacer v-if="!searchBool"></v-spacer>
             <v-menu offset-y
                 class="mx-auto"
@@ -110,7 +123,6 @@
 
 <script>
 import axios from 'axios'
-import SearchCourse from './SearchCourse'
 
 export default{
     props: {
@@ -125,6 +137,7 @@ export default{
     },
     data: function () {
         return {
+            query:"",
             navDrawer:false,
             drawer: null,
             credential:"",
@@ -228,14 +241,19 @@ export default{
         }
     },
     components:{
-        SearchCourse,
     },
     watch:{
     },
     computed:{
-
     },
     methods:{
+        searchItem(query){
+            let tmp_url = window.location.pathname.substr(0,window.location.pathname.lastIndexOf('/'));
+            if(tmp_url == "/market/items")
+                this.goToHref('/market/' + '?q=' + query);
+            else
+                this.goToHref(tmp_url + '/?q=' + query);
+        },
         navAsideMethod(item){
             if(item.text == "HoosMyProfessor"){
                 this.goToHref(this.urls.courses_url);

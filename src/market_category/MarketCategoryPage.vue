@@ -3,100 +3,36 @@
         <market-header></market-header>
         <v-content>
             <v-container fluid grid-list-lg>
-                <v-layout mb-3 mr-3>
-                    <v-flex > 
-                        <div>
-                            <span class="cus-headline-text">Market</span>
-                        </div>
-                    </v-flex>
+                <v-row mb-3 mr-3>
+                    <v-col> 
+                        <div class="cus-headline-text">{{categorymap(category)}}</div>
+                    </v-col>
                     <v-spacer></v-spacer>
-                </v-layout>
-                <v-layout mb-3>
-                    <v-row dense>
-                        <v-col
-                        v-for="(item, i) in items"
-                        :key="i"
-                        cols="3"
-                        >
-                        <v-card
-                            color="white"
-                            light
-                            @click=openItemDialog(item)
-                        >
-                            <v-img 
-                            aspect-ratio="1.5"
-                            contain
-                            :src="item.image">
-                            </v-img>
-                            <v-card-title>{{shortenString(item.name)}}</v-card-title>
-                            <v-card-subtitle >${{item.price}}</v-card-subtitle>
-                            <v-card-text>
-                                <div class="item-tags">
-                                    <span v-if="item.condition=='New'" class="item-tag item-tag-new">New</span>
-                                    <span v-if="item.condition=='Slightly Used'" class="item-tag item-tag-slightly-used">Slightly Used</span>
-                                    <span v-if="item.pickup" class="item-tag item-tag-pickup">Pickup</span>
-                                    <span v-if="item.delivery" class="item-tag item-tag-delivery">Delivery</span>
-                                </div>
-                            </v-card-text>
-                        </v-card>
-                        </v-col>
-                    </v-row>
-                </v-layout>
+                    <v-col>
+                        <v-select
+                        v-model="sortMethod"
+                        :items="sortOptions"
+                        label="Sort By"
+                        hide-details
+                        outlined>
+                        </v-select>
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col
+                    style="padding:6px;"
+                    v-for="(item, i) in items"
+                    :key="i"
+                    xs="12"
+                    sm="6"
+                    md="4"
+                    lg="4"
+                    xl="2">
+                    <market-item-card @open-item-dialog="openItemDialog(item)" :item="item"></market-item-card>
+                    </v-col>
+                </v-row>
             </v-container>
-            <v-dialog v-model="itemDialog" v-if='d_item' scrollable min-width="350px">
-                <v-card>
-                    <!-- <div class="d-flex flex-no-wrap justify-space-between"> -->
-                    <v-layout>
-                        <v-flex xs12 sm12 md8 lg8 xl8>
-                        <v-img 
-                        aspect-ratio="1.3"
-                        contain  
-                        :src="d_item.image">
-                        </v-img>
-                        </v-flex>
-                        <v-divider vertical ml-3></v-divider>
-                        <v-flex xs12 sm12 md4 lg4 xl4>
-                        <div>
-                            <v-card-title class="head-text">{{d_item.name}}</v-card-title>
-                            <v-card-text>
-                                <v-simple-table>
-                                    <template v-slot:default>
-                                    <tbody>
-                                        <tr>
-                                            <td>Price</td>
-                                            <td>{{ d_item.price }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Condition</td>
-                                            <td>{{ d_item.condition }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Pickup</td>
-                                            <td>{{ d_item.pickup ? 'Available' : 'Not Available' }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Delivery</td>
-                                            <td>{{ d_item.delivery ? 'Available' : 'Not Available' }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Description</td>
-                                            <td>{{ d_item.description }}</td>
-                                        </tr>
-                                    </tbody>
-                                    </template>
-                                </v-simple-table>
-                            </v-card-text>
-                            <v-divider></v-divider>
-                            <v-card-actions>
-                                <v-spacer></v-spacer>
-                                <v-btn color="blue darken-1" text @click="itemDialog = false">Close</v-btn>
-                            </v-card-actions>
-                        </div>
-                        </v-flex>
-                    </v-layout>
-                    <!-- </div> -->
-                </v-card>
-            </v-dialog>
+            <market-item-dialog @close-dialog="itemDialog=false" :d_item="d_item" :itemDialog="itemDialog" ></market-item-dialog>
         </v-content>
     </v-app>
 </template>
@@ -104,28 +40,56 @@
 <script>
 import axios from 'axios'
 import MarketHeader from '../components/MarketHeader'
+import MarketItemDialog from '../components/MarketItemDialog'
+import MarketItemCard from '../components/MarketItemCard'
 
   export default {
 	data() {
         return {
             itemDialog:false,
             items:[],
+            sortMethod:"Latest",
+            sortOptions:["Latest", "Price: High to Low", "Price: Low to High"],
             d_item:null,
         }
 	},
 	components:{
         MarketHeader,
+        MarketItemDialog,
+        MarketItemCard
 	},
 	watch: {
-
+        sortMethod(val){
+            if(val == "Latest"){
+                this.items.sort(function(a,b){
+                    return b.updated - a.updated;
+                });
+            }
+            else if(val == "Price: High to Low"){
+                this.items.sort(function(a,b){
+                    return b.price - a.price;
+                });
+            }
+            else if(val == "Price: Low to High"){
+                this.items.sort(function(a,b){
+                    return a.price - b.price;
+                });
+            }
+        },
 	},
 	computed:{
-        category: function(){
+        category(){
             let url = window.location.pathname.split('/');
             return url[url.length - 2];
         },
 	},
 	methods: {
+        categorymap(category){
+            if(category=="schoolsupplies")
+                return "School Supplies"
+            else
+                return this.capitalizeFirstLetter(category);
+        },
         shortenString(str){
             if(str.length >= 16){
                 return str.substr(0, 16) + "...";
@@ -146,9 +110,19 @@ import MarketHeader from '../components/MarketHeader'
                 this.items = response.data.items;
             });
         },
+        getSearchResult(query){
+            axios.get('/market/api/item_search_result/',{params: {"query":query, "category":this.category}}).then(response => {
+                this.items = response.data.items;
+            });
+        }
 	},
 	mounted(){
-        this.getCategoryItems();
+        let url = new URL(window.location.href);
+        let query = url.searchParams.get("q");
+        if(query != null)
+            this.getSearchResult(query);
+        else
+            this.getCategoryItems();
 	},
   };
 </script>

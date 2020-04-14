@@ -7,3 +7,8 @@ class ItemForm(forms.ModelForm):
     class Meta:
         model = Item
         fields = ('name', 'price', 'description', 'category', 'image', 'pickup','condition','delivery', 'user')
+
+class ItemEditForm(forms.ModelForm):
+    class Meta:
+        model = Item
+        fields = ('name', 'price', 'description', 'category', 'image', 'pickup','condition','delivery', 'id')
