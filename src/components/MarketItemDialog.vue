@@ -21,7 +21,7 @@
                             <tbody>
                                 <tr>
                                     <td>Price</td>
-                                    <td style="font-size:18px !important; color:red !important;" class="cus-td">${{ d_item.price }}</td>
+                                    <td style="font-size:17px !important; color:black !important;" class="cus-td">${{ d_item.price }}</td>
                                 </tr>
                                 <tr>
                                     <td>Condition</td>
@@ -68,7 +68,7 @@
                     <v-card-actions>
                         <v-spacer></v-spacer>
                         <v-btn color="red darken-1" v-if="edit" outlined @click="openDeleteDialog">Delete</v-btn>
-                        <v-btn color="yellow darken-1" v-if="edit" outlined @click="openSoldDialog">Sold</v-btn>
+                        <v-btn color="green darken-1" v-if="edit" outlined @click="openSoldDialog">Sold</v-btn>
                         <v-btn color="green darken-1" v-if="edit" outlined @click="openEditDialog">Edit</v-btn>
                         <v-btn color="blue darken-1" outlined @click="closeDialog">Close</v-btn>
                     </v-card-actions>

@@ -1,6 +1,7 @@
 <template>
     <v-app>
-        <market-header></market-header>
+        <market-header
+            @update-items="getMyItems"></market-header>
         <v-content>
             <v-container fluid grid-list-lg>
                 <v-row mb-3 mr-3>
@@ -9,16 +10,16 @@
                             <span class="cus-headline-text">My Items</span>
                         </div>
                     </v-col>
-                    <v-spacer></v-spacer>
+                    <!-- <v-spacer></v-spacer>
                     <v-col>
                         <v-btn style="float: right;" color="teal lighten-1" @click="openCreateItemDialog()" outlined d-flex>Sell an Item</v-btn>
-                    </v-col>
+                    </v-col> -->
                 </v-row>
                 <v-row dense>
                     <v-col
                     v-for="(item, i) in items"
                     :key="i"
-                    xs="12"
+                    cols="12"
                     sm="6"
                     md="4"
                     lg="4"
@@ -28,80 +29,6 @@
                     </v-col>
                 </v-row>
             </v-container>
-            <v-dialog v-model="createItemDialog" scrollable min-width="350px" max-width="600px">
-                <v-card>
-                    <v-card-title>Sell an Item</v-card-title>
-                    <v-divider></v-divider>
-                    <v-card-text style="height: 600px;">
-                        <v-form
-                            ref="create_form"
-                            v-model="create_item_form_valid">
-                            <v-text-field
-                            v-model="item.name"
-                            :counter="25"
-                            :rules="nameRules"
-                            label="Name"
-                            required
-                            ></v-text-field>
-
-                            <v-text-field
-                                v-model="item.price"
-                                label="Price (Dollars)"
-                                :rules="[v => (v!=undefined && v >= 0) || 'Price is required']"
-                                required
-                                type="number"
-                            />
-
-                            <v-select
-                            v-model="item.condition"
-                            :items="conditions"
-                            :rules="[v => !!v || 'Condition is required']"
-                            label="Condition"
-                            required
-                            ></v-select>
-
-                            <v-select
-                            v-model="item.category"
-                            :items="categories"
-                            :rules="[v => !!v || 'Category is required']"
-                            label="Category"
-                            required
-                            ></v-select>
-
-                            <v-file-input 
-                            v-model="item.image"
-                            accept="image/*"
-                            label="Image"></v-file-input>
-
-                            <v-checkbox
-                            v-model="item.pickup"
-                            label="Pickup"
-                            ></v-checkbox>
-
-                            <v-checkbox
-                            v-model="item.delivery"
-                            label="Delivery"
-                            ></v-checkbox>
-
-                            <v-textarea
-                                v-model="item.description"
-                                label="Description"
-                                outlined
-                                :rules="descriptionRules"
-                                required
-                                rows="3"
-                                row-height="20"
-                            ></v-textarea>
-                        </v-form>
-                    </v-card-text>
-                    <v-divider></v-divider>
-                    <v-card-actions>
-                        <v-spacer></v-spacer>
-                        <v-btn color="green darken-1" :loading="createItemBtnLoading" outlined @click.prevent="createItem(item)">Create</v-btn>   
-                        <v-btn color="blue darken-1" outlined @click="createItemDialog = false">Close</v-btn> 
-                    </v-card-actions>
-                </v-card>
-            </v-dialog>
             <v-dialog v-model="editItemDialog" v-if="edit_item" scrollable min-width="350px" max-width="600px">
                 <v-card>
                     <v-card-title>Edit Your Item</v-card-title>
@@ -230,14 +157,11 @@ axios.defaults.xsrfCookieName = "csrftoken";
 	data() {
         return {
             edit_item_form_valid:true,
-            create_item_form_valid:true,
 
-            createItemBtnLoading:false,
             editItemBtnLoading:false,
             deleteItemBtnLoading:false,
             soldItemBtnLoading:false,
 
-            createItemDialog:false,
             editItemDialog:false,
             soldItemDialog:false,
             deleteItemDialog:false,
@@ -248,65 +172,6 @@ axios.defaults.xsrfCookieName = "csrftoken";
             delete_item:null,
             edit_item:null,
             edit_item_image:null,
-
-            conditions:[
-                {   
-                    'value':'new',
-                    'text':'New'
-                },
-                {   
-                    'value':'slightlyused',
-                    'text':'Slightly Used'
-                },
-                {   
-                    'value':'used',
-                    'text':'Used'
-                },
-                {   
-                    'value':'dysfunctional',
-                    'text':'Dysfunctional'
-                },
-            ],
-            categories:[
-                {   
-                    'value':'electronics',
-                    'text':'Electronics'
-                },
-                {   
-                    'value':'textbooks',
-                    'text':'Textbooks'
-                },
-                {   
-                    'value':'schoolsupplies',
-                    'text':'School supplies'
-                },
-                {   
-                    'value':'pets',
-                    'text':'Pets'
-                },
-                {   
-                    'value':'clothing',
-                    'text':'Clothing'
-                },
-                {   
-                    'value':'housing',
-                    'text':'Housing'
-                },
-                {   
-                    'value':'miscellaneous',
-                    'text':'Miscellaneous'
-                },
-            ],
-            item:{
-                name:"",
-                price:0,
-                condition:'new',
-                category:'miscellaneous',
-                pickup:false,
-                delivery:false,
-                description:"",
-                image:null,
-            },
             nameRules: [
                 v => !!v || 'Name is required',
                 v => (v && v.length <= 25) || 'Name must be less than 25 characters',
@@ -334,9 +199,6 @@ axios.defaults.xsrfCookieName = "csrftoken";
             axios.get('/market/api/get_my_items/',{params: {}}).then(response => {
                 this.items = response.data.items;
             });
-        },
-        openCreateItemDialog(){
-            this.createItemDialog = true;
         },
         openSoldItemDialog(item){
             this.sold_item = item;
@@ -444,51 +306,6 @@ axios.defaults.xsrfCookieName = "csrftoken";
                     this.edit_item = null;
                     this.edit_item_image = null;
                     // this.$refs.edit_form.resetValidation();
-                }else{
-                    this.$message({
-                        message: 'Sth is wrong',
-                        type: 'error'
-                    });
-                }
-            });
-        },
-        createItem(item){
-            this.$refs.create_form.validate();
-            if(!this.create_item_form_valid)
-                return;
-            this.createItemBtnLoading = true;
-            let formData = new FormData();
-            formData.append('image',item.image);
-            for(var key in item){
-                if(key != "image"){
-                    formData.append(key, item[key]);
-                }
-            }
-            axios.post('/market/api/create_item/',formData,
-            {
-                headers:{
-                    'Content-Type': 'multipart/form-data',
-                }
-            }).then(response => {
-                if(response.data.success){
-                    this.$message({
-                        message: 'Item Posted',
-                        type: 'success'
-                    });
-                    this.createItemBtnLoading = false;
-                    this.getMyItems();
-                    this.createItemDialog = false;
-                    this.item = {
-                        name:"",
-                        price:0,
-                        condition:'new',
-                        category:'miscellaneous',
-                        pickup:false,
-                        delivery:false,
-                        description:"",
-                        image:null,
-                    };
-                    this.$refs.create_form.resetValidation();
                 }else{
                     this.$message({
                         message: 'Sth is wrong',

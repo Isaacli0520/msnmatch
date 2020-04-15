@@ -2,6 +2,7 @@
     <div>
         <v-navigation-drawer
             light
+            color="white"
             app
             v-model="drawer"
             :clipped="$vuetify.breakpoint.mdAndUp"
@@ -18,6 +19,14 @@
                     </v-list-item-avatar>
                     <v-list-item-content>
                         <v-list-item-title class="font-weight-bold">{{ item.title }}</v-list-item-title>
+                    </v-list-item-content>
+                </v-list-item>
+                <v-list-item @click="createItemDialog=true;">
+                    <v-list-item-avatar>
+                        <v-icon>fas fa-dollar-sign</v-icon>
+                    </v-list-item-avatar>
+                    <v-list-item-content>
+                        <v-list-item-title class="font-weight-bold">Sell an Item</v-list-item-title>
                     </v-list-item-content>
                 </v-list-item>
             </v-list>
@@ -52,13 +61,17 @@
                 <v-btn 
                     :href="urls.market_url"
                     text>Market</v-btn>
+                <!-- <v-divider inset vertical></v-divider>
+                <v-btn 
+                    :href="urls.market_url"
+                    text>Sell</v-btn> -->
             </v-toolbar-items>
             <v-text-field
                 label="Search Item"
                 v-model="query"
                 v-on:keyup.enter="searchItem(query)"
-                color="grey darken-2"
-                background-color="white"
+                color="grey lighten-5"
+                background-color="blue-grey lighten-5"
                 clearable
                 light
                 solo-inverted
@@ -118,11 +131,103 @@
                 </v-list>
             </v-menu>
         </v-app-bar>
+        <v-snackbar
+            top
+            v-model="success_snack"
+            color="teal lighten-1"
+            :timeout="1800">
+            Item Posted
+        <v-btn color="cyan accent-1" text @click="success_snack = false"> Close </v-btn>
+        </v-snackbar>
+        <v-snackbar
+            top
+            v-model="failure_snack"
+            color="red darken-1"
+            :timeout="1800">
+            Sth is wrong
+            <v-btn color="blue" text @click="failure_snack = false"> Close </v-btn>
+        </v-snackbar>
+        <v-dialog v-model="createItemDialog" scrollable min-width="350px" max-width="600px">
+            <v-card>
+                <v-card-title>Sell an Item</v-card-title>
+                <v-divider></v-divider>
+                <v-card-text style="height: 600px;">
+                    <v-form
+                        ref="create_form"
+                        v-model="create_item_form_valid">
+                        <v-text-field
+                        v-model="item.name"
+                        :counter="25"
+                        :rules="nameRules"
+                        label="Name"
+                        required
+                        ></v-text-field>
+
+                        <v-text-field
+                            v-model="item.price"
+                            label="Price (Dollars)"
+                            :rules="[v => (v!=undefined && v >= 0) || 'Price is required']"
+                            required
+                            type="number"
+                        />
+
+                        <v-select
+                        v-model="item.condition"
+                        :items="conditions"
+                        :rules="[v => !!v || 'Condition is required']"
+                        label="Condition"
+                        required
+                        ></v-select>
+
+                        <v-select
+                        v-model="item.category"
+                        :items="categories"
+                        :rules="[v => !!v || 'Category is required']"
+                        label="Category"
+                        required
+                        ></v-select>
+
+                        <v-file-input 
+                        v-model="item.image"
+                        accept="image/*"
+                        label="Image"></v-file-input>
+
+                        <v-checkbox
+                        v-model="item.pickup"
+                        label="Pickup"
+                        ></v-checkbox>
+
+                        <v-checkbox
+                        v-model="item.delivery"
+                        label="Delivery"
+                        ></v-checkbox>
+
+                        <v-textarea
+                            v-model="item.description"
+                            label="Description"
+                            outlined
+                            :rules="descriptionRules"
+                            required
+                            rows="3"
+                            row-height="20"
+                        ></v-textarea>
+                    </v-form>
+                </v-card-text>
+                <v-divider></v-divider>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="green darken-1" :loading="createItemBtnLoading" outlined @click.prevent="createItem(item)">Create</v-btn>   
+                    <v-btn color="blue darken-1" outlined @click="createItemDialog = false">Close</v-btn> 
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
     </div>
 </template>
 
 <script>
 import axios from 'axios'
+axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
+axios.defaults.xsrfCookieName = "csrftoken";
 
 export default{
     props: {
@@ -137,13 +242,84 @@ export default{
     },
     data: function () {
         return {
+            create_item_form_valid:true,
+            createItemBtnLoading:false,
+            createItemDialog:false,
             query:"",
+            success_snack:false,
+            failure_snack:false,
             navDrawer:false,
             drawer: null,
-            credential:"",
-            plannableURL:"",
-            username:"",
-            taking_courses:[],
+            item:{
+                name:"",
+                price:0,
+                condition:'new',
+                category:'miscellaneous',
+                pickup:false,
+                delivery:false,
+                description:"",
+                image:null,
+            },
+            nameRules: [
+                v => !!v || 'Name is required',
+                v => (v && v.length <= 25) || 'Name must be less than 25 characters',
+            ],
+            descriptionRules: [
+                v => !!v || 'Desctiption is required',
+                v => (v && v.length <= 350) || 'Desctiption must be less than 350 characters',
+            ],
+            conditions:[
+                {   
+                    'value':'new',
+                    'text':'New'
+                },
+                {   
+                    'value':'slightlyused',
+                    'text':'Slightly Used'
+                },
+                {   
+                    'value':'used',
+                    'text':'Used'
+                },
+                {   
+                    'value':'dysfunctional',
+                    'text':'Dysfunctional'
+                },
+            ],
+            categories:[
+                {   
+                    'value':'electronics',
+                    'text':'Electronics'
+                },
+                {   
+                    'value':'textbooks',
+                    'text':'Textbooks'
+                },
+                {   
+                    'value':'rentals',
+                    'text':'Rentals'
+                },
+                {   
+                    'value':'schoolsupplies',
+                    'text':'School supplies'
+                },
+                {   
+                    'value':'clothing',
+                    'text':'Clothing'
+                },
+                {   
+                    'value':'housing',
+                    'text':'Housing'
+                },
+                {   
+                    'value':'pets',
+                    'text':'Pet Supplies'
+                },
+                {   
+                    'value':'miscellaneous',
+                    'text':'Miscellaneous'
+                },
+            ],
             navBarItems:[
                 {
                     text:"HoosMyProfessor",
@@ -205,13 +381,19 @@ export default{
                     "target":"",
                 },
                 {
+                    "title":"Rentals",
+                    "icon":"fas fa-house-user",
+                    "href":"/market/?c=rentals",
+                    "target":"",
+                },
+                {
                     "title":"School Supplies",
                     "icon":"fas fa-school",
                     "href":"/market/?c=schoolsupplies",
                     "target":"",
                 },
                 {
-                    "title":"Pets",
+                    "title":"Pet Supplies",
                     "icon":"fas fa-cat",
                     "href":"/market/?c=pets",
                     "target":"",
@@ -248,6 +430,53 @@ export default{
     computed:{
     },
     methods:{
+        createItem(item){
+            this.$refs.create_form.validate();
+            if(!this.create_item_form_valid)
+                return;
+            this.createItemBtnLoading = true;
+            let formData = new FormData();
+            formData.append('image',item.image);
+            for(var key in item){
+                if(key != "image"){
+                    formData.append(key, item[key]);
+                }
+            }
+            axios.post('/market/api/create_item/',formData,
+            {
+                headers:{
+                    'Content-Type': 'multipart/form-data',
+                }
+            }).then(response => {
+                if(response.data.success){
+                    // this.$message({
+                    //     message: 'Item Posted',
+                    //     type: 'success'
+                    // });
+                    this.success_snack = true;
+                    this.createItemBtnLoading = false;
+                    this.$emit('update-items');
+                    this.createItemDialog = false;
+                    this.item = {
+                        name:"",
+                        price:0,
+                        condition:'new',
+                        category:'miscellaneous',
+                        pickup:false,
+                        delivery:false,
+                        description:"",
+                        image:null,
+                    };
+                    this.$refs.create_form.resetValidation();
+                }else{
+                    this.failure_snack=true;
+                    // this.$message({
+                    //     message: 'Sth is wrong',
+                    //     type: 'error'
+                    // });
+                }
+            });
+        },
         searchItem(query){
             let tmp_url = window.location.pathname.substr(0,window.location.pathname.lastIndexOf('/'));
             if(tmp_url == "/market/items")
@@ -313,7 +542,9 @@ export default{
 
 
 <style lang="css">
-
+    .theme--light.v-app-bar.v-toolbar.v-sheet{
+        background-color: white !important;
+    }
     .theme--light.v-text-field--solo-inverted.v-text-field--solo.v-input--is-focused > .v-input__control > .v-input__slot .v-label, .theme--light.v-text-field--solo-inverted.v-text-field--solo.v-input--is-focused > .v-input__control > .v-input__slot input {
         color: #000000 !important;
     }

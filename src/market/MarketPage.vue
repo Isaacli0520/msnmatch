@@ -1,6 +1,7 @@
 <template>
     <v-app>
-        <market-header></market-header>
+        <market-header
+            @update-items="getSearchResult(query, category)"></market-header>
         <v-content>
             <v-container fluid grid-list-lg>
                 <v-row mb-3 mr-3>
@@ -79,6 +80,14 @@ import MarketItemCard from '../components/MarketItemCard'
         },
 	},
 	computed:{
+        query(){
+            let url = new URL(window.location.href);
+            return url.searchParams.get("q");
+        },
+        category(){
+            let url = new URL(window.location.href);
+            return url.searchParams.get("c");
+        }
 	},
 	methods: {
         openItemDialog(item){
@@ -97,10 +106,7 @@ import MarketItemCard from '../components/MarketItemCard'
         }
 	},
 	mounted(){
-        let url = new URL(window.location.href);
-        let query = url.searchParams.get("q");
-        let category = url.searchParams.get("c");
-        this.getSearchResult(query, category);
+        this.getSearchResult(this.query, this.category);
         
 	},
   };
