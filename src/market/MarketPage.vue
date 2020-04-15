@@ -1,9 +1,24 @@
 <template>
     <v-app>
         <market-header
+            @accept-disclaimer="getSearchResult(query,category)"
             @update-items="getSearchResult(query, category)"></market-header>
         <v-content>
-            <v-container fluid grid-list-lg>
+            <v-container v-if="!loaded" fluid fill-height>
+                <v-layout 
+                    align-center
+                    justify-center>
+                    <div>
+                        <v-progress-circular
+                        :size="60"
+                        :width="6"
+                        indeterminate
+                        color="teal lighten-1">
+                        </v-progress-circular>
+                    </div>
+                </v-layout>
+            </v-container>
+            <v-container v-if="loaded" fluid grid-list-lg>
                 <v-row mb-3 mr-3>
                     <v-col> 
                         <div class="cus-headline-text">Market</div>
@@ -48,6 +63,7 @@ import MarketItemCard from '../components/MarketItemCard'
   export default {
 	data() {
         return {
+            loaded:false,
             itemDialog:false,
             items:[],
             sortMethod:"Latest",
@@ -97,17 +113,17 @@ import MarketItemCard from '../components/MarketItemCard'
         getAllItems(){
             axios.get('/market/api/get_all_items/',{params: {}}).then(response => {
                 this.items = response.data.items;
+                this.loaded = true;
             });
         },
         getSearchResult(query, category){
             axios.get('/market/api/item_search_result/',{params: {"query":query, "category":category}}).then(response => {
                 this.items = response.data.items;
+                this.loaded = true;
             });
         }
 	},
 	mounted(){
-        this.getSearchResult(this.query, this.category);
-        
 	},
   };
 </script>

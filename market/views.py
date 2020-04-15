@@ -26,6 +26,18 @@ def market_item(request, item_pk):
 def my_items(request):
     return render(request, 'market_my_items.html')
 
+@login_required
+def get_item(request):
+    item = Item.objects.filter(pk=request.GET.get('item_pk')).first()
+    if not item:
+        return JsonResponse({
+            "success":False,
+        })
+    else:
+        return JsonResponse({
+            "item":item_json(item),
+            "success":True,
+        })
 
 @login_required
 def get_category_items(request):
@@ -39,20 +51,19 @@ def get_all_items(request):
     sorted_items = sorted(Item.objects.filter(sold=False), key=lambda c:c.updated, reverse=True)
     return JsonResponse({
         "items":[item_json(item) for item in sorted_items]
-    }, encoder=CustomEncoder)
+    })
 
 @login_required
 def get_my_items(request):
     sorted_items = sorted(Item.objects.filter(user=request.user, sold=False), key=lambda c:c.updated, reverse=True)
     sold_sorted_items = sorted(Item.objects.filter(user=request.user, sold=True), key=lambda c:c.updated, reverse=True)
-    items = []
-    for item in sorted_items:
-        items.append(item_json(item))
-    for item in sold_sorted_items:
-        items.append(item_json(item))
     return JsonResponse({
-        "items":items
-    }, encoder=CustomEncoder)
+        "items":[item_json(item) for item in sorted_items],
+        "sold_items":[item_json(item) for item in sold_sorted_items]
+    })
+    # return JsonResponse({
+    #     "items":items
+    # }, encoder=CustomEncoder)
 
 
 @login_required
@@ -81,7 +92,7 @@ def item_search_result(request):
 
     return JsonResponse({
         "items": retrieved_items,
-    }, encoder=CustomEncoder)
+    })
 
 @login_required
 def create_item(request):

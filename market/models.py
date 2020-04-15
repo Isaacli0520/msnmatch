@@ -20,7 +20,7 @@ category_choices = [
 	('pets', 'Pets'),
 	('clothing', 'Clothing'),
 	('housing', 'Housing'),
-    ('rentals', 'Rentals'),
+    ('furniture', 'Furniture'),
 	('miscellaneous', 'Miscellaneous')
 ]
 

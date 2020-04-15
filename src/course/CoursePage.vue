@@ -6,7 +6,7 @@
             <v-layout 
                 align-center
                 justify-center>
-                <div class="text-center">
+                <div>
                     <v-progress-circular
                     :size="60"
                     :width="6"

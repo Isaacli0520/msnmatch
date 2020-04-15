@@ -1,9 +1,24 @@
 <template>
     <v-app>
         <market-header
+            @accept-disclaimer="getMyItems"
             @update-items="getMyItems"></market-header>
         <v-content>
-            <v-container fluid grid-list-lg>
+            <v-container v-if="!loaded" fluid fill-height>
+                <v-layout 
+                    align-center
+                    justify-center>
+                    <div>
+                        <v-progress-circular
+                        :size="60"
+                        :width="6"
+                        indeterminate
+                        color="teal lighten-1">
+                        </v-progress-circular>
+                    </div>
+                </v-layout>
+            </v-container>
+            <v-container v-if="loaded" fluid grid-list-lg>
                 <v-row mb-3 mr-3>
                     <v-col> 
                         <div>
@@ -14,6 +29,13 @@
                     <v-col>
                         <v-btn style="float: right;" color="teal lighten-1" @click="openCreateItemDialog()" outlined d-flex>Sell an Item</v-btn>
                     </v-col> -->
+                </v-row>
+                <v-row v-if="items.length == 0" mb-3 mr-3>
+                    <v-col> 
+                        <div>
+                            <span class="cus-headline-text">Go ahead and click "Sell an Item" on the left to sell sth~</span>
+                        </div>
+                    </v-col>
                 </v-row>
                 <v-row dense>
                     <v-col
@@ -28,6 +50,28 @@
                     <market-item-card @open-item-dialog="openItemDialog(item)" :item="item"></market-item-card>
                     </v-col>
                 </v-row>
+                <template v-if="sold_items.length > 0">
+                <v-row mb-3 mr-3>
+                    <v-col> 
+                        <div>
+                            <span class="cus-headline-text">Sold Items</span>
+                        </div>
+                    </v-col>
+                </v-row>
+                <v-row dense>
+                    <v-col
+                    v-for="(item, i) in sold_items"
+                    :key="i"
+                    cols="12"
+                    sm="6"
+                    md="4"
+                    lg="4"
+                    xl="3"
+                    >
+                    <market-item-card @open-item-dialog="openItemDialog(item)" :item="item"></market-item-card>
+                    </v-col>
+                </v-row>
+                </template>
             </v-container>
             <v-dialog v-model="editItemDialog" v-if="edit_item" scrollable min-width="350px" max-width="600px">
                 <v-card>
@@ -142,6 +186,38 @@
                 @open-sold-dialog="openSoldItemDialog"
                 @close-dialog="itemDialog=false"></market-item-dialog>
         </v-content>
+                <v-snackbar
+            top
+            v-model="delete_snack"
+            color="teal darken-1"
+            :timeout="3200">
+            Item Deleted
+        <v-btn color="cyan accent-1" text @click="delete_snack = false"> Close </v-btn>
+        </v-snackbar>
+        <v-snackbar
+            top
+            v-model="edit_snack"
+            color="teal darken-1"
+            :timeout="3200">
+            Item Edited
+        <v-btn color="cyan accent-1" text @click="edit_snack = false"> Close </v-btn>
+        </v-snackbar>
+        <v-snackbar
+            top
+            v-model="sold_snack"
+            color="teal darken-1"   
+            :timeout="3200">
+            Item Sold
+        <v-btn color="cyan accent-1" text @click="sold_snack = false"> Close </v-btn>
+        </v-snackbar>
+        <v-snackbar
+            top
+            v-model="failure_snack"
+            color="red darken-1"
+            :timeout="3200">
+            Sth is wrong
+        <v-btn color="blue" text @click="failure_snack = false"> Close </v-btn>
+        </v-snackbar>
     </v-app>
 </template>
 
@@ -156,6 +232,12 @@ axios.defaults.xsrfCookieName = "csrftoken";
   export default {
 	data() {
         return {
+            sold_snack:false,
+            edit_snack:false,
+            delete_snack:false,
+            failure_snack:false,
+
+            loaded:false,
             edit_item_form_valid:true,
 
             editItemBtnLoading:false,
@@ -172,6 +254,58 @@ axios.defaults.xsrfCookieName = "csrftoken";
             delete_item:null,
             edit_item:null,
             edit_item_image:null,
+            conditions:[
+                {   
+                    'value':'new',
+                    'text':'New'
+                },
+                {   
+                    'value':'slightlyused',
+                    'text':'Slightly Used'
+                },
+                {   
+                    'value':'used',
+                    'text':'Used'
+                },
+                {   
+                    'value':'dysfunctional',
+                    'text':'Dysfunctional'
+                },
+            ],
+            categories:[
+                {   
+                    'value':'electronics',
+                    'text':'Electronics'
+                },
+                {   
+                    'value':'textbooks',
+                    'text':'Textbooks'
+                },
+                {   
+                    'value':'furniture',
+                    'text':'Furniture'
+                },
+                {   
+                    'value':'schoolsupplies',
+                    'text':'School supplies'
+                },
+                {   
+                    'value':'clothing',
+                    'text':'Clothing'
+                },
+                {   
+                    'value':'housing',
+                    'text':'Housing'
+                },
+                {   
+                    'value':'pets',
+                    'text':'Pet Supplies'
+                },
+                {   
+                    'value':'miscellaneous',
+                    'text':'Miscellaneous'
+                },
+            ],
             nameRules: [
                 v => !!v || 'Name is required',
                 v => (v && v.length <= 25) || 'Name must be less than 25 characters',
@@ -181,6 +315,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
                 v => (v && v.length <= 350) || 'Desctiption must be less than 350 characters',
             ],
             items:[],
+            sold_items:[],
         }
 	},
 	components:{
@@ -198,6 +333,8 @@ axios.defaults.xsrfCookieName = "csrftoken";
         getMyItems(){
             axios.get('/market/api/get_my_items/',{params: {}}).then(response => {
                 this.items = response.data.items;
+                this.sold_items = response.data.sold_items;
+                this.loaded = true;
             });
         },
         openSoldItemDialog(item){
@@ -230,19 +367,13 @@ axios.defaults.xsrfCookieName = "csrftoken";
                 }
             }).then(response => {
                 if(response.data.success){
-                    this.$message({
-                        message: 'Item Sold',
-                        type: 'success'
-                    });
+                    this.sold_snack = true;
                     this.soldItemBtnLoading = false;
                     this.getMyItems();
                     this.soldItemDialog = false;
                     this.sold_item = null;
                 }else{
-                    this.$message({
-                        message: 'Sth is wrong',
-                        type: 'error'
-                    });
+                    this.failure_snack = true;
                 }
             });
         },
@@ -261,19 +392,13 @@ axios.defaults.xsrfCookieName = "csrftoken";
                 }
             }).then(response => {
                 if(response.data.success){
-                    this.$message({
-                        message: 'Item Deleted',
-                        type: 'success'
-                    });
+                    this.delete_snack = true;
                     this.deleteItemBtnLoading = false;
                     this.getMyItems();
                     this.deleteItemDialog = false;
                     this.delete_item = null;
                 }else{
-                    this.$message({
-                        message: 'Sth is wrong',
-                        type: 'error'
-                    });
+                    this.failure_snack = true;
                 }
             });
         },
@@ -296,10 +421,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
                 }
             }).then(response => {
                 if(response.data.success){
-                    this.$message({
-                        message: 'Item Updated',
-                        type: 'success'
-                    });
+                    this.edit_snack = true;
                     this.editItemBtnLoading = false;
                     this.getMyItems();
                     this.editItemDialog = false;
@@ -307,16 +429,12 @@ axios.defaults.xsrfCookieName = "csrftoken";
                     this.edit_item_image = null;
                     // this.$refs.edit_form.resetValidation();
                 }else{
-                    this.$message({
-                        message: 'Sth is wrong',
-                        type: 'error'
-                    });
+                    this.failure_snack = true;
                 }
             });
         },
 	},
 	mounted(){
-        this.getMyItems();
 	},
   };
 </script>

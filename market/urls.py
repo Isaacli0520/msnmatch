@@ -6,8 +6,9 @@ app_name = "comments"
 urlpatterns = [
     path('',views.market, name='market'),
     path('items/',views.my_items, name='my_items'),
-    # path('item/<int:item_pk>/',views.market_item, name='market_item'),
+    path('item/<int:item_pk>/',views.market_item, name='market_item'),
 
+    path('api/get_item/', views.get_item, name="get_item"),
     path('api/create_item/', views.create_item, name="create_item"),
     path('api/delete_item/', views.delete_item, name="delete_item"),
     path('api/sell_item/', views.sell_item, name="sell_item"),

@@ -81,7 +81,7 @@
                 hide-selected
                 hide-details
             ></v-text-field>
-            <v-spacer v-if="!searchBool"></v-spacer>
+            <v-spacer></v-spacer>
             <v-menu offset-y
                 class="mx-auto"
                 min-width="170">
@@ -134,8 +134,8 @@
         <v-snackbar
             top
             v-model="success_snack"
-            color="teal lighten-1"
-            :timeout="1800">
+            color="teal darken-1"
+            :timeout="3200">
             Item Posted
         <v-btn color="cyan accent-1" text @click="success_snack = false"> Close </v-btn>
         </v-snackbar>
@@ -143,10 +143,25 @@
             top
             v-model="failure_snack"
             color="red darken-1"
-            :timeout="1800">
+            :timeout="3200">
             Sth is wrong
             <v-btn color="blue" text @click="failure_snack = false"> Close </v-btn>
         </v-snackbar>
+        <v-dialog v-model="disclaimerDialog" persistent scrollable min-width="150px" max-width="450px">
+            <v-card>
+                <v-card-title>Disclaimer</v-card-title>
+                <v-divider></v-divider>
+                <v-card-text style="margin-top:10px;white-space:pre-wrap;">
+                    {{disclaimerText}}
+                </v-card-text>
+                <v-divider></v-divider>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="green darken-1" text @click="goToHref('/')">Disagree</v-btn>
+          <v-btn color="green darken-1" text @click="agreeDisclaimer">Agree</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
         <v-dialog v-model="createItemDialog" scrollable min-width="350px" max-width="600px">
             <v-card>
                 <v-card-title>Sell an Item</v-card-title>
@@ -231,17 +246,27 @@ axios.defaults.xsrfCookieName = "csrftoken";
 
 export default{
     props: {
-        searchBool:{
-            type:Boolean,
-            default:false,
-        },
-        headerUpdate:{
-            type:Boolean,
-            default:false,
-        },
     },
     data: function () {
         return {
+            disclaimerDialog:false,
+            disclaimerVersion:0.1,
+            disclaimerText:
+            `1. MSN Market提供二手物品信息发布平台，我们会尽量排除不良卖家，但无法对信息的真实性逐一验证，购买二手物品请仔细辨别。
+2. 交易双方自行承担交易风险和因此产生的经济损失，MSN不为交易产品信息的可靠性、准确性和产品质量承担任何责任。
+3. 疫情期间，建议尽量减少接触。
+
+发帖须知
+1. 请在售卖物品时填写对应的类别，新旧程度，物品详细描述，实物照片，价格，卖家联系方式
+2. 标题规则：需注明 物品+数量，例：玻璃花瓶2个
+3. 物品售出后，请将物品状态设置为Sold
+
+严禁以下行为（违规将被删除及警告）
+1. 禁止出售违禁品
+2. 禁止出售高于原价的产品
+3. 禁止非交易类帖子
+4. 禁止多次重复发布内容相同的帖子
+5. 禁止出售假货`,
             create_item_form_valid:true,
             createItemBtnLoading:false,
             createItemDialog:false,
@@ -296,8 +321,8 @@ export default{
                     'text':'Textbooks'
                 },
                 {   
-                    'value':'rentals',
-                    'text':'Rentals'
+                    'value':'furniture',
+                    'text':'Furniture'
                 },
                 {   
                     'value':'schoolsupplies',
@@ -381,9 +406,9 @@ export default{
                     "target":"",
                 },
                 {
-                    "title":"Rentals",
+                    "title":"Furniture",
                     "icon":"fas fa-house-user",
-                    "href":"/market/?c=rentals",
+                    "href":"/market/?c=furniture",
                     "target":"",
                 },
                 {
@@ -430,6 +455,34 @@ export default{
     computed:{
     },
     methods:{
+        setCookie(name,value,days) {
+            var expires = "";
+            if (days) {
+                var date = new Date();
+                date.setTime(date.getTime() + (days*24*60*60*1000));
+                expires = "; expires=" + date.toUTCString();
+            }
+            document.cookie = name + "=" + (value || "")  + expires + "; path=/";
+        },
+        getCookie(name) {
+            var nameEQ = name + "=";
+            var ca = document.cookie.split(';');
+            for(var i=0;i < ca.length;i++) {
+                var c = ca[i];
+                while (c.charAt(0)==' ') c = c.substring(1,c.length);
+                if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+            }
+            return null;
+        },
+        eraseCookie(name) {   
+            document.cookie = name+'=; Max-Age=-99999999;';  
+        },
+        agreeDisclaimer(){
+            this.eraseCookie('msn-market-disclaimer');
+            this.setCookie('msn-market-disclaimer', this.disclaimerVersion, 365);
+            this.disclaimerDialog = false;
+            this.$emit("accept-disclaimer");
+        },
         createItem(item){
             this.$refs.create_form.validate();
             if(!this.create_item_form_valid)
@@ -449,10 +502,6 @@ export default{
                 }
             }).then(response => {
                 if(response.data.success){
-                    // this.$message({
-                    //     message: 'Item Posted',
-                    //     type: 'success'
-                    // });
                     this.success_snack = true;
                     this.createItemBtnLoading = false;
                     this.$emit('update-items');
@@ -470,20 +519,24 @@ export default{
                     this.$refs.create_form.resetValidation();
                 }else{
                     this.failure_snack=true;
-                    // this.$message({
-                    //     message: 'Sth is wrong',
-                    //     type: 'error'
-                    // });
                 }
             });
         },
+        escapeString(unsafe) {
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        },
         searchItem(query){
-            let tmp_url = window.location.pathname.substr(0,window.location.pathname.lastIndexOf('/'));
-            if(tmp_url == "/market/items")
-                this.goToHref('/market/' + '?q=' + query);
+            // let tmp_url = window.location.pathname.substr(0,window.location.pathname.lastIndexOf('/'));
+            if(window.location.pathname.startsWith("/market/item"))
+                this.goToHref('/market/' + '?q=' + this.escapeString(query));
             else{
                 let url = new URL(window.location.href);
-                url.searchParams.set('q', query);
+                url.searchParams.set('q', this.escapeString(query));
                 this.goToHref(url);
             }
         },
@@ -536,6 +589,14 @@ export default{
     },
     mounted(){
         this.get_basic_info();
+        let tmp_cookie = this.getCookie('msn-market-disclaimer');
+        // console.log("Cookie", tmp_cookie);
+        if(!tmp_cookie || tmp_cookie != this.disclaimerVersion){
+            this.disclaimerDialog = true;
+        }else{
+            this.$emit("accept-disclaimer");
+        }
+
     },
 }
 </script>

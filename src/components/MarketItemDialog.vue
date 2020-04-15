@@ -13,7 +13,7 @@
                 <!-- xs="12" sm="12" md="4" lg="4" xl="4" -->
                 <v-col cols="12" sm="6" md="4" lg="4" xl="4">
                 <div>
-                    <v-card-title class="dialog-head-text">{{d_item.name}}</v-card-title>
+                    <v-card-title class="dialog-head-text"><a :href="'/market/item/' + d_item.id">{{d_item.name}}</a></v-card-title>
                     <v-divider></v-divider>
                     <v-card-text>
                         <div style="padding:0px 5px 8px 16px;" class="table-title">Item Details</div>
@@ -109,6 +109,7 @@ export default{
                 "housing":"Housing",
                 "pets":"Pets",
                 "miscellaneous":"Miscellaneous",
+                "furniture":"Furniture",
                 "clothing":"Clothing",
                 "textbooks":"Textbooks",
                 "schoolsupplies":"School Supplies"
@@ -196,6 +197,7 @@ export default{
 
     .dialog-head-text{
         /* font-family: "Times New Roman", Times, serif !important;  */
+        padding-left:31px;
         font-size: 28px !important;
         font-weight:700 !important;
     }

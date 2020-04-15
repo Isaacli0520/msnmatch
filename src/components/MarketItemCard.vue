@@ -12,17 +12,17 @@
         <v-divider></v-divider>
         <v-card-title>{{shortenString(item.name)}}</v-card-title>
         <v-card-subtitle class="cus-subtitle">${{item.price}}</v-card-subtitle>
-        <v-card-text v-if="item.sold">
+        <!-- <v-card-text v-if="item.sold">
             <div class="item-tags">
                 <span class="item-tag item-tag-sold">Sold</span>
-                <!-- <template v-if="!item.sold">
+                <template v-if="!item.sold">
                     <span v-if="item.condition=='New'" class="item-tag item-tag-new">New</span>
                     <span v-if="item.condition=='Slightly Used'" class="item-tag item-tag-slightly-used">Slightly Used</span>
                     <span v-if="item.pickup" class="item-tag item-tag-pickup">Pickup</span>
                     <span v-if="item.delivery" class="item-tag item-tag-delivery">Delivery</span>
-                </template> -->
+                </template>
             </div>
-        </v-card-text>
+        </v-card-text> -->
     </v-card>
 </template>
 
