@@ -33,6 +33,7 @@ GRADUATE_YEAR_CHOICES = (
 			('2021', '2021'),
 			('2022', '2022'),
 			('2023', '2023'),
+			('2024', '2024'),
 		)
 ROLE_CHOICES = (
 			('Mentee', 'Mentee'),
@@ -163,7 +164,7 @@ class Profile(models.Model):
 	bio = models.TextField(max_length=1000, blank=True)
 	location = models.CharField(max_length=30, blank=True)
 	birth_date = models.DateField(null=True, blank=True)
-	year = models.CharField(max_length=255, choices=YEAR_CHOICES)
+	# year = models.CharField(max_length=255, choices=YEAR_CHOICES)
 	graduate_year = models.CharField(max_length=255, choices =GRADUATE_YEAR_CHOICES, blank=True)
 	major = models.CharField(max_length=255, choices=MAJOR_CHOICES)
 	major_two = models.CharField(max_length=255, choices=MAJOR_CHOICES, blank=True)

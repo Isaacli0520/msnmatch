@@ -16,6 +16,7 @@ from users.models import MatchingHistory
 from .forms import UserForm, ProfileForm
 from .models import MatchRequest
 from msnmatch import settings
+from django.http import JsonResponse
 
 @login_required
 def update_profile(request, username):
@@ -37,11 +38,51 @@ def update_profile(request, username):
 	})
 
 @login_required
+def get_profile(request):
+	username = request.GET.get('username')
+	if not username:
+		return JsonResponse({
+			"success":False
+		})
+	editable = True if request.user.username == username else False
+	user = User.objects.filter(username = username).first()
+	return JsonResponse({
+		"success":True,
+		"editable":editable,
+		"user":profile_json(user),
+	})
+
+def profile_json(user):
+	if user.profile.graduate_year:
+		tmp_year = 4 + settings.CURRENT_YEAR - int(user.profile.graduate_year)
+	else:
+		tmp_year = ""
+	if user.profile.picture:
+		picture_url = user.profile.picture.url
+	else:
+		picture_url = settings.STATIC_URL + "css/images/brand.jpg"
+	return {
+		"pk": user.pk,
+		"picture": picture_url,
+		"first_name": user.first_name,
+		"last_name": user.last_name,
+		"email": user.email,
+		"bio": user.profile.bio,
+		"birth_date": user.profile.birth_date,
+		"location": user.profile.location,
+		"year": tmp_year,
+		"major": user.profile.major,
+		"sex":user.profile.sex,
+		"major_two":user.profile.major_two,
+		"minor":user.profile.minor,
+		"wechat":user.profile.wechat,
+	}
+
+@login_required
 def my_courses(request, username):
     if request.user.username != username:
         return redirect(reverse('my_courses', kwargs={"username": request.user.username, }))
     return render(request, "mycourses.html")
-
 
 @login_required
 def profile(request, username):

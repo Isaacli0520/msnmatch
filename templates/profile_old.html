@@ -1,0 +1,103 @@
+<!-- templates/profile.html -->
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+{% bootstrap_css %}
+{% load static %}
+
+{% load users_tags %}
+
+{% block title %}Profile{% endblock %}
+
+{% block css %}
+<link href="{% static 'css/userprofile.css' %}" rel="stylesheet">
+<link href="{% static 'css/tags_color.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="container mt-3 mb-5">
+  <div class="col-xs-12 col-sm-12 col-md-10 col-lg-8 col-xs-offset-0 col-sm-offset-0 toppad " style="width:100%; margin: 0 auto;">
+    <div class="card mt-3 mb-1">
+      {% if user.profile.picture %}
+        <img src="{{ user.profile.picture.url }}" class="card-img-top" >
+      {% else %}
+        <img src="{% static 'css/images/brand.jpg' %}" alt="None" class="card-img-top">
+      {% endif %}
+      <div class="skill-tags">
+          {% for skill in user_skills%}
+            <a  class="skill-tag {{skill.skill_type}}" href="{% url 'skill' skill.pk  %}">
+              <span> {{skill.skill_name}} </span>
+            </a>
+          {% endfor %}
+      </div>
+      <div class="card-body">
+        <table class="table table-user-information">
+            <tbody>
+                <tr>
+                    <td class="field-title">Name</td>
+                    <td>{{user.first_name}} {{user.last_name}}</td>
+                </tr>
+                <tr>
+                    <td class="field-title">Email</td>
+                    <td>{{user.email}}</td>
+                </tr>
+                <tr>
+                    <td class="field-title">Year</td>
+                    <td>{{user.profile.real_year}}</td>
+                </tr>
+                <tr>
+                    <td class="field-title">Major</td>
+                    <td>{{user.profile.major}}</td>
+                </tr>
+                <tr>
+                    <td class="field-title">Second Major</td>
+                    <td>{{user.profile.major_two}}</td>
+                </tr>
+                <tr>
+                    <td class="field-title">Minor</td>
+                    <td>{{user.profile.minor}}</td>
+                </tr>
+                <tr>
+                    <td class="field-title">Role</td>
+                    <td>{{user.profile.role}}</td>
+                </tr>
+                <tr>
+                  <td class="field-title">WeChat ID</td>
+                  <td>{{user.profile.wechat}}</td>
+                </tr>
+                <tr>
+                    <td class="field-title">Birth Date</td>
+                    <td>{{user.profile.birth_date}}</td>
+                </tr>
+                <tr>
+                    <td class="field-title">Gender</td>
+                    <td>{{user.profile.sex}}</td>
+                </tr>
+                <tr>
+                    <td class="field-title">Location</td>
+                    <td>{{user.profile.location}}</td>
+                </tr>
+                <tr>
+                    <td class="field-title">Bio</td>
+                    <td>{{user.profile.bio}}</td>
+                </tr>
+            </tbody>
+        </table>
+        {% if user.profile.video %}
+          <video width="100%" controls src="{{ user.profile.video.url }}">
+            Your Browser does not support the video tag lol
+          </video>
+        {% endif %}
+      </div>
+      <div class="card-footer">
+      {% if editable == False %}
+        <button class="btn-danger btn" type="button" onClick="javascript:history.go(-1);" style="float:right; padding:7px 10px 7px 10px;"><i class="fas fa-arrow-left"></i></button>
+      {% else %}
+       <a href="{% url 'update_profile' request.user.username %}">
+        <button class="btn-primary btn" style="float:right;">Edit Profile</button>
+      </a>
+      {% endif %}
+      </div>    
+    </div>
+  </div>
+</div>
+{% endblock %}

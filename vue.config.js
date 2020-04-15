@@ -140,6 +140,11 @@ module.exports = {
 			template: 'templates/market_my_items.html',
 			filename: 'market_my_items.html',
 		},
+		profile_page: {
+			entry: 'src/profile/main.js',
+			template: 'templates/profile.html',
+			filename: 'profile.html',
+		},
 		match: {
 			entry: 'src/match/main.js',
 			template: 'templates/match.html',
