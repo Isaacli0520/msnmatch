@@ -140,11 +140,6 @@ module.exports = {
 			template: 'templates/market_my_items.html',
 			filename: 'market_my_items.html',
 		},
-		market_category_page: {
-			entry: 'src/market_category/main.js',
-			template: 'templates/market_category.html',
-			filename: 'market_category.html',
-		},
 		match: {
 			entry: 'src/match/main.js',
 			template: 'templates/match.html',

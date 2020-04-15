@@ -26,9 +26,6 @@ def market_item(request, item_pk):
 def my_items(request):
     return render(request, 'market_my_items.html')
 
-@login_required
-def category_items(request, category):
-    return render(request, 'market_category.html')
 
 @login_required
 def get_category_items(request):
@@ -46,9 +43,15 @@ def get_all_items(request):
 
 @login_required
 def get_my_items(request):
-    sorted_items = sorted(Item.objects.filter(user=request.user), key=lambda c:c.updated, reverse=True)
+    sorted_items = sorted(Item.objects.filter(user=request.user, sold=False), key=lambda c:c.updated, reverse=True)
+    sold_sorted_items = sorted(Item.objects.filter(user=request.user, sold=True), key=lambda c:c.updated, reverse=True)
+    items = []
+    for item in sorted_items:
+        items.append(item_json(item))
+    for item in sold_sorted_items:
+        items.append(item_json(item))
     return JsonResponse({
-        "items":[item_json(item) for item in sorted_items]
+        "items":items
     }, encoder=CustomEncoder)
 
 

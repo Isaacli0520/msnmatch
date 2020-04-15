@@ -1,18 +1,17 @@
 <template>
     <v-dialog v-model="itemDialog" v-if='d_item' min-width="350px">
         <v-card>
-            <v-layout>
+            <v-row no-gutters>
                 <!-- xs="12" sm="12" md="8" lg="8" xl="8" -->
-                <v-flex xs12 sm12 md8 lg8 xl8>
-                <v-img 
+                <v-col cols="12" sm="6" md="8" lg="8" xl="8" class="img-col">
+                <v-img
                 aspect-ratio="1.3"
                 contain  
                 :src="d_item.image">
                 </v-img>
-                </v-flex>
-                <v-divider :vertical="verticalBool"></v-divider>
+                </v-col>
                 <!-- xs="12" sm="12" md="4" lg="4" xl="4" -->
-                <v-flex  xs12 sm12 md4 lg4 xl4>
+                <v-col cols="12" sm="6" md="4" lg="4" xl="4">
                 <div>
                     <v-card-title class="dialog-head-text">{{d_item.name}}</v-card-title>
                     <v-divider></v-divider>
@@ -74,8 +73,8 @@
                         <v-btn color="blue darken-1" outlined @click="closeDialog">Close</v-btn>
                     </v-card-actions>
                 </div>
-                </v-flex>
-            </v-layout>
+                </v-col>
+            </v-row>
         </v-card>
     </v-dialog>
 </template>
@@ -154,7 +153,11 @@ export default{
 
 
 <style lang="css">
-
+    .img-col{
+        border-right: 1px solid rgb(226, 224, 224);
+        border-bottom: 1px solid rgb(226, 224, 224);
+    }
+    
     .cus-table{
          /* font-family: "Times New Roman", Times, serif !important; */
     }

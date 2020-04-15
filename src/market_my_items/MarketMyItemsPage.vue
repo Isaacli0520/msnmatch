@@ -19,7 +19,7 @@
                     v-for="(item, i) in items"
                     :key="i"
                     xs="12"
-                    sm="12"
+                    sm="6"
                     md="4"
                     lg="4"
                     xl="3"
