@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'webpack_loader',
     'groups',
     'comments',
+    'market',
 ]
 
 MIDDLEWARE = [

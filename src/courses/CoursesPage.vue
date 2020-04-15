@@ -4,28 +4,23 @@
             :searchBool="false"></custom-header>
         <v-content>
             <v-container fluid grid-list-xl class="courses-main">
-                <v-layout wrap>
-                    <v-flex child-flex d-flex xs12 sm12 md12 lg12 xl12>
-                    <v-card
-                        outlined
-                        elevation="3">
-
-                            <div class="headline-div-center">
-                                <span class="cus-headline-title-text">Search Courses</span>
-                            </div>
-                        <v-layout row wrap>
-                            <v-spacer></v-spacer>
-                            <v-flex d-flex xs10 sm10 md8 lg8 xl8>
-                                <search-course class="custom-search"
-                                    background_color="white"></search-course>
-                            </v-flex>
-                            <v-spacer></v-spacer>
-                        </v-layout>
-                        <v-layout class="spacer-layout"></v-layout>
-                        <v-spacer></v-spacer>
-                    </v-card>
+                <v-col>
+                    <v-flex xs12 sm12 md12 lg12 xl12>
+                        <div class="headline-div-center">
+                            <span class="cus-headline-title-text">Search Courses</span>
+                        </div>
                     </v-flex>
-                </v-layout>
+                    <v-row row wrap>
+                        <v-spacer></v-spacer>
+                        <v-flex d-flex xs10 sm10 md8 lg8 xl8>
+                            <search-course class="custom-search"
+                                background_color="white"></search-course>
+                        </v-flex>
+                        <v-spacer></v-spacer>
+                    </v-row>
+                    <v-layout class="spacer-layout"></v-layout>
+                    <v-spacer></v-spacer>
+                </v-col>
                 <v-layout wrap>
                     <v-flex child-flex d-flex xs12 sm12 md12 lg12 xl12>
                         <v-card
@@ -92,61 +87,6 @@
                             </v-card-text>
                         </v-card>
                     </v-flex>
-                    <!-- <template v-for="i in ['Taking', 'Taken']">
-                        <v-flex child-flex d-flex :key="i + '-taking-taken' " xs12 sm4 md4 lg4 xl4>
-                            <v-card 
-                                :elevation="cardElevation"
-                                :loading="!loaded[i]">
-                                <v-card-title>Top 10 {{i}} Courses</v-card-title>
-                                <v-divider></v-divider>
-                                <v-card-text>
-                                    <v-list v-if="loaded[i]">
-                                        <v-list-item
-                                            style="width:100%;"
-                                            :key="index_course + '-trending-course' " 
-                                            v-for="(course, index_course) in trending_courses[i]"
-                                            :href="'/courses/'+ course.course_pk + '/' ">
-                                            <v-list-item-avatar
-                                                color="teal lighten-1">
-                                                <span style="color:#fff;">{{index_course + 1}}</span>
-                                            </v-list-item-avatar>
-                                            <v-list-item-content two-line>
-                                                <v-list-item-title>{{course.mnemonic}}{{course.number}} {{course.title}}</v-list-item-title>
-                                                <v-list-item-subtitle>{{i}}: {{course[i.toLowerCase()]}}</v-list-item-subtitle>
-                                            </v-list-item-content>
-                                        </v-list-item>
-                                    </v-list>
-                                </v-card-text>
-                            </v-card>
-                        </v-flex>
-                    </template>
-                    <v-flex child-flex d-flex xs12 sm4 md4 lg4 xl4>
-                        <v-card 
-                            :elevation="cardElevation"
-                            :loading="!review_user_load">
-                            <v-card-title>Top 10 Users</v-card-title>
-                            <v-divider></v-divider>
-                            <v-card-text>
-                                <v-list v-if="review_user_load">
-                                    <v-list-item
-                                        style="width:100%;"
-                                        :key="index_review + '-review_user' " 
-                                        v-for="(user, index_review) in review_users"
-                                        :href="'/users/'+ user.username + '/' ">
-                                        <v-list-item-avatar
-                                            color="teal lighten-1"
-                                            >
-                                            <span style="color:#fff;">{{index_review + 1}}</span>
-                                        </v-list-item-avatar>
-                                        <v-list-item-content two-line>
-                                            <v-list-item-title>{{user.name}}</v-list-item-title>
-                                            <v-list-item-subtitle>Reviews: {{user.reviews}}</v-list-item-subtitle>
-                                        </v-list-item-content>
-                                    </v-list-item>
-                                </v-list>
-                            </v-card-text>
-                        </v-card>
-                    </v-flex> -->
                 </v-layout>
                 <v-layout row wrap>
                     <v-flex> 
@@ -190,41 +130,10 @@
                                 </v-card-text>
                             </v-card>
                         </v-flex>
-                        <!-- <v-spacer :key="index+'spacer'"></v-spacer> -->
                     </template>
                 </v-layout>
-                <!-- <v-layout>
-                    <v-flex xs12 sm12 md12 lg12 xl12 child-flex d-flex>
-                        <v-card 
-                            :elevation="cardElevation"
-                            :loading="!review_user_load">
-                            <v-card-title>Top 30 Users</v-card-title>
-                            <v-divider></v-divider>
-                            <v-card-text>
-                                <v-list v-if="review_user_load">
-                                    <v-list-item
-                                        style="width:100%;"
-                                        :key="index_review + '-review_user' " 
-                                        v-for="(user, index_review) in review_users"
-                                        :href="'/users/'+ user.username + '/' ">
-                                        <v-list-item-avatar
-                                            color="teal lighten-1"
-                                            >
-                                            <span style="color:#fff;">{{index_review + 1}}</span>
-                                        </v-list-item-avatar>
-                                        <v-list-item-content two-line>
-                                            <v-list-item-title>{{user.name}}</v-list-item-title>
-                                            <v-list-item-subtitle>Reviews: {{user.reviews}}</v-list-item-subtitle>
-                                        </v-list-item-content>
-                                    </v-list-item>
-                                </v-list>
-                            </v-card-text>
-                        </v-card>
-                    </v-flex>
-                </v-layout> -->
             </v-container>
         </v-content>
-        <!-- <custom-footer></custom-footer> -->
     </v-app>
 </template>
 
@@ -232,11 +141,11 @@
 import axios from 'axios'
 import CustomHeader from '../components/CustomHeader'
 import SearchCourse from '../components/SearchCourse'
-import CustomFooter from '../components/CustomFooter'
 
   export default {
-	data() {
-	    return {
+    data() {
+        return {
+            user_info_get:false,
             cardElevation:4,
             review_users:[],
             review_user_load:false,
@@ -252,7 +161,6 @@ import CustomFooter from '../components/CustomFooter'
             semester:"",
             major:null,
             major_options:[],
-            taking_courses:[],
             urls:{
                 home_url:"",
                 brand_pic:"",
@@ -354,20 +262,25 @@ import CustomFooter from '../components/CustomFooter'
 	components:{
         CustomHeader,
         SearchCourse,
-        CustomFooter,
 	},
 	watch: {
         year(){
-            this.recommendation_loaded = false;
-            this.getRecommendations();
+            if(this.user_info_get){
+                this.recommendation_loaded = false;
+                this.getRecommendations();
+            }
         },
         semester(){
-            this.recommendation_loaded = false;
-            this.getRecommendations();
+            if(this.user_info_get){
+                this.recommendation_loaded = false;
+                this.getRecommendations();
+            }
         },
         major(){
-            this.recommendation_loaded = false;
-            this.getRecommendations();
+            if(this.user_info_get){
+                this.recommendation_loaded = false;
+                this.getRecommendations();
+            }
         },
 	},
 	computed:{
@@ -389,17 +302,11 @@ import CustomFooter from '../components/CustomFooter'
                 this.loaded["Taking"] = true;
             });
         },
-        getReviewUsers(){
-            this.review_user_load = false;
-            axios.get('/courses/ajax/get_top_review_users/',{params: {}}).then(response => {
-                this.review_users = response.data.review_users;
-                this.review_user_load = true;
-            });
-        },
         getRecommendations(){
             axios.get('/courses/ajax/get_recommendations/',{params: {year:this.year, semester:this.semester, major:this.major}}).then(response => {
                 this.rcm_courses = response.data.rcm_courses;
                 this.recommendation_loaded = true;
+                this.user_info_get = true;
             });
         },
         getMajorOptions(){
@@ -411,17 +318,10 @@ import CustomFooter from '../components/CustomFooter'
                 this.getRecommendations();
             });
         },
-        getTakingCourses(){
-            axios.get('/courses/ajax/get_taking_courses/',{params: {}}).then(response => {
-                this.taking_courses = response.data.taking_courses;
-            });
-        },
 	},
 	mounted(){
         this.getTrendingCourses();
         this.getMajorOptions();
-        this.getTakingCourses();
-        this.getReviewUsers();
         this.getCurrentSemester();
 	},
   };

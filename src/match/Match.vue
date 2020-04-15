@@ -1,5 +1,6 @@
 <template>
-    <div>
+    <v-app>
+    <div v-if="false">
         <div class="modal fade" id="modal-intruction" tabindex="-1" role="dialog" aria-labelledby="modal-intruction" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
@@ -233,6 +234,19 @@
             v-bind:tags_url="urls.tags_url"
             v-bind:profile="urls.profile"/>
     </div>
+        <v-content>
+            <v-container fluid fill-height>
+                <v-layout justify-center align-center>
+                    <v-card outlined>
+                        <v-card-text>
+                            This Page is down for maintenance. 
+                        </v-card-text>
+                    </v-card>
+                </v-layout>
+            </v-container>
+        </v-content>
+    </v-app>
+
 </template>
 
 
