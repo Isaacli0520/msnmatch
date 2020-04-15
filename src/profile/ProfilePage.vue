@@ -34,16 +34,18 @@
                             :src="user.picture">
                             </v-img>
                             <v-card-title>{{user.first_name + " " + user.last_name}}</v-card-title>
-                            <v-divider></v-divider>
-                            <v-card-actions>
-                                <v-spacer></v-spacer>
-                                <v-btn
-                                    :href="'/users/' + username + '/edit/'"
-                                    color="purple"
-                                    text>
-                                    Edit Profile
-                                </v-btn>
-                            </v-card-actions>
+                            <template v-if="editable">
+                                <v-divider></v-divider>
+                                <v-card-actions>
+                                    <v-spacer></v-spacer>
+                                    <v-btn
+                                        :href="'/users/' + username + '/edit/'"
+                                        color="purple"
+                                        text>
+                                        Edit Profile
+                                    </v-btn>
+                                </v-card-actions>
+                            </template>
                         </v-card>
                     </v-col>
                     <v-col cols="12" sm="6" md="7" lg="7" xl="7">
@@ -123,6 +125,7 @@ import MatchHeader from '../components/MatchHeader'
         return {
             loaded:false,
             user:null,
+            editable:false,
         }
 	},
 	components:{
@@ -146,8 +149,9 @@ import MatchHeader from '../components/MatchHeader'
             axios.get('/users/api/get_profile/',{params: {username:username}}).then(response => {
                 if(response.data.success){
                     this.user = response.data.user;
-                    this.loaded = true;
+                    this.editable = response.data.editable;
                 }
+                this.loaded = true;
             });
         },
         // getSearchResult(query, category){
@@ -164,6 +168,10 @@ import MatchHeader from '../components/MatchHeader'
 </script>
 
 <style>
+    .item-not-exist{
+        font-size:25px;
+    }
+
     .cus-table{
         table-layout: fixed;
         width:100%;
@@ -206,11 +214,11 @@ import MatchHeader from '../components/MatchHeader'
     }
 
 
-    td:not(.cus-td):not(.description-text){
+    /* td:not(.cus-td):not(.description-text){ */
         /* font-family: "Times New Roman", Times, serif !important;  */
         /* font-size: 15px !important; */
         /* padding: 4px 16px; */
-    }
+    /* } */
 
     .dialog-head-text{
         /* font-family: "Times New Roman", Times, serif !important;  */

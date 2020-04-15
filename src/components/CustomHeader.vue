@@ -219,9 +219,9 @@ export default{
             ],
             user_items:[
                 { title:"Profile", icon:"fas fa-user" },
-                { title:"Edit Profile", icon:"fas fa-biohazard" },
+                { title:"Edit Profile", icon:"fas fa-user-edit" },
                 { title:"My Courses", icon:"fas fa-list-ol" },
-                { title:"Log Out", icon:"fas fa-angry"},
+                { title:"Log Out", icon:"fas fa-sign-out-alt"},
             ],
             app_items:[
                 { title:"Match", icon:"fas fa-user-friends" },
@@ -305,7 +305,7 @@ export default{
         SearchCourse,
     },
     watch:{
-        headerUpdate(val){
+        headerUpdate(){
             this.getTakingCourses();
         },
         credential(){
@@ -407,6 +407,9 @@ export default{
 
 
 <style lang="css">
+    .theme--light.v-app-bar.v-toolbar.v-sheet{
+        background-color: white !important;
+    }
 
     .theme--light.v-text-field--solo-inverted.v-text-field--solo.v-input--is-focused > .v-input__control > .v-input__slot .v-label, .theme--light.v-text-field--solo-inverted.v-text-field--solo.v-input--is-focused > .v-input__control > .v-input__slot input {
         color: #000000 !important;

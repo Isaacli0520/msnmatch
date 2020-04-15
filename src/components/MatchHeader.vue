@@ -35,7 +35,7 @@
             <v-img max-height="46" max-width="46" :src="urls.brand_pic" alt=""></v-img>
             <v-toolbar-items v-if="$vuetify.breakpoint.mdAndUp">
                 <v-btn 
-                    :href="urls.course_url"
+                    :href="urls.courses_url"
                     text>HoosMyProfessor</v-btn>
                 <v-divider inset vertical></v-divider>
                 <v-btn 
@@ -121,8 +121,8 @@ export default{
             ],
             user_items:[
                 { title:"Profile", icon:"fas fa-user" },
-                { title:"Edit Profile", icon:"fas fa-biohazard" },
-                { title:"Log Out", icon:"fas fa-angry"},
+                { title:"Edit Profile", icon:"fas fa-user-edit" },
+                { title:"Log Out", icon:"fas fa-sign-out-alt"},
             ],
             app_items:[
                 { title:"Match", icon:"fas fa-user-friends" },

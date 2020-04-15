@@ -359,8 +359,8 @@ export default{
             ],
             user_items:[
                 { title:"Profile", icon:"fas fa-user" },
-                { title:"Edit Profile", icon:"fas fa-biohazard" },
-                { title:"Log Out", icon:"fas fa-angry"},
+                { title:"Edit Profile", icon:"fas fa-user-edit" },
+                { title:"Log Out", icon:"fas fa-sign-out-alt"},
             ],
             app_items:[
                 { title:"Match", icon:"fas fa-user-friends" },

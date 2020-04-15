@@ -145,6 +145,11 @@ module.exports = {
 			template: 'templates/profile.html',
 			filename: 'profile.html',
 		},
+		profile_edit_page: {
+			entry: 'src/profile_edit/main.js',
+			template: 'templates/profile_edit.html',
+			filename: 'profile_edit.html',
+		},
 		match: {
 			entry: 'src/match/main.js',
 			template: 'templates/match.html',
