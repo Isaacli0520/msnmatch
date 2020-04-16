@@ -30,6 +30,7 @@ semester_ids = {
 	"2019Spring":"1192",
 	"2019Fall":"1198",
 	"2020Spring":"1202",
+	"2020Fall":"1208",
 }
 
 
@@ -68,12 +69,25 @@ class Command(BaseCommand):
 			"iMaxCurWaitlist":"",
 			"Request CSV Data": "Request CSV data",
 		}
+		new_data = {
+			"Semester": semester_id,
+            "Group": 'CS',
+            "Description": 'Yes',
+            "submit": 'Submit Data Request',
+            "Extended": 'Yes'
+		}
+		headers = {'User-Agent':'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Safari/537.36'}
 		data, lines = [], []
-		with requests.post('https://rabi.phys.virginia.edu/mySIS/CS2/deliverSearchData.php' + '?Semester=' + semester_id, data=post_data, stream=True) as r:
+		with requests.post('https://louslist.org/deliverData.php', headers = headers, data=new_data, stream=True) as r:
 			csv_reader = csv.reader(codecs.iterdecode(r.iter_lines(), 'utf-8'))
+			# with open("tmp_csv.csv", 'w') as wf:
+			# 	writer = csv.writer(wf)
+			# 	for row in csv_reader:
+			# 		writer.writerow(row)
 			headers = next(csv_reader) 
 			print("Semester:", semester, "Semester ID:", semester_id)
 			print("headers",headers)
+			print("Comments Before:", CourseUser.objects.all().count())
 			for row in csv_reader:
 				lines.append(row)
 			print("length of lines", len(lines))
@@ -84,23 +98,25 @@ class Command(BaseCommand):
 			lines = [line for line in lines if len(line) > 0]
 			for line in lines:
 				tmp_data = {}
-				if(len(line) == 17):
-					for i in range(17):
-						if i == 15 and line[i] != '':
-							tmp_data[headers[i]] = []
-							tmp_data[headers[i]].append(line[i])
-						elif i == 15 and line[i] == '':
-							tmp_data[headers[i]] = []
-						else:
-							tmp_data[headers[i]] = line[i]
-				else:
-					for i in range(15):
-						tmp_data[headers[i]] = line[i]
-					tmp_data[headers[15]] = []
-					for i in range(15, len(line)):
-						if re.match(pattern, line[i]):
-							tmp_data[headers[15]].append(line[i])
-					tmp_data[headers[-1]] = line[-1]
+				for i in range(len(line)):
+					tmp_data[headers[i]] = line[i]
+				# if(len(line) == 17):
+				# 	for i in range(17):
+				# 		if i == 15 and line[i] != '':
+				# 			tmp_data[headers[i]] = []
+				# 			tmp_data[headers[i]].append(line[i])
+				# 		elif i == 15 and line[i] == '':
+				# 			tmp_data[headers[i]] = []
+				# 		else:
+				# 			tmp_data[headers[i]] = line[i]
+				# else:
+				# 	for i in range(15):
+				# 		tmp_data[headers[i]] = line[i]
+				# 	tmp_data[headers[15]] = []
+				# 	for i in range(15, len(line)):
+				# 		if re.match(pattern, line[i]):
+				# 			tmp_data[headers[15]].append(line[i])
+				# 	tmp_data[headers[-1]] = line[-1]
 				# if "Prerequisite:" in tmp_data['Description'].split(' '):
 				# 	tmp_data["Prerequisite"] =tmp_data['Description'][tmp_data['Description'].index("Prerequisite:"):]
 				# elif "Prerequisites:" in tmp_data['Description'].split(' '):
@@ -131,20 +147,34 @@ class Command(BaseCommand):
 				course.save()
 			except Course.DoesNotExist:
 				course = Course.objects.create(number=cs['Number'], mnemonic=cs['Mnemonic'], units=cs['Units'], title=cs['Title'],description=cs["Description"], type=cs['Type'], prerequisite=cs['Prerequisite'])
+			
+			# tmp_instructors = [ins.strip().split() for ins in cs["Instructor(s)"].split(',')]
+			# final_instructors = []
+			# for instructor in tmp_instructors:
+			# 	if len(instructor) >= 1 and len(instructor) <= 3:
+			# 		final_instructors.append(instructor)
+			# 	elif " ".join(instructor).lower()[:12] == "co-taught by":
+			# 		for inner_instructor in re.split(r"co-taught by", " ".join(instructor), flags=re.I)[1].split(" and "):
+			# 			final_instructors.append(inner_instructor.strip().split())
+			# 	elif len(instructor) > 2 and "and" in instructor:
+			# 		for inner_instructor in " ".join(instructor).split('and'):
+			# 			final_instructors.append(inner_instructor.strip().split())
+			# 	elif len(instructor) > 2:
+			# 		final_instructors.append(instructor)
 
-			tmp_instructors = [ins.strip().split() for ins in cs["Instructor(s)"].split(',')]
 			final_instructors = []
-			for instructor in tmp_instructors:
-				if len(instructor) >= 1 and len(instructor) <= 3:
-					final_instructors.append(instructor)
-				elif " ".join(instructor).lower()[:12] == "co-taught by":
-					for inner_instructor in re.split(r"co-taught by", " ".join(instructor), flags=re.I)[1].split(" and "):
-						final_instructors.append(inner_instructor.strip().split())
-				elif len(instructor) > 2 and "and" in instructor:
-					for inner_instructor in " ".join(instructor).split('and'):
-						final_instructors.append(inner_instructor.strip().split())
-				elif len(instructor) > 2:
-					final_instructors.append(instructor)
+			for i in range(1, 5):
+				tmp_instructor = cs["Instructor"+str(i)]
+				if tmp_instructor != "":
+					final_instructors.append(tmp_instructor.strip().split())
+
+			# ['ClassNumber', 'Mnemonic', 'Number', 'Section', 'Type', 
+			# 'Units', 'Instructor1', 'Days1', 'Room1', 'MeetingDates1', 
+			# 'Instructor2', 'Days2', 'Room2', 'MeetingDates2', 'Instructor3', 
+			# 'Days3', 'Room3', 'MeetingDates3', 'Instructor4', 'Days4', 'Room4'
+			# , 'MeetingDates4', 'Title', 'Topic', 'Status', 'Enrollment', 'EnrollmentLimit',
+			#  'Waitlist', 'Description']
+			
 
 			for instructor in final_instructors:
 				if len(instructor) == 0:
@@ -169,3 +199,4 @@ class Command(BaseCommand):
 			if v == 1:
 				print("Old Course Instructor Relation Deleted -", "Instructor:",old_cs_instr.instructor.first_name, old_cs_instr.instructor.last_name, "Course:", old_cs_instr.course.mnemonic, old_cs_instr.course.number, old_cs_instr.course.title)
 				old_cs_instr.delete()
+		print("Comments After:", CourseUser.objects.all().count())

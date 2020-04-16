@@ -135,17 +135,25 @@
             top
             v-model="success_snack"
             color="teal darken-1"
-            :timeout="3200">
+            :timeout="2700">
             Item Posted
         <v-btn color="cyan accent-1" text @click="success_snack = false"> Close </v-btn>
         </v-snackbar>
         <v-snackbar
             top
+            v-model="form_failure_snack"
+            color="red lighten-1"
+            :timeout="2700">
+            Invalid Form
+            <v-btn color="white" text @click="form_failure_snack = false"> Close </v-btn>
+        </v-snackbar>
+        <v-snackbar
+            top
             v-model="failure_snack"
-            color="red darken-1"
-            :timeout="3200">
+            color="red lighten-1"
+            :timeout="2700">
             Sth is wrong
-            <v-btn color="blue" text @click="failure_snack = false"> Close </v-btn>
+            <v-btn color="white" text @click="failure_snack = false"> Close </v-btn>
         </v-snackbar>
         <v-dialog v-model="disclaimerDialog" persistent scrollable min-width="150px" max-width="450px">
             <v-card>
@@ -181,7 +189,7 @@
                         <v-text-field
                             v-model="item.price"
                             label="Price (Dollars)"
-                            :rules="[v => (v!=undefined && v >= 0) || 'Price is required']"
+                            :rules="priceRules"
                             required
                             type="number"
                         />
@@ -271,6 +279,7 @@ export default{
             createItemBtnLoading:false,
             createItemDialog:false,
             query:"",
+            form_failure_snack:false,
             success_snack:false,
             failure_snack:false,
             navDrawer:false,
@@ -285,6 +294,11 @@ export default{
                 description:"",
                 image:null,
             },
+            priceRules:[
+                v => (v != undefined && v!="" && (v || v == 0) && v >= 0) || 'Price is required',
+                v => (this.countDecimals(v) <= 2) || 'Should be <= 2 decimal places',
+                v => (v <= 500000) || 'Are you serious?',
+            ],
             nameRules: [
                 v => !!v || 'Name is required',
                 v => (v && v.length <= 25) || 'Name must be less than 25 characters',
@@ -359,8 +373,8 @@ export default{
             ],
             user_items:[
                 { title:"Profile", icon:"fas fa-user" },
-                { title:"Edit Profile", icon:"fas fa-biohazard" },
-                { title:"Log Out", icon:"fas fa-angry"},
+                { title:"Edit Profile", icon:"fas fa-user-edit" },
+                { title:"Log Out", icon:"fas fa-sign-out-alt"},
             ],
             app_items:[
                 { title:"Match", icon:"fas fa-user-friends" },
@@ -455,6 +469,11 @@ export default{
     computed:{
     },
     methods:{
+        countDecimals(value) { 
+            if ((value % 1) != 0 || value.toString().indexOf(".") != -1) 
+                return value.toString().split(".")[1].length;  
+            return 0;
+        },
         setCookie(name,value,days) {
             var expires = "";
             if (days) {
@@ -485,8 +504,10 @@ export default{
         },
         createItem(item){
             this.$refs.create_form.validate();
-            if(!this.create_item_form_valid)
+            if(!this.create_item_form_valid){
+                this.form_failure_snack = true;
                 return;
+            }
             this.createItemBtnLoading = true;
             let formData = new FormData();
             formData.append('image',item.image);
@@ -501,9 +522,9 @@ export default{
                     'Content-Type': 'multipart/form-data',
                 }
             }).then(response => {
+                this.createItemBtnLoading = false;
                 if(response.data.success){
                     this.success_snack = true;
-                    this.createItemBtnLoading = false;
                     this.$emit('update-items');
                     this.createItemDialog = false;
                     this.item = {

@@ -219,12 +219,13 @@ export default{
             ],
             user_items:[
                 { title:"Profile", icon:"fas fa-user" },
-                { title:"Edit Profile", icon:"fas fa-biohazard" },
+                { title:"Edit Profile", icon:"fas fa-user-edit" },
                 { title:"My Courses", icon:"fas fa-list-ol" },
-                { title:"Log Out", icon:"fas fa-angry"},
+                { title:"Log Out", icon:"fas fa-sign-out-alt"},
             ],
             app_items:[
                 { title:"Match", icon:"fas fa-user-friends" },
+                { title:"Market", icon:"fas fa-search-dollar" },
                 { title:"Live Comments", icon:"fas fa-comment" },
             ],
             urls:{
@@ -305,7 +306,7 @@ export default{
         SearchCourse,
     },
     watch:{
-        headerUpdate(val){
+        headerUpdate(){
             this.getTakingCourses();
         },
         credential(){
@@ -354,6 +355,9 @@ export default{
             }
             else if(item.title=="Match"){
                 this.goToHref(this.urls.match_url)
+            }
+            else if(item.title=="Market"){
+                this.goToHref(this.urls.market_url)
             }
             else if(item.title=="Live Comments"){
                 this.goToHref(this.urls.comment_url)
@@ -407,6 +411,9 @@ export default{
 
 
 <style lang="css">
+    .theme--light.v-app-bar.v-toolbar.v-sheet{
+        background-color: white !important;
+    }
 
     .theme--light.v-text-field--solo-inverted.v-text-field--solo.v-input--is-focused > .v-input__control > .v-input__slot .v-label, .theme--light.v-text-field--solo-inverted.v-text-field--solo.v-input--is-focused > .v-input__control > .v-input__slot input {
         color: #000000 !important;

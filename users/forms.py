@@ -20,3 +20,8 @@ class ProfileForm(forms.ModelForm):
        	help_texts = {
             'birth_date': 'Format: mm/dd/yyyy',
         }
+
+class ProfileNewForm(forms.ModelForm):
+    class Meta:
+        model = Profile
+        fields = ('bio','graduate_year','sex', 'major', 'major_two', 'minor','wechat','picture',)

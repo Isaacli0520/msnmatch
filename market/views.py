@@ -114,9 +114,9 @@ def edit_item(request):
         post = request.POST.copy()
         item = Item.objects.filter(pk=post["id"]).first()
         if not item:
-            return JsonResponse({"sucess":False, "message":"Item does not exist"})
+            return JsonResponse({"success":False, "message":"Item does not exist"})
         if item.user != request.user:
-            return JsonResponse({"sucess":False, "message":"This item is not yours"})
+            return JsonResponse({"success":False, "message":"This item is not yours"})
         item_form = ItemEditForm(post, request.FILES, instance=item)
         if item_form.is_valid():
             print("Form cleaned data", item_form.cleaned_data)
@@ -124,7 +124,8 @@ def edit_item(request):
             return JsonResponse({"success":True})
         else:
             print("Market Create Item Error:", item_form.errors)
-    return JsonResponse({"sucess":False, "message":"Get request not supported"})
+            return JsonResponse({"success":False, "message":"Form data not valid"})
+    return JsonResponse({"success":False, "message":"Get request not supported"})
 
 @login_required
 def delete_item(request):

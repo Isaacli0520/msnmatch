@@ -101,8 +101,8 @@ export_users.short_description = 'Export to csv'
 
 class CustomUserAdmin(UserAdmin):
     inlines = (ProfileInline, SkillRelationInline, FollowRelationInline, GroupRelationInline)
-    list_display = ('username','get_sex', 'email', 'first_name', 'last_name', 'is_staff', 'get_location', 'get_credential' ,'get_matched', 'get_role','get_year', 'get_graduate_year','get_birth_date','get_major')
-    list_filter = ('is_staff', 'profile__sex','profile__role','profile__year','profile__graduate_year', 'profile__matched')
+    list_display = ('username','get_sex', 'email', 'first_name', 'last_name', 'is_staff', 'get_location', 'get_credential' ,'get_matched', 'get_role', 'get_graduate_year','get_birth_date','get_major')
+    list_filter = ('is_staff', 'profile__sex','profile__role','profile__graduate_year', 'profile__matched')
     list_select_related = ('profile', )
     actions = [change_role_mentor, change_role_mentee, export_users, update_avatar, update_graduate_year, update_credential]  # <-- Add the list action function here
 
@@ -126,10 +126,6 @@ class CustomUserAdmin(UserAdmin):
     def get_role(self, instance):
         return instance.profile.role
     get_role.short_description = 'Role'
-
-    def get_year(self, instance):
-        return instance.profile.year
-    get_year.short_description = 'Year'
 
     def get_graduate_year(self, instance):
         return instance.profile.graduate_year
