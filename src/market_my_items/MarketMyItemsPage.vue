@@ -92,7 +92,7 @@
                             <v-text-field
                                 v-model="edit_item.price"
                                 label="Price (Dollars)"  
-                                :rules="[v => (v!=undefined && v >= 0) || 'Price is required']"
+                                :rules="priceRules"
                                 required
                                 type="number"
                             />
@@ -186,11 +186,11 @@
                 @open-sold-dialog="openSoldItemDialog"
                 @close-dialog="itemDialog=false"></market-item-dialog>
         </v-content>
-                <v-snackbar
+        <v-snackbar
             top
             v-model="delete_snack"
             color="teal darken-1"
-            :timeout="3200">
+            :timeout="2700">
             Item Deleted
         <v-btn color="cyan accent-1" text @click="delete_snack = false"> Close </v-btn>
         </v-snackbar>
@@ -198,7 +198,7 @@
             top
             v-model="edit_snack"
             color="teal darken-1"
-            :timeout="3200">
+            :timeout="2700">
             Item Edited
         <v-btn color="cyan accent-1" text @click="edit_snack = false"> Close </v-btn>
         </v-snackbar>
@@ -206,17 +206,25 @@
             top
             v-model="sold_snack"
             color="teal darken-1"   
-            :timeout="3200">
+            :timeout="2700">
             Item Sold
         <v-btn color="cyan accent-1" text @click="sold_snack = false"> Close </v-btn>
         </v-snackbar>
         <v-snackbar
             top
             v-model="failure_snack"
-            color="red darken-1"
-            :timeout="3200">
+            color="red lighten-1"
+            :timeout="2700">
             Sth is wrong
-        <v-btn color="blue" text @click="failure_snack = false"> Close </v-btn>
+        <v-btn color="white" text @click="failure_snack = false"> Close </v-btn>
+        </v-snackbar>
+        <v-snackbar
+            top
+            v-model="form_invalid_snack"
+            color="red lighten-1"
+            :timeout="2700">
+            Invalid Form
+        <v-btn color="white" text @click="form_invalid_snack = false"> Close </v-btn>
         </v-snackbar>
     </v-app>
 </template>
@@ -236,6 +244,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
             edit_snack:false,
             delete_snack:false,
             failure_snack:false,
+            form_invalid_snack:false,
 
             loaded:false,
             edit_item_form_valid:true,
@@ -306,6 +315,11 @@ axios.defaults.xsrfCookieName = "csrftoken";
                     'text':'Miscellaneous'
                 },
             ],
+            priceRules:[
+                v => (v != undefined && v!="" && (v || v == 0) && v >= 0) || 'Price is required',
+                v => (this.countDecimals(v) <= 2) || 'Should be <= 2 decimal places',
+                v => (v <= 500000) || 'Are you serious?',
+            ],
             nameRules: [
                 v => !!v || 'Name is required',
                 v => (v && v.length <= 25) || 'Name must be less than 25 characters',
@@ -326,6 +340,11 @@ axios.defaults.xsrfCookieName = "csrftoken";
 	computed:{
 	},
 	methods: {
+        countDecimals(value) { 
+            if ((value % 1) != 0 || value.toString().indexOf(".") != -1) 
+                return value.toString().split(".")[1].length;  
+            return 0;
+        },
         openItemDialog(item){
             this.d_item = item;
             this.itemDialog = true;
@@ -366,9 +385,9 @@ axios.defaults.xsrfCookieName = "csrftoken";
                     'Content-Type': 'multipart/form-data',
                 }
             }).then(response => {
+                this.soldItemBtnLoading = false;
                 if(response.data.success){
                     this.sold_snack = true;
-                    this.soldItemBtnLoading = false;
                     this.getMyItems();
                     this.soldItemDialog = false;
                     this.sold_item = null;
@@ -391,9 +410,9 @@ axios.defaults.xsrfCookieName = "csrftoken";
                     'Content-Type': 'multipart/form-data',
                 }
             }).then(response => {
+                this.deleteItemBtnLoading = false;
                 if(response.data.success){
                     this.delete_snack = true;
-                    this.deleteItemBtnLoading = false;
                     this.getMyItems();
                     this.deleteItemDialog = false;
                     this.delete_item = null;
@@ -404,8 +423,10 @@ axios.defaults.xsrfCookieName = "csrftoken";
         },
         editItem(item, edit_item_image){
             this.$refs.edit_form.validate();
-            if(!this.edit_item_form_valid)
+            if(!this.edit_item_form_valid){
+                this.form_invalid_snack = true;
                 return;
+            }
             this.editItemBtnLoading = true;
             let formData = new FormData();
             formData.append('image', edit_item_image);
@@ -420,9 +441,9 @@ axios.defaults.xsrfCookieName = "csrftoken";
                     'Content-Type': 'multipart/form-data',
                 }
             }).then(response => {
+                this.editItemBtnLoading = false;
                 if(response.data.success){
                     this.edit_snack = true;
-                    this.editItemBtnLoading = false;
                     this.getMyItems();
                     this.editItemDialog = false;
                     this.edit_item = null;

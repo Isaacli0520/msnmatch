@@ -295,7 +295,7 @@ export default{
                 image:null,
             },
             priceRules:[
-                v => (v != undefined && (v || v == 0) && v >= 0) || 'Price is required',
+                v => (v != undefined && v!="" && (v || v == 0) && v >= 0) || 'Price is required',
                 v => (this.countDecimals(v) <= 2) || 'Should be <= 2 decimal places',
                 v => (v <= 500000) || 'Are you serious?',
             ],
