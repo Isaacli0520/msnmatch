@@ -124,6 +124,7 @@ def edit_item(request):
             return JsonResponse({"success":True})
         else:
             print("Market Create Item Error:", item_form.errors)
+            return JsonResponse({"success":False, "message":"Form data not valid"})
     return JsonResponse({"success":False, "message":"Get request not supported"})
 
 @login_required
