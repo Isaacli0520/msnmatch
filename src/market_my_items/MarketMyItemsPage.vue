@@ -33,7 +33,7 @@
                 <v-row v-if="items.length == 0" mb-3 mr-3>
                     <v-col> 
                         <div>
-                            <span class="cus-headline-text">Go ahead and click "Sell an Item" on the left to sell sth~</span>
+                            <span class="no-item-text">Go ahead and click "Sell an Item" on the left to sell sth~</span>
                         </div>
                     </v-col>
                 </v-row>
@@ -452,6 +452,16 @@ axios.defaults.xsrfCookieName = "csrftoken";
 		font-size: 2.1em;
 		font-weight: 300;
 		color:rgb(0, 0, 0);
+		padding: 1px 12px 7px 3px;
+		border-radius: 5px;
+		line-height: 1.0;
+	}
+
+    .no-item-text{
+		font-family: "Roboto", sans-serif;
+		font-size: 1.6em;
+		font-weight: 300;
+		color:rgb(129, 127, 127);
 		padding: 1px 12px 7px 3px;
 		border-radius: 5px;
 		line-height: 1.0;

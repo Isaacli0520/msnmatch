@@ -49,7 +49,7 @@
                         </v-card>
                     </v-col>
                     <v-col cols="12" sm="6" md="7" lg="7" xl="7">
-                            <v-card style="margin-bottom:8px;">
+                            <v-card style="margin-bottom:15px;">
                                 <v-card-title>Basic Info</v-card-title>
                                 <v-divider></v-divider>
                                 <v-card-text>
