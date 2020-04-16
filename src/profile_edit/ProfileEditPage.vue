@@ -69,7 +69,7 @@
                                     <v-select
                                     v-model="edit_user.major"
                                     :items="majors"
-                                    :rules="[v => !!v || 'Major is required']"
+                                    :rules="[v => !!v || 'Major is required (or intended major)']"
                                     label="Major"
                                     required
                                     ></v-select>
@@ -159,7 +159,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
                 v => (v && v.length <= 1000) || 'Last Name must be less than 1000 characters',
             ],
             wechatRules: [
-                v => (v && v.length <= 255) || 'WeChat ID must be less than 255 characters',
+                v => (!v || (v && v.length <= 255)) || 'WeChat ID must be less than 255 characters',
             ],
             graduate_years:[    
                 {'value':'2018', 'text':'2018'},
@@ -174,7 +174,9 @@ axios.defaults.xsrfCookieName = "csrftoken";
                 {'value':'Male', 'text':'Male'},
                 {'value':'Female', 'text':'Female'},
             ],
-            majors: [{'value':'Accelerated B.A./Master of Public Policy (MPP) Program', 'text':'Accelerated B.A./Master of Public Policy (MPP) Program'},
+            majors: [
+                {'value':'', 'text':'None'},
+                {'value':'Accelerated B.A./Master of Public Policy (MPP) Program', 'text':'Accelerated B.A./Master of Public Policy (MPP) Program'},
                     {'value':'Accounting', 'text':'Accounting'},
                     {'value':'Aerospace Engineering', 'text':'Aerospace Engineering'},
                     {'value':'African American & African Studies', 'text':'African American & African Studies'},

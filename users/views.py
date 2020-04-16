@@ -39,8 +39,8 @@ def edit_user(request):
         profile_form = ProfileNewForm(request.POST, request.FILES, instance=user.profile)
         user_form = UserForm(request.POST, request.FILES, instance=user)
         if profile_form.is_valid() and user_form.is_valid():
-            print("profile Form cleaned data", profile_form.cleaned_data)
-            print("user Form cleaned data", user_form.cleaned_data)
+            # print("profile Form cleaned data", profile_form.cleaned_data)
+            # print("user Form cleaned data", user_form.cleaned_data)
             profile_form.save()
             user_form.save()
             return JsonResponse({"success":True})

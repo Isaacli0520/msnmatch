@@ -150,7 +150,7 @@ export default{
                 },
                 {
                     "title":"Market",
-                    "icon":"fas fa-bullhorn",
+                    "icon":"fas fa-search-dollar",
                     "href":"/market/",
                     "target":"",
                 },
