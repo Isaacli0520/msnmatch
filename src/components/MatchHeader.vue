@@ -125,7 +125,7 @@ export default{
                 { title:"Log Out", icon:"fas fa-sign-out-alt"},
             ],
             app_items:[
-                { title:"Match", icon:"fas fa-user-friends" },
+                { title:"Market", icon:"fas fa-search-dollar" },
                 { title:"HoosMyProfessor", icon:"fas fa-graduation-cap" },
                 { title:"Live Comments", icon:"fas fa-comment" },
             ],
@@ -194,6 +194,9 @@ export default{
             }
             else if(item.title=="Match"){
                 this.goToHref(this.urls.match_url)
+            }
+            else if(item.title=="Market"){
+                this.goToHref(this.urls.market_url)
             }
             else if(item.title=="Live Comments"){
                 this.goToHref(this.urls.comment_url)

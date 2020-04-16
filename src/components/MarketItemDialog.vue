@@ -10,6 +10,7 @@
                             contain  
                             :src="d_item.image">
                         </v-img>
+                        <v-divider></v-divider>
                         <v-card-title>{{d_item.name}}</v-card-title>
                     </v-card>
                 </v-col>
