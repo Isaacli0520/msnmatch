@@ -226,7 +226,8 @@ def get_instructor(request):
 				"rating":get_rating_of_instructor_with_course(instructor, cs_instr.course)[0],
 				"semesters":[]
 			}
-		all_courses[tmp_course_number]["semesters"].append(cs_instr.semester)
+		if cs_instr.semester not in all_courses[tmp_course_number]["semesters"]:
+			all_courses[tmp_course_number]["semesters"].append(cs_instr.semester)
 	tmp_rating, tmp_counter = get_rating_of_instructor(instructor)
 	return JsonResponse({
 		"name":instructor.__str__(),

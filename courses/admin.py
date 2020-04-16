@@ -1,6 +1,23 @@
 from django.contrib import admin
 from .models import Course, CourseInstructor, Instructor, CourseUser
+from django.http import HttpResponse
+import csv
 # Register your models here.
+
+def export_comments(modeladmin, request, queryset):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="hsmp_comments.csv"'
+
+    CourseUserRelations = queryset.values_list('pk')
+    writer = csv.writer(response)
+    for cs in CourseUserRelations:
+        tmp_cs = CourseUser.objects.get(pk=cs[0])
+        tmp_row = []
+        for field in CourseUser._meta.fields:
+            tmp_row.append(getattr(tmp_cs, field.name))
+        writer.writerow(tmp_row)
+    return response
+export_comments.short_description = 'Export to text'
 
 class CourseUserRelationInline(admin.TabularInline):
     model = Course.users.through
@@ -26,6 +43,7 @@ class CustomCourseInstructorAdmin(admin.ModelAdmin):
 class CustomCourseUserAdmin(admin.ModelAdmin):
     list_display = ['course','user', 'instructor','take', 'text']
     list_filter = ('take',)
+    actions = [export_comments]
 
 class CustomInstructorAdmin(admin.ModelAdmin):
     list_display = ['first_name', 'last_name']

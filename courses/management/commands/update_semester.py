@@ -87,6 +87,7 @@ class Command(BaseCommand):
 			headers = next(csv_reader) 
 			print("Semester:", semester, "Semester ID:", semester_id)
 			print("headers",headers)
+			print("Comments Before:", CourseUser.objects.all().count())
 			for row in csv_reader:
 				lines.append(row)
 			print("length of lines", len(lines))
@@ -198,3 +199,4 @@ class Command(BaseCommand):
 			if v == 1:
 				print("Old Course Instructor Relation Deleted -", "Instructor:",old_cs_instr.instructor.first_name, old_cs_instr.instructor.last_name, "Course:", old_cs_instr.course.mnemonic, old_cs_instr.course.number, old_cs_instr.course.title)
 				old_cs_instr.delete()
+		print("Comments After:", CourseUser.objects.all().count())

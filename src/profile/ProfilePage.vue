@@ -64,8 +64,8 @@
                                                 <td>{{ user.sex }}</td>
                                             </tr>
                                             <tr>
-                                                <td>Year</td>
-                                                <td>{{ user.year }}</td>
+                                                <td>Graduate Year</td>
+                                                <td>{{ user.graduate_year }}</td>
                                             </tr>
                                             <tr>
                                                 <td>Major</td>
@@ -178,7 +178,7 @@ import MatchHeader from '../components/MatchHeader'
     }
 
     tr td:first-child{
-        color: rgb(156, 154, 154);
+        color: rgb(134, 132, 132);
     }
 
     tr td:last-child{
