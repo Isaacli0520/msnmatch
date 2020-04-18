@@ -57,7 +57,7 @@
                         return-object>
                         <template v-slot:item="{ item }">
                             <v-list-item-content>
-                                <v-list-item-title mb-2>{{item.text}}</v-list-item-title>
+                                <v-list-item-title mb-2>{{item.name}}</v-list-item-title>
                                 <v-list-item-subtitle>Type:{{item.type}}</v-list-item-subtitle>
                             </v-list-item-content>  
                         </template>
@@ -118,6 +118,8 @@ axios.defaults.xsrfCookieName = "csrftoken";
             lastTime: 0,
             entries:[],
             search: null,
+            all_skills:[],
+            user_skills:[],
             success_message:"",
             success_snack:false,
             failure_snack:false,
@@ -140,7 +142,8 @@ axios.defaults.xsrfCookieName = "csrftoken";
 	watch: {
         selected_item(val){
             if(val != null){
-                console.log("selected: ", val);
+                this.addSkill(val);
+                this.search = null;
             }
         },
         search(val) {
@@ -174,7 +177,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
                     ? entry.name.slice(0, this.skillNameLimit) + '...'
                     : entry.name;
 
-                return {text:skill_name, value:entry.id, type:entry.type};
+                return { text:skill_name, value:this.lastTime + entry.id, id:entry.id, intro:entry.intro,name:skill_name,  type:entry.type};
             })
         },
 	},
@@ -192,8 +195,10 @@ axios.defaults.xsrfCookieName = "csrftoken";
                 "name":skill.name,
             }).then(response => {
                 if(response.data.success){
-                    this.user_skills[skill.type].splice(this.user_skills[skill.type].indexOf(skill), 0, skill);
-                    this.all_skills[skill.type].splice(this.all_skills[skill.type].indexOf(skill), 1);
+                    let user_skill_pos = this.user_skills[skill.type].map(function(e) { return e.id; }).indexOf(skill.id);
+                    let all_skill_pos = this.all_skills[skill.type].map(function(e) { return e.id; }).indexOf(skill.id);
+                    this.user_skills[skill.type].splice(user_skill_pos, 0, skill);
+                    this.all_skills[skill.type].splice(all_skill_pos, 1);
                     this.success_message = "Tag Added"
                     this.success_snack = true;
                 }else{
@@ -206,7 +211,8 @@ axios.defaults.xsrfCookieName = "csrftoken";
                 "id":skill.id,
             }).then(response => {
                 if(response.data.success){
-                    this.user_skills[skill.type].splice(this.user_skills[skill.type].indexOf(skill), 1);
+                    let user_skill_pos = this.user_skills[skill.type].map(function(e) { return e.id; }).indexOf(skill.id);
+                    this.user_skills[skill.type].splice(user_skill_pos, 1);
                     if (skill.type != "Custom"){
                         this.all_skills[skill.type].push(skill);
                     }
