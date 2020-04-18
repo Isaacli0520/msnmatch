@@ -94,7 +94,7 @@
             top
             v-model="failure_snack"
             color="red darken-1"
-            :timeout="1700">
+            :timeout="1200">
             Sth is wrong
             <v-btn color="white" text @click="failure_snack = false"> Close </v-btn>
         </v-snackbar>
@@ -162,6 +162,14 @@ axios.defaults.xsrfCookieName = "csrftoken";
             axios.get('/skills/api/get_search_result/',{params: {query:val, time: this.lastTime}}).then(response => {
                 if(response.data.time == this.lastTime){
                     this.entries = response.data.skills; 
+                    if(this.entries[0].name != val){
+                        this.entries.push({
+                            id:-1,
+                            name:val,
+                            intro:"",
+                            type:"Custom"
+                        });
+                    }
                 }
             })
             .catch(err => {
@@ -195,10 +203,10 @@ axios.defaults.xsrfCookieName = "csrftoken";
                 "name":skill.name,
             }).then(response => {
                 if(response.data.success){
-                    let user_skill_pos = this.user_skills[skill.type].map(function(e) { return e.id; }).indexOf(skill.id);
                     let all_skill_pos = this.all_skills[skill.type].map(function(e) { return e.id; }).indexOf(skill.id);
-                    this.user_skills[skill.type].splice(user_skill_pos, 0, skill);
-                    this.all_skills[skill.type].splice(all_skill_pos, 1);
+                    this.user_skills[skill.type].splice(-1, 0, skill);
+                    if(all_skill_pos != -1)
+                        this.all_skills[skill.type].splice(all_skill_pos, 1);
                     this.success_message = "Tag Added"
                     this.success_snack = true;
                 }else{
@@ -212,7 +220,8 @@ axios.defaults.xsrfCookieName = "csrftoken";
             }).then(response => {
                 if(response.data.success){
                     let user_skill_pos = this.user_skills[skill.type].map(function(e) { return e.id; }).indexOf(skill.id);
-                    this.user_skills[skill.type].splice(user_skill_pos, 1);
+                    if(user_skill_pos != -1)
+                        this.user_skills[skill.type].splice(user_skill_pos, 1);
                     if (skill.type != "Custom"){
                         this.all_skills[skill.type].push(skill);
                     }
@@ -271,7 +280,9 @@ axios.defaults.xsrfCookieName = "csrftoken";
 
 
     @media (min-width: 10px) and (max-width: 767px) {
-        
+        .title-text{
+            font-size: 35px !important;
+        }
     }
 
 

@@ -98,7 +98,7 @@ export default{
 
     .Music{
         color:#ffffff;
-        background-color:#3915db;
+        background-color:#96db15;
     }
 
     .General{
@@ -123,6 +123,6 @@ export default{
 
     .Custom{
         color:#ffffff;
-        background-color: #ff0800;
+        background-color: #e7544f;
     }
 </style>
