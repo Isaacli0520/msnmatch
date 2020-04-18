@@ -3,114 +3,29 @@
         <match-header></match-header>
         <v-content>
             <v-container v-if="!loaded" fluid fill-height>
-                <v-layout 
-                    align-center
-                    justify-center>
-                    <div>
-                        <v-progress-circular
-                        :size="60"
-                        :width="6"
-                        indeterminate
-                        color="teal lighten-1">
-                        </v-progress-circular>
-                    </div>
-                </v-layout>
-            </v-container>
-            <v-container v-if="!user && loaded" fluid fill-height>
-                <v-layout 
-                    align-center
-                    justify-center>
-                    <div class="item-not-exist">
-                        User does not exist~~
-                    </div>
-                </v-layout>
-            </v-container>
-            <v-container v-if="user && loaded" fluid grid-list-lg>
-                <v-row>
-                    <v-col cols="12" sm="6" md="5" lg="5" xl="5">
-                        <v-card>
-                            <v-img
-                            aspect-ratio="1.33"
-                            :src="user.picture">
-                            </v-img>
-                            <v-card-title>{{user.first_name + " " + user.last_name}}</v-card-title>
-                            <template v-if="editable">
-                                <v-divider></v-divider>
-                                <v-card-actions>
-                                    <v-spacer></v-spacer>
-                                    <v-btn
-                                        :href="'/users/' + username + '/edit/'"
-                                        color="purple"
-                                        text>
-                                        Edit Profile
-                                    </v-btn>
-                                </v-card-actions>
-                            </template>
-                        </v-card>
-                    </v-col>
-                    <v-col cols="12" sm="6" md="7" lg="7" xl="7">
-                            <v-card style="margin-bottom:15px;">
-                                <v-card-title>Basic Info</v-card-title>
-                                <v-divider></v-divider>
-                                <v-card-text>
-                                    <table class="cus-table">
-                                        <colgroup>
-                                            <col class="left-tr" />
-                                            <col class="right-td" />
-                                        </colgroup>
-                                        <tbody>
-                                            <tr>
-                                                <td>Gender</td>
-                                                <td>{{ user.sex }}</td>
-                                            </tr>
-                                            <tr>
-                                                <td>Graduate Year</td>
-                                                <td>{{ user.graduate_year }}</td>
-                                            </tr>
-                                            <tr>
-                                                <td>Major</td>
-                                                <td>{{ user.major }}</td>
-                                            </tr>
-                                            <tr v-if="user.major_two">
-                                                <td>Second Major</td>
-                                                <td>{{ user.major_two }}</td>
-                                            </tr>
-                                            <tr v-if="user.minor">
-                                                <td>Minor</td>
-                                                <td>{{ user.minor }}</td>
-                                            </tr>
-                                            <tr>
-                                                <td style="vertical-align:top;">Bio</td>
-                                                <td class="description-td">{{ user.bio }}</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </v-card-text>
-                            </v-card>
-                            <v-card>
-                                <v-card-title>Contact Info</v-card-title>
-                                <v-divider></v-divider>
-                                <v-card-text>
-                                    <table class="cus-table">
-                                        <colgroup>
-                                            <col class="left-tr" />
-                                            <col class="right-td" />
-                                        </colgroup>
-                                        <tbody>
-                                            <tr v-if="user.wechat">
-                                                <td>WeChat ID</td>
-                                                <td>{{ user.wechat }}</td>
-                                            </tr>
-                                            <tr>
-                                                <td>Email</td>
-                                                <td>{{ user.email }}</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </v-card-text>
-                            </v-card>
-                    </v-col>
-                </v-row>
+                <v-autocomplete
+                    v-model="selected_item"
+                    :items="search_result_items"
+                    :loading="isLoading"
+                    :search-input.sync="search"
+                    color="black"
+                    background-color="grey lighten-3"
+                    clearable
+                    solo-inverted
+                    no-filter
+                    flat
+                    hide-no-data
+                    hide-selected
+                    hide-details
+                    placeholder="Search for Skills"
+                    return-object>
+                    <template v-slot:item="{ item }">
+                        <v-list-item-content>
+                            <v-list-item-title mb-2>{{item.text}}</v-list-item-title>
+                            <v-list-item-subtitle v-if="item.last_taught.length > 0">Last taught:{{item.last_taught}}</v-list-item-subtitle>
+                        </v-list-item-content>  
+                    </template>
+                </v-autocomplete>
             </v-container>
         </v-content>
     </v-app>
@@ -124,21 +39,52 @@ import MatchHeader from '../components/MatchHeader'
 	data() {
         return {
             loaded:false,
-            user:null,
-            editable:false,
         }
 	},
 	components:{
         MatchHeader,
 	},
 	watch: {
-        
+        selected_item(val){
+            if(val != null){
+                if(val.type == "course"){
+                    this.goToHref("/courses/" + val.value + "/");
+                }
+                else if(val.type == "instructor"){
+                    this.goToHref("/courses/instructors/" + val.value + "/");
+                }
+            }
+        },
+        search(val) {
+            // Items have already been loaded
+
+            if (val == null || val.length == 0){
+                this.entries = [];
+                this.lastTime += 1;
+                return;
+            }
+
+            if (val.length < 2) return;
+
+            this.lastTime += 1;
+
+            // Items have already been requested
+            // if (this.isLoading) return
+
+            this.isLoading = true
+            // Lazily load input items
+            axios.get('/courses/ajax/course_search_result/',{params: {query:val, time: this.lastTime}}).then(response => {
+                    if(response.data.time == this.lastTime){
+                        this.entries = response.data.course_result; 
+                    }
+            })
+            .catch(err => {
+                console.log("error: ",err)
+            })
+            .finally(() => {this.isLoading = false});
+        },
 	},
 	computed:{
-        username: function(){
-            let url = window.location.pathname.split('/');
-            return url[url.length - 2];
-        },
 	},
 	methods: {
         getProfile(username){
@@ -152,7 +98,6 @@ import MatchHeader from '../components/MatchHeader'
         },
 	},
 	mounted(){
-        this.getProfile(this.username);
 	},
   };
 </script>

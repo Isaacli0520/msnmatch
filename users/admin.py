@@ -19,7 +19,7 @@ from msnmatch import settings
 
 
 class SkillRelationInline(admin.TabularInline):
-    model = Skill.skill_users.through
+    model = Skill.users.through
 
 class GroupRelationInline(admin.TabularInline):
     model = Group.group_users.through
