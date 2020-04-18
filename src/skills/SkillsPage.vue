@@ -158,65 +158,6 @@ import MatchHeader from '../components/MatchHeader'
 </script>
 
 <style>
-    .item-not-exist{
-        font-size:25px;
-    }
-
-    .cus-table{
-        table-layout: fixed;
-        width:100%;
-    }
-
-    tr td:first-child{
-        color: rgb(134, 132, 132);
-    }
-
-    tr td:last-child{
-        color: rgb(0, 0, 0);
-    }
-
-    .left-tr{
-        width:24%;
-    }
-
-    .right-td{
-        width:76%;
-    }
-
-    .description-td{
-        padding: 6px 16px 15px 16px !important;
-        /* font-family: "Times New Roman", Times, serif !important; */
-    }
-
-    .table-title{
-        font-size:20px !important;
-        font-weight: 700 !important;
-    }
-
-    .v-card__title{
-        font-weight: 600 !important;
-    }
-
-    .v-card__text td{
-        font-family: "Times New Roman", Times, serif !important; 
-        font-size: 16px !important;
-        padding: 6px 16px;
-    }
-
-
-    /* td:not(.cus-td):not(.description-text){ */
-        /* font-family: "Times New Roman", Times, serif !important;  */
-        /* font-size: 15px !important; */
-        /* padding: 4px 16px; */
-    /* } */
-
-    .dialog-head-text{
-        /* font-family: "Times New Roman", Times, serif !important;  */
-        padding-left:31px;
-        font-size: 28px !important;
-        font-weight:700 !important;
-    }
-
     @media (min-width: 1025px) {
         
     }
@@ -231,13 +172,6 @@ import MatchHeader from '../components/MatchHeader'
 
 
     @media (min-width: 10px) and (max-width: 767px) {
-        .left-tr{
-            width:28% !important;
-        }
-
-        .right-td{
-            width:72% !important;
-        }
         
     }
 

@@ -35,10 +35,10 @@ module.exports = {
 			// output as dist/superadmin.html
 			filename: 'superadmin.html',
 		},
-		tagspage: {
-			entry: 'src/tags/main.js',
-			template: 'templates/tags.html',
-			filename: 'tags.html',
+		skillspage: {
+			entry: 'src/skills/main.js',
+			template: 'templates/skills.html',
+			filename: 'skills.html',
 		},
 		familypage: {
 			entry: 'src/family/main.js',

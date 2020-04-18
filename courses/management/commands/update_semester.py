@@ -44,31 +44,6 @@ class Command(BaseCommand):
 			print("Wrong semester")
 			return
 		semester_id = semester_ids[semester]
-		post_data = {
-			"iGroup":"", 
-			"iMnemonic":"", 
-			"iNumber":"", 
-			"iStatus":"", 
-			"iType":"", 
-			"iInstructor":"", 
-			"iBuilding":"", 
-			"iRoom":"", 
-			"iDays":"", 
-			"iTime":"", 
-			"iDates":"", 
-			"iUnits":"", 
-			"iTitle":"", 
-			"iTopic":"", 
-			"iDescription":"", 
-			"iDiscipline":"", 
-			"iMinPosEnroll":"", 
-			"iMaxPosEnroll":"", 
-			"iMinCurEnroll":"", 
-			"iMaxCurEnroll":"", 
-			"iMinCurWaitlist":"", 
-			"iMaxCurWaitlist":"",
-			"Request CSV Data": "Request CSV data",
-		}
 		new_data = {
 			"Semester": semester_id,
             "Group": 'CS',
@@ -147,20 +122,6 @@ class Command(BaseCommand):
 				course.save()
 			except Course.DoesNotExist:
 				course = Course.objects.create(number=cs['Number'], mnemonic=cs['Mnemonic'], units=cs['Units'], title=cs['Title'],description=cs["Description"], type=cs['Type'], prerequisite=cs['Prerequisite'])
-			
-			# tmp_instructors = [ins.strip().split() for ins in cs["Instructor(s)"].split(',')]
-			# final_instructors = []
-			# for instructor in tmp_instructors:
-			# 	if len(instructor) >= 1 and len(instructor) <= 3:
-			# 		final_instructors.append(instructor)
-			# 	elif " ".join(instructor).lower()[:12] == "co-taught by":
-			# 		for inner_instructor in re.split(r"co-taught by", " ".join(instructor), flags=re.I)[1].split(" and "):
-			# 			final_instructors.append(inner_instructor.strip().split())
-			# 	elif len(instructor) > 2 and "and" in instructor:
-			# 		for inner_instructor in " ".join(instructor).split('and'):
-			# 			final_instructors.append(inner_instructor.strip().split())
-			# 	elif len(instructor) > 2:
-			# 		final_instructors.append(instructor)
 
 			final_instructors = []
 			for i in range(1, 5):
@@ -196,7 +157,7 @@ class Command(BaseCommand):
 					cs_instr = CourseInstructor.objects.create(instructor=instr, course=course, topic=cs["Topic"], semester=cs["Semester"])
 				
 		for old_cs_instr, v in old_cs_instrs_dict.items():
-			if v == 1:
+			if v == 1 and not CourseUser.objects.filter(course_instructor=old_cs_instr).first():
 				print("Old Course Instructor Relation Deleted -", "Instructor:",old_cs_instr.instructor.first_name, old_cs_instr.instructor.last_name, "Course:", old_cs_instr.course.mnemonic, old_cs_instr.course.number, old_cs_instr.course.title)
 				old_cs_instr.delete()
 		print("Comments After:", CourseUser.objects.all().count())
