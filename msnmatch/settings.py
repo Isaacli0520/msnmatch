@@ -11,6 +11,9 @@ SECRET_KEY = config('SECRET_KEY')
 
 DEBUG = config("DEBUG",cast=bool)
 
+ITEM_NAME_TH = config("ITEM_NAME_TH")
+ITEM_DESCRIPTION_TH = config("ITEM_DESCRIPTION_TH")
+
 # SECURE_SSL_REDIRECT = not DEBUG
 # SECURE_PROXY_SSL_HEADER = ('X-Forwarded-Proto', 'https')
 # SESSION_COOKIE_SECURE = not DEBUG
@@ -37,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.postgres',
     'bootstrap4',
     'social_django',
     'users',

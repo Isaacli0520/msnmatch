@@ -79,14 +79,17 @@ def item_search_result(request):
         tmp_item_queryset = Item.objects.filter(sold=False, category=category)
         retrieved_items = sorted(tmp_item_queryset, key=lambda c: c.updated.timestamp(), reverse=True)
     elif query and not category:
+        # tmp_item_queryset = Item.objects.filter(sold=False, name__search=query)
+        # tmp_item_queryset = Item.objects.annotate(search=SearchVector('name','description',config='chinese')).filter(sold=False,search=query)
+        # retrieved_items = sorted(tmp_item_queryset, key=lambda c: c.updated.timestamp(), reverse=True)
         tmp_item_queryset = Item.objects.filter(sold=False).annotate(
                 similarity_name=TrigramSimilarity('name',query),
-                similarity_description=TrigramSimilarity('description',query)).filter(Q(similarity_name__gt=0.3) | Q(similarity_description__gt=0.15))
+                similarity_description=TrigramSimilarity('description',query)).filter(Q(similarity_name__gt=settings.ITEM_NAME_TH) | Q(similarity_description__gt=settings.ITEM_DESCRIPTION_TH))
         retrieved_items = sorted(tmp_item_queryset, key=lambda c: (-c.similarity_name,-c.similarity_description))
     else:
         tmp_item_queryset = Item.objects.filter(sold=False, category=category).annotate(
                 similarity_name=TrigramSimilarity('name',query),
-                similarity_description=TrigramSimilarity('description',query)).filter(Q(similarity_name__gt=0.3) | Q(similarity_description__gt=0.15))
+                similarity_description=TrigramSimilarity('description',query)).filter(Q(similarity_name__gt=settings.ITEM_NAME_TH) | Q(similarity_description__gt=settings.ITEM_DESCRIPTION_TH))
         retrieved_items = sorted(tmp_item_queryset, key=lambda c: (-c.similarity_name,-c.similarity_description))
     retrieved_items = [item_json(item) for item in retrieved_items]
 

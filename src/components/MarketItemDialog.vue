@@ -76,7 +76,7 @@
                             <v-btn color="red darken-1" v-if="edit" outlined @click="openDeleteDialog">Delete</v-btn>
                             <v-btn color="green darken-1" v-if="edit" outlined @click="openSoldDialog">Sold</v-btn>
                             <v-btn color="green darken-1" v-if="edit" outlined @click="openEditDialog">Edit</v-btn>
-                            <v-btn color="purple darken-1" v-if="!edit" outlined @click="goToItem(d_item)">Detail</v-btn>
+                            <!-- <v-btn color="purple darken-1" v-if="!edit" outlined @click="goToItem(d_item)">Detail</v-btn> -->
                             <v-btn color="blue darken-1" outlined @click="closeDialog">Close</v-btn>
                         </v-card-actions>
                     </v-card>
