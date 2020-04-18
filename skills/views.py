@@ -52,7 +52,7 @@ def skill_rank(request):
 @login_required
 def get_all_and_user_skills(request):
 	return JsonResponse({
-		"all_skills":skills_as_dict(Skill.objects.all().exclude(skill_type="Custom", users=request.user)),
+		"all_skills":skills_as_dict(Skill.objects.all().exclude(type="Custom").exclude(users=request.user)),
 		"user_skills":skills_as_dict(request.user.skill_set.all()),
 		})
 
@@ -60,11 +60,11 @@ def get_all_and_user_skills(request):
 def get_search_result(request):
 	skills = []
 	query_string = request.GET.get("query").strip()
+	query_time = request.GET.get("time")
 	skill_queryset = Skill.objects.annotate(
 		similarity_name=TrigramSimilarity('name',query_string),
 		similarity_type=TrigramSimilarity('type',query_string),
 		similarity_intro=TrigramSimilarity('intro', query_string)).filter(Q(similarity_name__gt=0.25)|Q(similarity_type__gt=0.23)|Q(similarity_intro__gt=0.2))
-	
 	if skill_queryset.exists():
 		sorted_skills = sorted(skill_queryset, key=lambda c: (-c.similarity_name,-c.similarity_type, -c.similarity_intro))
 		if len(sorted_skills) > MAXIMUM_SKILLS:
@@ -73,45 +73,61 @@ def get_search_result(request):
 			skills.append(skill_json(skill))
 	return JsonResponse({
 		"skills":skills,
+		"time":query_time
 		})
 
 @login_required
 def user_add_skill(request):
-	pass
+	if request.method == "POST":
+		post = json.loads(request.body.decode('utf-8'))
+		skill_id = post.get("id")
+		skill_name = post.get("name")
+		skill = Skill.objects.filter(pk = skill_id).first()
+		if not skill:
+			skill = Skill.objects.filter(name = skill_name).first()
+			if not skill:
+				skill = Skill.objects.create(name=skill_name, intro="", type="Custom")
+		if SkillRelation.objects.filter(user=request.user, skill=skill).first():
+			return JsonResponse({
+				"success":False,
+				"message":"Tag already added"
+			})
+		SkillRelation.objects.create(user=request.user, skill=skill)
+		return JsonResponse({
+			"success":True
+		})
+	return JsonResponse({
+		"success":False,
+		"message":"Get request not allowed"
+	})
 
 @login_required
 def user_del_skill(request):
-	user = request.user
-	add_del = request.GET.get("add_del")
-	added = False
-	if not Skill.objects.filter(pk = request.GET.get("skill_pk")).exists() and add_del == "add":
-		exist = False
-		if not Skill.objects.filter(skill_name = request.GET.get("skill_name")).exists():
-			skill = Skill.objects.create(skill_name=request.GET.get("skill_name"), skill_intro="", skill_type="Custom")
-			SkillRelation.objects.create(user=user,skill=skill)
-			exist = True
-			added = True
-			origin_exist = False
-		else:
-			origin_exist = True
-	else:
-		skill = Skill.objects.filter(skill_name = request.GET.get("skill_name")).first()
-		origin_exist = SkillRelation.objects.filter(user=user, skill=skill).exists()
-		if SkillRelation.objects.filter(user=user, skill=skill).exists() and add_del == "del":
-			SkillRelation.objects.get(user=user,skill=skill).delete()
-			# print("Skill",skill.skill_name, " Count", skill.skill_users.count())
-			if skill.skill_users.count() == 0 and skill.skill_type == "Custom":
+	if request.method == "POST":
+		post = json.loads(request.body.decode('utf-8'))
+		skill_id = post.get("id")
+		skill = Skill.objects.filter(pk = skill_id).first()
+		if not skill:
+			return JsonResponse({
+				"success":False,
+				"message":"Skill doesn't exist"
+			})
+		skill_relation = SkillRelation.objects.filter(user=request.user, skill=skill).first()
+		if skill_relation:
+			skill_relation.delete()
+			if skill.users.count() == 0 and skill.type == "Custom":
 				skill.delete()
-		elif not SkillRelation.objects.filter(user=user, skill=skill).exists() and add_del == "add":
-			SkillRelation.objects.create(user=user,skill=skill)
-			added = True
-		exist = SkillRelation.objects.filter(user=user, skill=skill).exists()
-
+			return JsonResponse({
+				"success":True
+			})
+		else:
+			return JsonResponse({
+				"success":False,
+				"message":"You don't have this skill"
+			})
 	return JsonResponse({
-		"exist": exist,
-		"origin_exist":origin_exist,
-		"added": added,
-		"skill_exist":SkillRelation.objects.filter(user=user, skill=skill).exists(),
+		"success":False,
+		"message":"Get request not allowed"
 	})
 
 def choose_role(request):

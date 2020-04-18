@@ -126,7 +126,7 @@
             color="red darken-1"
             :timeout="3200">
             Sth is wrong
-            <v-btn color="blue" text @click="failure_snack = false"> Close </v-btn>
+            <v-btn color="white" text @click="failure_snack = false"> Close </v-btn>
         </v-snackbar>
     </v-app>
 </template>
@@ -285,10 +285,10 @@ axios.defaults.xsrfCookieName = "csrftoken";
                     'Content-Type': 'multipart/form-data',
                 }
             }).then(response => {
+                this.editUserBtnLoading = false;
                 if(response.data.success){
                     window.location.href = '/users/'+this.username;
                 }else{
-                    this.editUserBtnLoading = false;
                     this.failure_snack = true;
                 }
             });

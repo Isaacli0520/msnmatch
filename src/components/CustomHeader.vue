@@ -62,6 +62,7 @@
         <v-navigation-drawer
             light
             app
+            hide-overlay
             v-model="drawer"
             :clipped="$vuetify.breakpoint.mdAndUp"
             >

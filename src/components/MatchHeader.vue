@@ -4,6 +4,7 @@
             light
             color="white"
             app
+            hide-overlay
             v-model="drawer"
             :clipped="$vuetify.breakpoint.mdAndUp"
             >

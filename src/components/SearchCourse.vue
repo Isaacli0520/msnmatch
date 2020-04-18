@@ -43,7 +43,6 @@ export default {
             lastTime: 0,
             entries:[],
             search: null,
-            searchquery: '',
         }
     },
     components:{

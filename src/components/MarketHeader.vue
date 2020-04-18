@@ -2,6 +2,7 @@
     <div>
         <v-navigation-drawer
             light
+            hide-overlay
             color="white"
             app
             v-model="drawer"
