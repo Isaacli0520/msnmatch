@@ -40,26 +40,6 @@ module.exports = {
 			template: 'templates/skills.html',
 			filename: 'skills.html',
 		},
-		familypage: {
-			entry: 'src/family/main.js',
-			template: 'templates/family.html',
-			filename: 'family.html',
-		},
-		groupsmanagepage: {
-			entry: 'src/groupsmanage/main.js',
-			template: 'templates/groups_manage.html',
-			filename: 'groups_manage.html',
-		},
-		grouppage: {
-			entry: 'src/group/main.js',
-			template: 'templates/group.html',
-			filename: 'group.html',
-		},
-		grouptagpage: {
-			entry: 'src/grouptag/main.js',
-			template: 'templates/group_tag.html',
-			filename: 'group_tag.html',
-		},
 		coursespage: {
 			entry: 'src/courses/main.js',
 			template: 'templates/courses.html',
