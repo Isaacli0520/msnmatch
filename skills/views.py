@@ -12,6 +12,7 @@ from django.http import JsonResponse
 from django.core import serializers
 from django.core.serializers.json import DjangoJSONEncoder
 
+from courses.models import CourseUser
 from django.contrib.auth.models import User
 from .models import Skill, SkillRelation
 from friendship.models import Follow
@@ -24,30 +25,32 @@ import operator
 from fuzzywuzzy import fuzz, process
 from msnmatch import settings
 
-MAXIMUM_SKILLS = 7
-DEBUGGG = False
+MAXIMUM_SKILLS = 5
+SKILL_TYPES = [
+	"Academic",
+	"Books",
+	"Custom",
+	"Film and TV",
+	"Game",
+	"General",
+	"Language",
+	"Music",
+	"Sport"
+]
 
 @login_required
 def skills(request):
 	return render(request, 'skills.html')
 
-@login_required
-def skill(request, skill_pk):
-	tmp_skill = Skill.objects.get(pk = skill_pk)
-	return render(request, 'skill.html', {
-		"tmp_skill":tmp_skill,
-		"users_with_skill":tmp_skill.users.all(),
-		})
-
-@login_required
-def skill_rank(request):
-	if Skill.objects.count() >= 75:
-		all_skills = Skill.objects.all().annotate(num_users=Count('skill_users')).order_by('-num_users')[:75]
-	else:
-		all_skills = Skill.objects.all().annotate(num_users=Count('skill_users')).order_by('-num_users')
-	return render(request, 'skill_rank.html',{
-		"all_skills":all_skills,
-		})
+# @login_required
+# def skill_rank(request):
+# 	if Skill.objects.count() >= 75:
+# 		all_skills = Skill.objects.all().annotate(num_users=Count('skill_users')).order_by('-num_users')[:75]
+# 	else:
+# 		all_skills = Skill.objects.all().annotate(num_users=Count('skill_users')).order_by('-num_users')
+# 	return render(request, 'skill_rank.html',{
+# 		"all_skills":all_skills,
+# 		})
 
 @login_required
 def get_all_and_user_skills(request):
@@ -55,6 +58,14 @@ def get_all_and_user_skills(request):
 		"all_skills":skills_as_dict(Skill.objects.all().exclude(type="Custom").exclude(users=request.user)),
 		"user_skills":skills_as_dict(request.user.skill_set.all()),
 		})
+
+@login_required
+def get_all_users(request):
+	users = sorted(User.objects.all().exclude(username="admin"), key=lambda x: random.random())
+	return JsonResponse({
+		"users":[user_json(user) for user in users],
+		"request_user":user_json(request.user),
+	})
 
 @login_required
 def get_search_result(request):
@@ -130,16 +141,29 @@ def user_del_skill(request):
 		"message":"Get request not allowed"
 	})
 
+@login_required
 def choose_role(request):
-	tmp_role = request.GET.get("role")
+	post = json.loads(request.body.decode('utf-8'))
+	tmp_role = post.get("role")
 	if tmp_role == "Mentor" and request.user.profile.role == "":
+		user_review_num = request.user.courseuser_set.annotate(length=Length("text")).filter(length__gt=15).count()
+		if user_review_num < 3:
+			return JsonResponse({
+				"success":False,
+				"message":"You don't have enough course comments."
+			})
 		request.user.profile.role = "Mentor"
 		request.user.save()
 	elif tmp_role == "Mentee" and request.user.profile.role == "":
+		return JsonResponse({
+			"success":False,
+			"message":"Mentee registration not yet started."
+		})
 		request.user.profile.role = "Mentee"
 		request.user.save()
 	return JsonResponse({
-		"user_role":request.user.profile.role,
+		"success":True,
+		"role":request.user.profile.role,
 	})
 
 def add_to_list(request):
@@ -182,35 +206,7 @@ def del_fav(request):
 		
 	})
 
-def get_all_users(request):
-	# all_users = User.objects.all().exclude(pk=request.user.pk)
-	all_users_list = sorted(User.objects.all().exclude(username="admin"), key=lambda x: random.random())
-	# all_users = User.objects.all().exclude(username="admin")
-	
-	return get_user_json(request,all_users_list)
-
-def get_user_json(request, all_users):
-	all_users_list = []
-	# start_time = time.time()
-	for user in all_users:
-		all_users_list.append(get_detail_of_user(user, request))
-	# print("--- %s seconds ---" % (time.time() - start_time))
-	return JsonResponse({
-		"all_users":all_users_list,
-	})
-
-def get_detail_of_user(user, request, score = 0):
-	skill_set = {}
-	for skill in user.skill_set.all():
-		if skill.skill_type not in skill_set:
-			skill_set[skill.skill_type] = []
-		new_skill = {
-			"skill_pk": skill.pk,
-			"skill_name": skill.skill_name,
-			"skill_type": skill.skill_type,
-			"skill_url":"/skills/"+str(skill.pk)+"/",
-		}
-		skill_set[skill.skill_type].append(new_skill)
+def user_json(user):
 	if user.profile.picture:
 		picture_url = user.profile.picture.url
 	else:
@@ -231,40 +227,33 @@ def get_detail_of_user(user, request, score = 0):
 		tmp_year = ""
 	return {
 		"pk": user.pk,
-		"user_url": "/users/"+user.username+"/",
-		"picture": picture_url,
 		"first_name": user.first_name,
 		"last_name": user.last_name,
 		"email": user.email,
 		"bio": user.profile.bio,
-		"birth_date": user.profile.birth_date,
+		# "birth_date": user.profile.birth_date,
 		"location": user.profile.location,
 		"year": tmp_year,
-		"major": user.profile.major,
 		"sex":user.profile.sex,
-		"skills": skill_set,
-		"video": video_url,
+		"skills": skills_as_dict(user.skill_set.all()),
 		"role":user.profile.role,
+		"major": user.profile.major,
 		"major_two":user.profile.major_two,
 		"minor":user.profile.minor,
 		"wechat":user.profile.wechat,
-		"follow": Follow.objects.filter(follower=request.user, followee=user).exists(),
+		# "follow": Follow.objects.filter(follower=request.user, followee=user).exists(),
+		"video": video_url,
+		"picture": picture_url,
 		"avatar":avatar_url,
-		"matched":user.profile.matched,
-		"score":score,
 	}
-
-def get_skills_of_users(queryset):
-	all_user_skills = {}
-	for user in queryset:
-		all_user_skills[user.pk] = get_format_skills(User.objects.get(pk=user.pk).skill_set.all())
-	return all_user_skills
 		
 def skills_as_dict(queryset):
 	skills = {}
-	for skill in Skill.objects.all():
-		if skill.type not in skills:
-			skills[skill.type] = []
+	# for skill in Skill.objects.all():
+	# 	if skill.type not in skills:
+	# 		skills[skill.type] = []
+	for s_type in SKILL_TYPES:
+		skills[s_type] = []
 	for skill in queryset:
 		skills[skill.type].append(skill_json(skill))
 	return skills
@@ -277,44 +266,3 @@ def skill_json(skill):
 		"type":skill.type,
 		"name":skill.name,
 	}
-
-def get_format_skills(queryset):
-	user_skills = {}
-	for sk in queryset:
-		if sk.skill_type not in user_skills:
-			user_skills[sk.skill_type] = []
-		user_skills[sk.skill_type].append(sk.pk)
-	return user_skills
-
-def skill_retrieve(query_string):
-	tmp_queryset = Skill.objects.annotate(
-		similarity_name=TrigramSimilarity('skill_name',query_string),
-		similarity_type=TrigramSimilarity('skill_type',query_string),
-		similarity_intro=TrigramSimilarity('skill_intro', query_string)).filter(Q(similarity_name__gt=0.25)|Q(similarity_type__gt=0.23)|Q(similarity_intro__gt=0.2))
-	if not tmp_queryset.exists():
-		return None
-	retrieved_skills = sorted(tmp_queryset, key=lambda c: (-c.similarity_name,-c.similarity_type, -c.similarity_intro))
-	if len(retrieved_skills) > MAXIMUM_SKILLS:
-		retrieved_skills = retrieved_skills[:MAXIMUM_SKILLS]
-	return retrieved_skills
-
-def skill_retrieve_new(pk, query_string):
-	user = User.objects.get(pk=pk)
-	all_user_skills = user.skill_set.all()
-	if user.skill_set.all().count() == 0:
-		return None
-	tmp_queryset = {sk.pk:sk.skill_name for sk in all_user_skills}
-
-	best_match = process.extractOne(query_string,tmp_queryset,scorer=fuzz.partial_ratio, score_cutoff=80)
-
-	# print("extract one",best_match)
-	# retrieved_skills = [Skill.objects.get(pk=sk_pk) for sk_name, sk_pk in sims]
-	# tmp_queryset = user.skill_set.all().annotate(
-	# 	similarity_name=TrigramSimilarity('skill_name',query_string)).filter(Q(similarity_name__gt=0.45))
-	# if tmp_queryset.first() == None:
-	# 	return None
-	# retrieved_skills = sorted(tmp_queryset, key=lambda c: (-c.similarity_name))
-	if best_match != None:
-		return Skill.objects.get(pk=best_match[2])
-	else:
-		return None

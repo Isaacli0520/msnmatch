@@ -80,6 +80,12 @@ def change_role_mentor(modeladmin, request, queryset):
         user.save()
 change_role_mentor.short_description = 'Change Role to Mentor'
 
+def change_role_none(modeladmin, request, queryset):
+    for user in queryset:
+        user.profile.role = ""
+        user.save()
+change_role_none.short_description = 'Change Role to None'
+
 def change_role_mentee(modeladmin, request, queryset):
     for user in queryset:
         user.profile.role = "Mentee"
@@ -104,7 +110,7 @@ class CustomUserAdmin(UserAdmin):
     list_display = ('username','get_sex', 'email', 'first_name', 'last_name', 'is_staff', 'get_location', 'get_credential' ,'get_matched', 'get_role', 'get_graduate_year','get_birth_date','get_major')
     list_filter = ('is_staff', 'profile__sex','profile__role','profile__graduate_year', 'profile__matched')
     list_select_related = ('profile', )
-    actions = [change_role_mentor, change_role_mentee, export_users, update_avatar, update_graduate_year, update_credential]  # <-- Add the list action function here
+    actions = [change_role_mentor, change_role_mentee, change_role_none, export_users, update_avatar, update_graduate_year, update_credential]  # <-- Add the list action function here
 
     def get_credential(self, instance):
         return instance.profile.credential

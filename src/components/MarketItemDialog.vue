@@ -1,5 +1,5 @@
 <template>
-    <v-dialog v-model="itemDialog" v-if='d_item' min-width="350px">
+    <v-dialog :value="value" @input="$emit('input')" v-if='d_item' min-width="350px">
         <v-card>
             <v-card-text>
             <v-row>
@@ -77,7 +77,7 @@
                             <v-btn color="green darken-1" v-if="edit" outlined @click="openSoldDialog">Sold</v-btn>
                             <v-btn color="green darken-1" v-if="edit" outlined @click="openEditDialog">Edit</v-btn>
                             <!-- <v-btn color="purple darken-1" v-if="!edit" outlined @click="goToItem(d_item)">Detail</v-btn> -->
-                            <v-btn color="blue darken-1" outlined @click="closeDialog">Close</v-btn>
+                            <v-btn color="blue darken-1" outlined @click.native="$emit('input')">Close</v-btn>
                         </v-card-actions>
                     </v-card>
                 </v-col>
@@ -95,7 +95,7 @@ export default{
             type:Object,
             default:null,
         },
-        itemDialog:{
+        value:{
             type:Boolean,
             default:false,
         },
@@ -130,16 +130,6 @@ export default{
     watch:{
     },
     computed:{
-        verticalBool () {
-            switch (this.$vuetify.breakpoint.name) {
-            case 'xs': return false
-            case 'sm': return false
-            case 'md': return true
-            case 'lg': return true
-            case 'xl': return true
-            }
-            return false;
-        },
     },
     methods:{
         openEditDialog(){
@@ -150,9 +140,6 @@ export default{
         },
         openDeleteDialog(){
             this.$emit('open-delete-dialog', this.d_item);
-        },
-        closeDialog(){
-            this.$emit('close-dialog');
         },
         goToItem(item){
             window.location.href = "/market/item/" + item.id;

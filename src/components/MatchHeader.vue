@@ -36,6 +36,10 @@
             <v-img max-height="46" max-width="46" :src="urls.brand_pic" alt=""></v-img>
             <v-toolbar-items v-if="$vuetify.breakpoint.mdAndUp">
                 <v-btn 
+                    :href="urls.match_url"
+                    text>Match</v-btn>
+                <v-divider inset vertical></v-divider>
+                <v-btn 
                     :href="urls.courses_url"
                     text>HoosMyProfessor</v-btn>
                 <v-divider inset vertical></v-divider>

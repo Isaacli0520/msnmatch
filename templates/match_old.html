@@ -1,4 +1,4 @@
-<!-- templates/match.html -->
+<!-- templates/market.html -->
 {% load static %}
 {% load render_bundle from webpack_loader %}
 
@@ -9,7 +9,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <meta http-equiv="x-ua-compatible" content="ie=edge">
 
-        <title>Match</title>
+        <title>Market</title>
 
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.13.0/css/all.min.css">
         <link rel="shortcut icon" href="{% static 'css/images/favicon.ico' %}">
@@ -22,8 +22,8 @@
 	</head>
 
 <body>
-    <div id="match"></div>
-    {% render_bundle 'match' %}
+    <div id="market-page"></div>
+    {% render_bundle 'market_page' %}
 </body>
 
 </html>
