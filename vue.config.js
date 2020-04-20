@@ -35,30 +35,15 @@ module.exports = {
 			// output as dist/superadmin.html
 			filename: 'superadmin.html',
 		},
-		tagspage: {
-			entry: 'src/tags/main.js',
-			template: 'templates/tags.html',
-			filename: 'tags.html',
+		skillpage: {
+			entry: 'src/skill/main.js',
+			template: 'templates/skill.html',
+			filename: 'skill.html',
 		},
-		familypage: {
-			entry: 'src/family/main.js',
-			template: 'templates/family.html',
-			filename: 'family.html',
-		},
-		groupsmanagepage: {
-			entry: 'src/groupsmanage/main.js',
-			template: 'templates/groups_manage.html',
-			filename: 'groups_manage.html',
-		},
-		grouppage: {
-			entry: 'src/group/main.js',
-			template: 'templates/group.html',
-			filename: 'group.html',
-		},
-		grouptagpage: {
-			entry: 'src/grouptag/main.js',
-			template: 'templates/group_tag.html',
-			filename: 'group_tag.html',
+		skillspage: {
+			entry: 'src/skills/main.js',
+			template: 'templates/skills.html',
+			filename: 'skills.html',
 		},
 		coursespage: {
 			entry: 'src/courses/main.js',

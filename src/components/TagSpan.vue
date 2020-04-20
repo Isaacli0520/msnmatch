@@ -1,8 +1,8 @@
 <template>
     <a
-        :class="['skill-tag',skill.skill_type, (clickable =='delete') ? 'skill-tag-del' : 'skill-tag-add']"
+        :class="['skill-tag',skill.type, (clickable =='delete') ? 'skill-tag-del' : 'skill-tag-add']"
         v-on="clickable!='delete' ? { click: () => add_skill(skill) } : {}">
-        <span>{{skill.skill_name}}</span>
+        <span>{{skill.name}}</span>
         <span v-if="clickable=='delete' " class="skill-tag-remove">
             <i v-on:click="del_skill(skill)" class="fas fa-times"></i>
         </span>
@@ -21,7 +21,7 @@ export default{
             if(this.clickable == "add")
                 this.$emit('add-skill', skill);
             else if(this.clickable == "href")
-                window.location.href = "/skills/"+ skill.skill_pk.toString(10);
+                window.location.href = "/skills/"+ skill.id.toString(10);
         },
         del_skill(skill){
             this.$emit('del-skill', skill);
@@ -74,5 +74,55 @@ export default{
 
     .skill-tag-remove{
         margin:2px 3px 1px 5px;
+    }
+
+    .Entertainment{
+        color:#ffffff;
+        background-color: #f1b9a6e7;
+    }
+        
+    .Sport{
+        color:#ffffff;
+        background-color: #80b6e2;
+    }
+        
+    .Game{
+        color:#ffffff;
+        background-color: #8a1ae6;
+    }
+
+    .Film{
+        color:#ffffff;
+        background-color:#4cb41b;
+    }
+
+    .Music{
+        color:#ffffff;
+        background-color:#96db15;
+    }
+
+    .General{
+        color:#ffffff;
+        background-color:#88999c;
+    }
+
+    .Language{
+        color:#ffffff;
+        background-color: #af51db;
+    }
+
+    .Books{
+        color:#ffffff;
+        background-color:#ff9900;
+    }
+
+    .Academic{
+        color:#ffffff;
+        background-color:#5bd4b6;
+    }
+
+    .Custom{
+        color:#ffffff;
+        background-color: #e7544f;
     }
 </style>

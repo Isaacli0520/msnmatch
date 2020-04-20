@@ -102,6 +102,7 @@ def get_basic_info(request):
 			"logout":reverse('logout'),
 			"market_url":reverse('market:market'),
 			"match_url":reverse('match'),
+			"skills_url":reverse('skills:skills'),
 		}
 	else:
 		info = {

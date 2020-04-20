@@ -1,18 +1,16 @@
 import Vue from 'vue'
 import Vuetify from 'vuetify/lib'
-import Match from './Match.vue'
-import VueProgressiveImage from 'vue-progressive-image'
+import MatchPage from './MatchPage.vue'
 
 const vuetifyOptions = { }
 
 Vue.use(Vuetify);
-Vue.use(VueProgressiveImage, {});
 
 
 Vue.config.productionTip = false
 
 new Vue({
-  render: h => h(Match),
+  render: h => h(MatchPage),
   vuetify: new Vuetify(vuetifyOptions),
-  components: { Match }
+  components: { MatchPage }
 }).$mount('#match')

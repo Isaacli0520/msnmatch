@@ -49,7 +49,7 @@
                     </v-col>
                 </v-row>
             </v-container>
-            <market-item-dialog @close-dialog="itemDialog=false" :d_item="d_item" :itemDialog="itemDialog" ></market-item-dialog>
+            <market-item-dialog @close-dialog="itemDialog=false" :d_item="d_item" v-model="itemDialog" ></market-item-dialog>
         </v-content>
     </v-app>
 </template>

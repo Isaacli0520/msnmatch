@@ -47,6 +47,13 @@
                                 </v-card-actions>
                             </template>
                         </v-card>
+                        <v-card style="margin-top:15px;">
+                            <div class="video-div" v-if="user.video.length">
+                                <video width="100%" style="object-fit: contain" controls :src="user.video">
+                                    Your Browser does not support video tags lol
+                                </video>
+                            </div>
+                        </v-card>
                     </v-col>
                     <v-col cols="12" sm="6" md="7" lg="7" xl="7">
                             <v-card style="margin-bottom:15px;">
@@ -66,6 +73,10 @@
                                             <tr>
                                                 <td>Graduate Year</td>
                                                 <td>{{ user.graduate_year }}</td>
+                                            </tr>
+                                            <tr v-if="user.role">
+                                                <td>Role</td>
+                                                <td>{{ user.role }}</td>
                                             </tr>
                                             <tr>
                                                 <td>Major</td>
@@ -141,10 +152,6 @@ import MatchHeader from '../components/MatchHeader'
         },
 	},
 	methods: {
-        // openItemDialog(item){
-        //     this.d_item = JSON.parse(JSON.stringify(item));
-        //     this.itemDialog = true;
-        // },
         getProfile(username){
             axios.get('/users/api/get_profile/',{params: {username:username}}).then(response => {
                 if(response.data.success){
@@ -154,12 +161,6 @@ import MatchHeader from '../components/MatchHeader'
                 this.loaded = true;
             });
         },
-        // getSearchResult(query, category){
-        //     axios.get('/market/api/item_search_result/',{params: {"query":query, "category":category}}).then(response => {
-        //         this.items = response.data.items;
-        //         this.loaded = true;
-        //     });
-        // }
 	},
 	mounted(){
         this.getProfile(this.username);

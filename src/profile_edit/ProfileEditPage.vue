@@ -108,12 +108,18 @@
                                     accept="image/*"
                                     label="Upload an image"
                                     ></v-file-input>
+
+                                    <v-file-input 
+                                    v-model="edit_user_video"
+                                    accept="video/mp4,video/x-m4v,video/*"
+                                    label="Upload a video"
+                                    ></v-file-input>
                                 </v-form>
                             </v-card-text>
                             <v-divider></v-divider>
                             <v-card-actions>
                                 <v-spacer></v-spacer>
-                                <v-btn color="green darken-1" outlined :loading="editUserBtnLoading" @click.prevent="editUser(edit_user, edit_user_image)">Edit</v-btn>
+                                <v-btn color="green darken-1" outlined :loading="editUserBtnLoading" @click.prevent="editUser(edit_user, edit_user_image, edit_user_video)">Edit</v-btn>
                             </v-card-actions>
                         </v-card>
                     </v-col>
@@ -126,7 +132,15 @@
             color="red darken-1"
             :timeout="3200">
             Sth is wrong
-            <v-btn color="blue" text @click="failure_snack = false"> Close </v-btn>
+            <v-btn color="white" text @click="failure_snack = false"> Close </v-btn>
+        </v-snackbar>
+        <v-snackbar
+            top
+            v-model="video_snack"
+            color="purple lighten-1"
+            :timeout="3200">
+            Video may take longer to upload. Be patient :)
+            <v-btn color="white" text @click="video_snack = false"> Close </v-btn>
         </v-snackbar>
     </v-app>
 </template>
@@ -142,10 +156,12 @@ axios.defaults.xsrfCookieName = "csrftoken";
         return {
             loaded:false,
             failure_snack: false,
+            video_snack: false,
             edit_user:null,
             editUserBtnLoading:false,
             edit_user_form_valid:false,
             edit_user_image:null,
+            edit_user_video:null,
             firstnameRules: [
                 v => !!v || 'First Name is required',
                 v => (v && v.length <= 30) || 'First Name must be less than 30 characters',
@@ -171,8 +187,9 @@ axios.defaults.xsrfCookieName = "csrftoken";
                 {'value':'2024', 'text':'2024'},
             ],
             genders:[
-                {'value':'Male', 'text':'Male'},
                 {'value':'Female', 'text':'Female'},
+                {'value':'Male', 'text':'Male'},
+                {'value':'Other', 'text':'Other'},
             ],
             majors: [
                 {'value':'', 'text':'None'},
@@ -267,28 +284,31 @@ axios.defaults.xsrfCookieName = "csrftoken";
         },
 	},
 	methods: {
-        editUser(user, edit_user_image){
+        editUser(user, edit_user_image, edit_user_video){
             this.$refs.edit_form.validate();
             if(!this.edit_user_form_valid)
                 return;
             this.editUserBtnLoading = true;
             let formData = new FormData();
             formData.append('picture', edit_user_image);
+            formData.append('video', edit_user_video);
             for(var key in user){
-                if(key != "picture"){
+                if(key != "picture" && key != "video"){
                     formData.append(key, user[key]);
                 }
             }
+            if(edit_user_video)
+                this.video_snack = true;
             axios.post('/users/api/edit_user/',formData,
             {
                 headers:{
                     'Content-Type': 'multipart/form-data',
                 }
             }).then(response => {
+                this.editUserBtnLoading = false;
                 if(response.data.success){
                     window.location.href = '/users/'+this.username;
                 }else{
-                    this.editUserBtnLoading = false;
                     this.failure_snack = true;
                 }
             });

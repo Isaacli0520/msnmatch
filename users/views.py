@@ -96,12 +96,17 @@ def profile_json(user):
         picture_url = user.profile.picture.url
     else:
         picture_url = settings.STATIC_URL + "css/images/brand.jpg"
+    if user.profile.video:
+        video_url = user.profile.video.url
+    else:
+        video_url = ""
     return {
         "pk": user.pk,
         "picture": picture_url,
         "first_name": user.first_name,
         "last_name": user.last_name,
         "email": user.email,
+        "role":user.profile.role,
         "bio": user.profile.bio,
         "birth_date": user.profile.birth_date,
         "location": user.profile.location,
@@ -113,6 +118,7 @@ def profile_json(user):
         "minor":user.profile.minor,
         "wechat":user.profile.wechat,
         "username":user.username,
+        "video":video_url,
     }
 
 @login_required
