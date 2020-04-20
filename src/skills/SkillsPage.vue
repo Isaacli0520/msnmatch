@@ -53,7 +53,7 @@
                         hide-no-data
                         hide-selected
                         hide-details
-                        placeholder="Search for Skills"
+                        placeholder="Search for Interests"
                         return-object>
                         <template v-slot:item="{ item }">
                             <v-list-item-content>
@@ -265,7 +265,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
         color:#32a49a; 
         font-size:45px;
         font-weight: 500 !important;
-        font-family: Palatino, URW Palladio L, serif !important;
+        font-family: Times, serif !important;
     }
 
     .subtitle-text{

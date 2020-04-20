@@ -42,6 +42,7 @@ ROLE_CHOICES = (
 SEX_CHOICES = (
 			('Male', 'Male'),
 			('Female', 'Female'),
+			('Other', 'Other'),
 		)
 MAJOR_CHOICES = (
 ('Accelerated B.A./Master of Public Policy (MPP) Program', 'Accelerated B.A./Master of Public Policy (MPP) Program'),

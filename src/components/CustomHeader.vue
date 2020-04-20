@@ -114,6 +114,14 @@
                 <v-btn 
                     :href="urls.courses_url"
                     text>HoosMyProfessor</v-btn>
+                <v-divider inset vertical></v-divider>
+                <v-btn 
+                    :href="urls.match_url"
+                    text>Match</v-btn>
+                <v-divider inset vertical></v-divider>
+                <v-btn 
+                    :href="urls.market_url"
+                    text>Market</v-btn>
             </v-toolbar-items>
             <search-course
                 v-if="searchBool"></search-course>
@@ -239,6 +247,8 @@ export default{
                 courses_url:"",
                 match_url:"",
                 comment_url:"",
+                market_url:"",
+                skills_url:"",
             },
             trash_items:[
                 {

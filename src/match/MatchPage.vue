@@ -379,7 +379,7 @@ import UserCard from '../components/UserCard'
         color:#32a49a; 
         font-size:45px;
         font-weight: 500 !important;
-        font-family: Palatino, URW Palladio L, serif !important;
+        font-family: Times, serif !important;
     }
 
     .all-buttons{

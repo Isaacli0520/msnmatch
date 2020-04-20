@@ -62,10 +62,15 @@
                 <v-btn 
                     :href="urls.market_url"
                     text>Market</v-btn>
-                <!-- <v-divider inset vertical></v-divider>
+                <v-divider inset vertical></v-divider>
                 <v-btn 
-                    :href="urls.market_url"
-                    text>Sell</v-btn> -->
+                    :href="urls.match_url"
+                    text>Match</v-btn>
+                <v-divider inset vertical></v-divider>
+                <v-btn 
+                    :href="urls.courses_url"
+                    text>HoosMyProfessor</v-btn>
+                <v-divider inset vertical></v-divider>
             </v-toolbar-items>
             <v-text-field
                 label="Search Item"
@@ -392,6 +397,7 @@ export default{
                 market_url:"",
                 courses_url:"",
                 match_url:"",
+                skills_url:"",
                 comment_url:"",
             },
             main_items:[

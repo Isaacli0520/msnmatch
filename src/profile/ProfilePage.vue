@@ -47,6 +47,13 @@
                                 </v-card-actions>
                             </template>
                         </v-card>
+                        <v-card style="margin-top:15px;">
+                            <div class="video-div" v-if="user.video.length">
+                                <video width="100%" style="object-fit: contain" controls :src="user.video">
+                                    Your Browser does not support video tags lol
+                                </video>
+                            </div>
+                        </v-card>
                     </v-col>
                     <v-col cols="12" sm="6" md="7" lg="7" xl="7">
                             <v-card style="margin-bottom:15px;">
