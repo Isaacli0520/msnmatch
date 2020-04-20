@@ -35,6 +35,11 @@ module.exports = {
 			// output as dist/superadmin.html
 			filename: 'superadmin.html',
 		},
+		skillpage: {
+			entry: 'src/skill/main.js',
+			template: 'templates/skill.html',
+			filename: 'skill.html',
+		},
 		skillspage: {
 			entry: 'src/skills/main.js',
 			template: 'templates/skills.html',

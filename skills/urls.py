@@ -1,12 +1,14 @@
 from django.urls import path
 from . import views
 from django.contrib.auth import logout, login
+app_name = "skills"
 
 urlpatterns = [
   path('', views.skills, name="skills"),
   # path('rank/', views.skill_rank, name='skill_rank'),
-  # path('<int:skill_pk>/', views.skill, name='skill'),
+  path('<int:skill_pk>/', views.skill, name='skill'),
 
+  path('api/get_skill/', views.get_skill, name="get_skill"),
   path('api/get_all_users/', views.get_all_users, name="get_all_users"),
   path('api/get_all_and_user_skills/', views.get_all_and_user_skills, name="get_all_and_user_skills"),
   path('api/get_search_result/', views.get_search_result, name="get_search_result"),

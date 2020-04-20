@@ -40,12 +40,17 @@
                     text>Match</v-btn>
                 <v-divider inset vertical></v-divider>
                 <v-btn 
+                    :href="urls.skills_url"
+                    text>Interests</v-btn>
+                <v-divider inset vertical></v-divider>
+                <v-btn 
                     :href="urls.courses_url"
                     text>HoosMyProfessor</v-btn>
                 <v-divider inset vertical></v-divider>
                 <v-btn 
                     :href="urls.market_url"
                     text>Market</v-btn>
+                
             </v-toolbar-items>
             <v-spacer></v-spacer>
             <v-menu offset-y
@@ -145,12 +150,20 @@ export default{
                 courses_url:"",
                 match_url:"",
                 comment_url:"",
+                skills_url:"",
             },
             main_items:[
                 {
                     "title":"Home",
                     "icon":"fas fa-home",
-                    "href":"/",
+                    "href":"/match/",
+                    "target":"",
+                },
+
+                {
+                    "title":"Add Your Interests",
+                    "icon":"fas fa-heart",
+                    "href":"/skills/",
                     "target":"",
                 },
                 {

@@ -240,6 +240,14 @@ axios.defaults.xsrfCookieName = "csrftoken";
 </script>
 
 <style>
+    .v-content__wrap{
+    width:100%;
+    /* height: 100%; */
+    background: url('../assets/static/css/images/cloud_new_09.jpg') no-repeat;
+    background-attachment: fixed;
+    background-position: center center;
+    background-size: cover;
+  }
 
     .skill-type-text{
         color: #32a49a;

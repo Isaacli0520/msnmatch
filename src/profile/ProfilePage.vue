@@ -67,6 +67,10 @@
                                                 <td>Graduate Year</td>
                                                 <td>{{ user.graduate_year }}</td>
                                             </tr>
+                                            <tr v-if="user.role">
+                                                <td>Role</td>
+                                                <td>{{ user.role }}</td>
+                                            </tr>
                                             <tr>
                                                 <td>Major</td>
                                                 <td>{{ user.major }}</td>

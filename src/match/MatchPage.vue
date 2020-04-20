@@ -16,7 +16,8 @@
                     </div>
                 </v-layout>
             </v-container>
-            <v-container v-if="loaded" fluid grid-list-lg>
+            <v-container style="padding:0 !important;" v-if="loaded" fluid grid-list-lg>
+                <div class="top-part-wrapper">
                 <v-row justify="center">
                     <div style="text-align: center;">
                         <h1 class="title-text">MSN Mentor-Mentee Match</h1>
@@ -66,7 +67,10 @@
                         <small class="muted-text">*Note that you have to be a mentor/mentee to appear in the user list and perform any actions</small>
                     </div>
                 </v-row>
-                <v-row style="margin-top:50px;" dense>
+                </div>
+            </v-container>
+            <v-container>
+                <v-row style="margin-top:17px;" dense>
                     <v-col
                         v-for="(user, i) in users"
                         :key="i"
@@ -345,6 +349,21 @@ import UserCard from '../components/UserCard'
 </script>
 
 <style>
+    .top-part-wrapper{
+        position: relative;
+        padding: 55px 0px 45px 0px;
+        color:#000000;
+        width:100%;
+        position:relative;
+        background: url('../assets/static/css/images/cloud_new_09.jpg') no-repeat;
+        background-attachment: fixed;
+        background-position: center center;
+        background-size: cover;
+
+        -webkit-box-shadow: inset 0 -2px 2px 0px rgba(0,0,0,.13), inset 0 -3px 3px 0px rgba(0,0,0,.12);
+        box-shadow: inset 0 -2px 2px 0px rgba(0,0,0,.13), inset 0 -3px 3px 0px rgba(0,0,0,.12);
+    }
+
     .checkbox-div{
         margin: 0 auto;
         width: 80%;

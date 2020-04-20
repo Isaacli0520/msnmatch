@@ -42,6 +42,10 @@ SKILL_TYPES = [
 def skills(request):
 	return render(request, 'skills.html')
 
+@login_required
+def skill(request, skill_pk):
+	return render(request, 'skill.html')
+
 # @login_required
 # def skill_rank(request):
 # 	if Skill.objects.count() >= 75:
@@ -51,6 +55,23 @@ def skills(request):
 # 	return render(request, 'skill_rank.html',{
 # 		"all_skills":all_skills,
 # 		})
+
+@login_required
+def get_skill(request):
+	skill_id = request.GET.get("id")
+	try:
+		skill = Skill.objects.get(pk = skill_id)
+		users = skill.users.all()
+		return JsonResponse({
+			"success":True,
+			"skill":skill_json(skill),
+			"users":[user_json(user) for user in users]
+		})
+	except:
+		return JsonResponse({
+			"success":False,
+			"message":"Skill doesn't exist."
+		})
 
 @login_required
 def get_all_and_user_skills(request):
@@ -227,6 +248,7 @@ def user_json(user):
 		tmp_year = ""
 	return {
 		"pk": user.pk,
+		"username":user.username,
 		"first_name": user.first_name,
 		"last_name": user.last_name,
 		"email": user.email,
