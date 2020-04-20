@@ -82,7 +82,7 @@ def get_all_and_user_skills(request):
 
 @login_required
 def get_all_users(request):
-	users = sorted(User.objects.all().exclude(username="admin"), key=lambda x: random.random())
+	users = sorted(User.objects.all().exclude(username="admin").exclude(profile__role=""), key=lambda x: random.random())
 	return JsonResponse({
 		"users":[user_json(user) for user in users],
 		"request_user":user_json(request.user),
