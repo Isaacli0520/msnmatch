@@ -72,6 +72,7 @@
             <v-divider></v-divider>
             <v-card-actions>
                 <v-spacer></v-spacer>
+                <v-btn color="purple darken-1" outlined v-if="edit" :href="'/users/'+user.username+'/edit/'">Edit</v-btn>
                 <v-btn color="blue darken-1" outlined @click.native="$emit('input')">Close</v-btn>
             </v-card-actions>
         </v-card>
@@ -93,6 +94,10 @@ export default{
             type:Boolean,
             default:false,
         },
+        edit:{
+            type:Boolean,
+            default:false,
+        }
     },
     data(){
         return{

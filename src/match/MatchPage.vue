@@ -45,7 +45,7 @@
                             id="myInput" 
                             type="text" 
                             name="class" 
-                            placeholder=" &quot;Marvel&quot;, &quot;major:Math&quot;, &quot;birth:2000&quot; " 
+                            placeholder=" &quot;Marvel&quot;, &quot;major:Math&quot;, &quot;loc:Beijing&quot; " 
                             class=" search-input" 
                             aria-label="Search">
                     </div>
@@ -79,12 +79,16 @@
                         md="4"
                         lg="3"
                         xl="3">
-                    <user-card :user="user" @open-user-dialog="openUserDialog"></user-card>
+                    <user-card
+                        class="fill-height"
+                        :user="user" @open-user-dialog="openUserDialog"></user-card>
                     </v-col>
                 </v-row>
             </v-container>
         </v-content>
         <user-dialog
+            v-if="d_user"
+            :edit="request_user.username == d_user.username"
             :user="d_user"
             v-model="userDialog"></user-dialog>
         <v-dialog v-model="roleDialog" scrollable min-width="200px" max-width="600px">

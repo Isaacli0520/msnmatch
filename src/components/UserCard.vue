@@ -11,7 +11,8 @@
         </v-img>
         <v-divider></v-divider>
         <v-card-title>{{user.first_name + " " + user.last_name}}</v-card-title>
-        <v-card-subtitle class="cus-subtitle">{{ user.major ? user.major : "None" }}</v-card-subtitle>
+        <div class="cus-subtitle" v-if="user.major">{{ user.major }}</div>
+        <div class="cus-subtitle major-two" v-if="user.major_two">{{ user.major_two }}</div>
         <!-- <v-card-text v-if="item.sold">
             <div class="item-tags">
                 <span class="item-tag item-tag-sold">Sold</span>
@@ -61,12 +62,22 @@ export default{
     .v-card__title{
         font-family: "Roboto", sans-serif !important;
         font-weight: 700 !important;
+        padding-bottom: 0px;
+        padding-top: 10px;
     }
 
     .cus-subtitle{
-        /* font-weight: 600 !important; */
-        font-size:17px !important;
+        font-weight: 400 !important;
+        font-size:15px !important;
+        color: rgb(117, 117, 117);
+        letter-spacing: 0.007em;
+        padding: 0px 16px 3px 16px;
     }
+
+    .major-two{
+        padding: 0px 16px 10px 16px !important;
+    }
+
 
     .item-tags{
         margin: -3px 0px 0px 0px;
