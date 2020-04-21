@@ -212,6 +212,8 @@ import MatchHeader from '../components/MatchHeader'
         font-family: "Times New Roman", Times, serif !important; 
         font-size: 16px !important;
         padding: 6px 16px;
+        word-break: break-all;
+        white-space: pre-line;
     }
 
 

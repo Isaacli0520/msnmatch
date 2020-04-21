@@ -154,7 +154,7 @@ export default{
     .v-card__text td{
         border-bottom: 1px solid rgb(216, 216, 216) !important;
         word-break: break-all;
-        /* white-space: pre-line; */
+        white-space: pre-line;
         font-family: "Roboto", sans-serif !important;
         font-size: 15px !important;
         padding: 11px 12px;

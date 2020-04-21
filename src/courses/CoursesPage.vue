@@ -152,7 +152,6 @@ import SearchCourse from '../components/SearchCourse'
             recommendation_loaded:false,
             loaded:{
                 "Taken":false,
-                "Taking":false,
             },
             credential:"",
             plannableURL:"",
@@ -296,10 +295,8 @@ import SearchCourse from '../components/SearchCourse'
         },
         getTrendingCourses(){
             axios.get('/courses/ajax/get_trending_courses/',{params: {}}).then(response => {
-                this.trending_courses["Taking"] = response.data.taking_courses;
                 this.trending_courses["Taken"] = response.data.taken_courses;
                 this.loaded["Taken"] = true;
-                this.loaded["Taking"] = true;
             });
         },
         getRecommendations(){

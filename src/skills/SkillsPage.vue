@@ -162,20 +162,22 @@ axios.defaults.xsrfCookieName = "csrftoken";
             axios.get('/skills/api/get_search_result/',{params: {query:val, time: this.lastTime}}).then(response => {
                 if(response.data.time == this.lastTime){
                     this.entries = response.data.skills; 
-                    if(this.entries[0].name != val){
-                        this.entries.push({
-                            id:-1,
-                            name:val,
-                            intro:"",
-                            type:"Custom"
-                        });
-                    }
                 }
             })
             .catch(err => {
                 console.log("error: ",err)
             })
-            .finally(() => {this.isLoading = false});
+            .finally(() => {
+                if((this.entries.length > 0 && this.entries[0].name != val) || this.entries.length == 0){
+                    this.entries.push({
+                        id:-1,
+                        name:val,
+                        intro:"",
+                        type:"Custom"
+                    });
+                }
+                this.isLoading = false
+            });
         },
 	},
 	computed:{

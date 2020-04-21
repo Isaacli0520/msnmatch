@@ -25,7 +25,7 @@ import operator
 from fuzzywuzzy import fuzz, process
 from msnmatch import settings
 
-MAXIMUM_SKILLS = 5
+MAXIMUM_SKILLS = 4
 SKILL_TYPES = [
 	"Academic",
 	"Books",
