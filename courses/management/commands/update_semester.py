@@ -129,7 +129,6 @@ class Command(BaseCommand):
 				tmp_instructor = cs["Instructor"+str(i)]
 				if tmp_instructor != "":
 					if len(tmp_instructor.split(',')) > 1:
-						tbd_instructors.append(tmp_instructor.strip().split())
 						for instructor in tmp_instructor.split(','):
 							final_instructors.append(instructor.strip().split())
 					else:
@@ -141,20 +140,6 @@ class Command(BaseCommand):
 			# 'Days3', 'Room3', 'MeetingDates3', 'Instructor4', 'Days4', 'Room4'
 			# , 'MeetingDates4', 'Title', 'Topic', 'Status', 'Enrollment', 'EnrollmentLimit',
 			#  'Waitlist', 'Description']
-			
-			for instructor in tbd_instructors:
-				if len(instructor) == 0:
-					print("Empty Instructor Name")
-					return
-				tmp_first_name = instructor[0]
-				tmp_last_name = "" if len(instructor) == 1 else instructor[-1]
-
-				try:
-					instr = Instructor.objects.get(first_name=tmp_first_name, last_name=tmp_last_name)
-					instr.delete()
-					print("Instructor", tmp_first_name, tmp_last_name, "deleted")
-				except Instructor.DoesNotExist:
-					print("Instructor", tmp_first_name, tmp_last_name, "does not exist")
 
 			for instructor in final_instructors:
 				if len(instructor) == 0:
