@@ -41,7 +41,7 @@
                 <v-divider inset vertical></v-divider>
                 <v-btn 
                     :href="urls.skills_url"
-                    text>Interests</v-btn>
+                    text>Tags</v-btn>
                 <v-divider inset vertical></v-divider>
                 <v-btn 
                     :href="urls.courses_url"
@@ -161,7 +161,7 @@ export default{
                 },
 
                 {
-                    "title":"Add Your Interests",
+                    "title":"Add Tags",
                     "icon":"fas fa-heart",
                     "href":"/skills/",
                     "target":"",

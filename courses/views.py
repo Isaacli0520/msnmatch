@@ -11,7 +11,7 @@ from django.contrib import messages
 from django.shortcuts import redirect
 from django.contrib.auth.models import User
 from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector, TrigramSimilarity
-from django.db.models import Q, F
+from django.db.models import Q, F, Count
 from django.db.models.functions import Lower, Substr, Length
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
@@ -418,33 +418,25 @@ def year_and_semester(ys):
 
 @login_required
 def get_trending_courses(request):
-	trending_courses = {}
-	for cs_user in CourseUser.objects.all():
-		tmp_course = cs_user.course
-		if tmp_course.pk not in trending_courses and tmp_course.last_taught == settings.CURRENT_SEMESTER:
-			trending_courses[tmp_course.pk] = {"taking":0, "taken":0,}
-		if tmp_course.pk in trending_courses:
-			trending_courses[tmp_course.pk][cs_user.take] += 1
-	tmp_courses = []
-	for cs_pk, take in trending_courses.items():
-		tmp_course = get_object_or_404(Course, pk = cs_pk)
-		tmp_courses.append({
-			"course_pk":cs_pk,
-			"title":tmp_course.title,
-			"mnemonic":tmp_course.mnemonic,
-			"number":tmp_course.number,
-			"description":tmp_course.description,
-			"taking":take["taking"],
-			"taken":take["taken"],
-		})
-	taking_courses = sorted(tmp_courses, key=lambda x:(x["taking"]), reverse=True)
-	taken_courses = sorted(tmp_courses, key=lambda x:(x["taken"]), reverse=True)
+	time_start = time.time()
+	tmp_courses = Course.objects.annotate(num_taken=Count('courseuser', filter=Q(courseuser__take__iexact = "taken"))).annotate(num_taking=Count('courseuser', filter=Q(courseuser__take__iexact = "taking")))
+	taken_courses = sorted(tmp_courses, key=lambda c: c.num_taken, reverse=True)[:20]
+	final_taken_courses = []
+	for cs in taken_courses:
+		if cs.num_taken > 0:
+			final_taken_courses.append({
+				"course_pk":cs.pk,
+				"title":cs.title,
+				"mnemonic":cs.mnemonic,
+				"number":cs.number,
+				"description":cs.description,
+				"taking":cs.num_taking,
+				"taken":cs.num_taken,
+			})
 
-	final_taking_courses = [cs for cs in taking_courses if cs["taking"] > 0]
-	final_taken_courses = [cs for cs in taken_courses if cs["taken"] > 0]
-
+	time_end = time.time()
+	print("GET TRENDING TIME SPENT:", time_end - time_start)
 	return JsonResponse({
-		"taking_courses":final_taking_courses[:10],
 		"taken_courses":final_taken_courses[:10],
 	})
 
