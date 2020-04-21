@@ -122,12 +122,18 @@ class Command(BaseCommand):
 				course.save()
 			except Course.DoesNotExist:
 				course = Course.objects.create(number=cs['Number'], mnemonic=cs['Mnemonic'], units=cs['Units'], title=cs['Title'],description=cs["Description"], type=cs['Type'], prerequisite=cs['Prerequisite'])
-
+			
+			tbd_instructors = []
 			final_instructors = []
 			for i in range(1, 5):
 				tmp_instructor = cs["Instructor"+str(i)]
 				if tmp_instructor != "":
-					final_instructors.append(tmp_instructor.strip().split())
+					if len(tmp_instructor.split(',')) > 1:
+						tbd_instructors.append(tmp_instructor.strip().split())
+						for instructor in tmp_instructor.split(','):
+							final_instructors.append(instructor.strip().split())
+					else:
+						final_instructors.append(tmp_instructor.strip().split())
 
 			# ['ClassNumber', 'Mnemonic', 'Number', 'Section', 'Type', 
 			# 'Units', 'Instructor1', 'Days1', 'Room1', 'MeetingDates1', 
@@ -136,6 +142,19 @@ class Command(BaseCommand):
 			# , 'MeetingDates4', 'Title', 'Topic', 'Status', 'Enrollment', 'EnrollmentLimit',
 			#  'Waitlist', 'Description']
 			
+			for instructor in tbd_instructors:
+				if len(instructor) == 0:
+					print("Empty Instructor Name")
+					return
+				tmp_first_name = instructor[0]
+				tmp_last_name = "" if len(instructor) == 1 else instructor[-1]
+
+				try:
+					instr = Instructor.objects.get(first_name=tmp_first_name, last_name=tmp_last_name)
+					instr.delete()
+					print("Instructor", tmp_first_name, tmp_last_name, "deleted")
+				except Instructor.DoesNotExist:
+					print("Instructor", tmp_first_name, tmp_last_name, "does not exist")
 
 			for instructor in final_instructors:
 				if len(instructor) == 0:
@@ -157,7 +176,10 @@ class Command(BaseCommand):
 					cs_instr = CourseInstructor.objects.create(instructor=instr, course=course, topic=cs["Topic"], semester=cs["Semester"])
 				
 		for old_cs_instr, v in old_cs_instrs_dict.items():
-			if v == 1 and not CourseUser.objects.filter(course_instructor=old_cs_instr).first():
-				print("Old Course Instructor Relation Deleted -", "Instructor:",old_cs_instr.instructor.first_name, old_cs_instr.instructor.last_name, "Course:", old_cs_instr.course.mnemonic, old_cs_instr.course.number, old_cs_instr.course.title)
-				old_cs_instr.delete()
+			try:
+				if v == 1 and not CourseUser.objects.filter(course_instructor=old_cs_instr).first():
+					print("Old Course Instructor Relation Deleted -", "Instructor:",old_cs_instr.instructor.first_name, old_cs_instr.instructor.last_name, "Course:", old_cs_instr.course.mnemonic, old_cs_instr.course.number, old_cs_instr.course.title)
+					old_cs_instr.delete()
+			except Instructor.DoesNotExist:
+				print("OLD instructor error")
 		print("Comments After:", CourseUser.objects.all().count())
