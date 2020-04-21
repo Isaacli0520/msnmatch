@@ -27,8 +27,8 @@ class CourseInstructorRelationInline(admin.TabularInline):
 
 class CustomCourseAdmin(admin.ModelAdmin):
     inlines = (CourseInstructorRelationInline,) #CourseUserRelationInline,
-    list_display = ['get_courseNum','type','units', 'title']
-    list_filter = ('type','mnemonic', 'units',)
+    list_display = ['get_courseNum','type','units', 'title', 'last_taught']
+    list_filter = ('type','mnemonic', 'units', 'last_taught')
     search_fields = ["mnemonic", "number", "title"]
 
     def get_courseNum(self, instance):
@@ -38,6 +38,7 @@ class CustomCourseAdmin(admin.ModelAdmin):
 class CustomCourseInstructorAdmin(admin.ModelAdmin):
     list_display = ['course','instructor','semester', 'topic']
     list_filter = ('semester',)
+    search_fields = ["course__mnemonic","course__number","course__title",]
     autocomplete_fields = ['course','instructor',]
 
 class CustomCourseUserAdmin(admin.ModelAdmin):
@@ -46,7 +47,8 @@ class CustomCourseUserAdmin(admin.ModelAdmin):
     actions = [export_comments]
 
 class CustomInstructorAdmin(admin.ModelAdmin):
-    list_display = ['first_name', 'last_name']
+    list_display = ['first_name', 'last_name', 'last_taught']
+    list_filter = ('last_taught',)
     search_fields = ['first_name','last_name']
 
 

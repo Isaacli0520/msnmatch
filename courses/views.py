@@ -16,6 +16,7 @@ from django.db.models.functions import Lower, Substr, Length
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
+from django.forms.models import model_to_dict
 
 from fuzzywuzzy import fuzz, process
 from msnmatch import settings
@@ -117,23 +118,6 @@ def get_basic_info(request):
 		"all_info":info,
 	})
 
-"""
-	Get the users with top reviews(sorted by review counts from maximum to minimum).
-
-	HttpRequest Method: GET
-
-	API Parameters:
-		None
-
-	Returns:
-		JsonResponse:
-			review_users: list
-				pk: user pk
-				username: user username
-				name: user name
-				reviews: user review count
-
-"""
 @login_required
 def get_top_review_users(request):
 	users = []
@@ -418,7 +402,7 @@ def year_and_semester(ys):
 
 @login_required
 def get_trending_courses(request):
-	time_start = time.time()
+	# time_start = time.time()
 	tmp_courses = Course.objects.annotate(num_taken=Count('courseuser', filter=Q(courseuser__take__iexact = "taken"))).annotate(num_taking=Count('courseuser', filter=Q(courseuser__take__iexact = "taking")))
 	taken_courses = sorted(tmp_courses, key=lambda c: c.num_taken, reverse=True)[:20]
 	final_taken_courses = []
@@ -434,32 +418,25 @@ def get_trending_courses(request):
 				"taken":cs.num_taken,
 			})
 
-	time_end = time.time()
-	print("GET TRENDING TIME SPENT:", time_end - time_start)
+	# time_end = time.time()
+	# print("GET TRENDING TIME SPENT:", time_end - time_start)
 	return JsonResponse({
 		"taken_courses":final_taken_courses[:10],
 	})
 
 @login_required
 def get_departments(request):
-	all_departments = Department.objects.all().exclude(name="")
-	departments = []
-	for department in all_departments:
-		departments.append({
-			"department_pk":department.pk,
-			"name":department.name,
-			"school":department.school,
-		})
 	return JsonResponse({
-		"departments":departments,
+		"departments":[model_to_dict(department) for department in Department.objects.all().exclude(name="")],
 	})
 
 @login_required
 def get_department(request):
+	start_time = time.time()
 	department_pk = request.GET.get("department_pk")
 	department = get_object_or_404(Department, pk=department_pk)
 	ret_courses = [get_detailed_json_of_course(cs, request.user, with_take=True) for cs in department.course_set.all().exclude(units="0")]
-	
+	print("Time Spent:", time.time()-start_time)
 	return JsonResponse({
 		"department":{
 			"name":department.name,
@@ -559,26 +536,22 @@ def get_course_instructor(request):
 
 @login_required
 def course_search_result(request):
-	# time_start = time.time()
-	# score_cutoff = 85
-	query = request.GET.get("query").strip()
+	query = request.GET.get("query")
 	query_time = request.GET.get("time")
-	field_queryset = course_and_instructor_retrieve(query)
-	# if query.upper() in mnemonics:
-	# 	field_queryset = Course.objects.filter(mnemonic = query.upper()).exclude(units="0")
-	# else:
-	# 	pk_queryset = {fq.pk:(str(getattr(fq, "mnemonic")) + str(getattr(fq,"number")) + " " + str(getattr(fq, "title")) ) for fq in Course.objects.exclude(units="0")}
-	# 	if len(pk_queryset) > 0:
-	# 		all_pks = process.extractBests(query, pk_queryset,scorer=fuzz.partial_ratio, score_cutoff=score_cutoff, limit=20)
-	# 		all_pks = [item[2] for item in all_pks]
-	# 		field_queryset = Course.objects.filter(pk__in=all_pks)
-	# 	else:
-	# 		field_queryset = None
-	course_reslt = get_json_of_search_result(field_queryset)
-	# time_end = time.time()
-	# print("Time spent:", time_end - time_start)
+	if not query or not query_time:
+		return JsonResponse({
+			"success":False,
+			"message":"Query or Time not provided"
+		})
+	search_queryset = course_and_instructor_retrieve(query)
+	course_result = []
+	for query in search_queryset:
+		if query[1] == "instructor":
+			course_result.append(get_json_of_instructor(query[0]))
+		if query[1] == "course":
+			course_result.append(get_json_of_course(query[0]))
 	return JsonResponse({
-		"course_result": course_reslt,
+		"course_result": course_result,
 		"time":query_time,
 	})
 
@@ -632,53 +605,26 @@ def course_and_instructor_retrieve(query):
 		
 		return retrieved_courses + retrieved_instructors
 
-def get_json_of_search_result(queryset):
-	ret_arr = []
-	for query in queryset:
-		if query[1] == "instructor":
-			ret_arr.append(get_json_of_instructor(query[0]))
-		if query[1] == "course":
-			ret_arr.append(get_json_of_course(query[0]))
-	return ret_arr
-
-def get_json_of_courses(queryset):
-	if len(queryset) > 0:
-		return [get_json_of_course(cs) for cs in queryset]
-	return []
-
 def cmp_semester_key(a,b):
 	return cmp_semester(a["semester"], b["semester"])
 
 def get_json_of_instructor(instructor):
-	last_taught = get_last_taught_of_course_instructors(CourseInstructor.objects.filter(instructor=instructor))
 	return {
 		"pk":instructor.pk,
 		"name": instructor.__str__(),
 		"type":"instructor",
-		"last_taught":last_taught,
+		"last_taught":instructor.last_taught,
 	}
 
 def get_json_of_course(course):
-	last_taught = get_last_taught_of_course_instructors(CourseInstructor.objects.filter(course=course))
 	return {
 		"pk":course.pk,
 		"mnemonic":course.mnemonic,
 		"number":course.number,
 		"title":course.title,
-		"last_taught":last_taught,
+		"last_taught":course.last_taught,
 		"type":"course",
 	}
-
-def get_last_taught_of_course_instructors(queryset):
-	cs_instr_arr = [cs_instr.semester for cs_instr in queryset]
-	cs_instr_arr = sorted(cs_instr_arr, key=cmp_to_key(cmp_semester))
-	if settings.CURRENT_SEMESTER not in cs_instr_arr and len(cs_instr_arr) > 0:
-		last_taught = cs_instr_arr[-1]
-	elif settings.CURRENT_SEMESTER in cs_instr_arr:
-		last_taught = settings.CURRENT_SEMESTER
-	else:
-		last_taught = ""
-	return last_taught
 
 def get_detailed_json_of_course_instructor(course, instructor, user):
 	course_instructor_relations = []
@@ -759,8 +705,8 @@ def get_detailed_json_of_course(course, user, with_instructors=False, with_take=
 	if with_instructors:
 		course_dict["instructors"] = get_instructors_of_course(course)
 	if with_take:
-		course_dict["taking"] = CourseUser.objects.filter(course=course, take="taking").count()
-		course_dict["taken"] = CourseUser.objects.filter(course=course, take="taken").count()
+		course_dict["taking"] = course.courseuser_set.filter(take="taking").count()
+		course_dict["taken"] = course.courseuser_set.filter(take="taken").count()
 	return course_dict
 
 def get_instructors_of_course(course):

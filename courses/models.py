@@ -6,6 +6,7 @@ from msnmatch import settings
 class Instructor(models.Model):
 	first_name = models.CharField(max_length=255, default="Null")
 	last_name = models.CharField(max_length=255, default="Null")
+	last_taught = models.CharField(max_length=100, default="")
 	
 	def __str__(self):
 		return self.first_name + " " + self.last_name
@@ -43,13 +44,12 @@ class CourseInstructor(models.Model):
 	topic = models.CharField(max_length=500, blank=True)
   
 	def save(self, *args, **kwargs):
-		# if self.pk != None:
-		# 	this = CourseInstructor.objects.get(pk = self.pk)
-		# 	if cmp_semester(self.semester, this.course.last_taught) > 0:
-		# 		self.course.last_taught = self.semester
 		if cmp_semester(self.semester, self.course.last_taught) > 0:
 			self.course.last_taught = self.semester
 			self.course.save()
+		if cmp_semester(self.semester, self.instructor.last_taught) > 0:
+			self.instructor.last_taught = self.semester
+			self.instructor.save()
 		super(CourseInstructor, self).save(*args, **kwargs)
 
 
