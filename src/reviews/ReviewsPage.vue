@@ -241,7 +241,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
         getCourseInstructors(course_pk, instructor_pk){
             this.cs_instr_load = true;
             var tmp_cs_instr = [];
-            axios.get('/courses/ajax/get_course_instructors/',{params: {course_pk:course_pk, instructor_pk:instructor_pk}}).then(response => {
+            axios.get('/courses/api/get_course_instructors/',{params: {course_pk:course_pk, instructor_pk:instructor_pk}}).then(response => {
                 this.course_instructors = response.data.course_instructors.sort(this.sortBySemesterKey);
                 for(let i = 0; i < this.course_instructors.length; i++){
                     if(this.course_instructors[i].semester != this.currentSemester){

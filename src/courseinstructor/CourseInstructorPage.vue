@@ -223,7 +223,6 @@
             </v-card-actions>
         </v-card>
     </v-dialog>
-    <!-- <custom-footer></custom-footer> -->
     </v-app>
 </template>
 
@@ -231,102 +230,64 @@
 import axios from 'axios'
 import CustomHeader from '../components/CustomHeader'
 import CustomRating from '../components/CustomRating'
-import CustomFooter from '../components/CustomFooter'
 import CustomBreadcrumb from '../components/CustomBreadcrumb'
 axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 axios.defaults.xsrfCookieName = "csrftoken";
 
-  export default {
+export default {
     data() {
-      return {
-        loaded:false,
-        taken_users_enable:false,
-        currentSemester:"",
-        courseNameLimit:40,
-        isLoading: false,
-        semester_error_messages:[],
-        review_error_messages:[],
-        course_rating_error_messages:[],
-        instructor_rating_error_messages:[],
-        entries:[],
-        home_url:"",
-        brand_pic:"",
-        profile:"",
-        update_profile:"",
-        logout:"",
-        navItems:[],
-        course:{
-            "course_pk":"",
-            "mnemonic":"",
-            "number":"",
-            "title":"",
-            "description":"",
-            "prerequisite":"",
-            "type":"",
-            "rating_instructor":null,
-            "rating_course":null,
-        },
-        course_instructors:[],
-        course_users:[],
-        semester:"",
-        topic:"",
-        instructor:{
-            "name":"",
-            "rating_instructor":"",
-        },
+        return {
+            loaded:false,
+            taken_users_enable:false,
+            currentSemester:"",
+            courseNameLimit:40,
+            isLoading: false,
+            semester_error_messages:[],
+            review_error_messages:[],
+            course_rating_error_messages:[],
+            instructor_rating_error_messages:[],
+            entries:[],
+            home_url:"",
+            brand_pic:"",
+            profile:"",
+            update_profile:"",
+            logout:"",
+            navItems:[],
+            course:{
+                "course_pk":"",
+                "mnemonic":"",
+                "number":"",
+                "title":"",
+                "description":"",
+                "prerequisite":"",
+                "type":"",
+                "rating_instructor":null,
+                "rating_course":null,
+            },
+            course_instructors:[],
+            course_users:[],
+            semester:"",
+            topic:"",
+            instructor:{
+                "name":"",
+                "rating_instructor":"",
+            },
 
-        reviewDialog:false,
-        review_rating_course:1,
-        review_rating_instructor:1,
-        review_text:"",
-        review_course_instructor_pk:null,
+            reviewDialog:false,
+            review_rating_course:1,
+            review_rating_instructor:1,
+            review_text:"",
+            review_course_instructor_pk:null,
 
-        drawer: null,
-        source: "/lessons/",
-        user_items:[
-            { title:"Profile", icon:"fas fa-user" },
-            { title:"Edit Profile", icon:"fas fa-biohazard" },
-            { title:"Log Out", icon:"fas fa-angry"},
-        ],
-        old_items: [
-        //   {  icon: 'contacts', text: 'Contacts' },
-        //   { icon: 'history', text: 'Frequently contacted' },
-        //   { icon: 'content_copy', text: 'Duplicates' },
-        //   {
-        //     icon: 'keyboard_arrow_up',
-        //     'icon-alt': 'keyboard_arrow_down',
-        //     text: 'Labels',
-        //     model: true,
-        //     children: [
-        //       { icon: 'add', text: 'Create label' }
-        //     ]
-        //   },
-        //   {
-        //     icon: 'keyboard_arrow_up',
-        //     'icon-alt': 'keyboard_arrow_down',
-        //     text: 'More',
-        //     model: false,
-        //     children: [
-        //       { text: 'Import' },
-        //       { text: 'Export' },
-        //       { text: 'Print' },
-        //       { text: 'Undo changes' },
-        //       { text: 'Other contacts' }
-        //     ]
-        //   },
-          { icon: 'settings', text: 'Settings' },
-          { icon: 'chat_bubble', text: 'Send feedback' },
-          { icon: 'help', text: 'Help' },
-        ],
-      }
+            drawer: null,
+        }
     },
     components:{
         CustomHeader,
         CustomRating,
-        CustomFooter,
         CustomBreadcrumb,
     },
-    watch: {
+    watch:{
         review_course_instructor_pk(val){
             if(val != null){
                 this.semester_error_messages = []
@@ -352,7 +313,6 @@ axios.defaults.xsrfCookieName = "csrftoken";
                     duplicate_keys.push(this.course_users[i].user_pk);
                     ret_users_taking.push(this.course_users[i]);
                 }
-                
             }
             return ret_users_taking
             // return this.course_users.filter(obj => {
@@ -448,27 +408,27 @@ axios.defaults.xsrfCookieName = "csrftoken";
             //     error_flag = true;
             // }
             if(!error_flag){
-            axios.post('/courses/ajax/submit_review/', {
-                "text":this.review_text,
-                "rating_course":this.review_rating_course,
-                "rating_instructor":this.review_rating_instructor,
-                "course_pk":this.course_pk,
-                "instructor_pk":this.instructor_pk,
-                "course_instructor_pk":this.review_course_instructor_pk,
-            }).then(response => {
-                if(response.data.success){
-                    this.$message({
-                        message: 'Review Submitted',
-                        type: 'success'
-                    });
-                    this.getCourseInstructor();
-                }
-            });
-            this.reviewDialog = false;
+                axios.post('/courses/ajax/submit_review/', {
+                    "text":this.review_text,
+                    "rating_course":this.review_rating_course,
+                    "rating_instructor":this.review_rating_instructor,
+                    "course_pk":this.course_pk,
+                    "instructor_pk":this.instructor_pk,
+                    "course_instructor_pk":this.review_course_instructor_pk,
+                }).then(response => {
+                    if(response.data.success){
+                        this.$message({
+                            message: 'Review Submitted',
+                            type: 'success'
+                        });
+                        this.getCourseInstructor();
+                    }
+                });
+                this.reviewDialog = false;
             }
         },
         getCourseInstructor(){
-            axios.get('/courses/ajax/get_course_instructor/',{params: {course_pk:this.course_pk, instructor_pk:this.instructor_pk, }}).then(response => {
+            axios.get('/courses/api/get_course_instructor/',{params: {course_pk:this.course_pk, instructor_pk:this.instructor_pk, }}).then(response => {
                 let data = response.data;
                 var tmp_cs_instr = [];
                 this.course = data.course;
@@ -519,16 +479,11 @@ axios.defaults.xsrfCookieName = "csrftoken";
         goToHref(text){
             window.location.href = text;
         },
-        getAutoComplete(query){
-          axios.get('/courses/ajax/course_search_result/',{params: {query:query, }}).then(response => {
-                this.allFmls = response.data.groups; 
-          });
-        },
     },
     mounted(){
         this.getCurrentSemester();
     },
-  };
+};
 </script>
 
 <style>

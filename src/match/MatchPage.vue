@@ -2,10 +2,11 @@
     <v-app>
         <match-header></match-header>
         <v-content>
-            <v-container v-if="!loaded" fluid fill-height>
-                <v-layout 
-                    align-center
-                    justify-center>
+                <v-row 
+                    class="fill-height"
+                    v-if="!loaded"
+                    justify="center"
+                    align="center">
                     <div>
                         <v-progress-circular
                         :size="60"
@@ -14,77 +15,74 @@
                         color="teal lighten-1">
                         </v-progress-circular>
                     </div>
-                </v-layout>
-            </v-container>
-            <v-container style="padding:0 !important;" v-if="loaded" fluid grid-list-lg>
-                <div class="top-part-wrapper">
-                <v-row justify="center">
-                    <div style="text-align: center;">
-                        <h1 class="title-text">MSN Mentor-Mentee Match</h1>
-                        <!-- <h4 class="subtitle-text">Search for existing tags or add your own tags</h4> -->
-                    </div>
                 </v-row>
-                <v-row>
-                    <div class="search-tags mb-3">
-                        <span :key="index" v-for="(tag,index) in tags"
-                            class="search-tag">
-                            <span>{{tag}}</span>
-                            <span class="search-tag-remove"><i v-on:click="del_tag(tag)" class="fas fa-times"></i></span>
-                        </span>
-                    </div>
-                </v-row>
-                <v-row justify="center">
-                    <div class="search-form mt-1">
-                        <div class="search-icon">
-                            <i class="fas fa-search"></i>
+                <div v-if="loaded" class="top-part-wrapper">
+                    <v-row justify="center">
+                        <div style="text-align: center;">
+                            <h1 class="title-text">MSN Mentor-Mentee Match</h1>
+                            <!-- <h4 class="subtitle-text">Search for existing tags or add your own tags</h4> -->
                         </div>
-                        <input 
-                            @keydown="onKeydown" 
-                            v-model="query" 
-                            autocomplete="off" 
-                            id="myInput" 
-                            type="text" 
-                            name="class" 
-                            placeholder=" &quot;Marvel&quot;, &quot;major:Math&quot;, &quot;loc:Beijing&quot; " 
-                            class=" search-input" 
-                            aria-label="Search">
-                    </div>
-                </v-row>
-                <v-row>
-                    <div class="checkbox-div">
-                        <v-checkbox v-model="tags" hide-details class="mx-2" value="role:Mentor" label="Mentor"></v-checkbox>
-                        <v-checkbox v-model="tags" hide-details class="mx-2" value="role:Mentee" label="Mentee"></v-checkbox>
-                    </div>
-                </v-row>
-                <v-row justify="center" v-if="request_user.role == '' ">
-                    <div style="text-align:center; margin-top:13px;">
-                        <v-btn style="margin-right: 10px;" outlined color="teal lighten-1" @click="openRoleDialog('Mentor')">Be A Mentor</v-btn>
-                        <v-btn outlined color="teal lighten-1" @click="openRoleDialog('Mentee')">Be A Mentee</v-btn>
-                    </div>
-                </v-row>
-                <v-row justify="center">
-                    <div v-if="request_user.role == '' " style="text-align:center;">
-                        <small class="muted-text">*Note that you have to be a mentor/mentee to appear in the user list and perform any actions</small>
-                    </div>
-                </v-row>
+                    </v-row>
+                    <v-row>
+                        <div class="search-tags mb-3">
+                            <span :key="index" v-for="(tag,index) in tags"
+                                class="search-tag">
+                                <span>{{tag}}</span>
+                                <span class="search-tag-remove"><i v-on:click="del_tag(tag)" class="fas fa-times"></i></span>
+                            </span>
+                        </div>
+                    </v-row>
+                    <v-row justify="center">
+                        <div class="search-form mt-1">
+                            <div class="search-icon">
+                                <i class="fas fa-search"></i>
+                            </div>
+                            <input 
+                                @keydown="onKeydown" 
+                                v-model="query" 
+                                autocomplete="off" 
+                                id="myInput" 
+                                type="text" 
+                                name="class" 
+                                placeholder=" &quot;Marvel&quot;, &quot;major:Math&quot;, &quot;loc:Beijing&quot; " 
+                                class=" search-input" 
+                                aria-label="Search">
+                        </div>
+                    </v-row>
+                    <v-row>
+                        <div class="checkbox-div">
+                            <v-checkbox v-model="tags" hide-details class="mx-2" value="role:Mentor" label="Mentor"></v-checkbox>
+                            <v-checkbox v-model="tags" hide-details class="mx-2" value="role:Mentee" label="Mentee"></v-checkbox>
+                        </div>
+                    </v-row>
+                    <v-row justify="center" v-if="request_user.role == '' ">
+                        <div style="text-align:center; margin-top:13px;">
+                            <v-btn style="margin-right: 10px;" outlined color="teal lighten-1" @click="openRoleDialog('Mentor')">Be A Mentor</v-btn>
+                            <v-btn outlined color="teal lighten-1" @click="openRoleDialog('Mentee')">Be A Mentee</v-btn>
+                        </div>
+                    </v-row>
+                    <v-row justify="center">
+                        <div v-if="request_user.role == '' " style="text-align:center;">
+                            <small class="muted-text">*Note that you have to be a mentor/mentee to appear in the user list and perform any actions</small>
+                        </div>
+                    </v-row>
                 </div>
-            </v-container>
-            <v-container>
-                <v-row style="margin-top:17px;" dense>
-                    <v-col
-                        v-for="(user, i) in users"
-                        :key="i"
-                        cols="12"
-                        sm="6"
-                        md="4"
-                        lg="3"
-                        xl="3">
-                    <user-card
-                        class="fill-height"
-                        :user="user" @open-user-dialog="openUserDialog"></user-card>
-                    </v-col>
-                </v-row>
-            </v-container>
+                <v-container fluid >
+                    <v-row style="margin-top:17px;" dense>
+                        <v-col
+                            v-for="(user, i) in users"
+                            :key="i"
+                            cols="12"
+                            sm="6"
+                            md="4"
+                            lg="3"
+                            xl="3">
+                            <user-card
+                                class="fill-height"
+                                :user="user" @open-user-dialog="openUserDialog"></user-card>
+                        </v-col>
+                    </v-row>
+                </v-container>
         </v-content>
         <user-dialog
             v-if="d_user"

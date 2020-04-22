@@ -2,7 +2,21 @@
   <v-app>
     <custom-header></custom-header>
     <v-content>
-        <v-container fluid grid-list-lg>
+        <v-container v-if="!loaded" fluid fill-height>
+            <v-layout 
+                align-center
+                justify-center>
+                <div>
+                    <v-progress-circular
+                    :size="60"
+                    :width="6"
+                    indeterminate
+                    color="teal lighten-1">
+                    </v-progress-circular>
+                </div>
+            </v-layout>
+        </v-container>
+        <v-container v-if="loaded" fluid grid-list-lg>
             <v-layout>
                 <v-flex>
                     <custom-breadcrumb :items="navItems"></custom-breadcrumb>
@@ -29,7 +43,7 @@
                                     :key="index_d + 'department' " 
                                     v-for="(department, index_d) in departments">
                                         <v-chip
-                                            :href="'/courses/departments/'+ department.department_pk + '/' "
+                                            :href="'/courses/departments/'+ department.id + '/' "
                                             outlined 
                                             
                                             color="teal darken-1">{{department.name}}</v-chip>
@@ -41,14 +55,12 @@
             </v-layout>
         </v-container>
     </v-content>
-    <!-- <custom-footer></custom-footer> -->
   </v-app>
 </template>
 
 <script>
 import axios from 'axios'
 import CustomHeader from '../components/CustomHeader'
-import CustomFooter from '../components/CustomFooter'
 import CustomBreadcrumb from '../components/CustomBreadcrumb'
 axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 axios.defaults.xsrfCookieName = "csrftoken";
@@ -59,36 +71,34 @@ axios.defaults.xsrfCookieName = "csrftoken";
         departments:[],
         navItems:[],
         departments_dict:{},
-
-        
+        loaded:false,
       }
     },
     components:{
         CustomHeader,
-        CustomFooter,
         CustomBreadcrumb,
     },
     watch: {
-      
     },
     computed:{
     },
     methods: {
         getDepartments(){
-            axios.get('/courses/ajax/get_departments/',{params: {}}).then(response => {
+            axios.get('/courses/api/get_departments/',{params: {}}).then(response => {
                 this.departments = response.data.departments;
+                this.loaded = true;
                 var tmp_d = {};
                 for(let i = 0; i < this.departments.length; i++){
                     if(this.departments[i].name=="Computer Science"){
                         if(this.departments[i].school=="School of Engineering and Applied Science"){
-                            var tmp_cs_department_pk = this.departments[i].department_pk;
+                            var tmp_cs_department_pk = this.departments[i].id;
                         }
                         else{
                             var tmp_cs_index = i;
                         }
                     }
                 }
-                this.departments[tmp_cs_index].department_pk = tmp_cs_department_pk;
+                this.departments[tmp_cs_index].id = tmp_cs_department_pk;
                 for(let i = 0; i < this.departments.length; i++){
                     if(! (this.departments[i].school in tmp_d)){
                         tmp_d[this.departments[i].school] = [];

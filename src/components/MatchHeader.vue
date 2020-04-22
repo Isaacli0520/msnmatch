@@ -182,7 +182,7 @@ export default{
             old_items: [
                 { icon: 'fas fa-book', text: 'HoosMyProfessor' },
                 { icon: 'fas fa-user', text: 'Match' },
-                ],
+            ],
         }
     },
     components:{
