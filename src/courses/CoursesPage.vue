@@ -21,7 +21,7 @@
                     <v-layout class="spacer-layout"></v-layout>
                     <v-spacer></v-spacer>
                 </v-col>
-                <v-layout wrap>
+                <!-- <v-layout wrap>
                     <v-flex child-flex d-flex xs12 sm12 md12 lg12 xl12>
                         <v-card
                             outlined
@@ -87,7 +87,7 @@
                             </v-card-text>
                         </v-card>
                     </v-flex>
-                </v-layout>
+                </v-layout> -->
                 <v-layout row wrap>
                     <v-flex> 
                         <div class="headline-div">
@@ -145,153 +145,66 @@ import SearchCourse from '../components/SearchCourse'
   export default {
     data() {
         return {
-            user_info_get:false,
-            cardElevation:4,
-            review_users:[],
-            review_user_load:false,
-            recommendation_loaded:false,
             loaded:{
                 "Taken":false,
             },
-            credential:"",
-            plannableURL:"",
-            username:"",
-            year:1,
-            semester:"",
-            major:null,
-            major_options:[],
-            urls:{
-                home_url:"",
-                brand_pic:"",
-                profile:"",
-                update_profile:"",
-                logout:"",
-                my_courses:"",
-                courses_url:"",
-                match_url:"",
-            },
-            year_options:[
-                {
-                    "text":"1",
-                    "value":1,
-                },
-                {
-                    "text":"2",
-                    "value":2,
-                },
-                {
-                    "text":"3",
-                    "value":3,
-                },
-                {
-                    "text":"4",
-                    "value":4,
-                },
-            ],
-            semester_options:[
-                {
-                    "text":"Fall",
-                    "value":"Fall",
-                },
-                {
-                    "text":"Spring",
-                    "value":"Spring",
-                },
-            ],
-            with_carousel:false,
             trending_courses:{
                 "Taking":[],
                 "Taken":[],
             },
-            rcm_courses:[],
-            trash_items:[
-                {
-                    "title":"Departments",
-                    "icon":"fas fa-list-ol",
-                    "href":"/courses/departments/",
-                    "target":"",
-                },
-                {
-                    "title":"Courses",
-                    "icon":"fas fa-user-circle",
-                    "href":"",
-                    "target":"",
-                },
-                {
-                    "title":"Reviews",
-                    "icon":"fas fa-book",
-                    "href":"/courses/reviews/",
-                    "target":"",
-                },
-                {
-                    "title":"Plannable",
-                    "icon":"fas fa-paper-plane",
-                    "href":"https://plannable.org",
-                    "target":"_blank",
-                },
-                {
-                    "title":"Home",
-                    "icon":"fas fa-home",
-                    "href":"/",
-                    "target":"",
-                },
-            ],
-            colors: [
-                'primary',
-                'secondary',
-                'yellow darken-2',
-                'red',
-                'orange',
-            ],
-            courseTypes:[
-                'Clinical',
-                'Discussion',
-                'Drill',
-                'Independent Study',
-                'Laboratory',
-                'Lecture',
-                'Practicum',
-                'Seminar',
-                'Studio',
-                'Workshop',
-                '',
-            ]
-	    }
-	},
-	components:{
+            // user_info_get:false,
+            // recommendation_loaded:false,
+            // year:1,
+            // semester:"",
+            // major:null,
+            // major_options:[],
+            // year_options:[
+            //     {"text":"1","value":1,},
+            //     {"text":"2","value":2,},
+            //     {"text":"3","value":3,},
+            //     {"text":"4","value":4,},
+            // ],
+            // semester_options:[
+            //     {"text":"Fall","value":"Fall",},
+            //     {"text":"Spring","value":"Spring",},
+            // ],
+            // rcm_courses:[],
+        }
+    },
+    components:{
         CustomHeader,
         SearchCourse,
-	},
-	watch: {
-        year(){
-            if(this.user_info_get){
-                this.recommendation_loaded = false;
-                this.getRecommendations();
-            }
-        },
-        semester(){
-            if(this.user_info_get){
-                this.recommendation_loaded = false;
-                this.getRecommendations();
-            }
-        },
-        major(){
-            if(this.user_info_get){
-                this.recommendation_loaded = false;
-                this.getRecommendations();
-            }
-        },
-	},
-	computed:{
-	},
-	methods: {
+    },
+    watch: {
+        // year(){
+        //     if(this.user_info_get){
+        //         this.recommendation_loaded = false;
+        //         this.getRecommendations();
+        //     }
+        // },
+        // semester(){
+        //     if(this.user_info_get){
+        //         this.recommendation_loaded = false;
+        //         this.getRecommendations();
+        //     }
+        // },
+        // major(){
+        //     if(this.user_info_get){
+        //         this.recommendation_loaded = false;
+        //         this.getRecommendations();
+        //     }
+        // },
+    },
+    computed:{
+    },
+    methods: {
         getCurrentSemester(){
             axios.get('/courses/ajax/get_current_semester/',{params: { }}).then(response => {
                 this.semester = response.data.semester;
             });
         },
-		goToHref(text){
-			window.location.href = text;
+        goToHref(text){
+            window.location.href = text;
         },
         getTrendingCourses(){
             axios.get('/courses/ajax/get_trending_courses/',{params: {}}).then(response => {
@@ -299,28 +212,28 @@ import SearchCourse from '../components/SearchCourse'
                 this.loaded["Taken"] = true;
             });
         },
-        getRecommendations(){
-            axios.get('/courses/ajax/get_recommendations/',{params: {year:this.year, semester:this.semester, major:this.major}}).then(response => {
-                this.rcm_courses = response.data.rcm_courses;
-                this.recommendation_loaded = true;
-                this.user_info_get = true;
-            });
-        },
-        getMajorOptions(){
-            axios.get('/courses/ajax/get_major_options/',{params: {}}).then(response => {
-                this.major_options = response.data.major_options;
-                this.major = response.data.major == "" ? this.major_options[0].value : response.data.major;
-                this.semester = response.data.semester == "" ? this.semester_options[0].value : response.data.semester;
-                this.year = response.data.year == 0 ? this.year_options[0].value : response.data.year;
-                this.getRecommendations();
-            });
-        },
-	},
-	mounted(){
+        // getRecommendations(){
+        //     axios.get('/courses/ajax/get_recommendations/',{params: {year:this.year, semester:this.semester, major:this.major}}).then(response => {
+        //         this.rcm_courses = response.data.rcm_courses;
+        //         this.recommendation_loaded = true;
+        //         this.user_info_get = true;
+        //     });
+        // },
+        // getMajorOptions(){
+        //     axios.get('/courses/ajax/get_major_options/',{params: {}}).then(response => {
+        //         this.major_options = response.data.major_options;
+        //         this.major = response.data.major == "" ? this.major_options[0].value : response.data.major;
+        //         this.semester = response.data.semester == "" ? this.semester_options[0].value : response.data.semester;
+        //         this.year = response.data.year == 0 ? this.year_options[0].value : response.data.year;
+        //         this.getRecommendations();
+        //     });
+        // },
+    },
+    mounted(){
         this.getTrendingCourses();
-        this.getMajorOptions();
+        // this.getMajorOptions();
         this.getCurrentSemester();
-	},
+    },
   };
 </script>
 
@@ -345,14 +258,6 @@ import SearchCourse from '../components/SearchCourse'
         margin: auto auto 60px auto;
         width: 80%;
         max-width: 600px;
-    }
-
-    .courses-main{
-        /* background-color: #fff; */
-        /* background: url('../assets/static/css/images/cloud_new_11.jpg') no-repeat;
-        background-attachment: fixed;
-        background-position: center center;
-        background-size: cover; */
     }
 
     .main-title{
@@ -393,24 +298,24 @@ import SearchCourse from '../components/SearchCourse'
     }
 
     .cus-headline-title-text{
-		font-family: "Roboto", sans-serif;
-		font-size: 2.1em;
-		font-weight: 300;
-		color:rgb(0, 0, 0);
-		padding: 7px 12px 7px 3px;
-		border-radius: 5px;
-		line-height: 1.0;
-	}
+        font-family: "Roboto", sans-serif;
+        font-size: 2.1em;
+        font-weight: 300;
+        color:rgb(0, 0, 0);
+        padding: 7px 12px 7px 3px;
+        border-radius: 5px;
+        line-height: 1.0;
+    }
 
-	.cus-headline-text{
-		font-family: "Roboto", sans-serif;
-		font-size: 2.1em;
-		font-weight: 300;
-		color:rgb(0, 0, 0);
-		padding: 7px 12px 7px 3px;
-		border-radius: 5px;
-		line-height: 1.0;
-	}
+    .cus-headline-text{
+        font-family: "Roboto", sans-serif;
+        font-size: 2.1em;
+        font-weight: 300;
+        color:rgb(0, 0, 0);
+        padding: 7px 12px 7px 3px;
+        border-radius: 5px;
+        line-height: 1.0;
+    }
 
     @media (min-width: 1025px) {
         
@@ -434,8 +339,6 @@ import SearchCourse from '../components/SearchCourse'
         .cus-headline-title-text{
             font-size:1.7em;
         }
-
-        .
 
         .main-title{
             font-size: 28px;

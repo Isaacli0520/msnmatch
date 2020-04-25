@@ -3,7 +3,7 @@
         color="white"
         light
         :ripple="false"
-        @click=openUserDialog(user)>
+        @click=openUserDialog>
         <v-img 
         aspect-ratio="1.5"
         contain
@@ -35,6 +35,10 @@ export default{
             type:Object,
             default:null,
         },
+        user_index:{
+            type:Number,
+            default:-1,
+        }
     },
     data(){
         return{
@@ -48,8 +52,8 @@ export default{
         
     },
     methods:{
-        openUserDialog(user){
-            this.$emit('open-user-dialog', user);
+        openUserDialog(){
+            this.$emit('open-user-dialog', this.user_index);
         },
     },
     mounted(){
