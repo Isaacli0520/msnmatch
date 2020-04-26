@@ -126,7 +126,8 @@ def user_add_skill(request):
 			})
 		SkillRelation.objects.create(user=request.user, skill=skill)
 		return JsonResponse({
-			"success":True
+			"success":True,
+			"id":skill.id,
 		})
 	return JsonResponse({
 		"success":False,
