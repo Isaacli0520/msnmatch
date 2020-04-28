@@ -1,29 +1,9 @@
-<!-- templates/market_sell_itme.html -->
-{% load static %}
+{% extends 'base.html' %}
 {% load render_bundle from webpack_loader %}
 
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <meta http-equiv="x-ua-compatible" content="ie=edge">
+{% block title %}My Items{% endblock %}
 
-        <title>Sell an Item</title>
-
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.13.0/css/all.min.css">
-        <link rel="shortcut icon" href="{% static 'css/images/favicon.ico' %}">
-        <link href="https://cdn.jsdelivr.net/npm/material-design-icons-iconfont@5.0.1/dist/material-design-icons.css" rel="stylesheet">
-        <link href="https://cdn.jsdelivr.net/npm/@mdi/font@latest/css/materialdesignicons.min.css" rel="stylesheet">
-        
-        
-        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js"></script>
-        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/axios@0.18.0/dist/axios.js"></script>
-	</head>
-
-<body>
+{% block content %}
     <div id="market-my-items-page"></div>
     {% render_bundle 'market_my_items_page' %}
-</body>
-
-</html>
+{% endblock %}

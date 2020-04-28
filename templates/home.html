@@ -1,26 +1,9 @@
-<!-- templates/home.html -->
-{% load bootstrap4 %}
-{% load static %}
-{% bootstrap_css %}
-{% load users_tags %}
+{% extends 'base.html' %}
 {% load render_bundle from webpack_loader %}
 
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <meta http-equiv="x-ua-compatible" content="ie=edge">
-        <link rel="shortcut icon" href="{% static 'css/images/favicon.ico' %}">
+{% block title %}Home{% endblock %}
 
-        <title>Home</title>
-
-        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/axios@0.18.0/dist/axios.js"></script>
-	</head>
-
-<body>
+{% block content %}
     <div id="home-page"></div>
     {% render_bundle 'home' %}
-</body>
-
-</html>
+{% endblock %}
