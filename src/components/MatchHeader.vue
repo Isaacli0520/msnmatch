@@ -6,8 +6,7 @@
             app
             hide-overlay
             v-model="drawer"
-            :clipped="$vuetify.breakpoint.mdAndUp"
-            >
+            :clipped="$vuetify.breakpoint.mdAndUp">
             <v-container v-if="!loaded || user == null" fluid fill-height>
                 <v-layout 
                     align-center
@@ -16,7 +15,6 @@
                         <v-progress-circular
                         :size="60"
                         :width="6"
-                        v-if="!loaded"
                         indeterminate
                         color="teal lighten-1">
                         </v-progress-circular>

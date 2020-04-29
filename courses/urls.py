@@ -16,6 +16,8 @@ urlpatterns = [
 	path('api/get_course_instructors/', views.get_course_instructors, name='get_course_instructors'),
 	path('api/get_user_hmp_header/', views.get_user_hmp_header, name='get_user_hmp_header'),
 
+	path('api/submit_review/', views.submit_review, name='submit_review'),
+
 	path('ajax/save_take/', views.save_take, name='save_take'),
 	path('ajax/course_search_result/', views.course_search_result, name='course_search_result'),
 	path('ajax/get_current_semester/', views.get_current_semester, name='get_current_semester'),
@@ -29,7 +31,6 @@ urlpatterns = [
 	path('ajax/get_my_courses/', views.get_my_courses, name='get_my_courses'),
 	path('ajax/get_credential/', views.get_credential, name='get_credential'),
 	path('ajax/get_reviews/', views.get_reviews, name='get_reviews'),
-	path('ajax/submit_review/', views.submit_review, name='submit_review'),
 
 	path('<int:course_number>/<int:instructor_number>/', views.course_instructor, name='course_instructor'),
 

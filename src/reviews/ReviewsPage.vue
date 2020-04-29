@@ -1,6 +1,7 @@
 <template>
     <v-app>
-        <custom-header></custom-header>
+        <custom-header
+            @submit-review="getReviews"></custom-header>
         <v-content>
             <v-container fluid grid-list-lg>
                 <v-layout>
@@ -94,9 +95,11 @@
                     <span class="headline">Edit Your Review</span>
                 </v-card-title>
                 <v-card-text>
-                    <v-container grid-list-md>
-                        <v-layout wrap>
-                            <v-flex>
+                    <v-form
+                        ref="review_form"
+                        v-model="submit_review_form_valid">
+                        <v-row wrap>
+                            <v-col>
                                 <span>Instructor Rating:</span>
                                 <v-rating
                                     v-model="review_rating_instructor"
@@ -113,39 +116,41 @@
                                     medium
                                     hover>
                                 </v-rating>
-                            </v-flex>
-                            <v-flex d-flex>
+                            </v-col>
+                            <v-col>
                                 <v-select
                                     v-model="review_course_instructor_pk"
                                     :items="course_instructors"
                                     :loading="cs_instr_load"
                                     item-text="text"
                                     item-value="course_instructor_pk"
+                                    :rules="[v => !!v || 'Semester is required']"
                                     label="Semester"
                                     :menu-props="{ offsetY: true }"
                                     outlined>
                                 </v-select>
-                            </v-flex>
-                        </v-layout>
-                        <v-layout>
-                            <v-flex>
+                            </v-col>
+                        </v-row>
+                        <v-row>
+                            <v-col>
                                 <v-textarea
                                     v-model="review_text"
                                     label="Write Your Review"
                                     auto-grow
                                     outlined
+                                    :rules="reviewTextRules"
                                     rows="5"
                                     row-height="20"
                                 ></v-textarea>
-                            </v-flex>
-                        </v-layout>
-                    </v-container>
+                            </v-col>
+                        </v-row>
+                    </v-form>
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn color="red darken-1" text @click="deleteDialog = true">Delete</v-btn>
-                    <v-btn color="blue darken-1" text @click="reviewDialog = false">Close</v-btn>
-                    <v-btn color="blue darken-1" text @click="submitReview()">Submit</v-btn>
+                    <v-btn color="red darken-1" outlined @click="deleteDialog = true">Delete</v-btn>
+                    <v-btn color="teal darken-1" :loading="submitReviewBtnLoading" outlined @click="submitReview()">Submit</v-btn>
+                    <v-btn color="blue darken-1" outlined @click="reviewDialog = false">Close</v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
@@ -159,11 +164,35 @@
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn color="blue darken-1" text @click="deleteDialog = false">No</v-btn>
-                    <v-btn color="blue darken-1" text @click="deleteReview()">Yes</v-btn>
+                    <v-btn color="teal darken-1" outlined @click="deleteReview()">Yes</v-btn>
+                    <v-btn color="red lighten-1" outlined @click="deleteDialog = false">No</v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
+        <v-snackbar
+            top
+            v-model="failure_snack"
+            color="red lighten-1"
+            :timeout="2700">
+            Sth is wrong
+            <v-btn color="white" text @click="failure_snack = false"> Close </v-btn>
+        </v-snackbar>
+        <v-snackbar
+            top
+            v-model="form_invalid_snack"
+            color="red lighten-1"
+            :timeout="2700">
+            Invalid Form
+            <v-btn color="white" text @click="form_invalid_snack = false"> Close </v-btn>
+        </v-snackbar>
+        <v-snackbar
+            top
+            v-model="success_snack"
+            color="teal darken-1"
+            :timeout="2700">
+            {{success_text}}
+            <v-btn color="cyan accent-1" text @click="success_snack = false"> Close </v-btn>
+        </v-snackbar>
     </v-app>
 </template>
 
@@ -175,13 +204,22 @@ axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 axios.defaults.xsrfCookieName = "csrftoken";
 
   export default {
-	data() {
-	    return {
+    data() {
+        return {
+            // Page Basics
             currentSemester:"",
-            reviewDialog:false,
-            deleteDialog:false,
             navItems:[],
             reviews:[],
+            // Snacks
+            success_text:"",
+            failure_snack:false,
+            success_snack:false,
+            form_invalid_snack:false,
+            // Review Dialog
+            submit_review_form_valid:true,
+            submitReviewBtnLoading:false,
+            reviewDialog:false,
+            deleteDialog:false,
             review_text:"",
             review_rating_instructor:0,
             review_rating_course:0,
@@ -189,21 +227,23 @@ axios.defaults.xsrfCookieName = "csrftoken";
             review_course_pk:"",
             review_instructor_pk:"",
             course_instructors:[],
+            reviewTextRules:[
+                v => !!v || 'Review is required',
+                v => (v && v.length <= 2000) || 'Review must be less than 2000 characters',
+            ],
             cs_instr_load:false,
             reviews_load:false,
-	    }
-	},
-	components:{
+        }
+    },
+    components:{
       CustomHeader,
       CustomBreadcrumb,
-	},
-	watch: {
-
-	},
-	computed:{
-	  
-	},
-	methods: {
+    },
+    watch: {
+    },
+    computed:{
+    },
+    methods: {
         getCurrentSemester(){
             axios.get('/courses/ajax/get_current_semester/',{params: {}}).then(response => {
                 this.currentSemester = response.data.year + response.data.semester;
@@ -228,8 +268,8 @@ axios.defaults.xsrfCookieName = "csrftoken";
         sortBySemesterKey(a,b){
             return this.sortBySemester(a["semester"], b["semester"]);
         },
-		goToHref(text){
-			window.location.href = text;
+        goToHref(text){
+            window.location.href = text;
         },
         getReviews(){
             this.reviews_load = false;
@@ -275,48 +315,44 @@ axios.defaults.xsrfCookieName = "csrftoken";
                     "delete":true
                 }).then(response => {
                 if(response.data.success){
-                    this.$message({
-                        message: "Updated",
-                        type: "success"
-                    });
+                    this.success_text = "Review Deleted";
+                    this.success_snack = true;
                     this.getReviews();
                 }else{
-                    this.$message({
-                        message: 'Sth is wrong baby~',
-                        type: 'error'
-                    });
+                    this.failure_snack = true;
                 }
             });
             this.deleteDialog = false,
             this.reviewDialog = false;
         },
         submitReview(){
-            axios.post("/courses/ajax/submit_review/", {
+            this.$refs.review_form.validate();
+            if(!this.submit_review_form_valid){
+                this.form_invalid_snack = true;
+                return;
+            }
+            this.submitReviewBtnLoading = true;
+            axios.post("/courses/api/submit_review/", {
                 "text":this.review_text,
                 "rating_course":this.review_rating_course,
                 "rating_instructor":this.review_rating_instructor,
-                "course_pk":this.review_course_pk,
-                "instructor_pk":this.review_instructor_pk,
                 "course_instructor_pk":this.review_course_instructor_pk,
             }).then(response => {
+                this.submitReviewBtnLoading = false;
                 if(response.data.success){
-                    this.$message({
-                        message: 'Review Submitted',
-                        type: 'success'
-                    });
+                    this.success_text = "Review Edited";
+                    this.success_snack = true;
                     this.getReviews();
+                    this.$refs.review_form.reset()
                 }
                 else{
-                    this.$message({
-                        message: 'Sth is wrong baby~',
-                        type: 'error'
-                    });
+                    this.failure_snack = true;
                 }
+                this.reviewDialog = false;
             });
-            this.reviewDialog = false;
         },
-	},
-	mounted(){
+    },
+    mounted(){
         this.navItems = [
             {
                 text: "Main",
@@ -331,11 +367,11 @@ axios.defaults.xsrfCookieName = "csrftoken";
         ];
         this.getCurrentSemester();
         this.getReviews();
-	},
+    },
   };
 </script>
 
-<style>
+<style scoped>
     .review-title-text{
         font-size: 20px;
     }
@@ -353,15 +389,15 @@ axios.defaults.xsrfCookieName = "csrftoken";
         padding-left: 4px !important;
     }
 
-	.cus-headline-text{
-		font-family: "Roboto", sans-serif;
-		font-size: 2.1em;
-		font-weight: 300;
-		color:rgb(0, 0, 0);
-		padding: 1px 12px 7px 3px;
-		border-radius: 5px;
-		line-height: 1.0;
-	}
+    .cus-headline-text{
+        font-family: "Roboto", sans-serif;
+        font-size: 2.1em;
+        font-weight: 300;
+        color:rgb(0, 0, 0);
+        padding: 1px 12px 7px 3px;
+        border-radius: 5px;
+        line-height: 1.0;
+    }
 
     @media (min-width: 1025px) {
         

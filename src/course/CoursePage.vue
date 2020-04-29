@@ -1,6 +1,8 @@
 <template>
   <v-app>
-    <custom-header :headerUpdate="header_update"></custom-header>
+    <custom-header 
+        @submit-review="getCourse"
+        :headerUpdate="header_update"></custom-header>
     <v-content>
         <v-container v-if="!loaded" fluid fill-height>
             <v-layout 
