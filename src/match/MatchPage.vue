@@ -69,14 +69,14 @@
                 </div>
                 <v-container fluid >
                     <v-lazy>
-                    <v-row style="margin-top:17px;" dense>
+                    <v-row dense>
                         <v-col
                             v-for="(user, i) in users"
                             :key="i"
                             cols="12"
                             sm="6"
                             md="4"
-                            lg="3"
+                            lg="4"
                             xl="3">
                             <user-card
                                 class="fill-height"
@@ -367,7 +367,7 @@ import UserCard from '../components/UserCard'
   };
 </script>
 
-<style>
+<style scoped>
     .top-part-wrapper{
         position: relative;
         padding: 55px 0px 45px 0px;

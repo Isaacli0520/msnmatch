@@ -237,7 +237,7 @@ import SearchCourse from '../components/SearchCourse'
   };
 </script>
 
-<style>
+<style scoped>
     .spacer-layout{
         padding: 10px 5px 50px 5px;
     }

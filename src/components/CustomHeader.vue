@@ -1,75 +1,27 @@
 <template>
     <div>
-        <!-- <v-navigation-drawer
-            fixed
-            app
-            v-model="drawer">
-            <v-list dense>
-                <template v-for="item in old_items">
-                    <v-layout
-                        row
-                        v-if="item.heading"
-                        align-center
-                        :key="item.heading">
-                        <v-flex xs6>
-                            <v-subheader v-if="item.heading">
-                                {{ item.heading }}
-                            </v-subheader>
-                        </v-flex>
-                        <v-flex xs6 class="text-xs-center">
-                            <a href="#!" class="body-2 black--text">EDIT</a>
-                        </v-flex>
-                    </v-layout>
-                    <v-list-group
-                        v-else-if="item.children"
-                        v-model="item.model"
-                        :key="item.text"
-                        :prepend-icon="item.model ? item.icon : item['icon-alt']"
-                        append-icon="">
-                        <v-list-item slot="activator">
-                            <v-list-item-content>
-                                <v-list-item-title>
-                                    {{ item.text }}
-                                </v-list-item-title>
-                            </v-list-item-content>
-                        </v-list-item>
-                        <v-list-item
-                            v-for="(child, i) in item.children"
-                            :key="i">
-                            <v-list-item-action v-if="child.icon">
-                                <v-icon>{{ child.icon }}</v-icon>
-                            </v-list-item-action>
-                            <v-list-item-content>
-                                <v-list-item-title>
-                                {{ child.text }}
-                                </v-list-item-title>
-                            </v-list-item-content>
-                        </v-list-item>
-                    </v-list-group>
-                    <v-list-item v-else @click="navAsideMethod(item)" :key="item.text">
-                            <v-list-item-action>
-                                <v-icon>{{ item.icon }}</v-icon>
-                            </v-list-item-action>
-                            <v-list-item-content>
-                                <v-list-item-title>
-                                    {{ item.text }}
-                                </v-list-item-title>
-                            </v-list-item-content>
-                    </v-list-item>
-                </template>
-            </v-list>
-        </v-navigation-drawer> -->
+        <!-- Side Navigation Drawer -->
         <v-navigation-drawer
-            light
+            color="#fcfcfc"
             app
             hide-overlay
             v-model="drawer"
-            :clipped="$vuetify.breakpoint.mdAndUp"
-            >
-            <v-list>
+            :clipped="$vuetify.breakpoint.mdAndUp">
+            <v-container>
+            <v-card 
+                color="#FFFFFF"
+                v-if="user">
+                <v-card-title>{{user.first_name + " " + user.last_name}}</v-card-title>
+                <v-card-subtitle>Reviews: {{user.num_reviews}}</v-card-subtitle>
+                </v-card>
+            <v-card
+                style="margin-top:15px;"
+                color="#FFFFFF">
+            <v-list
+                dense>
                 <v-list-item
                     :key="index_item + '-trash' " 
-                    v-for="(item, index_item) in trash_items"
+                    v-for="(item, index_item) in nav_drawer_items"
                     :href="item.href"
                     :target="item.target">
                     <v-list-item-avatar
@@ -81,34 +33,17 @@
                     </v-list-item-content>
                 </v-list-item>
             </v-list>
+            </v-card>
+            </v-container>
         </v-navigation-drawer>
-        <!-- color="blue-grey darken-1" -->
+        <!-- APP BAR -->
         <v-app-bar
             :clipped-left="$vuetify.breakpoint.mdAndUp"
             app
             light
             height="62"
-            
-            elevation="1"
-            >
+            elevation="1">
             <v-app-bar-nav-icon  @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
-            <!-- <a class="navbar-brand" :href="urls.courses_url">
-                <img :src="urls.brand_pic" style="margin:5px 0px 0px 0px;" width="35" height="35" class="d-inline-block align-center" alt="">
-            </a> -->
-            <!-- <v-toolbar-items v-if="$vuetify.breakpoint.mdAndUp">
-                <template v-for="item in navBarItems">
-                    <v-btn 
-                        :key="item.text + '-btn' "
-                        :href="item.href"
-                        text>
-                        {{item.text}}
-                    </v-btn>
-                    <v-divider
-                        :key="item.text + '-divider' "
-                        inset
-                        vertical></v-divider>
-                </template>
-            </v-toolbar-items> -->
             <v-img max-height="46" max-width="46" :src="urls.brand_pic" alt=""></v-img>
             <v-toolbar-items v-if="$vuetify.breakpoint.mdAndUp">
                 <v-btn 
@@ -126,6 +61,7 @@
             <search-course
                 v-if="searchBool"></search-course>
             <v-spacer v-if="!searchBool"></v-spacer>
+            <!-- App Menu -->
             <v-menu offset-y
                 class="mx-auto"
                 min-width="170">
@@ -150,6 +86,7 @@
                     </v-list-item>
                 </v-list>
             </v-menu>
+            <!-- User Drop Menu -->
             <v-menu offset-y
                 class="mx-auto"
                 min-width="170">
@@ -196,23 +133,12 @@ export default{
     data: function () {
         return {
             navDrawer:false,
+            user:null,
             drawer: null,
             credential:"",
             plannableURL:"",
             username:"",
             taking_courses:[],
-            navBarItems:[
-                {
-                    text:"HoosMyProfessor",
-                    href:"",
-                    diabled:true,
-                },
-                {
-                    text:"Match",
-                    href:"",
-                    diabled:true,
-                },
-            ],
             courseTypes:[
                 'Clinical',
                 'Discussion',
@@ -250,7 +176,7 @@ export default{
                 market_url:"",
                 skills_url:"",
             },
-            trash_items:[
+            nav_drawer_items:[
                 {
                     "title":"Home",
                     "icon":"fas fa-home",
@@ -264,13 +190,13 @@ export default{
                     "target":"",
                 },
                 {
-                    "title":"Courses",
+                    "title":"My Courses",
                     "icon":"fas fa-user-circle",
                     "href":"",
                     "target":"",
                 },
                 {
-                    "title":"Reviews",
+                    "title":"My Reviews",
                     "icon":"fas fa-book",
                     "href":"/courses/reviews/",
                     "target":"",
@@ -282,35 +208,6 @@ export default{
                     "target":"_blank",
                 },
             ],
-            old_items: [
-                //   {  icon: 'contacts', text: 'Contacts' },
-                //   { icon: 'history', text: 'Frequently contacted' },
-                //   { icon: 'content_copy', text: 'Duplicates' },
-                //   {
-                //     icon: 'keyboard_arrow_up',
-                //     'icon-alt': 'keyboard_arrow_down',
-                //     text: 'Labels',
-                //     model: true,
-                //     children: [
-                //       { icon: 'add', text: 'Create label' }
-                //     ]
-                //   },
-                //   {
-                //     icon: 'keyboard_arrow_up',
-                //     'icon-alt': 'keyboard_arrow_down',
-                //     text: 'More',
-                //     model: false,
-                //     children: [
-                //       { text: 'Import' },
-                //       { text: 'Export' },
-                //       { text: 'Print' },
-                //       { text: 'Undo changes' },
-                //       { text: 'Other contacts' }
-                //     ]
-                //   },
-                { icon: 'fas fa-book', text: 'HoosMyProfessor' },
-                { icon: 'fas fa-user', text: 'Match' },
-                ],
         }
     },
     components:{
@@ -325,7 +222,7 @@ export default{
         },
         username(){
             this.getPlannableURL();
-            this.trash_items[2].href = "/users/" + this.username + "/courses/";
+            this.nav_drawer_items[2].href = "/users/" + this.username + "/courses/";
         },
         taking_courses(val){
             var tmp_arr = [];
@@ -377,16 +274,6 @@ export default{
         get_basic_info(){
             axios.get('/courses/ajax/get_basic_info/',{params: {}}).then(response => {
                 this.urls = response.data.all_info;
-                this.navBarItems[0] = {
-                    text:"HoosMyProfessor",
-                    href:this.urls.courses_url,
-                    diabled:false,
-                };
-                this.navBarItems[1] = {
-                    text:"Match",
-                    href:this.urls.match_url,
-                    diabled:false,
-                };
             });
         },
         goToHref(text){
@@ -402,14 +289,15 @@ export default{
             });
         },
         getTakingCourses(){
-            axios.get('/courses/ajax/get_taking_courses/',{params: {}}).then(response => {
+            axios.get('/courses/api/get_user_hmp_header/',{params: {}}).then(response => {
+                this.user = response.data.user;
                 this.taking_courses = response.data.taking_courses;
             });
         },
         getPlannableURL(){
             // var preHref = "localhost:8080"
             var preHref = "https://plannable.org"
-            this.trash_items[4].href = preHref + "/?courses=" + this.plannableURL + "&username=" + this.username + "&credential=" + this.credential + "";
+            this.nav_drawer_items[4].href = preHref + "/?courses=" + this.plannableURL + "&username=" + this.username + "&credential=" + this.credential + "";
         },
     },
     mounted(){
@@ -421,7 +309,12 @@ export default{
 </script>
 
 
-<style lang="css">
+<style scoped lang="css">
+    .cus-navbar-item{
+        font-size: 15px !important;
+        font-family: Arial, Helvetica, sans-serif !important;
+    }
+
     .theme--light.v-app-bar.v-toolbar.v-sheet{
         background-color: white !important;
     }

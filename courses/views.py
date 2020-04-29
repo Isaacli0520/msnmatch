@@ -223,16 +223,21 @@ def get_instructor(request):
 	})
 
 @login_required
+def get_user_hmp_header(request):
+	return JsonResponse({
+		"user":{
+			"first_name":request.user.first_name,
+			"last_name":request.user.last_name,
+			"num_reviews":request.user.courseuser_set.annotate(length=Length("text")).filter(length__gt=15).count(),
+		},
+		"taking_courses":get_take_courses(request.user, "taking")
+	})
+
+@login_required
 def get_my_courses(request):
 	return JsonResponse({
 		"taking_courses":get_take_courses(request.user, "taking"),
 		"taken_courses":get_take_courses(request.user, "taken"),
-	})
-
-@login_required
-def get_taking_courses(request):
-	return JsonResponse({
-		"taking_courses":get_take_courses(request.user, "taking")
 	})
 
 def get_take_courses(user, take):
