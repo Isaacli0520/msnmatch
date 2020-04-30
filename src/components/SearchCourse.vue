@@ -5,12 +5,16 @@
         :items="search_result_items"
         :loading="isLoading"
         :search-input.sync="search"
-        color="black"
+        :color="color"
+        :light="light"
+        :dark="dark"
+        :dense="dense"
         :background-color="background_color"
         clearable
-        solo-inverted
+        solo
         no-filter
-        flat
+        :flat="flat"
+        :outlined="outlined"
         hide-no-data
         hide-selected
         hide-details
@@ -34,6 +38,42 @@ export default {
             type:String,
             default:"grey lighten-3",
         },
+        searchCourse:{
+            type:Boolean,
+            default:true,
+        },
+        searchInstructor:{
+            type:Boolean,
+            default:true,
+        },
+        searchFunction:{
+            type:String,
+            default:"jump",
+        },
+        color:{
+            type:String,
+            default:"undefined",
+        },
+        flat:{
+            type:Boolean,
+            default:true,
+        },
+        outlined:{
+            type:Boolean,
+            default:false,
+        },
+        light:{
+            type:Boolean,
+            default:false,
+        },
+        dark:{
+            type:Boolean,
+            default:false,
+        },
+        dense:{
+            type:Boolean,
+            default:false,
+        },
     },
     data() {
         return {
@@ -50,11 +90,16 @@ export default {
     watch:{
         selected_item(val){
             if(val != null){
-                if(val.type == "course"){
-                    this.goToHref("/courses/" + val.value + "/");
+                if(this.searchFunction == "jump"){
+                    if(val.type == "course"){
+                        this.goToHref("/courses/" + val.value + "/");
+                    }
+                    else if(val.type == "instructor"){
+                        this.goToHref("/courses/instructors/" + val.value + "/");
+                    }
                 }
-                else if(val.type == "instructor"){
-                    this.goToHref("/courses/instructors/" + val.value + "/");
+                else if(this.searchFunction == "select"){
+                    this.$emit("select-course",val);
                 }
             }
         },
@@ -76,7 +121,7 @@ export default {
 
             this.isLoading = true
             // Lazily load input items
-            axios.get('/courses/ajax/course_search_result/',{params: {query:val, time: this.lastTime}}).then(response => {
+            axios.get('/courses/ajax/course_search_result/',{params: {query:val, time: this.lastTime, cs:this.searchCourse, instr:this.searchInstructor}}).then(response => {
                     if(response.data.time == this.lastTime){
                         this.entries = response.data.course_result; 
                     }

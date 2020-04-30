@@ -14,6 +14,7 @@ urlpatterns = [
   path('api/get_search_result/', views.get_search_result, name="get_search_result"),
   path('api/user_add_skill/', views.user_add_skill, name="user_add_skill"),
   path('api/user_del_skill/', views.user_del_skill, name="user_del_skill"),
+  path('api/get_user_match_header/', views.get_user_match_header, name="get_user_match_header"),
 
   path('api/add_to_list/', views.add_to_list, name="add_to_list"),
   path('api/get_all_users/', views.get_all_users, name="get_all_users"),

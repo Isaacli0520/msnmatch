@@ -21,7 +21,7 @@ from django.forms.models import model_to_dict
 from fuzzywuzzy import fuzz, process
 from msnmatch import settings
 
-from msnmatch.utils import custom_md5, cmp_semester
+from msnmatch.utils import custom_md5, cmp_semester, js_boolean
 from functools import cmp_to_key
 
 from users.models import MAJOR_CHOICES, PlanProfile
@@ -223,16 +223,22 @@ def get_instructor(request):
 	})
 
 @login_required
+def get_user_hmp_header(request):
+	return JsonResponse({
+		"user":{
+			"first_name":request.user.first_name,
+			"last_name":request.user.last_name,
+			"role":request.user.profile.role,
+			"num_reviews":request.user.courseuser_set.annotate(length=Length("text")).filter(length__gt=15).count(),
+		},
+		"taking_courses":get_take_courses(request.user, "taking")
+	})
+
+@login_required
 def get_my_courses(request):
 	return JsonResponse({
 		"taking_courses":get_take_courses(request.user, "taking"),
 		"taken_courses":get_take_courses(request.user, "taken"),
-	})
-
-@login_required
-def get_taking_courses(request):
-	return JsonResponse({
-		"taking_courses":get_take_courses(request.user, "taking")
 	})
 
 def get_take_courses(user, take):
@@ -450,28 +456,26 @@ def submit_review(request):
 	if request.method == "POST":
 		post = json.loads(request.body)
 		text, rating_course, rating_instructor = post["text"], post["rating_course"], post["rating_instructor"]
-		course_pk, instructor_pk, course_instructor_pk =  post["course_pk"], post["instructor_pk"], post["course_instructor_pk"]
+		course_instructor_pk =  post["course_instructor_pk"]
 		if len(text.strip()) == 0 or rating_course == 0 or rating_instructor == 0:
 			return JsonResponse({
 				"success":False,
 			})
-		course = get_object_or_404(Course, pk=course_pk)
-		instructor = get_object_or_404(Instructor, pk=instructor_pk)
 		course_instructor = get_object_or_404(CourseInstructor, pk=course_instructor_pk)
-		cs_user_query = CourseUser.objects.filter(course=course, user=request.user)
+		cs_user_query = CourseUser.objects.filter(course=course_instructor.course, user=request.user)
 		if cs_user_query.first() != None:
 			cs_user = cs_user_query.first()
 			cs_user.text = text
-			cs_user.instructor = instructor
+			cs_user.instructor = course_instructor.instructor
 			cs_user.take = "taken"
 			cs_user.rating_course = rating_course
 			cs_user.rating_instructor = rating_instructor
 			cs_user.course_instructor = course_instructor
 			cs_user.save()
 		else:
-			CourseUser.objects.create(course=course,
+			CourseUser.objects.create(course=course_instructor.course,
 				user=request.user, 
-				instructor=instructor,
+				instructor=course_instructor.instructor,
 				course_instructor=course_instructor,
 				text=text,
 				take="taken",
@@ -538,12 +542,14 @@ def get_course_instructor(request):
 def course_search_result(request):
 	query = request.GET.get("query")
 	query_time = request.GET.get("time")
+	search_course = js_boolean(request.GET.get('cs'))
+	search_instructor = js_boolean(request.GET.get('instr'))
 	if not query or not query_time:
 		return JsonResponse({
 			"success":False,
 			"message":"Query or Time not provided"
 		})
-	search_queryset = course_and_instructor_retrieve(query)
+	search_queryset = course_and_instructor_retrieve(query, search_course, search_instructor)
 	course_result = []
 	for query in search_queryset:
 		if query[1] == "instructor":
@@ -555,7 +561,7 @@ def course_search_result(request):
 		"time":query_time,
 	})
 
-def course_and_instructor_retrieve(query):
+def course_and_instructor_retrieve(query, search_course, search_instructor):
 	query = query.strip().lower()
 
 	nums = re.findall(r'\d+', query)
@@ -582,26 +588,28 @@ def course_and_instructor_retrieve(query):
 		tmp_a, tmp_b = query.split()[0], query.split()[1]
 		exact_instructor_query = Instructor.objects.filter(first_name__iexact = tmp_a, last_name__iexact = tmp_b) | Instructor.objects.filter(first_name__iexact = tmp_b, last_name__iexact = tmp_a)
 
-	if query.upper() in mnemonics:
+	if query.upper() in mnemonics and search_course:
 		return [(course, "course") for course in sorted(Course.objects.filter(mnemonic=query.upper()).exclude(units="0"), key=lambda c:(c.mnemonic, c.number))]
-	elif exact_course_query.first() != None:
+	elif exact_course_query.first() != None and search_course:
 		return [(course, "course") for course in exact_course_query.exclude(units="0")]
-	elif len(query.split()) == 2 and exact_instructor_query.first() != None:
+	elif len(query.split()) == 2 and exact_instructor_query.first() != None and search_instructor:
 		return [(tmp_instructor, "instructor") for tmp_instructor in exact_instructor_query]
 	else:
-		tmp_course_queryset = Course.objects.exclude(units="0").annotate(
-			similarity_prefix=TrigramSimilarity('mnemonic',query_string_mn),
-			similarity_number=TrigramSimilarity('number',query_string_num),
-			similarity_name=TrigramSimilarity('title', query_string_str)).filter((Q(similarity_prefix__gt=0.5) & (Q(number__startswith=query_string_num)|Q(similarity_number__gt=0.3)|Q(similarity_name__gt=0.2))) | Q(similarity_name__gt=0.25))
-		retrieved_courses = sorted(tmp_course_queryset, key=lambda c: (-c.similarity_prefix,-c.similarity_number, -c.similarity_name,c.mnemonic,c.number))
-		retrieved_courses = [(tmp_r_c, "course") for tmp_r_c in retrieved_courses[:20]]
-
-		tmp_instructor_queryset = Instructor.objects.annotate(
-			similarity_first_name=TrigramSimilarity('first_name', query_string_str),
-			similarity_last_name=TrigramSimilarity('last_name', query_string_str),
-		).filter(Q(similarity_first_name__gt=0.35)|Q(similarity_last_name__gt=0.35))
-		retrieved_instructors = sorted(tmp_instructor_queryset, key=lambda c: (-c.similarity_first_name,-c.similarity_last_name))
-		retrieved_instructors = [(tmp_r_i, "instructor") for tmp_r_i in retrieved_instructors[:20]]
+		retrieved_courses, retrieved_instructors = [], []
+		if search_course:
+			tmp_course_queryset = Course.objects.exclude(units="0").annotate(
+				similarity_prefix=TrigramSimilarity('mnemonic',query_string_mn),
+				similarity_number=TrigramSimilarity('number',query_string_num),
+				similarity_name=TrigramSimilarity('title', query_string_str)).filter((Q(similarity_prefix__gt=0.5) & (Q(number__startswith=query_string_num)|Q(similarity_number__gt=0.3)|Q(similarity_name__gt=0.2))) | Q(similarity_name__gt=0.25))
+			retrieved_courses = sorted(tmp_course_queryset, key=lambda c: (-c.similarity_prefix,-c.similarity_number, -c.similarity_name,c.mnemonic,c.number))
+			retrieved_courses = [(tmp_r_c, "course") for tmp_r_c in retrieved_courses[:20]]
+		if search_instructor:
+			tmp_instructor_queryset = Instructor.objects.annotate(
+				similarity_first_name=TrigramSimilarity('first_name', query_string_str),
+				similarity_last_name=TrigramSimilarity('last_name', query_string_str),
+			).filter(Q(similarity_first_name__gt=0.35)|Q(similarity_last_name__gt=0.35))
+			retrieved_instructors = sorted(tmp_instructor_queryset, key=lambda c: (-c.similarity_first_name,-c.similarity_last_name))
+			retrieved_instructors = [(tmp_r_i, "instructor") for tmp_r_i in retrieved_instructors[:20]]
 		
 		return retrieved_courses + retrieved_instructors
 

@@ -148,8 +148,9 @@ def get_name(self):
 User.add_to_class("__str__", get_name)
 
 def get_user():
-  User.objects.get_or_create(id=1)
-  return 1
+	print("hellooooooooooooo")
+	User.objects.get_or_create(id=1)
+	return 1
 
 class PlanProfile(models.Model):
 	name = models.CharField(max_length=255, null=True, blank=True)

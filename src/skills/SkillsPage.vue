@@ -205,10 +205,12 @@ axios.defaults.xsrfCookieName = "csrftoken";
                 "name":skill.name,
             }).then(response => {
                 if(response.data.success){
-                    let all_skill_pos = this.all_skills[skill.type].map(function(e) { return e.id; }).indexOf(skill.id);
-                    this.user_skills[skill.type].splice(-1, 0, skill);
+                    let tmp_skill = JSON.parse(JSON.stringify(skill));
+                    tmp_skill.id = response.data.id;
+                    let all_skill_pos = this.all_skills[skill.type].map(function(e) { return e.id; }).indexOf(tmp_skill.id);
+                    this.user_skills[tmp_skill.type].splice(-1, 0, tmp_skill);
                     if(all_skill_pos != -1)
-                        this.all_skills[skill.type].splice(all_skill_pos, 1);
+                        this.all_skills[tmp_skill.type].splice(all_skill_pos, 1);
                     this.success_message = "Tag Added"
                     this.success_snack = true;
                 }else{

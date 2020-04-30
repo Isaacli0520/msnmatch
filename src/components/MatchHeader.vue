@@ -6,23 +6,49 @@
             app
             hide-overlay
             v-model="drawer"
-            :clipped="$vuetify.breakpoint.mdAndUp"
-            >
-            <v-list dense>
-                <v-list-item
-                    :key="index_item + '-trash' " 
-                    v-for="(item, index_item) in main_items"
-                    :href="item.href"
-                    :target="item.target">
-                    <v-list-item-avatar
-                        v-if="item.icon">
-                        <v-icon>{{ item.icon }}</v-icon>
-                    </v-list-item-avatar>
-                    <v-list-item-content>
-                        <v-list-item-title class="font-weight-bold">{{ item.title }}</v-list-item-title>
-                    </v-list-item-content>
-                </v-list-item>
-            </v-list>
+            :clipped="$vuetify.breakpoint.mdAndUp">
+            <v-container v-if="!loaded || user == null" fluid fill-height>
+                <v-layout 
+                    align-center
+                    justify-center>
+                    <div>
+                        <v-progress-circular
+                        :size="60"
+                        :width="6"
+                        indeterminate
+                        color="teal lighten-1">
+                        </v-progress-circular>
+                    </div>
+                </v-layout>
+            </v-container>
+            <v-container v-if="loaded && user">
+                <v-card 
+                    color="#FFFFFF">
+                    <v-card-title>{{user.first_name + " " + user.last_name}}</v-card-title>
+                    <v-card-subtitle>Role: {{ user.role ? user.role : "None" }}</v-card-subtitle>
+                </v-card>
+                <v-card
+                    v-for="(items, i) in side_bar_items"
+                    :key="i"
+                    style="margin-top:15px;"
+                    color="#FFFFFF">
+                    <v-list dense>
+                        <v-list-item
+                            :key="index_item + '-trash' " 
+                            v-for="(item, index_item) in items"
+                            @click="navMethod(item)"
+                            :target="item.target">
+                            <v-list-item-avatar
+                                v-if="item.icon">
+                                <v-icon>{{ item.icon }}</v-icon>
+                            </v-list-item-avatar>
+                            <v-list-item-content>
+                                <v-list-item-title class="font-weight-bold">{{ item.title }}</v-list-item-title>
+                            </v-list-item-content>
+                        </v-list-item>
+                    </v-list>
+                </v-card>
+            </v-container>
         </v-navigation-drawer>
         <v-app-bar
             :clipped-left="$vuetify.breakpoint.mdAndUp"
@@ -116,19 +142,9 @@ export default{
     data: function () {
         return {
             navDrawer:false,
-            drawer: false,
-            navBarItems:[
-                {
-                    text:"HoosMyProfessor",
-                    href:"",
-                    diabled:true,
-                },
-                {
-                    text:"Match",
-                    href:"",
-                    diabled:true,
-                },
-            ],
+            drawer: null,
+            loaded:false,
+            user: null,
             user_items:[
                 { title:"Profile", icon:"fas fa-user" },
                 { title:"Edit Profile", icon:"fas fa-user-edit" },
@@ -152,18 +168,23 @@ export default{
                 comment_url:"",
                 skills_url:"",
             },
-            main_items:[
-                {
-                    "title":"Home",
-                    "icon":"fas fa-home",
-                    "href":"/match/",
-                    "target":"",
-                },
-
-                {
+            side_bar_items:[
+                [{
                     "title":"Add Tags",
                     "icon":"fas fa-heart",
                     "href":"/skills/",
+                    "target":"",
+                },
+                {
+                    "title":"Edit Profile",
+                    "icon":"fas fa-user-edit",
+                    "href":"/skills/",
+                    "target":"",
+                }],
+                [{
+                    "title":"Match",
+                    "icon":"fas fa-home",
+                    "href":"/match/",
                     "target":"",
                 },
                 {
@@ -177,7 +198,8 @@ export default{
                     "icon":"fas fa-graduation-cap",
                     "href":"/courses/",
                     "target":"",
-                }],
+                }]
+                ],
             
             old_items: [
                 { icon: 'fas fa-book', text: 'HoosMyProfessor' },
@@ -213,6 +235,9 @@ export default{
             else if(item.title=="Match"){
                 this.goToHref(this.urls.match_url)
             }
+            else if(item.title=="Add Tags"){
+                this.goToHref('/skills/')
+            }
             else if(item.title=="Market"){
                 this.goToHref(this.urls.market_url)
             }
@@ -226,16 +251,12 @@ export default{
         get_basic_info(){
             axios.get('/courses/ajax/get_basic_info/',{params: {}}).then(response => {
                 this.urls = response.data.all_info;
-                this.navBarItems[0] = {
-                    text:"HoosMyProfessor",
-                    href:this.urls.courses_url,
-                    diabled:false,
-                };
-                this.navBarItems[1] = {
-                    text:"Match",
-                    href:this.urls.match_url,
-                    diabled:false,
-                };
+                this.loaded = true;
+            });
+        },
+        get_match_header(){
+            axios.get('/skills/api/get_user_match_header/',{params: {}}).then(response => {
+                this.user = response.data.user;
             });
         },
         goToHref(text){
@@ -244,6 +265,7 @@ export default{
     },
     mounted(){
         this.get_basic_info();
+        this.get_match_header();
     },
 }
 </script>

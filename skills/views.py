@@ -89,6 +89,16 @@ def get_all_users(request):
 	})
 
 @login_required
+def get_user_match_header(request):
+	return JsonResponse({
+		"user":{
+			"first_name":request.user.first_name,
+			"last_name":request.user.last_name,
+			"role":request.user.profile.role,
+		}
+	})
+
+@login_required
 def get_search_result(request):
 	skills = []
 	query_string = request.GET.get("query").strip()
@@ -126,7 +136,8 @@ def user_add_skill(request):
 			})
 		SkillRelation.objects.create(user=request.user, skill=skill)
 		return JsonResponse({
-			"success":True
+			"success":True,
+			"id":skill.id,
 		})
 	return JsonResponse({
 		"success":False,

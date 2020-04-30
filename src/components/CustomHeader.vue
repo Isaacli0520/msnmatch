@@ -1,114 +1,62 @@
 <template>
     <div>
-        <!-- <v-navigation-drawer
-            fixed
-            app
-            v-model="drawer">
-            <v-list dense>
-                <template v-for="item in old_items">
-                    <v-layout
-                        row
-                        v-if="item.heading"
-                        align-center
-                        :key="item.heading">
-                        <v-flex xs6>
-                            <v-subheader v-if="item.heading">
-                                {{ item.heading }}
-                            </v-subheader>
-                        </v-flex>
-                        <v-flex xs6 class="text-xs-center">
-                            <a href="#!" class="body-2 black--text">EDIT</a>
-                        </v-flex>
-                    </v-layout>
-                    <v-list-group
-                        v-else-if="item.children"
-                        v-model="item.model"
-                        :key="item.text"
-                        :prepend-icon="item.model ? item.icon : item['icon-alt']"
-                        append-icon="">
-                        <v-list-item slot="activator">
-                            <v-list-item-content>
-                                <v-list-item-title>
-                                    {{ item.text }}
-                                </v-list-item-title>
-                            </v-list-item-content>
-                        </v-list-item>
-                        <v-list-item
-                            v-for="(child, i) in item.children"
-                            :key="i">
-                            <v-list-item-action v-if="child.icon">
-                                <v-icon>{{ child.icon }}</v-icon>
-                            </v-list-item-action>
-                            <v-list-item-content>
-                                <v-list-item-title>
-                                {{ child.text }}
-                                </v-list-item-title>
-                            </v-list-item-content>
-                        </v-list-item>
-                    </v-list-group>
-                    <v-list-item v-else @click="navAsideMethod(item)" :key="item.text">
-                            <v-list-item-action>
-                                <v-icon>{{ item.icon }}</v-icon>
-                            </v-list-item-action>
-                            <v-list-item-content>
-                                <v-list-item-title>
-                                    {{ item.text }}
-                                </v-list-item-title>
-                            </v-list-item-content>
-                    </v-list-item>
-                </template>
-            </v-list>
-        </v-navigation-drawer> -->
+        <!-- Side Navigation Drawer -->
         <v-navigation-drawer
-            light
             app
             hide-overlay
             v-model="drawer"
-            :clipped="$vuetify.breakpoint.mdAndUp"
-            >
-            <v-list>
-                <v-list-item
-                    :key="index_item + '-trash' " 
-                    v-for="(item, index_item) in trash_items"
-                    :href="item.href"
-                    :target="item.target">
-                    <v-list-item-avatar
-                        v-if="item.icon">
-                        <v-icon>{{ item.icon }}</v-icon>
-                    </v-list-item-avatar>
-                    <v-list-item-content>
-                        <v-list-item-title class="font-weight-bold">{{ item.title }}</v-list-item-title>
-                    </v-list-item-content>
-                </v-list-item>
-            </v-list>
+            :clipped="$vuetify.breakpoint.mdAndUp">
+            <v-container v-if="!loaded || user == null" fluid fill-height>
+                <v-layout 
+                    align-center
+                    justify-center>
+                    <div>
+                        <v-progress-circular
+                        :size="60"
+                        :width="6"
+                        indeterminate
+                        color="teal lighten-1">
+                        </v-progress-circular>
+                    </div>
+                </v-layout>
+            </v-container>
+            <v-container v-if="loaded && user">
+                <v-card 
+                    color="#FFFFFF"
+                    v-if="user">
+                    <v-card-title>{{user.first_name + " " + user.last_name}}</v-card-title>
+                    <v-card-subtitle>Role: {{user.role ? user.role : "None"}}</v-card-subtitle>
+                </v-card>
+                <v-card
+                    v-for="(items, i) in nav_drawer_items"
+                    :key="i"
+                    style="margin-top:15px;"
+                    color="#FFFFFF">
+                    <v-list dense>
+                        <v-list-item
+                            :key="index_item + '-trash' " 
+                            v-for="(item, index_item) in items"
+                            @click="navMethod(item)">
+                            <v-list-item-avatar
+                                v-if="item.icon">
+                                <v-icon>{{ item.icon }}</v-icon>
+                            </v-list-item-avatar>
+                            <v-list-item-content>
+                                <v-list-item-title class="font-weight-bold">{{ item.title }}</v-list-item-title>
+                            </v-list-item-content>
+                        </v-list-item>
+                    </v-list>
+                </v-card>
+            </v-container>
         </v-navigation-drawer>
-        <!-- color="blue-grey darken-1" -->
+        <!-- APP BAR -->
         <v-app-bar
             :clipped-left="$vuetify.breakpoint.mdAndUp"
             app
             light
             height="62"
-            
-            elevation="1"
-            >
+            elevation="1">
             <v-app-bar-nav-icon  @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
-            <!-- <a class="navbar-brand" :href="urls.courses_url">
-                <img :src="urls.brand_pic" style="margin:5px 0px 0px 0px;" width="35" height="35" class="d-inline-block align-center" alt="">
-            </a> -->
-            <!-- <v-toolbar-items v-if="$vuetify.breakpoint.mdAndUp">
-                <template v-for="item in navBarItems">
-                    <v-btn 
-                        :key="item.text + '-btn' "
-                        :href="item.href"
-                        text>
-                        {{item.text}}
-                    </v-btn>
-                    <v-divider
-                        :key="item.text + '-divider' "
-                        inset
-                        vertical></v-divider>
-                </template>
-            </v-toolbar-items> -->
             <v-img max-height="46" max-width="46" :src="urls.brand_pic" alt=""></v-img>
             <v-toolbar-items v-if="$vuetify.breakpoint.mdAndUp">
                 <v-btn 
@@ -126,6 +74,7 @@
             <search-course
                 v-if="searchBool"></search-course>
             <v-spacer v-if="!searchBool"></v-spacer>
+            <!-- App Menu -->
             <v-menu offset-y
                 class="mx-auto"
                 min-width="170">
@@ -150,6 +99,7 @@
                     </v-list-item>
                 </v-list>
             </v-menu>
+            <!-- User Drop Menu -->
             <v-menu offset-y
                 class="mx-auto"
                 min-width="170">
@@ -175,12 +125,137 @@
                 </v-list>
             </v-menu>
         </v-app-bar>
+        <v-snackbar
+            top
+            v-model="form_invalid_snack"
+            color="red lighten-1"
+            :timeout="2700">
+            Form Invalid
+            <v-btn color="white" text @click="form_invalid_snack = false"> Close </v-btn>
+        </v-snackbar>
+        <v-snackbar
+            top
+            v-model="failure_snack"
+            color="red lighten-1"
+            :timeout="2700">
+            Sth is wrong
+            <v-btn color="white" text @click="failure_snack = false"> Close </v-btn>
+        </v-snackbar>
+        <v-snackbar
+            top
+            v-model="success_snack"
+            color="teal darken-1"
+            :timeout="2700">
+            Review Submitted
+            <v-btn color="cyan accent-1" text @click="success_snack = false"> Close </v-btn>
+        </v-snackbar>
+        <v-dialog v-model="submitReviewDialog" scrollable min-width="350px" max-width="600px">
+            <v-card>
+                <v-card-title>Submit a Review</v-card-title>
+                <v-divider></v-divider>
+                <v-card-text>
+                    <v-form
+                        ref="review_form"
+                        v-model="submit_review_form_valid">
+                        <v-row>
+                            <v-col>
+                            <span>Instructor Rating:</span>
+                            <v-rating
+                                v-model="review.rating_instructor"
+                                color="yellow darken-3"
+                                background-color="grey darken-1"
+                                medium
+                                hover>
+                            </v-rating>
+                            </v-col>
+                            <v-col>
+                            <span>Course Rating:</span>
+                            <v-rating
+                                v-model="review.rating_course"
+                                color="yellow darken-3"
+                                background-color="grey darken-1"
+                                medium
+                                hover>
+                            </v-rating>
+                            </v-col>
+                        </v-row>
+                        <v-row>
+                            <v-col>
+                            <search-course
+                                searchFunction="select"
+                                :searchInstructor="false"
+                                :flat="true"
+                                :light="true"
+                                background_color="white"
+                                :dense="true"
+                                @select-course="selectCourse"
+                                :outlined="true">
+                            </search-course>
+                            </v-col>
+                        </v-row>
+                        <v-row>
+                            <v-col>
+                                <v-select
+                                    dense
+                                    v-model="review_instructor_pk"
+                                    :items="instructor_options"
+                                    item-text="name"
+                                    item-value="instructor_pk"
+                                    :disabled="review_course_pk==null"
+                                    :loading="instructorSelectLoading"
+                                    label="Instructor"
+                                    :rules="[v => !!v || 'Instructor is required']"
+                                    :menu-props="{ offsetY: true }"
+                                    outlined>
+                                </v-select>
+                            </v-col>
+                            <v-col>
+                                <v-select
+                                    dense
+                                    v-model="review.course_instructor_pk"
+                                    :items="course_instructor_options"
+                                    item-text="semester"
+                                    item-value="course_instructor_pk"
+                                    :disabled="review_instructor_pk==null"
+                                    label="Semester"
+                                    :rules="[v => !!v || 'Semester is required']"
+                                    :menu-props="{ offsetY: true }"
+                                    outlined>
+                                </v-select>
+                            </v-col>
+                        </v-row>
+                        <v-row>
+                            <v-col>
+                                <v-textarea
+                                    v-model="review.text"
+                                    label="Write Your Review"
+                                    auto-grow
+                                    outlined
+                                    required
+                                    :rules="reviewTextRules"
+                                    rows="5"
+                                    row-height="20">
+                                </v-textarea>
+                            </v-col>
+                        </v-row>
+                    </v-form>
+                </v-card-text>
+                <v-divider></v-divider>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="green darken-1" :loading="submitReviewBtnLoading" outlined @click.prevent="submitReview(review)">Create</v-btn>   
+                    <v-btn color="blue darken-1" outlined @click="submitReviewDialog = false">Close</v-btn> 
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
     </div>
 </template>
 
 <script>
 import axios from 'axios'
 import SearchCourse from './SearchCourse'
+axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
+axios.defaults.xsrfCookieName = "csrftoken";
 
 export default{
     props: {
@@ -195,24 +270,40 @@ export default{
     },
     data: function () {
         return {
+            // Review
+            submit_review_form_valid:true,
+            submitReviewDialog:false,
+            submitReviewBtnLoading:false,
+            instructorSelectLoading:false,
+            reviewTextRules: [
+                v => !!v || 'Review is required',
+                v => (v && v.length <= 2000) || 'Review must be less than 2000 characters',
+            ],
+            review_course_pk:null,
+            review_course:null,
+            review_instructor_pk:null,
+            instructors:[],
+            instructor_options:[],
+            course_instructor_options:[],
+            review:{
+                rating_course:1,
+                rating_instructor:1,
+                text:"",
+                course_instructor_pk:null,
+            },
+            // Snacks
+            form_invalid_snack:false,
+            failure_snack:false,
+            success_snack:false,
+
+            loaded:false,
             navDrawer:false,
+            user:null,
             drawer: null,
             credential:"",
             plannableURL:"",
             username:"",
             taking_courses:[],
-            navBarItems:[
-                {
-                    text:"HoosMyProfessor",
-                    href:"",
-                    diabled:true,
-                },
-                {
-                    text:"Match",
-                    href:"",
-                    diabled:true,
-                },
-            ],
             courseTypes:[
                 'Clinical',
                 'Discussion',
@@ -250,8 +341,26 @@ export default{
                 market_url:"",
                 skills_url:"",
             },
-            trash_items:[
+            nav_drawer_items:[
+                [{
+                    "title":"My Courses",
+                    "icon":"fas fa-user-circle",
+                    "href":"",
+                    "target":"",
+                },
                 {
+                    "title":"My Reviews",
+                    "icon":"fas fa-book",
+                    "href":"/courses/reviews/",
+                    "target":"",
+                },
+                {
+                    "title":"Submit a Review",
+                    "icon":"fas fa-pen",
+                    "href":"",
+                    "target":"",
+                },],
+                [{
                     "title":"Home",
                     "icon":"fas fa-home",
                     "href":"/courses/",
@@ -264,68 +373,27 @@ export default{
                     "target":"",
                 },
                 {
-                    "title":"Courses",
-                    "icon":"fas fa-user-circle",
-                    "href":"",
-                    "target":"",
-                },
-                {
-                    "title":"Reviews",
-                    "icon":"fas fa-book",
-                    "href":"/courses/reviews/",
-                    "target":"",
-                },
-                {
                     "title":"Plannable",
                     "icon":"fas fa-paper-plane",
                     "href":"https://plannable.org",
                     "target":"_blank",
-                },
+                },]
             ],
-            old_items: [
-                //   {  icon: 'contacts', text: 'Contacts' },
-                //   { icon: 'history', text: 'Frequently contacted' },
-                //   { icon: 'content_copy', text: 'Duplicates' },
-                //   {
-                //     icon: 'keyboard_arrow_up',
-                //     'icon-alt': 'keyboard_arrow_down',
-                //     text: 'Labels',
-                //     model: true,
-                //     children: [
-                //       { icon: 'add', text: 'Create label' }
-                //     ]
-                //   },
-                //   {
-                //     icon: 'keyboard_arrow_up',
-                //     'icon-alt': 'keyboard_arrow_down',
-                //     text: 'More',
-                //     model: false,
-                //     children: [
-                //       { text: 'Import' },
-                //       { text: 'Export' },
-                //       { text: 'Print' },
-                //       { text: 'Undo changes' },
-                //       { text: 'Other contacts' }
-                //     ]
-                //   },
-                { icon: 'fas fa-book', text: 'HoosMyProfessor' },
-                { icon: 'fas fa-user', text: 'Match' },
-                ],
         }
     },
     components:{
         SearchCourse,
     },
     watch:{
+        review_instructor_pk(val){
+            this.course_instructor_options = this.instructors[val];
+        },
+        review_course_pk(){
+            this.instructorSelectLoading = true;
+            this.getCourse();
+        },
         headerUpdate(){
             this.getTakingCourses();
-        },
-        credential(){
-            this.getPlannableURL();
-        },
-        username(){
-            this.getPlannableURL();
-            this.trash_items[2].href = "/users/" + this.username + "/courses/";
         },
         taking_courses(val){
             var tmp_arr = [];
@@ -333,13 +401,69 @@ export default{
                 tmp_arr.push(val[i].mnemonic.toLowerCase() + val[i].number+this.courseTypes.indexOf(val[i].type).toString(10))
             }
             this.plannableURL = JSON.stringify(tmp_arr);
-            this.getPlannableURL();
         },
     },
     computed:{
-
+        plannableFinalURL(){
+            return "https://plannable.org" + "/?courses=" + this.plannableURL + "&username=" + this.username + "&credential=" + this.credential + "";
+        }
     },
     methods:{
+        selectCourse(course){
+            this.review_course_pk = course.value;
+        },
+        submitReview(review){
+            this.$refs.review_form.validate();
+            if(!this.submit_review_form_valid){
+                this.form_invalid_snack = true;
+                return;
+            }
+            this.submitReviewBtnLoading = true;
+            axios.post('/courses/api/submit_review/', {
+                "text":review.text,
+                "rating_course":review.rating_course,
+                "rating_instructor":review.rating_instructor,
+                "course_instructor_pk":review.course_instructor_pk,
+            }).then(response => {
+                this.submitReviewBtnLoading = false;
+                if(response.data.success){
+                    this.success_snack = true;
+                    this.review = {
+                        rating_course:1,
+                        rating_instructor:1,
+                        text:"",
+                        course_instructor_pk:null,
+                    }
+                    this.$refs.review_form.reset()
+                    this.$emit("submit-review")
+                }
+                else{
+                    this.failure_snack = true;
+                }
+                this.submitReviewDialog = false;
+            });
+        },
+        getCourse(){
+            axios.get('/courses/ajax/get_course/',{params: {pk:this.review_course_pk, }}).then(response => {
+                this.review_course = response.data.course;
+                this.instructors = {};
+                this.instructor_options = [];
+                for(let i = 0; i < this.review_course.instructors.length; i++){
+                    this.instructor_options.push({
+                        "instructor_pk":this.review_course.instructors[i].pk,
+                        "name":this.review_course.instructors[i].name
+                    });
+                    this.instructors[this.review_course.instructors[i].pk] = []
+                    for(let j = 0; j < this.review_course.instructors[i].semesters.length; j++){
+                        this.instructors[this.review_course.instructors[i].pk].push({
+                            "semester":this.review_course.instructors[i].semesters[j].semester,
+                            "course_instructor_pk":this.review_course.instructors[i].semesters[j].course_instructor_pk,
+                        });
+                    }
+                }
+                this.instructorSelectLoading = false;
+            });
+        },
         sortCourseNumber(a, b){
             return a.number.toString(10) - b.number.toString(10);
         },
@@ -353,40 +477,46 @@ export default{
         },
         navMethod(item){
             if(item.title=="Profile"){
-                this.goToHref(this.urls.profile)
+                this.goToHref(this.urls.profile);
             }
             else if(item.title=="Edit Profile"){
-                this.goToHref(this.urls.update_profile)
+                this.goToHref(this.urls.update_profile);
             }
             else if(item.title=="Log Out"){
-                this.goToHref(this.urls.logout)
+                this.goToHref(this.urls.logout);
             }
             else if(item.title=="My Courses"){
-                this.goToHref(this.urls.my_courses)
+                this.goToHref(this.urls.my_courses);
+            }
+            else if(item.title=="My Reviews"){
+                this.goToHref("/courses/reviews/");
             }
             else if(item.title=="Match"){
-                this.goToHref(this.urls.match_url)
+                this.goToHref(this.urls.match_url);
             }
             else if(item.title=="Market"){
-                this.goToHref(this.urls.market_url)
+                this.goToHref(this.urls.market_url);
             }
             else if(item.title=="Live Comments"){
-                this.goToHref(this.urls.comment_url)
+                this.goToHref(this.urls.comment_url);
+            }
+            else if(item.title=="Home"){
+                this.goToHref("/courses/");
+            }
+            else if(item.title=="Departments"){
+                this.goToHref("/courses/departments/");
+            }
+            else if(item.title=="Plannable"){
+                this.goToHref(this.plannableFinalURL);
+            }
+            else if(item.title=="Submit a Review"){
+                this.submitReviewDialog = true;
             }
         },
         get_basic_info(){
             axios.get('/courses/ajax/get_basic_info/',{params: {}}).then(response => {
                 this.urls = response.data.all_info;
-                this.navBarItems[0] = {
-                    text:"HoosMyProfessor",
-                    href:this.urls.courses_url,
-                    diabled:false,
-                };
-                this.navBarItems[1] = {
-                    text:"Match",
-                    href:this.urls.match_url,
-                    diabled:false,
-                };
+                this.loaded = true;
             });
         },
         goToHref(text){
@@ -402,14 +532,10 @@ export default{
             });
         },
         getTakingCourses(){
-            axios.get('/courses/ajax/get_taking_courses/',{params: {}}).then(response => {
+            axios.get('/courses/api/get_user_hmp_header/',{params: {}}).then(response => {
+                this.user = response.data.user;
                 this.taking_courses = response.data.taking_courses;
             });
-        },
-        getPlannableURL(){
-            // var preHref = "localhost:8080"
-            var preHref = "https://plannable.org"
-            this.trash_items[4].href = preHref + "/?courses=" + this.plannableURL + "&username=" + this.username + "&credential=" + this.credential + "";
         },
     },
     mounted(){
@@ -421,7 +547,12 @@ export default{
 </script>
 
 
-<style lang="css">
+<style scoped lang="css">
+    .cus-navbar-item{
+        font-size: 15px !important;
+        font-family: Arial, Helvetica, sans-serif !important;
+    }
+
     .theme--light.v-app-bar.v-toolbar.v-sheet{
         background-color: white !important;
     }

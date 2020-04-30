@@ -103,9 +103,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
                     if(! (this.departments[i].school in tmp_d)){
                         tmp_d[this.departments[i].school] = [];
                     }
-                    else{
-                        tmp_d[this.departments[i].school].push(this.departments[i])
-                    }
+                    tmp_d[this.departments[i].school].push(this.departments[i]);
                 }
                 this.departments_dict = tmp_d;
                 this.navItems = [

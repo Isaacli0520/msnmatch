@@ -68,20 +68,23 @@
                     </v-row>
                 </div>
                 <v-container fluid >
-                    <v-row style="margin-top:17px;" dense>
+                    <v-lazy>
+                    <v-row dense>
                         <v-col
                             v-for="(user, i) in users"
                             :key="i"
                             cols="12"
                             sm="6"
                             md="4"
-                            lg="3"
+                            lg="4"
                             xl="3">
                             <user-card
                                 class="fill-height"
+                                :user_index="i"
                                 :user="user" @open-user-dialog="openUserDialog"></user-card>
                         </v-col>
                     </v-row>
+                    </v-lazy>
                 </v-container>
         </v-content>
         <user-dialog
@@ -141,23 +144,28 @@ import UserCard from '../components/UserCard'
   export default {
 	data() {
         return {
+            loaded:false,
+            // Search Bar
             query:"",
+            tags:[],
+            // Users
+            request_user:null,
+            users:[],
+            backup_all_users: [],
+            // Dialog
             dialogRole:"Mentor",
+            roleBtnLoading:false,
+            userDialog:false,
+            roleDialog:false,
+            dialog_user_index:-1,
+            // Fuzz Search
+            fuzz: null,
+            options:null,
+            // Snacks
             failure_text:"",
             success_text:"",
             failure_snack:false,
             success_snack:false,
-            loaded:false,
-            roleBtnLoading:false,
-            userDialog:false,
-            roleDialog:false,
-            d_user:null,
-            request_user:null,
-            users:[],
-            backup_all_users: [],
-            tags:[],
-            fuzz: null,
-            options:null,
         }
 	},
 	components:{
@@ -171,6 +179,12 @@ import UserCard from '../components/UserCard'
         }
 	},
 	computed:{
+        d_user(){
+            if(this.dialog_user_index < 0)
+                return null;
+            else
+                return this.users[this.dialog_user_index];
+        },
 	},
 	methods: {
         setRole(role){
@@ -210,11 +224,14 @@ import UserCard from '../components/UserCard'
                 this.query = ""
             }
         },
-        openUserDialog(user){
-            this.d_user = JSON.parse(JSON.stringify(user));
-            Vue.nextTick().then(function(){
-                document.getElementsByClassName('v-dialog')[0].scrollTop = 0;
-            })
+        openUserDialog(index){
+            this.dialog_user_index = index;
+            // this.d_user = JSON.parse(JSON.stringify(user));
+            if(this.dialog_user_index != -1){
+                Vue.nextTick().then(function(){
+                    document.getElementsByClassName('v-dialog')[0].scrollTop = 0;
+                })
+            }
             this.userDialog = true;
         },
         closeUserDialog(){
@@ -350,7 +367,7 @@ import UserCard from '../components/UserCard'
   };
 </script>
 
-<style>
+<style scoped>
     .top-part-wrapper{
         position: relative;
         padding: 55px 0px 45px 0px;

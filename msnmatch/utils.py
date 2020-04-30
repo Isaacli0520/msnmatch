@@ -1,6 +1,14 @@
 from msnmatch import settings
 from hashlib import md5
 
+def js_boolean(val):
+	if val == u"true":
+		return True
+	elif val == u"false":
+		return False
+	else:
+		return -1
+
 def custom_md5(pwd, salt):
     obj = md5()
     obj.update((pwd + salt).encode('utf-8'))

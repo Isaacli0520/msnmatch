@@ -1,4 +1,5 @@
 const BundleTracker = require("webpack-bundle-tracker");
+// const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 
 module.exports = {
@@ -105,11 +106,6 @@ module.exports = {
 			template: 'templates/commentcreate.html',
 			filename: 'commentcreate.html',
 		},
-		testpage: {
-			entry: 'src/test/main.js',
-			template: 'templates/test.html',
-			filename: 'test.html',
-		},
 		market_page: {
 			entry: 'src/market/main.js',
 			template: 'templates/market.html',
@@ -149,6 +145,14 @@ module.exports = {
 			},
 		},
 	},
+
+	// configureWebpack: {
+	// 	plugins: [
+	// 		new BundleAnalyzerPlugin({
+	// 			generateStatsFile:true,
+	// 		})
+	// 	]
+	// },
 
 	chainWebpack: config => {
 		["vue-modules", "vue", "normal-modules", "normal"].forEach((match) => {

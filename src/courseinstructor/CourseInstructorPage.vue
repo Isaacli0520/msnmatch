@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <custom-header></custom-header>
+    <custom-header @submit-review="getCourseInstructor"></custom-header>
     <v-content>
         <v-container v-if="!loaded" fluid fill-height>
             <v-layout 
@@ -10,7 +10,6 @@
                     <v-progress-circular
                     :size="60"
                     :width="6"
-                    v-if="!loaded"
                     indeterminate
                     color="teal lighten-1">
                     </v-progress-circular>
@@ -159,15 +158,17 @@
             </v-layout>
         </v-container>
     </v-content>
-    <v-dialog v-model="reviewDialog" persistent max-width="600px">
+    <v-dialog v-model="reviewDialog" max-width="600px">
         <v-card>
             <v-card-title>
                 <span class="headline">Submit a Review</span>
             </v-card-title>
             <v-card-text>
-                <v-container v-if="course_instructors.length > 0" grid-list-md>
-                    <v-layout wrap>
-                        <v-flex>
+                <v-form
+                    ref="review_form"
+                    v-model="submit_review_form_valid">
+                    <v-row wrap>
+                        <v-col>
                             <span>Instructor Rating:</span>
                             <v-rating
                                 v-model="review_rating_instructor"
@@ -184,45 +185,66 @@
                                 medium
                                 hover>
                             </v-rating>
-                        </v-flex>
-                        <v-flex d-flex>
+                        </v-col>
+                        <v-col>
                             <v-select
                                 v-model="review_course_instructor_pk"
                                 :items="course_instructors"
                                 item-text="text"
                                 item-value="course_instructor_pk"
+                                :rules="[v => !!v || 'Semester is required']"
                                 label="Semester"
-                                :error-messages="semester_error_messages"
                                 :menu-props="{ offsetY: true }"
                                 outlined>
                             </v-select>
-                        </v-flex>
-                    </v-layout>
-                    <v-layout>
-                        <v-flex>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col>
                             <v-textarea
                                 v-model="review_text"
                                 label="Write Your Review"
                                 auto-grow
                                 outlined
-                                :error-messages="review_error_messages"
+                                :rules="reviewTextRules"
                                 rows="5"
                                 row-height="20"
                             ></v-textarea>
-                        </v-flex>
-                    </v-layout>
-                </v-container>
-                <p v-else>
-                    You can't review this instructor.
-                </p>
+                        </v-col>
+                    </v-row>
+                </v-form>
             </v-card-text>
             <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="blue darken-1" text @click="reviewDialog = false">Close</v-btn>
-                <v-btn color="blue darken-1" text v-if="course_instructors.length > 0" @click="submitReview()">Submit</v-btn>
+                <v-btn color="teal darken-1" outlined v-if="course_instructors.length > 0" :loading="submitReviewBtnLoading" @click="submitReview()">Submit</v-btn>
+                <v-btn color="red lighten-1" outlined @click="reviewDialog = false">Close</v-btn>
             </v-card-actions>
         </v-card>
     </v-dialog>
+    <v-snackbar
+        top
+        v-model="failure_snack"
+        color="red lighten-1"
+        :timeout="2700">
+        Sth is wrong
+        <v-btn color="white" text @click="failure_snack = false"> Close </v-btn>
+    </v-snackbar>
+    <v-snackbar
+        top
+        v-model="form_invalid_snack"
+        color="red lighten-1"
+        :timeout="2700">
+        Form Invalid
+        <v-btn color="white" text @click="form_invalid_snack = false"> Close </v-btn>
+    </v-snackbar>
+    <v-snackbar
+        top
+        v-model="success_snack"
+        color="teal darken-1"
+        :timeout="2700">
+        Review Submitted
+        <v-btn color="cyan accent-1" text @click="success_snack = false"> Close </v-btn>
+    </v-snackbar>
     </v-app>
 </template>
 
@@ -238,14 +260,22 @@ export default {
     data() {
         return {
             loaded:false,
+            submitReviewBtnLoading:false,
+            submit_review_form_valid:true,
+            // Snacks
+            failure_snack:false,
+            success_snack:false,
+            form_invalid_snack:false,
+
+            reviewTextRules:[
+                v => !!v || 'Review is required',
+                v => (v && v.length <= 2000) || 'Review must be less than 2000 characters',
+            ],
+
             taken_users_enable:false,
             currentSemester:"",
             courseNameLimit:40,
             isLoading: false,
-            semester_error_messages:[],
-            review_error_messages:[],
-            course_rating_error_messages:[],
-            instructor_rating_error_messages:[],
             entries:[],
             home_url:"",
             brand_pic:"",
@@ -288,16 +318,6 @@ export default {
         CustomBreadcrumb,
     },
     watch:{
-        review_course_instructor_pk(val){
-            if(val != null){
-                this.semester_error_messages = []
-            }
-        },
-        review_text(val){
-            if(val != null){
-                this.review_error_messages = []
-            }
-        },
     },
     computed:{
         users_with_review(){
@@ -390,42 +410,29 @@ export default {
             return this.sortBySemester(a["semester"], b["semester"]);
         },
         submitReview(){
-            let error_flag = false;
-            if(this.review_course_instructor_pk == null){
-                this.semester_error_messages.push("Choose a Semester");
-                error_flag = true;
+            this.$refs.review_form.validate();
+            if(!this.submit_review_form_valid){
+                this.form_invalid_snack = true;
+                return;
             }
-            if(this.review_text == ""){
-                this.review_error_messages.push("Write Sth");
-                error_flag = true;
-            }
-            // if(this.review_rating_course == 0){
-            //     this.course_rating_error_messages.push("Can't be 0");
-            //     error_flag = true;
-            // }
-            // if(this.review_rating_instructor == 0){
-            //     this.instructor_rating_error_messages.push("Can't be 0");
-            //     error_flag = true;
-            // }
-            if(!error_flag){
-                axios.post('/courses/ajax/submit_review/', {
-                    "text":this.review_text,
-                    "rating_course":this.review_rating_course,
-                    "rating_instructor":this.review_rating_instructor,
-                    "course_pk":this.course_pk,
-                    "instructor_pk":this.instructor_pk,
-                    "course_instructor_pk":this.review_course_instructor_pk,
-                }).then(response => {
-                    if(response.data.success){
-                        this.$message({
-                            message: 'Review Submitted',
-                            type: 'success'
-                        });
-                        this.getCourseInstructor();
-                    }
-                });
+            this.submitReviewBtnLoading = true;
+            axios.post('/courses/api/submit_review/', {
+                "text":this.review_text,
+                "rating_course":this.review_rating_course,
+                "rating_instructor":this.review_rating_instructor,
+                "course_instructor_pk":this.review_course_instructor_pk,
+            }).then(response => {
+                this.submitReviewBtnLoading = false;
+                if(response.data.success){
+                    this.getCourseInstructor();
+                    this.success_snack = true;
+                    this.$refs.review_form.reset()
+                }
+                else{
+                    this.failure_snack = true;
+                }
                 this.reviewDialog = false;
-            }
+            });
         },
         getCourseInstructor(){
             axios.get('/courses/api/get_course_instructor/',{params: {course_pk:this.course_pk, instructor_pk:this.instructor_pk, }}).then(response => {
