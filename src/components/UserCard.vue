@@ -10,9 +10,17 @@
         :src="user.picture">
         </v-img>
         <v-divider></v-divider>
-        <v-card-title>{{user.first_name + " " + user.last_name}}</v-card-title>
-        <div class="cus-subtitle" v-if="user.major">{{ user.major }}</div>
-        <div class="cus-subtitle major-two" v-if="user.major_two">{{ user.major_two }}</div>
+        <!-- <v-card-title>{{user.first_name + " " + user.last_name}}</v-card-title> -->
+        <div style="padding-top: 10px; padding-bottom:0px;">
+            <div class="title-div">
+                <span class="cus-title" style="float:left;">{{user.first_name + " " + user.last_name}}</span>
+                <span :class="['role-title', user.role=='Mentor' ? 'mentor-title':'', user.role=='Mentee' ? 'mentee-title':'']" style="float:right;">{{user.role}}</span>
+            </div>
+        </div>
+        <div class="major-div">
+            <div class="cus-subtitle" v-if="user.major">{{ user.major }}</div>
+            <div class="cus-subtitle" v-if="user.major_two">{{ user.major_two }}</div>
+        </div>
         <!-- <v-card-text v-if="item.sold">
             <div class="item-tags">
                 <span class="item-tag item-tag-sold">Sold</span>
@@ -63,11 +71,39 @@ export default{
 
 
 <style scoped>
-    .v-card__title{
+    .title-div{
+        display:block; 
+        height:28px; 
+        line-height:28px;
+        clear:both;
+        padding: 0px 16px 0px 16px;
+    }
+
+    .cus-title{
         font-family: "Roboto", sans-serif !important;
         font-weight: 700 !important;
-        padding-bottom: 0px;
-        padding-top: 10px;
+        align-items: center;
+        font-size: 18px;
+        letter-spacing: 0.0125em;
+    }
+
+    .role-title{
+        font-family: "Roboto", sans-serif !important;
+        font-weight: 700 !important;
+        align-items: center;
+        font-size: 13px;
+        letter-spacing: 0.0125em;
+        padding: 0px 6px 0px 6px;
+        color: white;
+        border-radius: 5px;
+    }
+
+    .mentee-title{
+        background-color: rgb(61, 199, 80);
+    }
+
+    .mentor-title{
+        background-color: rgb(65, 194, 211);
     }
 
     .cus-subtitle{
@@ -75,11 +111,12 @@ export default{
         font-size:15px !important;
         color: rgb(117, 117, 117);
         letter-spacing: 0.007em;
-        padding: 0px 16px 3px 16px;
+        padding: 2px 16px 0px 16px;
     }
 
-    .major-two{
-        padding: 0px 16px 10px 16px !important;
+    .major-div{
+        display:block;
+        padding-bottom:10px !important;
     }
 
 

@@ -138,6 +138,10 @@ axios.defaults.xsrfCookieName = "csrftoken";
 
 export default{
     props: {
+        headerUpdate:{
+            type:Boolean,
+            default:false,
+        },
     },
     data: function () {
         return {
@@ -210,6 +214,9 @@ export default{
     components:{
     },
     watch:{
+        headerUpdate(){
+            this.get_match_header();
+        }
     },
     computed:{
     },

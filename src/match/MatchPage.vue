@@ -1,6 +1,7 @@
 <template>
     <v-app>
-        <match-header></match-header>
+        <match-header
+            :headerUpdate="headerUpdate"></match-header>
         <v-content>
                 <v-row 
                     class="fill-height"
@@ -96,9 +97,9 @@
             <v-card>
                 <v-card-title>Be a {{dialogRole}}</v-card-title>
                 <v-divider></v-divider>
-                <v-card-text style="color:black;margin-top:21px; font-size:16px;font-weight:500;">
+                <v-card-text v-if="dialogRole=='Mentor'" style="color:black;margin-top:21px; font-size:16px;font-weight:500;">
                     <p style="font-size:19x;font-weight:600;">成为Mentor需要做到什么？</p>
-                    <p>1. 第一时间联系你的Mentee，让TA感受到夏村大家庭的温暖和友好，并尽量在国内就开始与新生进行线上线下的交流。</p>
+                    <p>1.第一时间联系你的Mentee，让TA感受到夏村大家庭的温暖和友好，并尽量在国内就开始与新生进行线上线下的交流。</p>
                     <p>2.能够耐心地解决新生的问题，主动向新生分享自己的资源和经历。</p>
                     <p>3.给予新生支持，鼓励新生尝试新的事物，融入美国校园，并积极带领新手感受夏村的生活</p>
                     <p>4.帮助一起建设MSN Hoos My Professor网站，分享学术方面的经历，从而帮助建立新生选课的指南。</p>
@@ -107,6 +108,11 @@
                     <p>且已经累计填写过<strong style="color:red;">3条多于15字的Hoos My Professor课程评价</strong></p>
                     <p>那么点击Yes即可成为Mentor!</p>
                     <p>Do you really want to be a <strong>{{dialogRole}}</strong>?</p>
+                    <p style="font-size:14px; margin-bottom:0px !important;" class="muted-text">*Note that your role can only be changed by the mentor program chair once you've made your choice.</p>
+                </v-card-text>
+                <v-card-text v-if="dialogRole=='Mentee'" style="color:black;margin-top:21px; font-size:16px;font-weight:500;">
+                    <p style="font-size:19x;font-weight:600;">你是否要成为Mentee？</p>
+                    <p>点击Yes即可成为Mentee!</p>
                     <p style="font-size:14px; margin-bottom:0px !important;" class="muted-text">*Note that your role can only be changed by the mentor program chair once you've made your choice.</p>
                 </v-card-text>
                 <v-divider></v-divider>
@@ -145,6 +151,8 @@ import UserCard from '../components/UserCard'
 	data() {
         return {
             loaded:false,
+            // Header
+            headerUpdate: false,
             // Search Bar
             query:"",
             tags:[],
@@ -193,22 +201,23 @@ import UserCard from '../components/UserCard'
                 this.roleDialog = false;
                 this.roleBtnLoading = false;
                 if(response.data.success){
-                    this.success_text = "恭喜你成为Mentor!";
+                    this.success_text = "恭喜你成为" + role + "!";
                     this.success_snack = true;
+                    this.headerUpdate = !this.headerUpdate;
                     this.getAllUsers();
-                }else{
+                }
+                else if(response.data.message == "You don't have enough course comments."){
                     this.failure_text = "你大概是没填够三条大于15字的HoosMyProfessor课程评价";
+                    this.failure_snack = true;
+                }
+                else{
+                    this.failure_text = "Sth is wrong. 你似乎发现了神奇的bug";
                     this.failure_snack = true;
                 }
             });
             
         },
         openRoleDialog(role){
-            if(role == "Mentee"){
-                this.failure_text = "还没开始呢亲(づ￣3￣)づ╭❤～";
-                this.failure_snack = true;
-                return;
-            }
             this.dialogRole = role;
             this.roleDialog = true;
         },
@@ -370,7 +379,7 @@ import UserCard from '../components/UserCard'
 <style scoped>
     .top-part-wrapper{
         position: relative;
-        padding: 55px 0px 45px 0px;
+        padding: 55px 0px 30px 0px;
         color:#000000;
         width:100%;
         position:relative;

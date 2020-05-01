@@ -187,12 +187,17 @@ def choose_role(request):
 		request.user.profile.role = "Mentor"
 		request.user.save()
 	elif tmp_role == "Mentee" and request.user.profile.role == "":
-		return JsonResponse({
-			"success":False,
-			"message":"Mentee registration not yet started."
-		})
+		# return JsonResponse({
+		# 	"success":False,
+		# 	"message":"Mentee registration not yet started."
+		# })
 		request.user.profile.role = "Mentee"
 		request.user.save()
+	else:
+		return JsonResponse({
+			"success":False,
+			"message":"Unknown Reason"
+		})
 	return JsonResponse({
 		"success":True,
 		"role":request.user.profile.role,
