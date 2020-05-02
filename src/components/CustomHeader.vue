@@ -3,6 +3,7 @@
         <!-- Side Navigation Drawer -->
         <v-navigation-drawer
             app
+            floating
             hide-overlay
             v-model="drawer"
             :clipped="$vuetify.breakpoint.mdAndUp">
@@ -53,11 +54,11 @@
         <v-app-bar
             :clipped-left="$vuetify.breakpoint.mdAndUp"
             app
+            dense
             light
-            height="62"
             elevation="1">
             <v-app-bar-nav-icon  @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
-            <v-img max-height="46" max-width="46" :src="urls.brand_pic" alt=""></v-img>
+            <v-img max-height="38" max-width="38" :src="urls.brand_pic" alt=""></v-img>
             <v-toolbar-items v-if="$vuetify.breakpoint.mdAndUp">
                 <v-btn 
                     :href="urls.courses_url"

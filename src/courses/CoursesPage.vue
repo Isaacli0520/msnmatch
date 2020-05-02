@@ -14,6 +14,7 @@
                         <v-spacer></v-spacer>
                         <v-flex d-flex xs10 sm10 md8 lg8 xl8>
                             <search-course class="custom-search"
+                                :dense="false"
                                 background_color="white"></search-course>
                         </v-flex>
                         <v-spacer></v-spacer>

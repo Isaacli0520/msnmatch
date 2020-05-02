@@ -2,6 +2,7 @@
     <v-card
         color="white"
         light
+        :elevation="2"
         :ripple="false"
         @click=openUserDialog>
         <v-img 

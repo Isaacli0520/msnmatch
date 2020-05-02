@@ -2,7 +2,8 @@
     <v-app>
         <match-header
             :headerUpdate="headerUpdate"></match-header>
-        <v-content>
+        <v-content class="content-div">
+            <v-container>
                 <v-row 
                     class="fill-height"
                     v-if="!loaded"
@@ -20,7 +21,8 @@
                 <div v-if="loaded" class="top-part-wrapper">
                     <v-row justify="center">
                         <div style="text-align: center;">
-                            <h1 class="title-text">MSN Mentor-Mentee Match</h1>
+                            <!-- <h1 class="title-text">MSN Mentor-Mentee Match</h1> -->
+                            <h1 class="title-text">设计师请假了</h1>
                             <!-- <h4 class="subtitle-text">Search for existing tags or add your own tags</h4> -->
                         </div>
                     </v-row>
@@ -35,9 +37,7 @@
                     </v-row>
                     <v-row justify="center">
                         <div class="search-form mt-1">
-                            <div class="search-icon">
-                                <i class="fas fa-search"></i>
-                            </div>
+                            
                             <input 
                                 @keydown="onKeydown" 
                                 v-model="query" 
@@ -68,25 +68,23 @@
                         </div>
                     </v-row>
                 </div>
-                <v-container fluid >
-                    <v-lazy>
-                    <v-row dense>
-                        <v-col
-                            v-for="(user, i) in users"
-                            :key="i"
-                            cols="12"
-                            sm="6"
-                            md="4"
-                            lg="4"
-                            xl="3">
-                            <user-card
-                                class="fill-height"
-                                :user_index="i"
-                                :user="user" @open-user-dialog="openUserDialog"></user-card>
-                        </v-col>
-                    </v-row>
-                    </v-lazy>
-                </v-container>
+                <!-- <v-divider style="margin-left:13px;margin-right:13px;"></v-divider> -->
+                <v-row>
+                    <v-col
+                        v-for="(user, i) in users"
+                        :key="i"
+                        cols="12"
+                        sm="6"
+                        md="4"
+                        lg="4"
+                        xl="3">
+                        <user-card
+                            class="fill-height"
+                            :user_index="i"
+                            :user="user" @open-user-dialog="openUserDialog"></user-card>
+                    </v-col>
+                </v-row>
+            </v-container>
         </v-content>
         <user-dialog
             v-if="d_user"
@@ -377,19 +375,22 @@ import UserCard from '../components/UserCard'
 </script>
 
 <style scoped>
+    .content-div{
+        background-color: rgb(252, 252, 252);
+    }
+
     .top-part-wrapper{
-        position: relative;
-        padding: 55px 0px 30px 0px;
+        /* position: relative; */
+        padding: 45px 0px 30px 0px;
         color:#000000;
         width:100%;
-        position:relative;
-        background: url('../assets/static/css/images/cloud_new_09.jpg') no-repeat;
-        background-attachment: fixed;
+        /* background: url('../assets/static/css/images/cloud_new_09.jpg') no-repeat; */
+        /* background-attachment: fixed;
         background-position: center center;
-        background-size: cover;
+        background-size: cover; */
 
-        -webkit-box-shadow: inset 0 -2px 2px 0px rgba(0,0,0,.13), inset 0 -3px 3px 0px rgba(0,0,0,.12);
-        box-shadow: inset 0 -2px 2px 0px rgba(0,0,0,.13), inset 0 -3px 3px 0px rgba(0,0,0,.12);
+        /* -webkit-box-shadow: inset 0 -2px 2px 0px rgba(0,0,0,.13), inset 0 -3px 3px 0px rgba(0,0,0,.12);
+        box-shadow: inset 0 -2px 2px 0px rgba(0,0,0,.13), inset 0 -3px 3px 0px rgba(0,0,0,.12); */
     }
 
     .checkbox-div{
@@ -463,7 +464,7 @@ import UserCard from '../components/UserCard'
     .search-input {
         position: absolute;
         top: 10px;
-        left: 38px;
+        left: 15px;
         font-size: 14px;
         background: none;
         color: #5a6674;

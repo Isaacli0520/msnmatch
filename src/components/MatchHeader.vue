@@ -2,11 +2,12 @@
     <div>
         <v-navigation-drawer
             light
-            color="white"
+            floating
+            temporary
             app
-            hide-overlay
-            v-model="drawer"
-            :clipped="$vuetify.breakpoint.mdAndUp">
+            v-model="drawer">
+
+            <!-- :clipped="$vuetify.breakpoint.mdAndUp" -->
             <v-container v-if="!loaded || user == null" fluid fill-height>
                 <v-layout 
                     align-center
@@ -24,6 +25,15 @@
             <v-container v-if="loaded && user">
                 <v-card 
                     color="#FFFFFF">
+                    <!-- <v-list-item>
+                        <v-list-item-avatar color="grey">
+                            <v-img :src="user.picture"></v-img>
+                        </v-list-item-avatar>
+                        <v-list-item-content>
+                            <v-list-item-title class="headline">{{user.first_name + " " + user.last_name}}</v-list-item-title>
+                            <v-list-item-subtitle>Role: {{ user.role ? user.role : "None" }}</v-list-item-subtitle>
+                        </v-list-item-content>
+                    </v-list-item> -->
                     <v-card-title>{{user.first_name + " " + user.last_name}}</v-card-title>
                     <v-card-subtitle>Role: {{ user.role ? user.role : "None" }}</v-card-subtitle>
                 </v-card>
@@ -53,13 +63,11 @@
         <v-app-bar
             :clipped-left="$vuetify.breakpoint.mdAndUp"
             app
-            light
-            height="62"
-            
-            elevation="1"
-            >
+            liht
+            dense
+            elevation="1">
             <v-app-bar-nav-icon  @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
-            <v-img max-height="46" max-width="46" :src="urls.brand_pic" alt=""></v-img>
+            <v-img max-height="38" max-width="38" :src="urls.brand_pic" alt=""></v-img>
             <v-toolbar-items v-if="$vuetify.breakpoint.mdAndUp">
                 <v-btn 
                     :href="urls.match_url"
@@ -146,7 +154,7 @@ export default{
     data: function () {
         return {
             navDrawer:false,
-            drawer: null,
+            drawer: false,
             loaded:false,
             user: null,
             user_items:[
