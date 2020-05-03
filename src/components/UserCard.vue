@@ -6,9 +6,9 @@
         :ripple="false"
         @click=openUserDialog>
         <v-img 
-        aspect-ratio="1.5"
-        contain
-        :src="user.picture">
+            aspect-ratio="1.5"
+            contain
+            :src="user.picture">
         </v-img>
         <v-divider></v-divider>
         <!-- <v-card-title>{{user.first_name + " " + user.last_name}}</v-card-title> -->

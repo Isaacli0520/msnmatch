@@ -1,14 +1,14 @@
 <template>
     <v-app>
+
         <match-header
             :headerUpdate="headerUpdate"></match-header>
         <v-content class="content-div">
-            <v-container>
-                <v-row 
-                    class="fill-height"
-                    v-if="!loaded"
-                    justify="center"
-                    align="center">
+
+            <v-container 
+                class="fill-height"
+                v-if="!loaded">
+                <v-row justify="center" align="center">
                     <div>
                         <v-progress-circular
                         :size="60"
@@ -18,7 +18,9 @@
                         </v-progress-circular>
                     </div>
                 </v-row>
-                <div v-if="loaded" class="top-part-wrapper">
+            </v-container>
+            <v-container v-if="loaded">
+                <div class="top-part-wrapper">
                     <v-row justify="center">
                         <div style="text-align: center;">
                             <!-- <h1 class="title-text">MSN Mentor-Mentee Match</h1> -->
@@ -376,7 +378,14 @@ import UserCard from '../components/UserCard'
 
 <style scoped>
     .content-div{
-        background-color: rgb(252, 252, 252);
+        /* background-color:#fdfff9; */
+        /* f0f5e5 */
+        position: relative;
+        /* background: url('../assets/static/css/images/cloud_new_09.jpg') no-repeat; */
+        background: url('../assets/static/css/images/cloud_bg_new_02.jpg') no-repeat;
+        background-attachment: fixed;
+        background-position: center center;
+        background-size: cover;
     }
 
     .top-part-wrapper{

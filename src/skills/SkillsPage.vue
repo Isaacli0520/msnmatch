@@ -1,7 +1,7 @@
 <template>
     <v-app>
         <match-header></match-header>
-        <v-content>
+        <v-content class="content-div">
             <v-container v-if="!loaded" fluid fill-height>
                 <v-layout 
                     align-center
@@ -244,14 +244,16 @@ axios.defaults.xsrfCookieName = "csrftoken";
 </script>
 
 <style>
-    .v-content__wrap{
-    width:100%;
-    /* height: 100%; */
-    background: url('../assets/static/css/images/cloud_new_09.jpg') no-repeat;
-    background-attachment: fixed;
-    background-position: center center;
-    background-size: cover;
-  }
+    .content-div{
+        /* background-color:#fdfff9; */
+        /* f0f5e5 */
+        position: relative;
+        /* background: url('../assets/static/css/images/cloud_new_09.jpg') no-repeat; */
+        background: url('../assets/static/css/images/cloud_bg_new_02.jpg') no-repeat;
+        background-attachment: fixed;
+        background-position: center center;
+        background-size: cover;
+    }
 
     .skill-type-text{
         color: #32a49a;

@@ -62,25 +62,34 @@
         </v-navigation-drawer>
         <v-app-bar
             :clipped-left="$vuetify.breakpoint.mdAndUp"
+            flat
             app
-            liht
-            dense
-            elevation="1">
-            <v-app-bar-nav-icon  @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
-            <v-img max-height="38" max-width="38" :src="urls.brand_pic" alt=""></v-img>
+            absolute
+            color="transparent"
+            >
+            <!-- <v-app-bar-nav-icon  @click.stop="drawer = !drawer"></v-app-bar-nav-icon> -->
+            <v-btn
+                @click.stop="drawer = !drawer"
+                text
+                small>
+                <v-icon small>
+                    fas fa-bars
+                </v-icon>
+            </v-btn>
+            <v-img class="ml-2" max-height="38" max-width="38" :src="urls.brand_pic" alt=""></v-img>
             <v-toolbar-items v-if="$vuetify.breakpoint.mdAndUp">
                 <v-btn 
                     :href="urls.match_url"
                     text>Match</v-btn>
-                <v-divider inset vertical></v-divider>
+                <!-- <v-divider inset vertical></v-divider> -->
                 <v-btn 
                     :href="urls.skills_url"
                     text>Tags</v-btn>
-                <v-divider inset vertical></v-divider>
+                <!-- <v-divider inset vertical></v-divider> -->
                 <v-btn 
                     :href="urls.courses_url"
                     text>HoosMyProfessor</v-btn>
-                <v-divider inset vertical></v-divider>
+                <!-- <v-divider inset vertical></v-divider> -->
                 <v-btn 
                     :href="urls.market_url"
                     text>Market</v-btn>
@@ -93,6 +102,7 @@
                 <template v-slot:activator="{ on }">
                     <v-btn
                         icon
+                        color="black"
                         v-on="on">
                         <v-icon>mdi-apps</v-icon>
                     </v-btn>
@@ -116,7 +126,9 @@
                 min-width="170">
                 <template v-slot:activator="{ on }">
                     <v-btn
+                        class="ml-2 mr-1"
                         icon
+                        color="black"
                         v-on="on">
                         <v-icon>fas fa-user-circle</v-icon>
                     </v-btn>
@@ -287,9 +299,9 @@ export default{
 
 
 <style lang="css">
-    .theme--light.v-app-bar.v-toolbar.v-sheet{
+    /* .theme--light.v-app-bar.v-toolbar.v-sheet{
         background-color: white !important;
-    }
+    } */
     .theme--light.v-text-field--solo-inverted.v-text-field--solo.v-input--is-focused > .v-input__control > .v-input__slot .v-label, .theme--light.v-text-field--solo-inverted.v-text-field--solo.v-input--is-focused > .v-input__control > .v-input__slot input {
         color: #000000 !important;
     }

@@ -1,7 +1,7 @@
 <template>
     <v-app>
         <match-header></match-header>
-        <v-content>
+        <v-content class="content-div">
             <v-container v-if="!loaded" fluid fill-height>
                 <v-layout 
                     align-center
@@ -169,6 +169,17 @@ import MatchHeader from '../components/MatchHeader'
 </script>
 
 <style>
+    .content-div{
+        /* background-color:#fdfff9; */
+        /* f0f5e5 */
+        position: relative;
+        /* background: url('../assets/static/css/images/cloud_new_09.jpg') no-repeat; */
+        background: url('../assets/static/css/images/cloud_bg_new_02.jpg') no-repeat;
+        background-attachment: fixed;
+        background-position: center center;
+        background-size: cover;
+    }
+
     .item-not-exist{
         font-size:25px;
     }

@@ -144,6 +144,7 @@ export default{
 
     tr td:last-child{
         color: rgb(0, 0, 0);
+        font-weight:300 !important;
     }
 
     table tr:last-child td{
