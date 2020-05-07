@@ -123,7 +123,7 @@
             <v-btn
                 icon
                 color="black"
-                @click="openReportBugDialog">
+                @click="reportBugDialog=true">
                 <v-icon>far fa-question-circle</v-icon>
             </v-btn>
             <v-menu offset-y
@@ -194,6 +194,42 @@
             {{failure_text}}
             <v-btn color="white" text @click="failure_snack = false"> Close </v-btn>
         </v-snackbar>
+        <v-dialog v-model="reportBugDialog" max-width="600px">
+            <v-card>
+                <v-card-title>
+                    <span class="headline">Report Bugs</span>
+                </v-card-title>
+                <v-card-text style="margin-top:10px;">
+                    <v-form
+                        ref="report_form"
+                        v-model="report_form_valid">
+                        <v-text-field
+                            outlined
+                            v-model="report_title"
+                            dense
+                            :rules="reportTitleRules"
+                            label="Title"
+                            ></v-text-field>
+
+                        <v-textarea
+                            v-model="report_text"
+                            label="Describe the Bug"
+                            auto-grow
+                            dense
+                            outlined
+                            :rules="reportTextRules"
+                            rows="4"
+                            row-height="20">
+                        </v-textarea>
+                    </v-form>
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="teal darken-1" outlined :loading="reportBugBtnLoading" @click="submitReport()">Submit</v-btn>
+                    <v-btn color="red lighten-1" outlined @click="reportBugDialog = false">Close</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
     </div>
 </template>
 
@@ -211,7 +247,8 @@ export default{
     },
     data: function () {
         return {
-            openReportBugDialog:false,
+            reportBugDialog:false,
+            reportBugBtnLoading:false,
             success_snack:false,
             success_text:"",
             failure_text:"",
@@ -221,6 +258,17 @@ export default{
             loaded:false,
             user: null,
             follow_users:null,
+            report_title:"",
+            report_text:"",
+            report_form_valid:true,
+            reportTextRules:[
+                v => !!v || 'Description is required',
+                v => (v && v.length <= 1000) || 'Description must be less than 1000 characters',
+            ],
+            reportTitleRules: [
+                v => !!v || 'Title is required',
+                v => (v && v.length <= 55) || 'Title must be less than 55 characters',
+            ],
             user_items:[
                 { title:"Profile", icon:"fas fa-user" },
                 { title:"Edit Profile", icon:"fas fa-user-edit" },
@@ -362,6 +410,28 @@ export default{
                 }
             });
         },
+        submitReport(){
+            this.$refs.report_form.validate();
+            if(!this.report_form_valid){
+                return;
+            }
+            this.reportBugBtnLoading = true;
+            axios.post('/courses/api/report_bug/',{"title":this.report_title, "text":this.report_text}).then(response => {
+                this.reportBugBtnLoading = false;
+                if(response.data.success){
+                    this.success_text = "Thank you!";
+                    this.success_snack = true;
+                    this.reportBugDialog = false;
+                    this.report_title = "";
+                    this.report_text = "";
+                    this.$refs.report_form.resetValidation();
+                }
+                else{
+                    this.failure_text = "Sth is wronggggggg!!";
+                    this.failure_snack = true;
+                }
+            });
+        }
     },
     mounted(){
         this.get_basic_info();

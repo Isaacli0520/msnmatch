@@ -17,6 +17,7 @@ urlpatterns = [
 	path('api/get_user_hmp_header/', views.get_user_hmp_header, name='get_user_hmp_header'),
 
 	path('api/submit_review/', views.submit_review, name='submit_review'),
+	path('api/report_bug/', views.report_bug, name='report_bug'),
 
 	path('ajax/save_take/', views.save_take, name='save_take'),
 	path('ajax/course_search_result/', views.course_search_result, name='course_search_result'),

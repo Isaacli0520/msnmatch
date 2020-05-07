@@ -25,7 +25,7 @@ from msnmatch.utils import custom_md5, cmp_semester, js_boolean
 from functools import cmp_to_key
 
 from users.models import MAJOR_CHOICES, PlanProfile
-from .models import Course, CourseUser, CourseInstructor, Instructor, Department
+from .models import Course, CourseUser, CourseInstructor, Instructor, Department, Bug
 
 mnemonics = ['AAS', 'MATH', 'ANTH', 'SWAH', 'MDST', 'ARAD', 'ARAH', 'ARTH', 'ARTS',
 'ARAB', 'ARTR', 'HEBR', 'HIND', 'MESA', 'MEST', 'PERS', 'SANS', 'SAST', 'SATR', 'URDU', 'ASTR',
@@ -118,6 +118,26 @@ def get_basic_info(request):
 		}
 	return JsonResponse({
 		"all_info":info,
+	})
+
+@login_required
+def report_bug(request):
+	if request.method == "POST":
+		post = json.loads(request.body.decode('utf-8'))
+		title, text = post.get("title"), post.get("text")
+		if len(title) > 0 and len(text) > 0:
+			Bug.objects.create(user=request.user, title=title, text=text)
+			return JsonResponse({
+				"success":True,
+			})
+		else:
+			return JsonResponse({
+				"success":False,
+				"message":"Missing title or text field",
+			})	
+	return JsonResponse({
+		"success":False,
+		"message":"Get method not allowed"
 	})
 
 @login_required
