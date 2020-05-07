@@ -52,12 +52,11 @@
             :clipped-left="$vuetify.breakpoint.mdAndUp"
             app
             light
-            height="62"
-            
+            dense
             elevation="1"
             >
             <v-app-bar-nav-icon  @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
-            <v-img max-height="46" max-width="46" :src="urls.brand_pic" alt=""></v-img>
+            <v-img max-height="38" max-width="38" :src="urls.brand_pic" alt=""></v-img>
             <v-toolbar-items v-if="$vuetify.breakpoint.mdAndUp">
                 <v-btn 
                     :href="urls.market_url"
@@ -70,7 +69,6 @@
                 <v-btn 
                     :href="urls.courses_url"
                     text>HoosMyProfessor</v-btn>
-                <v-divider inset vertical></v-divider>
             </v-toolbar-items>
             <v-text-field
                 label="Search Item"
@@ -82,6 +80,7 @@
                 light
                 solo-inverted
                 no-filter
+                dense
                 flat
                 hide-no-data
                 hide-selected

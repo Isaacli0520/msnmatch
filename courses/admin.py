@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Course, CourseInstructor, Instructor, CourseUser
+from .models import Course, CourseInstructor, Instructor, CourseUser, Bug
 from django.http import HttpResponse
 import csv
 # Register your models here.
@@ -51,7 +51,11 @@ class CustomInstructorAdmin(admin.ModelAdmin):
     list_filter = ('last_taught',)
     search_fields = ['first_name','last_name']
 
+class BugAdmin(admin.ModelAdmin):
+    list_display = ['title', 'user', 'created']
 
+
+admin.site.register(Bug, BugAdmin)
 admin.site.register(CourseInstructor, CustomCourseInstructorAdmin)
 admin.site.register(Instructor, CustomInstructorAdmin)
 admin.site.register(Course, CustomCourseAdmin)

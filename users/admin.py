@@ -16,7 +16,14 @@ from friendship.models import Follow
 from groups.models import Group
 from msnmatch.utils import custom_md5
 from msnmatch import settings
+from django.core import serializers
 
+def export_users_new(modeladmin, request, queryset):
+    json_str = serializers.serialize('json', queryset, fields=('username','profile__sex', 'email', 'first_name', 'last_name', 'is_staff', 'profile__location','profile__major','profile__major_two','profile__minor','profile__picture'))
+    response = HttpResponse(json_str, content_type='application/json')
+    response['Content-Disposition'] = 'attachment; filename=msnmatch_users.json'
+    return response
+export_users_new.short_description = 'Export users to json'
 
 class SkillRelationInline(admin.TabularInline):
     model = Skill.users.through
@@ -110,7 +117,7 @@ class CustomUserAdmin(UserAdmin):
     list_display = ('username','get_sex', 'email', 'first_name', 'last_name', 'is_staff', 'get_location', 'get_credential' ,'get_matched', 'get_role', 'get_graduate_year','get_birth_date','get_major')
     list_filter = ('is_staff', 'profile__sex','profile__role','profile__graduate_year', 'profile__matched')
     list_select_related = ('profile', )
-    actions = [change_role_mentor, change_role_mentee, change_role_none, export_users, update_avatar, update_graduate_year, update_credential]  # <-- Add the list action function here
+    actions = [change_role_mentor, change_role_mentee, change_role_none, export_users, export_users_new, update_avatar, update_graduate_year, update_credential]  # <-- Add the list action function here
 
     def get_credential(self, instance):
         return instance.profile.credential

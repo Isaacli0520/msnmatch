@@ -100,6 +100,10 @@ def superadmin(request):
 def match(request):
 	return render(request, 'match.html')
 
+@login_required
+def roommate_match(request):
+	return render(request, 'roommate_match.html')
+
 # @login_required
 def home(request):
 	# if request.method == 'POST':

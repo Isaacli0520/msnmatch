@@ -65,7 +65,7 @@ def get_skill(request):
 		return JsonResponse({
 			"success":True,
 			"skill":skill_json(skill),
-			"users":[user_json(user) for user in users]
+			"users":[user_json(user, request) for user in users]
 		})
 	except:
 		return JsonResponse({
@@ -84,8 +84,16 @@ def get_all_and_user_skills(request):
 def get_all_users(request):
 	users = sorted(User.objects.all().exclude(username="admin").exclude(profile__role=""), key=lambda x: random.random())
 	return JsonResponse({
-		"users":[user_json(user) for user in users],
-		"request_user":user_json(request.user),
+		"users":[user_json(user, request) for user in users],
+		"request_user":user_json(request.user, request),
+	})
+
+@login_required
+def get_all_users_roommate(request):
+	users = sorted(User.objects.filter(profile__rm=True).exclude(username="admin").exclude(profile__role=""), key=lambda x: random.random())
+	return JsonResponse({
+		"users":[user_json(user, request) for user in users],
+		"request_user":user_json(request.user, request),
 	})
 
 @login_required
@@ -116,7 +124,7 @@ def get_search_result(request):
 	return JsonResponse({
 		"skills":skills,
 		"time":query_time
-		})
+	})
 
 @login_required
 def user_add_skill(request):
@@ -139,10 +147,7 @@ def user_add_skill(request):
 			"success":True,
 			"id":skill.id,
 		})
-	return JsonResponse({
-		"success":False,
-		"message":"Get request not allowed"
-	})
+	return _get_not_allowed()
 
 @login_required
 def user_del_skill(request):
@@ -168,54 +173,100 @@ def user_del_skill(request):
 				"success":False,
 				"message":"You don't have this skill"
 			})
-	return JsonResponse({
-		"success":False,
-		"message":"Get request not allowed"
-	})
+	return _get_not_allowed()
+
+@login_required
+def choose_roommate_role(request):
+	if request.method == "POST":
+		post = json.loads(request.body.decode('utf-8'))
+		rm = post.get("rm")
+		if rm != True and rm != False:
+			return JsonResponse({
+				"success":False,
+				"message":"Unknown Rm"
+			})
+		request.user.profile.rm = rm
+		request.user.save()
+		return JsonResponse({
+			"success":True,
+			"rm":request.user.profile.rm,
+		})
+	return _get_not_allowed()
+
 
 @login_required
 def choose_role(request):
-	post = json.loads(request.body.decode('utf-8'))
-	tmp_role = post.get("role")
-	if tmp_role == "Mentor" and request.user.profile.role == "":
-		user_review_num = request.user.courseuser_set.annotate(length=Length("text")).filter(length__gt=15).count()
-		if user_review_num < 3:
+	if request.method == "POST":
+		post = json.loads(request.body.decode('utf-8'))
+		tmp_role = post.get("role")
+		if tmp_role == "Mentor" and request.user.profile.role == "":
+			user_review_num = request.user.courseuser_set.annotate(length=Length("text")).filter(length__gt=15).count()
+			if user_review_num < 3:
+				return JsonResponse({
+					"success":False,
+					"message":"You don't have enough course comments."
+				})
+			request.user.profile.role = "Mentor"
+			request.user.save()
+		elif tmp_role == "Mentee" and request.user.profile.role == "":
+			# return JsonResponse({
+			# 	"success":False,
+			# 	"message":"Mentee registration not yet started."
+			# })
+			request.user.profile.role = "Mentee"
+			request.user.save()
+		else:
 			return JsonResponse({
 				"success":False,
-				"message":"You don't have enough course comments."
+				"message":"Unknown Reason"
 			})
-		request.user.profile.role = "Mentor"
-		request.user.save()
-	elif tmp_role == "Mentee" and request.user.profile.role == "":
+		return JsonResponse({
+			"success":True,
+			"role":request.user.profile.role,
+		})
+	return _get_not_allowed()
+
+def add_fav(request):
+	if request.method != "POST":
+		return _get_not_allowed()
+	post = json.loads(request.body.decode('utf-8'))
+	user_pk = post.get("user_pk")
+	try:
+		to_user = User.objects.get(pk=user_pk)
+	except:
 		return JsonResponse({
 			"success":False,
-			"message":"Mentee registration not yet started."
+			"message":"User does not exist",
 		})
-		request.user.profile.role = "Mentee"
-		request.user.save()
-	return JsonResponse({
-		"success":True,
-		"role":request.user.profile.role,
-	})
-
-def add_to_list(request):
-	to_user = User.objects.get(pk=request.GET.get("user_pk"))
-	success = 0
+	if request.user.profile.role == '' or request.user.profile.role == to_user.profile.role:
+		return JsonResponse({
+			"success":False,
+			"message":"Role False",
+		})
 	if not Follow.objects.filter(follower=request.user, followee=to_user).exists() and Follow.objects.filter(follower=request.user).count() < 3:
 		Follow.objects.add_follower(request.user, to_user)
-		success = 1
-
+		return JsonResponse({
+			"success": True,
+		})
 	return JsonResponse({
-		"success": success,
+		"success": False,
+		"message": "You either have already followed this person or you have already followed three users"
 	})
+
+	
 
 def get_follow_list(request):
 	following = Follow.objects.following(request.user)
 	# print("following", following)
 	flw_ret = []
 	for flw in following:
+		if flw.profile.picture:
+			picture_url = flw.profile.picture.url
+		else:
+			picture_url = settings.STATIC_URL + "css/images/brand.jpg"
 		new_flw = {
 			"pk": flw.pk,
+			"picture": picture_url,
 			"user_url": "/users/"+flw.username+"/",
 			"first_name": flw.first_name,
 			"last_name": flw.last_name,
@@ -227,18 +278,28 @@ def get_follow_list(request):
 	})
 
 def del_fav(request):
-	to_user = get_object_or_404(User, pk=request.GET.get("user_pk"))
-	# to_user = User.objects.get(pk = request.GET.get("user_pk"))
-	# print("from_user", request.user.username, "to_user", to_user.username, Follow.objects.filter(follower=request.user, followee=to_user).exists())
-	# print("before delete", Follow.objects.following(request.user), Follow.objects.all()),
+	if request.method != "POST":
+		return _get_not_allowed()
+	post = json.loads(request.body.decode('utf-8'))
+	user_pk = post.get("user_pk")
+	try:
+		to_user = User.objects.get(pk=user_pk)
+	except:
+		return JsonResponse({
+			"success":False,
+			"message":"User does not exist",
+		})
 	if Follow.objects.filter(follower=request.user, followee=to_user).exists():
 		Follow.objects.remove_follower(follower=request.user, followee=to_user)
-		# print("after delete", Follow.objects.following(request.user), Follow.objects.all())
+		return JsonResponse({
+			"success":True,
+		})
 	return JsonResponse({
-		
+		"success":False,
+		"message":"Following relationship does not exist",
 	})
 
-def user_json(user):
+def user_json(user, request):
 	if user.profile.picture:
 		picture_url = user.profile.picture.url
 	else:
@@ -274,10 +335,13 @@ def user_json(user):
 		"major_two":user.profile.major_two,
 		"minor":user.profile.minor,
 		"wechat":user.profile.wechat,
-		# "follow": Follow.objects.filter(follower=request.user, followee=user).exists(),
+		"follow": Follow.objects.filter(follower=request.user, followee=user).exists(),
 		"video": video_url,
 		"picture": picture_url,
 		"avatar":avatar_url,
+		"rm_bio":user.profile.rm_bio,
+		"rm_schedule":user.profile.rm_schedule,
+		"rm":user.profile.rm,
 	}
 		
 def skills_as_dict(queryset):
@@ -299,3 +363,9 @@ def skill_json(skill):
 		"type":skill.type,
 		"name":skill.name,
 	}
+
+def _get_not_allowed():
+	return JsonResponse({
+		"success":False,
+		"message":"Get request not allowed"
+	})

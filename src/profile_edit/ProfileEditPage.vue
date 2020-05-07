@@ -1,7 +1,7 @@
 <template>
     <v-app>
         <match-header></match-header>
-        <v-content>
+        <v-content class="content-div">
             <v-container v-if="!loaded" fluid fill-height>
                 <v-layout 
                     align-center
@@ -105,21 +105,53 @@
 
                                     <v-file-input 
                                     v-model="edit_user_image"
+                                    outlined 
+                                    dense
                                     accept="image/*"
                                     label="Upload an image"
                                     ></v-file-input>
 
                                     <v-file-input 
                                     v-model="edit_user_video"
+                                    outlined
+                                    dense
                                     accept="video/mp4,video/x-m4v,video/*"
                                     label="Upload a video"
                                     ></v-file-input>
+
+                                <div style="font-size: 1.25rem;
+                                            font-weight: 500;
+                                            color:rgb(0,0,0,1);
+                                            letter-spacing: 0.0125em;
+                                            line-height: 2rem;
+                                            padding:0px 0px 5px 0px">For Roommate Match</div>
+                                    <v-textarea
+                                    v-model="edit_user.rm_bio"
+                                    label="Roommate Bio"
+                                    outlined
+                                    :rules="rmBioRules"
+                                    required
+                                    :counter="1000"
+                                    rows="3"
+                                    row-height="20"
+                                    ></v-textarea>
+
+                                    <v-textarea
+                                    v-model="edit_user.rm_schedule"
+                                    label="找室友之作息安排"
+                                    outlined
+                                    :rules="rmBioRules"
+                                    required
+                                    :counter="1000"
+                                    rows="3"
+                                    row-height="20"
+                                    ></v-textarea>
                                 </v-form>
                             </v-card-text>
                             <v-divider></v-divider>
                             <v-card-actions>
                                 <v-spacer></v-spacer>
-                                <v-btn color="green darken-1" outlined :loading="editUserBtnLoading" @click.prevent="editUser(edit_user, edit_user_image, edit_user_video)">Edit</v-btn>
+                                <v-btn color="green darken-1" outlined :disabled="!submitBtnEnable" :loading="editUserBtnLoading" @click.prevent="editUser(edit_user, edit_user_image, edit_user_video)">Edit</v-btn>
                             </v-card-actions>
                         </v-card>
                     </v-col>
@@ -157,6 +189,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
             loaded:false,
             failure_snack: false,
             video_snack: false,
+            submitBtnEnable: true,
             edit_user:null,
             editUserBtnLoading:false,
             edit_user_form_valid:false,
@@ -176,6 +209,9 @@ axios.defaults.xsrfCookieName = "csrftoken";
             ],
             wechatRules: [
                 v => (!v || (v && v.length <= 255)) || 'WeChat ID must be less than 255 characters',
+            ],
+            rmBioRules: [
+                v => (!v ||(v && v.length <= 1000)) || 'Must be less than 1000 characters',
             ],
             graduate_years:[    
                 {'value':'2018', 'text':'2018'},
@@ -307,6 +343,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
             }).then(response => {
                 this.editUserBtnLoading = false;
                 if(response.data.success){
+                    this.submitBtnEnable = false;
                     window.location.href = '/users/'+this.username;
                 }else{
                     this.failure_snack = true;
@@ -329,6 +366,17 @@ axios.defaults.xsrfCookieName = "csrftoken";
 </script>
 
 <style>
+    .content-div{
+        /* background-color:#fdfff9; */
+        /* f0f5e5 */
+        position: relative;
+        /* background: url('../assets/static/css/images/cloud_new_09.jpg') no-repeat; */
+        background: url('../assets/static/css/images/cloud_bg_new_02.jpg') no-repeat;
+        background-attachment: fixed;
+        background-position: center center;
+        background-size: cover;
+    }
+
     .cus-table{
         table-layout: fixed;
         width:100%;

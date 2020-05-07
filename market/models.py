@@ -48,21 +48,5 @@ class Item(models.Model):
 
 		super(Item, self).save(*args, **kwargs)
 
-	# def save(self, *args, **kwargs):
-	#   # delete old file when replacing by updating the file
-	#   try:
-	#       this = Profile.objects.get(pk=self.pk)
-	#       self.credential = custom_md5(settings.SECRET_KEY + self.user.username, settings.SECRET_KEY)
-	#       if self.picture and this.picture != self.picture:
-	#           # this.picture.delete(save=False)
-	#           tmp_picture = self.picture
-	#           self.picture = self.compressImage(tmp_picture, False, 0, 0, 70)
-	#           self.avatar = self.compressImage_new(tmp_picture, True, 60)
-	#       if self.video and this.video != self.video:
-	#           # this.video.delete(save=False)
-	#           self.video.name = str(uuid.uuid4())
-	#   except: pass # when new photo then we do nothing, normal case
-	#   super(Profile, self).save(*args, **kwargs)
-
 	def __str__(self):
 		return "Item: " + self.name
