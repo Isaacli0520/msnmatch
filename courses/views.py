@@ -104,6 +104,7 @@ def get_basic_info(request):
 			"market_url":reverse('market:market'),
 			"match_url":reverse('match'),
 			"skills_url":reverse('skills:skills'),
+			"rm_url":reverse('roommate_match'),
 		}
 	else:
 		info = {
@@ -113,6 +114,7 @@ def get_basic_info(request):
 			"comment_url": reverse('comments:comments_send'),
 			"brand_pic": settings.STATIC_URL + "css/images/brand_compressed.png",
 			"match_url":reverse('match'),
+			"rm_url":reverse('roommate_match'),
 		}
 	return JsonResponse({
 		"all_info":info,

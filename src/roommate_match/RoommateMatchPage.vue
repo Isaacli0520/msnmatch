@@ -2,7 +2,6 @@
     <v-app>
 
         <match-header
-            @del-from-fav="deleteFromFav"
             :headerUpdate="headerUpdate"></match-header>
         <v-content class="content-div">
 
@@ -25,7 +24,7 @@
                     <v-row justify="center">
                         <div style="text-align: center;">
                             <!-- <h1 class="title-text">MSN Mentor-Mentee Match</h1> -->
-                            <h1 class="title-text">Mentee-Mentor Match</h1>
+                            <h1 class="title-text">Roommate Match</h1>
                             <!-- <h4 class="subtitle-text">Search for existing tags or add your own tags</h4> -->
                         </div>
                     </v-row>
@@ -53,25 +52,22 @@
                                 aria-label="Search">
                         </div>
                     </v-row>
-                    <v-row>
-                        <div class="checkbox-div">
-                            <v-checkbox v-model="tags" hide-details class="mx-2" value="role:Mentor" label="Mentor"></v-checkbox>
-                            <v-checkbox v-model="tags" hide-details class="mx-2" value="role:Mentee" label="Mentee"></v-checkbox>
+                    <v-row justify="center" v-if="!request_user.rm">
+                        <div style="text-align:center; margin-top:18px;">
+                            <v-btn outlined color="teal lighten-1" @click="openRoleDialog(true)">Find Roommates</v-btn>
                         </div>
                     </v-row>
-                    <v-row justify="center" v-if="request_user.role == '' ">
-                        <div style="text-align:center; margin-top:13px;">
-                            <v-btn style="margin-right: 10px;" outlined color="teal lighten-1" @click="openRoleDialog('Mentor')">Be A Mentor</v-btn>
-                            <v-btn outlined color="teal lighten-1" @click="openRoleDialog('Mentee')">Be A Mentee</v-btn>
+                    <v-row justify="center" v-if="request_user.rm">
+                        <div style="text-align:center; margin-top:18px;">
+                            <v-btn outlined color="teal lighten-1" @click="openRoleDialog(false)">Roommates Found</v-btn>
                         </div>
                     </v-row>
                     <v-row justify="center">
-                        <div v-if="request_user.role == '' " style="text-align:center;">
-                            <small class="muted-text">*Note that you have to be a mentor/mentee to appear in the user list and perform any actions</small>
+                        <div v-if="!request_user.rm " style="text-align:center;">
+                            <small class="muted-text">*Note that you have to click the above button to appear in the user list and perform any actions</small>
                         </div>
                     </v-row>
                 </div>
-                <!-- <v-divider style="margin-left:13px;margin-right:13px;"></v-divider> -->
                 <v-row>
                     <v-col
                         v-for="(user, i) in users"
@@ -83,6 +79,7 @@
                         xl="3">
                         <user-card
                             class="fill-height"
+                            :display_role="false"
                             :user_index="i"
                             :user="user" @open-user-dialog="openUserDialog"></user-card>
                     </v-col>
@@ -91,38 +88,27 @@
         </v-content>
         <user-dialog
             v-if="d_user"
-            :add_to_fav="request_user.role!='' && request_user.role != d_user.role"
             :edit="request_user.username == d_user.username"
+            :rm="true"
             :user="d_user"
-            @add-to-fav="addToFav"
-            @del-from-fav="deleteFromFav"
             v-model="userDialog"></user-dialog>
         <v-dialog v-model="roleDialog" scrollable min-width="200px" max-width="600px">
             <v-card>
-                <v-card-title>Be a {{dialogRole}}</v-card-title>
+                <v-card-title>{{request_user && request_user.rm ? "Roommates Found" : "Find Roommates"}}</v-card-title>
                 <v-divider></v-divider>
-                <v-card-text v-if="dialogRole=='Mentor'" style="color:black;margin-top:21px; font-size:16px;font-weight:500;">
-                    <p style="font-size:19x;font-weight:600;">成为Mentor需要做到什么？</p>
-                    <p>1.第一时间联系你的Mentee，让TA感受到夏村大家庭的温暖和友好，并尽量在国内就开始与新生进行线上线下的交流。</p>
-                    <p>2.能够耐心地解决新生的问题，主动向新生分享自己的资源和经历。</p>
-                    <p>3.给予新生支持，鼓励新生尝试新的事物，融入美国校园，并积极带领新手感受夏村的生活</p>
-                    <p>4.帮助一起建设MSN Hoos My Professor网站，分享学术方面的经历，从而帮助建立新生选课的指南。</p>
-                    <p style="font-size:19x;font-weight:600;">Be a Mentor</p>
-                    <p>如果你觉得自己可以做到以上几点</p>
-                    <p>且已经累计填写过<strong style="color:red;">3条多于15字的Hoos My Professor课程评价</strong></p>
-                    <p>那么点击Yes即可成为Mentor!</p>
-                    <p>Do you really want to be a <strong>{{dialogRole}}</strong>?</p>
-                    <p style="font-size:14px; margin-bottom:0px !important;" class="muted-text">*Note that your role can only be changed by the mentor program chair once you've made your choice.</p>
+                <v-card-text v-if="request_user && !request_user.rm"  style="color:black;margin-top:21px; font-size:16px;font-weight:500;">
+                    <p>本页面旨在帮助大家寻找合适的室友，如果想找室友的话可以点击下方的Yes即可出现在下面的List中</p>
+                    <p>我们在Profile中提供了<strong>Roommate Bio和作息时间</strong>来帮助大家更好的找到适合自己的室友</p>
+                    <p>希望想找室友的同学可以去Edit Profile认真填写这两项</p>
+                    <p><strong>Do you really want to find roommates</strong>?</p>
                 </v-card-text>
-                <v-card-text v-if="dialogRole=='Mentee'" style="color:black;margin-top:21px; font-size:16px;font-weight:500;">
-                    <p style="font-size:19x;font-weight:600;">你是否要成为Mentee？</p>
-                    <p>点击Yes即可成为Mentee!</p>
-                    <p style="font-size:14px; margin-bottom:0px !important;" class="muted-text">*Note that your role can only be changed by the mentor program chair once you've made your choice.</p>
+                <v-card-text v-if="request_user && request_user.rm" style="color:black;margin-top:21px; font-size:16px;font-weight:500;">
+                    <p>如果你已经找到室友了，那么点击Yes后你就不会出现在下面的List中啦！</p>
                 </v-card-text>
                 <v-divider></v-divider>
                 <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn color="green darken-1" :loading="roleBtnLoading" outlined @click="setRole(dialogRole)">Yes</v-btn>
+                    <v-btn color="green darken-1" :loading="roleBtnLoading" outlined @click="setRoommateRole(dialogRole)">Yes</v-btn>
                     <v-btn color="red lighten-1" outlined @click="roleDialog = false">No</v-btn>
                 </v-card-actions>
             </v-card>
@@ -201,39 +187,15 @@ axios.defaults.xsrfCookieName = "csrftoken";
         },
 	},
 	methods: {
-        addToFav(user){
-            this.changeFav(user, true);
-        },
-        deleteFromFav(user){
-            this.changeFav(user, false);
-        },
-        changeFav(user, boolVal){
-            for(let i = 0;i < this.users.length;i++){
-                if(this.users[i].pk == user.pk){
-                    this.users[i].follow = boolVal;
-                }
-            }
-            for(let i = 0;i < this.backup_all_users.length;i++){
-                if(this.backup_all_users[i].pk == user.pk){
-                    this.backup_all_users[i].follow = boolVal;
-                }
-            }
-            this.headerUpdate = !this.headerUpdate;
-        },
-        setRole(role){
+        setRoommateRole(rm){
             this.roleBtnLoading = true;
-            axios.post('/skills/api/choose_role/',{"role":role}).then(response => {
+            axios.post('/skills/api/choose_roommate_role/',{"rm":rm}).then(response => {
                 this.roleDialog = false;
                 this.roleBtnLoading = false;
                 if(response.data.success){
-                    this.success_text = "恭喜你成为" + role + "!";
+                    this.success_text = "Success";
                     this.success_snack = true;
-                    this.headerUpdate = !this.headerUpdate;
                     this.getAllUsers();
-                }
-                else if(response.data.message == "You don't have enough course comments."){
-                    this.failure_text = "你大概是没填够三条大于15字的HoosMyProfessor课程评价";
-                    this.failure_snack = true;
                 }
                 else{
                     this.failure_text = "Sth is wrong. 你似乎发现了神奇的bug";
@@ -272,7 +234,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
             this.userDialog = false;
         },
         getAllUsers(){
-            axios.get('/skills/api/get_all_users/',{params: {}}).then(response => {
+            axios.get('/skills/api/get_all_users_roommate/',{params: {}}).then(response => {
                 this.backup_all_users = response.data.users;
                 this.users = response.data.users;
                 this.request_user = response.data.request_user;
@@ -414,17 +376,9 @@ axios.defaults.xsrfCookieName = "csrftoken";
     }
 
     .top-part-wrapper{
-        /* position: relative; */
         padding: 45px 0px 30px 0px;
         color:#000000;
         width:100%;
-        /* background: url('../assets/static/css/images/cloud_new_09.jpg') no-repeat; */
-        /* background-attachment: fixed;
-        background-position: center center;
-        background-size: cover; */
-
-        /* -webkit-box-shadow: inset 0 -2px 2px 0px rgba(0,0,0,.13), inset 0 -3px 3px 0px rgba(0,0,0,.12);
-        box-shadow: inset 0 -2px 2px 0px rgba(0,0,0,.13), inset 0 -3px 3px 0px rgba(0,0,0,.12); */
     }
 
     .checkbox-div{

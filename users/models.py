@@ -179,6 +179,9 @@ class Profile(models.Model):
 	wechat = models.CharField(max_length=255, blank=True)
 	matched = models.BooleanField(default=False)
 	credential = models.TextField(blank=True)
+	rm_bio = models.TextField(max_length=1000, blank=True)
+	rm_schedule = models.TextField(max_length=1000, blank=True)
+	rm = models.BooleanField(default=False)
 
 	def real_year(self):
 		if self.graduate_year:

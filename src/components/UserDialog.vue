@@ -2,7 +2,12 @@
     <v-dialog :value="value" @input="$emit('input')" v-if='user' min-width="330px" max-width="550px">
         <v-card>
             <v-img :src="user.picture"></v-img>
-            <v-card-title>{{ user.first_name + " " + user.last_name}}</v-card-title>
+            <div style="padding-top: 10px; padding-bottom:0px;">
+                <div class="title-div">
+                    <span class="cus-title" style="float:left;">{{user.first_name + " " + user.last_name}}</span>
+                    <span v-if="user.follow" class="role-title" style="float:right;">Favorite</span>
+                </div>
+            </div>
             <v-card-text>
                 <div class="skill-tags">
                     <template v-for="(skills_of_type, skills_type_name) in user.skills">
@@ -60,6 +65,14 @@
                                 <td style="vertical-align:top;" class="field-title">Bio</td>
                                 <td>{{user.bio}}</td>
                             </tr>
+                            <tr v-if="rm">
+                                <td style="vertical-align:top;" class="field-title">Roommate Bio</td>
+                                <td>{{user.rm_bio}}</td>
+                            </tr>
+                            <tr v-if="rm">
+                                <td style="vertical-align:top;" class="field-title">Schedule</td>
+                                <td>{{user.rm_schedule}}</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -72,10 +85,28 @@
             <v-divider></v-divider>
             <v-card-actions>
                 <v-spacer></v-spacer>
+                <v-btn color="purple darken-1" outlined :loading="addFavBtnLoading" v-if="add_to_fav && !user.follow" @click="addFav(user)">Add to Favorite</v-btn>
+                <v-btn color="purple darken-1" outlined :loading="delFavBtnLoading" v-if="add_to_fav && user.follow" @click="delFav(user)">Remove from Favorite</v-btn>
                 <v-btn color="purple darken-1" outlined v-if="edit" :href="'/users/'+user.username+'/edit/'">Edit</v-btn>
                 <v-btn color="blue darken-1" outlined @click.native="$emit('input')">Close</v-btn>
             </v-card-actions>
         </v-card>
+        <v-snackbar
+            top
+            v-model="success_snack"
+            color="teal darken-1"
+            :timeout="1800">
+            {{success_text}}
+            <v-btn color="cyan accent-1" text @click="success_snack = false"> Close </v-btn>
+        </v-snackbar>
+        <v-snackbar
+            top
+            v-model="failure_snack"
+            color="red lighten-1"
+            :timeout="2700">
+            {{failure_text}}
+            <v-btn color="white" text @click="failure_snack = false"> Close </v-btn>
+        </v-snackbar>
     </v-dialog>
 </template>
 
@@ -83,6 +114,9 @@
 
 <script>
 import TagSpan from '../components/TagSpan'
+import axios from 'axios'
+axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
+axios.defaults.xsrfCookieName = "csrftoken";
 
 export default{
     props: {
@@ -97,10 +131,24 @@ export default{
         edit:{
             type:Boolean,
             default:false,
+        },
+        rm:{
+            type:Boolean,
+            default:false,
+        },
+        add_to_fav:{
+            type:Boolean,
+            default:false,
         }
     },
     data(){
         return{
+            success_text:"",
+            success_snack:false,
+            failure_text:"",
+            failure_snack:false,
+            addFavBtnLoading:false,
+            delFavBtnLoading:false,
         }
     },
     components:{
@@ -112,6 +160,36 @@ export default{
         
     },
     methods:{
+        addFav(user){
+            this.addFavBtnLoading = true;
+            axios.post('/skills/api/add_fav/',{"user_pk":user.pk}).then(response => {
+                this.addFavBtnLoading = false;
+                if(response.data.success){
+                    this.$emit('add-to-fav', user);
+                    this.success_text = "Added to Favorite";
+                    this.success_snack = true;
+                }
+                else{
+                    this.failure_text = "做人不能太贪心(*￣︶￣)~";
+                    this.failure_snack = true;
+                }
+            });
+        },
+        delFav(user){
+            this.delFavBtnLoading = true;
+            axios.post('/skills/api/del_fav/',{"user_pk":user.pk}).then(response => {
+                this.delFavBtnLoading = false;
+                if(response.data.success){
+                    this.$emit('del-from-fav', user);
+                    this.success_text = "Deleted from Favorite";
+                    this.success_snack = true;
+                }
+                else{
+                    this.failure_text = "Sth is wronggggggg!!";
+                    this.failure_snack = true;
+                }
+            });
+        },
     },
     mounted(){
     },
@@ -120,6 +198,34 @@ export default{
 
 
 <style lang="css">
+    .title-div{
+        display:block; 
+        height:28px; 
+        line-height:28px;
+        clear:both;
+        padding: 0px 16px 0px 16px;
+    }
+
+    .cus-title{
+        font-family: "Roboto", sans-serif !important;
+        font-weight: 700 !important;
+        align-items: center;
+        font-size: 18px;
+        letter-spacing: 0.0125em;
+    }
+
+    .role-title{
+        font-family: "Roboto", sans-serif !important;
+        font-weight: 700 !important;
+        align-items: center;
+        font-size: 13px;
+        letter-spacing: 0.0125em;
+        padding: 0px 6px 0px 6px;
+        color: white;
+        background-color: rgb(255, 38, 38);
+        border-radius: 5px;
+    }
+
     .skill-tags{
         display: flex;
         flex-flow: row wrap;

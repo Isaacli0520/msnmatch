@@ -15,24 +15,14 @@
         <div style="padding-top: 10px; padding-bottom:0px;">
             <div class="title-div">
                 <span class="cus-title" style="float:left;">{{user.first_name + " " + user.last_name}}</span>
-                <span :class="['role-title', user.role=='Mentor' ? 'mentor-title':'', user.role=='Mentee' ? 'mentee-title':'']" style="float:right;">{{user.role}}</span>
+                <span v-if="user.follow" class="role-title fav-title" style="float:right;">Fav</span>
+                <span v-if="display_role" :class="['role-title', user.role=='Mentor' ? 'mentor-title':'', user.role=='Mentee' ? 'mentee-title':'']" style="float:right;">{{user.role}}</span>
             </div>
         </div>
         <div class="major-div">
             <div class="cus-subtitle" v-if="user.major">{{ user.major }}</div>
             <div class="cus-subtitle" v-if="user.major_two">{{ user.major_two }}</div>
         </div>
-        <!-- <v-card-text v-if="item.sold">
-            <div class="item-tags">
-                <span class="item-tag item-tag-sold">Sold</span>
-                <template v-if="!item.sold">
-                    <span v-if="item.condition=='New'" class="item-tag item-tag-new">New</span>
-                    <span v-if="item.condition=='Slightly Used'" class="item-tag item-tag-slightly-used">Slightly Used</span>
-                    <span v-if="item.pickup" class="item-tag item-tag-pickup">Pickup</span>
-                    <span v-if="item.delivery" class="item-tag item-tag-delivery">Delivery</span>
-                </template>
-            </div>
-        </v-card-text> -->
     </v-card>
 </template>
 
@@ -47,6 +37,10 @@ export default{
         user_index:{
             type:Number,
             default:-1,
+        },
+        display_role:{
+            type:Boolean,
+            default:true,
         }
     },
     data(){
@@ -95,8 +89,13 @@ export default{
         font-size: 13px;
         letter-spacing: 0.0125em;
         padding: 0px 6px 0px 6px;
+        margin-left:3px;
         color: white;
         border-radius: 5px;
+    }
+
+    .fav-title{
+        background-color: rgb(255, 78, 55);
     }
 
     .mentee-title{
@@ -118,22 +117,6 @@ export default{
     .major-div{
         display:block;
         padding-bottom:10px !important;
-    }
-
-
-    .item-tags{
-        margin: -3px 0px 0px 0px;
-        display: flex;
-        flex-flow: row wrap;
-        width:100%;
-    }
-
-    .item-tag{
-        font-size: 12px;
-        font-weight: 700;
-        padding: 2px 6px 2px 6px;
-        margin: 5px 4px 0px 0px;
-        border-radius: 4px;
     }
 
 </style>

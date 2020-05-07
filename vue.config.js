@@ -131,6 +131,11 @@ module.exports = {
 			template: 'templates/profile_edit.html',
 			filename: 'profile_edit.html',
 		},
+		roommate_match_page:{
+			entry: 'src/roommate_match/main.js',
+			template: 'templates/roommate_match.html',
+			filename: 'roommate_match.html',
+		},
 		match: {
 			entry: 'src/match/main.js',
 			template: 'templates/match.html',

@@ -119,6 +119,9 @@ def profile_json(user):
         "wechat":user.profile.wechat,
         "username":user.username,
         "video":video_url,
+        "rm_bio":user.profile.rm_bio,
+        "rm_schedule":user.profile.rm_schedule,
+        "rm":user.profile.rm,
     }
 
 @login_required

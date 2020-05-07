@@ -56,70 +56,92 @@
                         </v-card>
                     </v-col>
                     <v-col cols="12" sm="6" md="7" lg="7" xl="7">
-                            <v-card style="margin-bottom:15px;">
-                                <v-card-title>Basic Info</v-card-title>
-                                <v-divider></v-divider>
-                                <v-card-text>
-                                    <table class="cus-table">
-                                        <colgroup>
-                                            <col class="left-tr" />
-                                            <col class="right-td" />
-                                        </colgroup>
-                                        <tbody>
-                                            <tr>
-                                                <td>Gender</td>
-                                                <td>{{ user.sex }}</td>
-                                            </tr>
-                                            <tr>
-                                                <td>Graduate Year</td>
-                                                <td>{{ user.graduate_year }}</td>
-                                            </tr>
-                                            <tr v-if="user.role">
-                                                <td>Role</td>
-                                                <td>{{ user.role }}</td>
-                                            </tr>
-                                            <tr>
-                                                <td>Major</td>
-                                                <td>{{ user.major }}</td>
-                                            </tr>
-                                            <tr v-if="user.major_two">
-                                                <td>Second Major</td>
-                                                <td>{{ user.major_two }}</td>
-                                            </tr>
-                                            <tr v-if="user.minor">
-                                                <td>Minor</td>
-                                                <td>{{ user.minor }}</td>
-                                            </tr>
-                                            <tr>
-                                                <td style="vertical-align:top;">Bio</td>
-                                                <td class="description-td">{{ user.bio }}</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </v-card-text>
-                            </v-card>
-                            <v-card>
-                                <v-card-title>Contact Info</v-card-title>
-                                <v-divider></v-divider>
-                                <v-card-text>
-                                    <table class="cus-table">
-                                        <colgroup>
-                                            <col class="left-tr" />
-                                            <col class="right-td" />
-                                        </colgroup>
-                                        <tbody>
-                                            <tr v-if="user.wechat">
-                                                <td>WeChat ID</td>
-                                                <td>{{ user.wechat }}</td>
-                                            </tr>
-                                            <tr>
-                                                <td>Email</td>
-                                                <td>{{ user.email }}</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </v-card-text>
-                            </v-card>
+                        <v-card style="margin-bottom:15px;">
+                            <v-card-title>Basic Info</v-card-title>
+                            <v-divider></v-divider>
+                            <v-card-text>
+                                <table class="cus-table">
+                                    <colgroup>
+                                        <col class="left-tr" />
+                                        <col class="right-td" />
+                                    </colgroup>
+                                    <tbody>
+                                        <tr>
+                                            <td>Gender</td>
+                                            <td>{{ user.sex }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Graduate Year</td>
+                                            <td>{{ user.graduate_year }}</td>
+                                        </tr>
+                                        <tr v-if="user.role">
+                                            <td>Role</td>
+                                            <td>{{ user.role }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Major</td>
+                                            <td>{{ user.major }}</td>
+                                        </tr>
+                                        <tr v-if="user.major_two">
+                                            <td>Second Major</td>
+                                            <td>{{ user.major_two }}</td>
+                                        </tr>
+                                        <tr v-if="user.minor">
+                                            <td>Minor</td>
+                                            <td>{{ user.minor }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="vertical-align:top;">Bio</td>
+                                            <td class="description-td">{{ user.bio }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </v-card-text>
+                        </v-card>
+                        <v-card style="margin-bottom:15px;">
+                            <v-card-title>Contact Info</v-card-title>
+                            <v-divider></v-divider>
+                            <v-card-text>
+                                <table class="cus-table">
+                                    <colgroup>
+                                        <col class="left-tr" />
+                                        <col class="right-td" />
+                                    </colgroup>
+                                    <tbody>
+                                        <tr v-if="user.wechat">
+                                            <td>WeChat ID</td>
+                                            <td>{{ user.wechat }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Email</td>
+                                            <td>{{ user.email }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </v-card-text>
+                        </v-card>
+                        <v-card v-if="user.rm_schedule || user.rm_bio">
+                            <v-card-title>Roommate Match Info</v-card-title>
+                            <v-divider></v-divider>
+                            <v-card-text>
+                                <table class="cus-table">
+                                    <colgroup>
+                                        <col class="left-tr" />
+                                        <col class="right-td" />
+                                    </colgroup>
+                                    <tbody>
+                                        <tr>
+                                            <td>Schedule</td>
+                                            <td>{{ user.rm_schedule }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Bio</td>
+                                            <td>{{ user.rm_bio }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </v-card-text>
+                        </v-card>
                     </v-col>
                 </v-row>
             </v-container>

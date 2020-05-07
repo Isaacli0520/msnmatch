@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% load render_bundle from webpack_loader %}
+
+{% block title %}Roommate{% endblock %}
+
+{% block content %}
+    <div id="roommate-match-page"></div>
+    {% render_bundle 'roommate_match_page' %}
+{% endblock %}

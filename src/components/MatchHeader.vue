@@ -8,7 +8,7 @@
             v-model="drawer">
 
             <!-- :clipped="$vuetify.breakpoint.mdAndUp" -->
-            <v-container v-if="!loaded || user == null" fluid fill-height>
+            <v-container v-if="!loaded || user == null || follow_users == null" fluid fill-height>
                 <v-layout 
                     align-center
                     justify-center>
@@ -22,7 +22,7 @@
                     </div>
                 </v-layout>
             </v-container>
-            <v-container v-if="loaded && user">
+            <v-container v-if="loaded && user && follow_users">
                 <v-card 
                     color="#FFFFFF">
                     <!-- <v-list-item>
@@ -36,6 +36,27 @@
                     </v-list-item> -->
                     <v-card-title>{{user.first_name + " " + user.last_name}}</v-card-title>
                     <v-card-subtitle>Role: {{ user.role ? user.role : "None" }}</v-card-subtitle>
+                </v-card>
+                <v-card
+                    style="margin-top:15px;">
+                    <v-card-title style="padding-bottom:0px !important;">Favorite Users</v-card-title>
+                    <v-list dense>
+                        <v-list-item
+                            v-for="(follow_user, idx) in follow_users" 
+                            :key="idx">
+                            <v-list-item-avatar color="grey">
+                                <v-img :src="follow_user.picture"></v-img>
+                            </v-list-item-avatar>
+                            <v-list-item-content>
+                                <v-list-item-title>{{follow_user.first_name + " " + follow_user.last_name}}</v-list-item-title>
+                            </v-list-item-content>
+                            <v-list-item-action>
+                                <v-btn icon small>
+                                    <v-icon small color="black lighten-1" @click="delFav(follow_user)">fas fa-trash-alt</v-icon>
+                                </v-btn>
+                            </v-list-item-action>
+                        </v-list-item>
+                    </v-list>
                 </v-card>
                 <v-card
                     v-for="(items, i) in side_bar_items"
@@ -85,6 +106,9 @@
                 <v-btn 
                     :href="urls.skills_url"
                     text>Tags</v-btn>
+                <v-btn 
+                    :href="urls.rm_url"
+                    text>Roommate</v-btn>
                 <!-- <v-divider inset vertical></v-divider> -->
                 <v-btn 
                     :href="urls.courses_url"
@@ -96,6 +120,12 @@
                 
             </v-toolbar-items>
             <v-spacer></v-spacer>
+            <v-btn
+                icon
+                color="black"
+                @click="openReportBugDialog">
+                <v-icon>far fa-question-circle</v-icon>
+            </v-btn>
             <v-menu offset-y
                 class="mx-auto"
                 min-width="170">
@@ -113,7 +143,7 @@
                         :key="index + '-app'"
                         @click="navMethod(item)">
                         <v-list-item-icon>
-                            <v-icon dense v-text="item.icon"></v-icon>
+                            <v-icon color="black" dense v-text="item.icon"></v-icon>
                         </v-list-item-icon>
                         <v-list-item-content>
                             <v-list-item-title>{{ item.title }}</v-list-item-title>
@@ -126,7 +156,7 @@
                 min-width="170">
                 <template v-slot:activator="{ on }">
                     <v-btn
-                        class="ml-2 mr-1"
+                        class="mr-1"
                         icon
                         color="black"
                         v-on="on">
@@ -139,7 +169,7 @@
                         :key="index"
                         @click="navMethod(item)">
                         <v-list-item-icon>
-                            <v-icon dense v-text="item.icon"></v-icon>
+                            <v-icon color="black" dense v-text="item.icon"></v-icon>
                         </v-list-item-icon>
                         <v-list-item-content>
                             <v-list-item-title>{{ item.title }}</v-list-item-title>
@@ -148,6 +178,22 @@
                 </v-list>
             </v-menu>
         </v-app-bar>
+        <v-snackbar
+            top
+            v-model="success_snack"
+            color="teal darken-1"
+            :timeout="1800">
+            {{success_text}}
+            <v-btn color="cyan accent-1" text @click="success_snack = false"> Close </v-btn>
+        </v-snackbar>
+        <v-snackbar
+            top
+            v-model="failure_snack"
+            color="red lighten-1"
+            :timeout="2700">
+            {{failure_text}}
+            <v-btn color="white" text @click="failure_snack = false"> Close </v-btn>
+        </v-snackbar>
     </div>
 </template>
 
@@ -165,10 +211,16 @@ export default{
     },
     data: function () {
         return {
+            openReportBugDialog:false,
+            success_snack:false,
+            success_text:"",
+            failure_text:"",
+            failure_snack:false,
             navDrawer:false,
             drawer: false,
             loaded:false,
             user: null,
+            follow_users:null,
             user_items:[
                 { title:"Profile", icon:"fas fa-user" },
                 { title:"Edit Profile", icon:"fas fa-user-edit" },
@@ -187,6 +239,7 @@ export default{
                 logout:"",
                 my_courses:"",
                 market_url:"",
+                rm_url:"",
                 courses_url:"",
                 match_url:"",
                 comment_url:"",
@@ -236,6 +289,7 @@ export default{
     watch:{
         headerUpdate(){
             this.get_match_header();
+            this.get_follow_users();
         }
     },
     computed:{
@@ -281,6 +335,11 @@ export default{
                 this.loaded = true;
             });
         },
+        get_follow_users(){
+            axios.get('/skills/api/get_follow_list/',{params: {}}).then(response => {
+                this.follow_users = response.data.following;
+            });
+        },
         get_match_header(){
             axios.get('/skills/api/get_user_match_header/',{params: {}}).then(response => {
                 this.user = response.data.user;
@@ -289,10 +348,25 @@ export default{
         goToHref(text){
             window.location.href = text;
         },
+        delFav(user){
+            axios.post('/skills/api/del_fav/',{"user_pk":user.pk}).then(response => {
+                if(response.data.success){
+                    this.$emit('del-from-fav', user);
+                    this.get_follow_users();
+                    this.success_text = "Deleted from Favorite";
+                    this.success_snack = true;
+                }
+                else{
+                    this.failure_text = "Sth is wronggggggg!!";
+                    this.failure_snack = true;
+                }
+            });
+        },
     },
     mounted(){
         this.get_basic_info();
         this.get_match_header();
+        this.get_follow_users();
     },
 }
 </script>
