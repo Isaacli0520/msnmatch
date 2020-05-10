@@ -77,12 +77,12 @@
                     </table>
                 </div>
                 <div class="video-div" v-if="user.video.length">
-                    <!-- <video width="100%" controls :src="user.video">
+                    <video width="100%" controls :src="user.video">
                         Your Browser does not support video tags lol
-                    </video> -->
-                    <video width="100%" controls>
-                        <source :src="user.video" type="video/mp4">
                     </video>
+                    <!-- <video width="100%" controls>
+                        <source :src="user.video" type="video/mp4">
+                    </video> -->
                 </div>
             </v-card-text>
             <v-divider></v-divider>
