@@ -15,6 +15,7 @@ urlpatterns = [
 	path('api/get_course_instructor/', views.get_course_instructor, name='get_course_instructor'),
 	path('api/get_course_instructors/', views.get_course_instructors, name='get_course_instructors'),
 	path('api/get_user_hmp_header/', views.get_user_hmp_header, name='get_user_hmp_header'),
+	path('api/get_top_reviews/', views.get_top_reviews, name='get_top_reviews'),
 
 	path('api/submit_review/', views.submit_review, name='submit_review'),
 	path('api/report_bug/', views.report_bug, name='report_bug'),

@@ -1,6 +1,8 @@
 import re
 import time
 import json
+import random
+import numpy as np
 
 from django.shortcuts import render
 from django.urls import reverse_lazy, reverse
@@ -139,6 +141,21 @@ def report_bug(request):
 		"success":False,
 		"message":"Get method not allowed"
 	})
+
+@login_required
+def get_top_reviews(request):
+	time_start = time.time()
+	reviews = CourseUser.objects.annotate(length=Length("text")).filter(Q(length__gt=35) & Q(take="taken"))
+	tot = sum([review.length for review in reviews])
+	reviews_prob = [review.length * 1.0 / tot for review in reviews]
+	K = 10
+	reviews = np.random.choice(reviews, K if K < len(reviews_prob) else len(reviews_prob), False, reviews_prob)
+	reviews = [get_detailed_json_of_course_user(review) for review in reviews]
+	print("---------------get top reviews time--------------", time.time() - time_start)
+	return JsonResponse({
+		"reviews":reviews,
+	})
+	
 
 @login_required
 def get_top_review_users(request):
@@ -692,6 +709,13 @@ def get_detailed_json_of_course_instructor(course, instructor, user):
 def get_detailed_json_of_course_user(course_user):
 	return {
 		"course_user_pk":course_user.pk,
+		"instructor_pk":course_user.course_instructor.instructor.pk,
+		"instructor_name":course_user.course_instructor.instructor.__str__(),
+		"course_pk":course_user.course_instructor.course.pk,
+		"mnemonic":course_user.course_instructor.course.mnemonic,
+		"number":course_user.course_instructor.course.number,
+		"title":course_user.course_instructor.course.title,
+		"course_instructor_pk":course_user.course_instructor.pk,
 		"user_pk":course_user.user.pk,
 		"username":course_user.user.username,
 		"name":course_user.user.first_name + " " + course_user.user.last_name,
