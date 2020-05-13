@@ -144,14 +144,14 @@ def report_bug(request):
 
 @login_required
 def get_top_reviews(request):
-	time_start = time.time()
-	reviews = CourseUser.objects.annotate(length=Length("text")).filter(Q(length__gt=35) & Q(take="taken"))
+	# time_start = time.time()
+	reviews = CourseUser.objects.annotate(length=Length("text")).filter(Q(length__gt=45) & Q(take="taken"))
 	tot = sum([review.length for review in reviews])
 	reviews_prob = [review.length * 1.0 / tot for review in reviews]
 	K = 10
 	reviews = np.random.choice(reviews, K if K < len(reviews_prob) else len(reviews_prob), False, reviews_prob)
 	reviews = [get_detailed_json_of_course_user(review) for review in reviews]
-	print("---------------get top reviews time--------------", time.time() - time_start)
+	# print("---------------get top reviews time--------------", time.time() - time_start)
 	return JsonResponse({
 		"reviews":reviews,
 	})

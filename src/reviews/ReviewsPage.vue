@@ -36,15 +36,13 @@
                         <v-layout row wrap v-if="reviews.length > 0">
                             <v-flex 
                                 child-flex d-flex
-                                xs12 sm12 md6 lg6 xl6
+                                xs12 sm12 md12 lg12 xl12
                                 :key="index_review + '-review' " 
                                 v-for="(review, index_review) in reviews">
                                 <v-card>
                                     <v-card-title>
-                                        <div class="review-title-text">
-                                            <span>{{review.course.mnemonic}} {{review.course.number}}</span>
-                                            <span class="grey--text">  {{review.course.title}}</span>
-                                        </div>
+                                        <span class="review-headline-number">{{review.course.mnemonic}}{{review.course.number}}</span>
+                                        <span class="review-headline-text">{{review.course.title}}</span>
                                     </v-card-title>
                                     <v-divider></v-divider>
                                     <v-card-text>
@@ -372,13 +370,38 @@ axios.defaults.xsrfCookieName = "csrftoken";
 </script>
 
 <style scoped>
-    .review-title-text{
-        font-size: 20px;
+
+    .review-headline-number{
+        font-family: "Roboto", sans-serif;
+        font-size: 1.3em;
+        font-weight: 500;
+        background-color: rgb(13, 124, 109);
+        color:#fff;
+        padding: 1px 7px 1px 7px;
+        border-radius: 5px 0px 0px 5px;
+        line-height: 1.4;
+        box-decoration-break: clone;
+    }
+
+    .review-headline-text{
+        font-family: "Roboto", sans-serif;
+        font-size: 1.3em;
+        font-weight: 300;
+        background-color: rgb(240, 240, 240);
+        color:rgb(0, 0, 0);
+        padding: 1px 7px 1px 7px;
+        border-radius: 0px 5px 5px 0px;
+        line-height: 1.4;
+        box-decoration-break: clone;
+
     }
 
     .review-text{
-        font-size: 17px;
+        font-size: 16px;
         color: black;
+        font-family: "Roboto", sans-serif;
+        word-wrap:break-word;
+        white-space: pre-line;
     }
 
     .v-breadcrumbs li{
