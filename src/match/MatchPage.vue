@@ -70,9 +70,14 @@
                             <v-btn outlined color="teal lighten-1" @click="get_users_by_sim();clicked=true;">Click Me!</v-btn>
                         </div>
                     </v-row>
-                    <v-row justify="center">
+                    <v-row justify="center" style="margin-top:7px;">
                         <div v-if="clicked" style="text-align:center;">
                             <small class="muted-text">*这就是个随便写的算法大家开心就好😁</small>
+                        </div>
+                    </v-row>
+                    <v-row justify="center">
+                        <div v-if="clicked" style="text-align:center;">
+                            <small class="muted-text">*以及你至少需要有一个tag</small>
                         </div>
                     </v-row>
                     <v-row justify="center">
