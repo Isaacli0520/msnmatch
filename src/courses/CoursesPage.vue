@@ -7,7 +7,7 @@
                 <v-col>
                     <v-flex xs12 sm12 md12 lg12 xl12>
                         <div class="headline-div-center">
-                            <span class="cus-headline-title-text">Search Courses</span>
+                            <span class="cus-headline-title-text">HOOS MY PROFESSOR</span>
                         </div>
                     </v-flex>
                     <v-row row wrap>
@@ -89,50 +89,122 @@
                         </v-card>
                     </v-flex>
                 </v-layout> -->
-                <v-layout row wrap>
-                    <v-flex> 
-                        <div class="headline-div">
-                        <span class="cus-headline-text">Popular Courses</span>
-                        </div>
-                    </v-flex>
-                    <v-spacer></v-spacer>
-                </v-layout>
-                <v-layout row wrap>
-                    <template v-for="(course, index) in trending_courses['Taken']">
-                        <v-flex xs12 sm12 md12 lg12 xl12 :key="index" child-flex  d-flex>
-                            <v-card
-                                outlined
-                                elevation="3"
-                                :href="'/courses/' + course.course_pk + '/' ">
-                                <v-card-title>{{course.mnemonic}}{{course.number}} {{ course.title }}</v-card-title>
-                                <v-card-text>
-                                    <div>
-                                        <!-- <v-chip
-                                            class="ma-1" color="teal lighten-2" label small text-color="white">
-                                            Rating: {{course.rating_course}}
-                                        </v-chip> -->
-                                        <v-chip
-                                            class="ma-1" color="teal lighten-2" label small text-color="white">
-                                            Taking: {{course.taking}}
-                                        </v-chip>
-                                        <v-chip
-                                            class="ma-1" color="teal lighten-2" label small text-color="white">
-                                            Taken: {{course.taken}}
-                                        </v-chip>
-                                        <!-- <v-chip
-                                            v-if=" taking_or_taken(course) != '' "
-                                            class="ma-1" color="orange darken-1" label small text-color="white">
-                                            {{taking_or_taken(course)}}
-                                        </v-chip> -->
-                                    </div>
-                                    <v-flex d-flex>
-                                        {{ course.description }}
-                                    </v-flex>
-                                </v-card-text>
-                            </v-card>
+                <template v-if="top_reviews.length > 0">
+                    <v-layout row wrap>
+                        <v-flex> 
+                            <div class="headline-div">
+                            <span class="cus-headline-text">Interesting Reviews</span>
+                            </div>
                         </v-flex>
-                    </template>
-                </v-layout>
+                        <v-spacer></v-spacer>
+                    </v-layout>
+                    <v-row>
+                        <template v-for="(review, index) in top_reviews">
+                            <v-col :key="index"
+                                cols="12"
+                                sm="12"
+                                md="12"
+                                lg="12"
+                                xl="12">
+                                <v-card
+                                    class="fill-height"
+                                    outlined
+                                    elevation="3"
+                                    :href="'/courses/' + review.course_pk + '/' + review.instructor_pk ">
+                                    <v-card-title>
+                                        <span class="review-headline-number">{{review.mnemonic}}{{review.number}}</span>
+                                        <span class="review-headline-text">{{review.title}}</span></v-card-title>
+                                    <v-card-subtitle class="review-instructor-name">{{review.instructor_name}}</v-card-subtitle>
+                                    <v-card-text style="color:#000;padding-left: 18px !important;">
+                                        <div class="review-text">{{ review.text }}</div>
+                                    </v-card-text>
+                                    <v-divider></v-divider>
+                                    <v-card-actions>
+                                        <v-row>
+                                            <v-spacer></v-spacer>
+                                            <v-chip
+                                                class="ma-1" color="#336699" outlined small text-color="#336699">
+                                                {{review.semester}}
+                                            </v-chip>
+                                            <v-chip
+                                                class="ma-1" color="teal darken-2" outlined small text-color="teal darken-2">
+                                                <span style="margin-top:2px;" class="caption mr-1">Instructor:</span>
+                                                <v-rating
+                                                    v-model="review.rating_instructor"
+                                                    color="yellow darken-2"
+                                                    background-color="teal darken-2"
+                                                    readonly
+                                                    dense
+                                                    small
+                                                    half-increments>
+                                                </v-rating>
+                                            </v-chip>
+                                            <v-chip
+                                                class="ma-1 mr-3" color="teal darken-2" outlined small text-color="teal darken-2">
+                                                <span style="margin-top:2px;" class="caption mr-1">Course:</span>
+                                                <v-rating
+                                                    v-model="review.rating_course"
+                                                    color="yellow darken-2"
+                                                    background-color="teal darken-2"
+                                                    readonly
+                                                    dense
+                                                    small
+                                                    half-increments>
+                                                </v-rating>
+                                            </v-chip>
+                                        </v-row>
+                                    </v-card-actions>
+                                </v-card>
+                            </v-col>
+                        </template>
+                    </v-row>
+                </template>
+                <template v-if="trending_courses['Taken'].length > 0">
+                    <v-layout row wrap>
+                        <v-flex> 
+                            <div class="headline-div">
+                            <span class="cus-headline-text">Popular Courses</span>
+                            </div>
+                        </v-flex>
+                        <v-spacer></v-spacer>
+                    </v-layout>
+                    <v-layout row wrap>
+                        <template v-for="(course, index) in trending_courses['Taken']">
+                            <v-flex xs12 sm12 md12 lg12 xl12 :key="index" child-flex  d-flex>
+                                <v-card
+                                    outlined
+                                    elevation="3"
+                                    :href="'/courses/' + course.course_pk + '/' ">
+                                    <v-card-title>{{course.mnemonic}}{{course.number}} {{ course.title }}</v-card-title>
+                                    <v-card-text>
+                                        <div>
+                                            <!-- <v-chip
+                                                class="ma-1" color="teal lighten-2" label small text-color="white">
+                                                Rating: {{course.rating_course}}
+                                            </v-chip> -->
+                                            <v-chip
+                                                class="ma-1" color="teal lighten-2" label small text-color="white">
+                                                Taking: {{course.taking}}
+                                            </v-chip>
+                                            <v-chip
+                                                class="ma-1" color="teal lighten-2" label small text-color="white">
+                                                Taken: {{course.taken}}
+                                            </v-chip>
+                                            <!-- <v-chip
+                                                v-if=" taking_or_taken(course) != '' "
+                                                class="ma-1" color="orange darken-1" label small text-color="white">
+                                                {{taking_or_taken(course)}}
+                                            </v-chip> -->
+                                        </div>
+                                        <v-flex d-flex>
+                                            {{ course.description }}
+                                        </v-flex>
+                                    </v-card-text>
+                                </v-card>
+                            </v-flex>
+                        </template>
+                    </v-layout>
+                </template>
             </v-container>
         </v-content>
     </v-app>
@@ -153,6 +225,7 @@ import SearchCourse from '../components/SearchCourse'
                 "Taking":[],
                 "Taken":[],
             },
+            top_reviews:[],
             // user_info_get:false,
             // recommendation_loaded:false,
             // year:1,
@@ -213,6 +286,11 @@ import SearchCourse from '../components/SearchCourse'
                 this.loaded["Taken"] = true;
             });
         },
+        getTopReviews(){
+            axios.get('/courses/api/get_top_reviews/',{params: {}}).then(response => {
+                this.top_reviews = response.data.reviews;
+            });
+        },
         // getRecommendations(){
         //     axios.get('/courses/ajax/get_recommendations/',{params: {year:this.year, semester:this.semester, major:this.major}}).then(response => {
         //         this.rcm_courses = response.data.rcm_courses;
@@ -232,6 +310,7 @@ import SearchCourse from '../components/SearchCourse'
     },
     mounted(){
         this.getTrendingCourses();
+        this.getTopReviews();
         // this.getMajorOptions();
         this.getCurrentSemester();
     },
@@ -239,6 +318,46 @@ import SearchCourse from '../components/SearchCourse'
 </script>
 
 <style scoped>
+    .review-text{
+        font-size: 16px;
+        color:rgb(0, 0, 0);
+        font-family: "Roboto", sans-serif;
+        word-wrap:break-word;
+        white-space: pre-line;
+    }
+
+    .review-instructor-name{
+        color:#000;
+        padding: 6px 16px 8px 18px !important;
+        font-size:1.1em !important;
+        border: black;
+    }
+
+    .review-headline-number{
+        font-family: "Roboto", sans-serif;
+        font-size: 1.3em;
+        font-weight: 500;
+        background-color: rgb(13, 124, 109);
+        color:#fff;
+        padding: 1px 7px 1px 7px;
+        border-radius: 5px 0px 0px 5px;
+        line-height: 1.4;
+        box-decoration-break: clone;
+    }
+
+    .review-headline-text{
+        font-family: "Roboto", sans-serif;
+        font-size: 1.3em;
+        font-weight: 300;
+        background-color: rgb(240, 240, 240);
+        color:rgb(0, 0, 0);
+        padding: 1px 7px 1px 7px;
+        border-radius: 0px 5px 5px 0px;
+        line-height: 1.4;
+        box-decoration-break: clone;
+
+    }
+
     .spacer-layout{
         padding: 10px 5px 50px 5px;
     }
@@ -300,8 +419,9 @@ import SearchCourse from '../components/SearchCourse'
 
     .cus-headline-title-text{
         font-family: "Roboto", sans-serif;
-        font-size: 2.1em;
+        font-size: 2.3em;
         font-weight: 300;
+        letter-spacing: 0.06em;
         color:rgb(0, 0, 0);
         padding: 7px 12px 7px 3px;
         border-radius: 5px;
@@ -310,7 +430,7 @@ import SearchCourse from '../components/SearchCourse'
 
     .cus-headline-text{
         font-family: "Roboto", sans-serif;
-        font-size: 2.1em;
+        font-size: 1.8em;
         font-weight: 300;
         color:rgb(0, 0, 0);
         padding: 7px 12px 7px 3px;
@@ -337,6 +457,18 @@ import SearchCourse from '../components/SearchCourse'
 
 
     @media (min-width: 10px) and (max-width: 767px) {
+        .review-headline-instructor{
+            font-size: 0.8em
+        }
+
+        .review-headline-text{
+            font-size: 0.8em
+        }
+
+        .review-headline-number{
+            font-size: 0.8em;
+        }
+
         .cus-headline-title-text{
             font-size:1.7em;
         }

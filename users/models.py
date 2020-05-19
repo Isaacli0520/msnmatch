@@ -201,7 +201,7 @@ class Profile(models.Model):
 				self.avatar = self.compressImage_new(tmp_picture, True, 60)
 			if self.video and this.video != self.video:
 				# this.video.delete(save=False)
-				self.video.name = str(uuid.uuid4())
+				self.video.name = str(uuid.uuid4()) + self.video.name[self.video.name.rfind('.'):]
 		except: pass # when new photo then we do nothing, normal case
 		super(Profile, self).save(*args, **kwargs)
 

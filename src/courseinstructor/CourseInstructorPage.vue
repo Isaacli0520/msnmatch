@@ -41,7 +41,7 @@
                 </v-flex>
                 <v-spacer></v-spacer>
             </v-layout>
-            <v-layout> <!-- Course Description -->
+            <!-- <v-layout>
                 <v-flex child-flex d-flex>
                     <v-card>
                         <v-card-title>Prerequisite</v-card-title>
@@ -49,7 +49,7 @@
                         <v-card-text v-else>No prereq is specified for this course(Please check on SIS)</v-card-text>
                     </v-card>
                 </v-flex>
-            </v-layout>
+            </v-layout> -->
             <v-layout wrap> <!-- Prereq and Rate -->
                 <v-flex xl7 lg7 md6 sm12 xs12 d-flex child-flex>
                     <v-card>
@@ -127,24 +127,41 @@
                                 {{user.text}}
                             </div>
                         </v-card-text>
+                        <v-divider></v-divider>
                         <v-card-actions>
-                            <v-layout>
+                            <v-row>
                                 <v-spacer></v-spacer>
-                            <div>
                                 <v-chip
-                                    class="ma-1" color="teal lighten-2" label small text-color="white">
+                                    class="ma-1" color="#336699" outlined small text-color="#336699">
                                     {{user.semester}}
                                 </v-chip>
                                 <v-chip
-                                    class="ma-1" color="teal lighten-2" label small text-color="white">
-                                    Course: {{ user.rating_course ? user.rating_course : 'N/A' }}
+                                    class="ma-1" color="teal darken-2" outlined small text-color="teal darken-2">
+                                    <span style="margin-top:2px;" class="caption mr-1">Instructor:</span>
+                                    <v-rating
+                                        v-model="user.rating_instructor"
+                                        color="yellow darken-2"
+                                        background-color="teal darken-2"
+                                        readonly
+                                        dense
+                                        small
+                                        half-increments>
+                                    </v-rating>
                                 </v-chip>
                                 <v-chip
-                                    class="ma-1" color="teal lighten-2" label small text-color="white">
-                                    Instructor: {{user.rating_instructor ? user.rating_instructor : 'N/A'}}
+                                    class="ma-1 mr-3" color="teal darken-2" outlined small text-color="teal darken-2">
+                                    <span style="margin-top:2px;" class="caption mr-1">Course:</span>
+                                    <v-rating
+                                        v-model="user.rating_course"
+                                        color="yellow darken-2"
+                                        background-color="teal darken-2"
+                                        readonly
+                                        dense
+                                        small
+                                        half-increments>
+                                    </v-rating>
                                 </v-chip>
-                            </div>
-                            </v-layout>
+                            </v-row>
                         </v-card-actions>
                     </v-card>
                 </v-flex>

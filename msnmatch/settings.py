@@ -5,6 +5,8 @@ import dj_database_url
 import sys
 from decouple import config, Csv
 
+DATA_UPLOAD_MAX_MEMORY_SIZE = 1024*1024*1024
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 SECRET_KEY = config('SECRET_KEY')

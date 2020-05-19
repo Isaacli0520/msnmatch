@@ -7,21 +7,7 @@
             hide-overlay
             v-model="drawer"
             :clipped="$vuetify.breakpoint.mdAndUp">
-            <v-container v-if="!loaded || user == null" fluid fill-height>
-                <v-layout 
-                    align-center
-                    justify-center>
-                    <div>
-                        <v-progress-circular
-                        :size="60"
-                        :width="6"
-                        indeterminate
-                        color="teal lighten-1">
-                        </v-progress-circular>
-                    </div>
-                </v-layout>
-            </v-container>
-            <v-container v-if="loaded && user">
+            <v-container>
                 <v-card 
                     color="#FFFFFF"
                     v-if="user">
@@ -244,7 +230,7 @@
                 <v-divider></v-divider>
                 <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn color="green darken-1" :loading="submitReviewBtnLoading" outlined @click.prevent="submitReview(review)">Create</v-btn>   
+                    <v-btn color="green darken-1" :loading="submitReviewBtnLoading" outlined @click.prevent="submitReview(review)">Submit</v-btn>   
                     <v-btn color="blue darken-1" outlined @click="submitReviewDialog = false">Close</v-btn> 
                 </v-card-actions>
             </v-card>
@@ -462,6 +448,12 @@ export default{
                         });
                     }
                 }
+                this.instructor_options.sort(function(a,b){
+                    let nameA=a.name.toLowerCase(), nameB=b.name.toLowerCase();
+                    if (nameA < nameB) return -1;
+                    if (nameA > nameB) return 1;
+                    return 0;
+                })
                 this.instructorSelectLoading = false;
             });
         },

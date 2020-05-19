@@ -74,7 +74,7 @@ def get_all_ranked_users(request):
 			"bio": user.profile.bio,
 			"birth_date": user.profile.birth_date,
 			"location": user.profile.location,
-			"year": user.profile.year,
+			"year": user.profile.graduate_year,
 			"major": user.profile.major,
 			"sex":user.profile.sex,
 			"role":user.profile.role,

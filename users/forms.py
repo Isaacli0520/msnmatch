@@ -24,4 +24,4 @@ class ProfileForm(forms.ModelForm):
 class ProfileNewForm(forms.ModelForm):
     class Meta:
         model = Profile
-        fields = ('bio','graduate_year','sex', 'major', 'major_two', 'minor','wechat','picture','video','rm_bio','rm_schedule')
+        fields = ('bio','graduate_year','sex','location', 'major', 'major_two', 'minor','wechat','picture','video','rm_bio','rm_schedule')

@@ -75,32 +75,13 @@ class Command(BaseCommand):
 				tmp_data = {}
 				for i in range(len(line)):
 					tmp_data[headers[i]] = line[i]
-				# if(len(line) == 17):
-				# 	for i in range(17):
-				# 		if i == 15 and line[i] != '':
-				# 			tmp_data[headers[i]] = []
-				# 			tmp_data[headers[i]].append(line[i])
-				# 		elif i == 15 and line[i] == '':
-				# 			tmp_data[headers[i]] = []
-				# 		else:
-				# 			tmp_data[headers[i]] = line[i]
-				# else:
-				# 	for i in range(15):
-				# 		tmp_data[headers[i]] = line[i]
-				# 	tmp_data[headers[15]] = []
-				# 	for i in range(15, len(line)):
-				# 		if re.match(pattern, line[i]):
-				# 			tmp_data[headers[15]].append(line[i])
-				# 	tmp_data[headers[-1]] = line[-1]
-				# if "Prerequisite:" in tmp_data['Description'].split(' '):
-				# 	tmp_data["Prerequisite"] =tmp_data['Description'][tmp_data['Description'].index("Prerequisite:"):]
-				# elif "Prerequisites:" in tmp_data['Description'].split(' '):
-				# 	tmp_data["Prerequisite"] =tmp_data['Description'][(tmp_data['Description'].index("Prerequisites:") + 1):]
-				split_description = tmp_data['Description'].split(' ')
+
+				# split_description = tmp_data['Description'].split(' ')
+				split_description = re.split(r'\W+', tmp_data['Description'])
 				tmp_data["Prerequisite"] = ""
 				for prereq_key in ["Prerequisite:", "Prerequisites:", "Prerequisite", "Prerequisites"]:
 					if prereq_key in split_description:
-						tmp_data["Prerequisite"] =tmp_data['Description'][(tmp_data['Description'].index(prereq_key) + len(prereq_key)):]
+						tmp_data["Prerequisite"] =tmp_data['Description'][(tmp_data['Description'].index(prereq_key) + len(prereq_key)):].strip(':').strip()
 				tmp_data["Semester"] = semester
 				data.append(tmp_data)
 			print("data:",len(data))
