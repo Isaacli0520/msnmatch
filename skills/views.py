@@ -17,6 +17,7 @@ from django.contrib.auth.models import User
 from .models import Skill, SkillRelation
 from friendship.models import Follow
 
+import collections
 import re
 import json
 import random
@@ -345,12 +346,12 @@ def user_json(user, request):
 	}
 		
 def skills_as_dict(queryset):
-	skills = {}
+	skills = collections.defaultdict(list)
 	# for skill in Skill.objects.all():
 	# 	if skill.type not in skills:
 	# 		skills[skill.type] = []
-	for s_type in SKILL_TYPES:
-		skills[s_type] = []
+	# for s_type in SKILL_TYPES:
+	# 	skills[s_type] = []
 	for skill in queryset:
 		skills[skill.type].append(skill_json(skill))
 	return skills

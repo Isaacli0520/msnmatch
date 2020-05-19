@@ -23,6 +23,7 @@
         <div class="major-div">
             <div class="cus-subtitle" v-if="user.major">{{ user.major }}</div>
             <div class="cus-subtitle" v-if="user.major_two">{{ user.major_two }}</div>
+            <div class="cus-sim" v-if="user.score">Score:{{ user.score }}%</div>
         </div>
     </v-card>
 </template>
@@ -105,6 +106,14 @@ export default{
 
     .mentor-title{
         background-color: rgb(65, 194, 211);
+    }
+
+    .cus-sim{
+        font-weight: 700 !important;
+        font-size:15px !important;
+        color: rgb(255, 168, 37);
+        letter-spacing: 0.007em;
+        padding: 2px 16px 0px 16px;
     }
 
     .cus-subtitle{

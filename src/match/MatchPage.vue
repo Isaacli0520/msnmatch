@@ -65,6 +65,16 @@
                             <v-btn outlined color="teal lighten-1" @click="openRoleDialog('Mentee')">Be A Mentee</v-btn>
                         </div>
                     </v-row>
+                    <v-row justify="center" v-if="request_user.role != '' ">
+                        <div style="text-align:center; margin-top:13px;">
+                            <v-btn outlined color="teal lighten-1" @click="get_users_by_sim();clicked=true;">Click Me!</v-btn>
+                        </div>
+                    </v-row>
+                    <v-row justify="center">
+                        <div v-if="clicked" style="text-align:center;">
+                            <small class="muted-text">*这就是个随便写的算法大家开心就好😁</small>
+                        </div>
+                    </v-row>
                     <v-row justify="center">
                         <div v-if="request_user.role == '' " style="text-align:center;">
                             <small class="muted-text">*Note that you have to be a mentor/mentee to appear in the user list and perform any actions</small>
@@ -157,6 +167,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
 	data() {
         return {
             loaded:false,
+            clicked:false,
             // Header
             headerUpdate: false,
             // Search Bar
@@ -388,6 +399,72 @@ axios.defaults.xsrfCookieName = "csrftoken";
                 }
             });
             ref.users = tmp_all_users;
+        },
+        get_users_by_sim(){
+            let req_user = this.backup_all_users.filter(obj => {
+                return obj.pk == this.request_user.pk;
+            })[0];
+            let other_users = this.users.filter(obj => {
+                return obj.pk != this.request_user.pk;
+            });
+            for(let i = 0; i < other_users.length; i++){
+                other_users[i]["score"] = parseFloat((this.similarity_between(req_user, other_users[i])*100).toFixed(2));
+            }
+            this.users = other_users.sort(function(a,b){
+                return b.score - a.score;
+            });
+        },
+        similarity_between(a, b){
+            if (!("skills" in a) || !("skills" in b)){
+                return 0;
+            }
+            let a_skills = a.skills;
+            let b_skills = b.skills;
+            let total_length = 0;
+            let a_length = 0;
+            let b_length = 0;
+            let sims = [];
+            for (const [ key, value ] of Object.entries(a_skills)) {
+                total_length += this.scaler(value.length);
+                a_length += value.length;
+            }
+            for (const [ key, value ] of Object.entries(b_skills)) {
+                b_length += value.length;
+            }
+            for (const [ key, value ] of Object.entries(a_skills)) {
+                if(key in b_skills){
+                    let a_tmp_names = value.map(obj => { return obj.name });
+                    let b_tmp_names = b_skills[key].map(obj => { return obj.name });
+                    let tmp_skill_list = Array.from(new Set(a_tmp_names.concat(b_tmp_names)));
+                    let a_vec = tmp_skill_list.map( obj =>{
+                        return a_tmp_names.indexOf(obj) != -1 ? 1 : 0;
+                    })
+                    let b_vec = tmp_skill_list.map( obj =>{
+                        return b_tmp_names.indexOf(obj) != -1 ? 1 : 0;
+                    })
+                    let cosine_scaler = 1-(Math.abs(value.length/a_length - b_skills[key].length/b_length) + Math.abs(value.length - b_skills[key].length)/tmp_skill_list.length)/2;
+                    sims.push(this.cosine_sim(a_vec, b_vec) * (cosine_scaler) * this.scaler(value.length)/total_length);
+                }
+            }
+            return sims.reduce(function(a,b){ return a + b; }, 0);
+        },
+        cosine_sim(u,v){
+            if(u.length != v.length){
+                // console.log("what the f*** are you doing?(Cosine)");
+                return 0;
+            }
+            let uv = 0;
+            let u_len = 0;
+            let v_len = 0;
+            for(let i = 0; i < u.length;i++){
+                uv += u[i]*v[i];
+                u_len += u[i]*u[i];
+                v_len += v[i]*v[i]
+            }
+            return uv/Math.sqrt(u_len)/Math.sqrt(v_len);
+        },
+        scaler(x){
+            return Math.pow((x+1),(2/3.0))-Math.pow((x+1),(-1/8.0));
         },
 	},
 	mounted(){
