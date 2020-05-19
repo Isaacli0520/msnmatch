@@ -91,6 +91,10 @@
                                             <td>{{ user.minor }}</td>
                                         </tr>
                                         <tr>
+                                            <td>Location</td>
+                                            <td>{{ user.location }}</td>
+                                        </tr>
+                                        <tr>
                                             <td style="vertical-align:top;">Bio</td>
                                             <td class="description-td">{{ user.bio }}</td>
                                         </tr>

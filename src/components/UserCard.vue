@@ -5,11 +5,12 @@
         :elevation="3"
         :ripple="false"
         @click=openUserDialog>
-        <v-img 
+        <!-- <v-img 
             aspect-ratio="1.5"
             contain
             :src="user.picture">
-        </v-img>
+        </v-img> -->
+        <img :src="user.picture" style="width:100%;">
         <v-divider></v-divider>
         <!-- <v-card-title>{{user.first_name + " " + user.last_name}}</v-card-title> -->
         <div style="padding-top: 10px; padding-bottom:0px;">

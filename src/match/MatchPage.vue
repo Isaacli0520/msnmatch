@@ -61,7 +61,7 @@
                     </v-row>
                     <v-row justify="center" v-if="request_user.role == '' ">
                         <div style="text-align:center; margin-top:13px;">
-                            <v-btn style="margin-right: 10px;" outlined color="teal lighten-1" @click="openRoleDialog('Mentor')">Be A Mentor</v-btn>
+                            <!-- <v-btn style="margin-right: 10px;" outlined color="teal lighten-1" @click="openRoleDialog('Mentor')">Be A Mentor</v-btn> -->
                             <v-btn outlined color="teal lighten-1" @click="openRoleDialog('Mentee')">Be A Mentee</v-btn>
                         </div>
                     </v-row>

@@ -52,6 +52,12 @@
                                     required
                                     ></v-text-field>
 
+                                    <v-text-field
+                                    v-model="edit_user.location"
+                                    :rules="locationRules"
+                                    label="Location"
+                                    ></v-text-field>
+
                                     <v-select
                                     v-model="edit_user.sex"
                                     :items="genders"
@@ -206,6 +212,9 @@ axios.defaults.xsrfCookieName = "csrftoken";
             bioRules: [
                 v => !!v || 'Bio is required',
                 v => (v && v.length <= 1000) || 'Last Name must be less than 1000 characters',
+            ],
+            locationRules: [
+                v => (!v || (v && v.length <= 30)) || 'Location must be less than 30 characters',
             ],
             wechatRules: [
                 v => (!v || (v && v.length <= 255)) || 'WeChat ID must be less than 255 characters',

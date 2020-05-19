@@ -41,7 +41,7 @@
                 </v-flex>
                 <v-spacer></v-spacer>
             </v-layout>
-            <v-layout> <!-- Course Description -->
+            <!-- <v-layout>
                 <v-flex child-flex d-flex>
                     <v-card>
                         <v-card-title>Prerequisite</v-card-title>
@@ -49,7 +49,7 @@
                         <v-card-text v-else>No prereq is specified for this course(Please check on SIS)</v-card-text>
                     </v-card>
                 </v-flex>
-            </v-layout>
+            </v-layout> -->
             <v-layout wrap> <!-- Prereq and Rate -->
                 <v-flex xl7 lg7 md6 sm12 xs12 d-flex child-flex>
                     <v-card>
