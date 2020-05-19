@@ -77,8 +77,8 @@ def get_skill(request):
 @login_required
 def get_all_and_user_skills(request):
 	return JsonResponse({
-		"all_skills":skills_as_dict(Skill.objects.all().exclude(type="Custom").exclude(users=request.user)),
-		"user_skills":skills_as_dict(request.user.skill_set.all()),
+		"all_skills":skills_as_dict(Skill.objects.all().exclude(type="Custom").exclude(users=request.user), empty_list = True),
+		"user_skills":skills_as_dict(request.user.skill_set.all(), empty_list = True),
 		})
 
 @login_required
@@ -345,13 +345,14 @@ def user_json(user, request):
 		"rm":user.profile.rm,
 	}
 		
-def skills_as_dict(queryset):
+def skills_as_dict(queryset, empty_list = False):
 	skills = collections.defaultdict(list)
 	# for skill in Skill.objects.all():
 	# 	if skill.type not in skills:
 	# 		skills[skill.type] = []
-	# for s_type in SKILL_TYPES:
-	# 	skills[s_type] = []
+	if empty_list:
+		for s_type in SKILL_TYPES:
+			skills[s_type] = []
 	for skill in queryset:
 		skills[skill.type].append(skill_json(skill))
 	return skills
