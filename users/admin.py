@@ -99,6 +99,12 @@ def change_role_mentee(modeladmin, request, queryset):
         user.save()
 change_role_mentee.short_description = 'Change Role to Mentee'
 
+def change_matched(modeladmin, request, queryset):
+    for user in queryset:
+        user.profile.matched = False
+        user.save()
+change_matched.short_description = 'Change matched to False'
+
 def export_users(modeladmin, request, queryset):
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="users_list.csv"'
@@ -117,7 +123,7 @@ class CustomUserAdmin(UserAdmin):
     list_display = ('username','get_sex', 'email', 'first_name', 'last_name', 'is_staff', 'get_location', 'get_credential' ,'get_matched', 'get_role', 'get_graduate_year','get_birth_date','get_major')
     list_filter = ('is_staff', 'profile__sex','profile__role','profile__graduate_year', 'profile__matched')
     list_select_related = ('profile', )
-    actions = [change_role_mentor, change_role_mentee, change_role_none, export_users, export_users_new, update_avatar, update_graduate_year, update_credential]  # <-- Add the list action function here
+    actions = [change_role_mentor, change_role_mentee, change_role_none, export_users, export_users_new, update_avatar, update_graduate_year, update_credential, change_matched]  # <-- Add the list action function here
 
     def get_credential(self, instance):
         return instance.profile.credential

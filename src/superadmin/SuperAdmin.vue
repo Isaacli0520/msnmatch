@@ -52,6 +52,7 @@
                                         xl="3">
                                             <user-card
                                                 class="fill-height"
+                                                @open-user-dialog="matchUser(us_pk, user.pk)"
                                                 :user="all_users[us_pk]"></user-card>
                                         </v-col>
                                     </v-row>
