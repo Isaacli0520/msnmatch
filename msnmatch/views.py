@@ -50,7 +50,7 @@ def get_home_page_basic_info(request):
 	})
 
 def get_all_ranked_users(request):
-	all_users = User.objects.all().exclude(username="admin")
+	all_users = User.objects.all().exclude(username="admin").exclude(profile__role="")
 	all_users_dict = {}
 	start_time = time.time()
 	for user in all_users:
@@ -76,6 +76,7 @@ def get_all_ranked_users(request):
 			"location": user.profile.location,
 			"year": user.profile.graduate_year,
 			"major": user.profile.major,
+			"matched":user.profile.matched,
 			"sex":user.profile.sex,
 			"role":user.profile.role,
 			"major_two":user.profile.major_two,
@@ -86,7 +87,6 @@ def get_all_ranked_users(request):
 			"avatar":avatar_url,
 		}
 	print("Get all ranked users --- %s seconds ---" % (time.time() - start_time))
-	# print("all_users_dict", all_users_dict)
 	return JsonResponse({
 		"all_users":all_users_dict,
 	})

@@ -17,6 +17,7 @@ from .forms import UserForm, ProfileForm, ProfileNewForm
 from .models import MatchRequest
 from msnmatch import settings
 from django.http import JsonResponse
+import json
 
 @login_required
 def update_profile(request, username):
@@ -24,6 +25,22 @@ def update_profile(request, username):
         return redirect(reverse('update_profile', kwargs={"username": request.user.username, }))
     return render(request, 'profile_edit.html')
 
+@login_required
+def match_user(request):
+    if request.method == "POST":
+        post = json.loads(request.body)
+        user_1_pk, user_2_pk = post["user_1"], post["user_2"]
+        try:
+            user_1, user_2 = User.objects.get(pk=user_1_pk), User.objects.get(pk=user_2_pk)
+            user_1.profile.matched = True
+            user_1.save()
+            user_2.profile.matched = True
+            user_2.save()
+            return JsonResponse({"success":True})
+        except:
+            return JsonResponse({"success":False, "message":"User doesn't exist"})
+    else:
+        return JsonResponse({"success":False, "message":"Get request not allowed"})
 @login_required
 def edit_user(request):
     if request.method == "POST":
