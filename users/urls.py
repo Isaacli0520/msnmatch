@@ -7,6 +7,7 @@ urlpatterns = [
     path('<username>/courses/', views.my_courses, name='my_courses'),
     path('<username>/edit/', views.update_profile, name='update_profile'),
 
+    path('api/match_user/', views.match_user,name="match_user"),
     path('api/edit_user/',views.edit_user, name='edit_user'),
     path('api/get_profile/',views.get_profile, name='get_profile'),
 ]
