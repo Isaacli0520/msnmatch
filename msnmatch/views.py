@@ -86,7 +86,7 @@ def get_all_ranked_users(request):
 			"followee": [flw.followee.pk for flw in Follow.objects.filter(follower=user)],
 			"avatar":avatar_url,
 		}
-	print("Get all ranked users --- %s seconds ---" % (time.time() - start_time))
+	# print("Get all ranked users --- %s seconds ---" % (time.time() - start_time))
 	return JsonResponse({
 		"all_users":all_users_dict,
 	})

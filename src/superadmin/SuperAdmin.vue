@@ -11,7 +11,7 @@
                 <v-progress-linear
                     rounded
                     height = "24"
-                    :value="Math.ceil(mentorMatched / mentorNum)"
+                    :value="100 * mentorMatched / mentorNum"
                     color="blue accent-2">
                     <template v-slot="{ value }">
                         <strong>{{ mentorMatched }} / {{mentorNum}}</strong>
@@ -23,7 +23,8 @@
                 <v-progress-linear
                     height = "24"
                     rounded
-                    :value="Math.ceil(menteeMatched / menteeNum)"
+                    class="mb-3"
+                    :value="100 * menteeMatched / menteeNum"
                     color="green accent-4">
                     <template v-slot="{ value }">
                         <strong>{{ menteeMatched }} / {{menteeNum}}</strong>
