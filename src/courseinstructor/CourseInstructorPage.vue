@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <custom-header @submit-review="getCourseInstructor"></custom-header>
-    <v-content>
+    <v-main>
         <v-container v-if="!loaded" fluid fill-height>
             <v-layout 
                 align-center
@@ -174,7 +174,7 @@
                 </v-flex>
             </v-layout>
         </v-container>
-    </v-content>
+    </v-main>
     <v-dialog v-model="reviewDialog" max-width="600px">
         <v-card>
             <v-card-title>
@@ -244,7 +244,9 @@
         color="red lighten-1"
         :timeout="2700">
         Sth is wrong
-        <v-btn color="white" text @click="failure_snack = false"> Close </v-btn>
+        <template v-slot:action="{ attrs }">
+        <v-btn color="white" v-bind="attrs" text @click="failure_snack = false"> Close </v-btn>
+        </template>
     </v-snackbar>
     <v-snackbar
         top
@@ -252,7 +254,9 @@
         color="red lighten-1"
         :timeout="2700">
         Form Invalid
-        <v-btn color="white" text @click="form_invalid_snack = false"> Close </v-btn>
+        <template v-slot:action="{ attrs }">
+        <v-btn color="white" v-bind="attrs" text @click="form_invalid_snack = false"> Close </v-btn>
+        </template>
     </v-snackbar>
     <v-snackbar
         top
@@ -260,7 +264,9 @@
         color="teal darken-1"
         :timeout="2700">
         Review Submitted
-        <v-btn color="cyan accent-1" text @click="success_snack = false"> Close </v-btn>
+        <template v-slot:action="{ attrs }">
+        <v-btn color="cyan accent-1" v-bind="attrs" text @click="success_snack = false"> Close </v-btn>
+        </template>
     </v-snackbar>
     </v-app>
 </template>

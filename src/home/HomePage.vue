@@ -6,7 +6,7 @@
                     <v-card outlined>
                         <v-card-text>
                             <v-btn class="ma-3 d-flex flex-column justify-center" outlined @click="goToHref('/match/')" color="pink lighten-2">Match</v-btn>
-                            <v-btn class="ma-3 d-flex flex-column justify-center" outlined @click="goToHref('/market/')" color="blue darken-1">Market</v-btn>
+                            <!-- <v-btn class="ma-3 d-flex flex-column justify-center" outlined @click="goToHref('/market/')" color="blue darken-1">Market</v-btn> -->
                             <v-btn class="ma-3 d-flex flex-column justify-center" outlined @click="goToHref('/courses/')" color="teal darken-2">Hoosmyprofessor</v-btn>
                             <!-- <v-btn class="ma-3 d-flex flex-column justify-center" outlined @click="goToHref('/comments/send/')" color="Purple lighten-2">If You Are The One</v-btn> -->
                         </v-card-text>

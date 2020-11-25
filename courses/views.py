@@ -85,6 +85,10 @@ def courses_admin(request):
 	return render(request, 'courses_admin.html')
 
 @login_required
+def my_courses(request):
+    return render(request, "mycourses.html")
+
+@login_required
 def get_current_semester(request):
 	return JsonResponse({
 		"year":settings.CURRENT_SEMESTER[:4],
@@ -101,7 +105,7 @@ def get_basic_info(request):
 			"brand_pic": settings.STATIC_URL + "css/images/brand_compressed.png",
 			"profile": reverse('profile', args=[request.user.username]),
 			"update_profile":reverse('update_profile', args=[request.user.username]),
-			"my_courses":reverse('my_courses', args=[request.user.username]),
+			"my_courses":reverse('my_courses'),
 			"logout":reverse('logout'),
 			"market_url":reverse('market:market'),
 			"match_url":reverse('match'),

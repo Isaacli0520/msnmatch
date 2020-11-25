@@ -142,12 +142,6 @@ def profile_json(user):
     }
 
 @login_required
-def my_courses(request, username):
-    if request.user.username != username:
-        return redirect(reverse('my_courses', kwargs={"username": request.user.username, }))
-    return render(request, "mycourses.html")
-
-@login_required
 def profile(request, username):
     # user = User.objects.get(username=username)
     # # print(user_taken_courses)

@@ -172,7 +172,7 @@ export default{
             }
         },
         get_basic_info(){
-            axios.get('/courses/ajax/get_basic_info/',{params: {}}).then(response => {
+            axios.get('/courses/api/get_basic_info/',{params: {}}).then(response => {
                 this.urls = response.data.all_info;
                 this.navBarItems[0] = {
                     text:"HoosMyProfessor",

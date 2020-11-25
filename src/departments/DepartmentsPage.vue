@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <custom-header></custom-header>
-    <v-content>
+    <v-main>
         <v-container v-if="!loaded" fluid fill-height>
             <v-layout 
                 align-center
@@ -43,6 +43,7 @@
                                     :key="index_d + 'department' " 
                                     v-for="(department, index_d) in departments">
                                         <v-chip
+                                            label
                                             :href="'/courses/departments/'+ department.id + '/' "
                                             outlined 
                                             
@@ -54,7 +55,7 @@
                 </v-flex>
             </v-layout>
         </v-container>
-    </v-content>
+    </v-main>
   </v-app>
 </template>
 

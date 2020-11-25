@@ -43,11 +43,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.postgres',
-    'bootstrap4',
     'social_django',
     'users',
     'courses',
-    'widget_tweaks',
     'friendship',
     'storages',
     'skills',
@@ -93,9 +91,9 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'msnmatch.wsgi.application'
+ASGI_APPLICATION = 'msnmatch.asgi.application'
 
-ASGI_APPLICATION = 'msnmatch.routing.application'
+WSGI_APPLICATION = 'msnmatch.wsgi.application'
 
 CHANNEL_LAYERS = {
     'default': {

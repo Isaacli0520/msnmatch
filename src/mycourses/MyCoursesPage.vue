@@ -1,7 +1,7 @@
 <template>
     <v-app>
         <custom-header></custom-header>
-        <v-content>
+        <v-main>
             <v-container fluid grid-list-lg>
                 <v-layout>
                     <v-flex>
@@ -68,7 +68,7 @@
                     </v-flex>
                 </v-layout>
             </v-container>
-        </v-content>
+        </v-main>
         <!-- <custom-footer></custom-footer> -->
     </v-app>
 </template>
@@ -123,7 +123,7 @@ import CustomBreadcrumb from '../components/CustomBreadcrumb'
 			window.location.href = text;
         },
         getMyCourses(){
-            axios.get('/courses/ajax/get_my_courses/',{params: {}}).then(response => {
+            axios.get('/courses/api/get_my_courses/',{params: {}}).then(response => {
                 this.taking_courses = response.data.taking_courses;
                 this.taken_courses = response.data.taken_courses;
                 this.taken_courses_semester = this.seperateSemesters(this.taken_courses);

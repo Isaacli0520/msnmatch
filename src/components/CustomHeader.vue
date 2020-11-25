@@ -3,9 +3,8 @@
         <!-- Side Navigation Drawer -->
         <v-navigation-drawer
             app
-            floating
-            hide-overlay
             v-model="drawer"
+            temporary
             :clipped="$vuetify.breakpoint.mdAndUp">
             <v-container>
                 <v-card 
@@ -44,19 +43,19 @@
             light
             elevation="1">
             <v-app-bar-nav-icon  @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
-            <v-img max-height="38" max-width="38" :src="urls.brand_pic" alt=""></v-img>
+            <v-img max-height="38" max-width="38" :src="brand_pic" alt=""></v-img>
             <v-toolbar-items v-if="$vuetify.breakpoint.mdAndUp">
                 <v-btn 
-                    :href="urls.courses_url"
+                    :href="general_urls.courses_url"
                     text>HoosMyProfessor</v-btn>
                 <v-divider inset vertical></v-divider>
                 <v-btn 
-                    :href="urls.match_url"
+                    :href="general_urls.match_url"
                     text>Match</v-btn>
-                <v-divider inset vertical></v-divider>
-                <v-btn 
-                    :href="urls.market_url"
-                    text>Market</v-btn>
+                <!-- <v-divider inset vertical></v-divider> -->
+                <!-- <v-btn 
+                    :href="general_urls.market_url"
+                    text>Market</v-btn> -->
             </v-toolbar-items>
             <search-course
                 v-if="searchBool"></search-course>
@@ -65,9 +64,11 @@
             <v-menu offset-y
                 class="mx-auto"
                 min-width="170">
-                <template v-slot:activator="{ on }">
+                <template v-slot:activator="{ attrs, on }">
                     <v-btn
+                        color="black"
                         icon
+                        v-bind="attrs"
                         v-on="on">
                         <v-icon>mdi-apps</v-icon>
                     </v-btn>
@@ -78,7 +79,7 @@
                         :key="index + '-app'"
                         @click="navMethod(item)">
                         <v-list-item-icon>
-                            <v-icon dense v-text="item.icon"></v-icon>
+                            <v-icon color="black" dense v-text="item.icon"></v-icon>
                         </v-list-item-icon>
                         <v-list-item-content>
                             <v-list-item-title>{{ item.title }}</v-list-item-title>
@@ -90,9 +91,11 @@
             <v-menu offset-y
                 class="mx-auto"
                 min-width="170">
-                <template v-slot:activator="{ on }">
+                <template v-slot:activator="{ attrs, on }">
                     <v-btn
+                        color="black"
                         icon
+                        v-bind="attrs"
                         v-on="on">
                         <v-icon>fas fa-user-circle</v-icon>
                     </v-btn>
@@ -103,7 +106,7 @@
                         :key="index"
                         @click="navMethod(item)">
                         <v-list-item-icon>
-                            <v-icon dense v-text="item.icon"></v-icon>
+                            <v-icon color="black" dense v-text="item.icon"></v-icon>
                         </v-list-item-icon>
                         <v-list-item-content>
                             <v-list-item-title>{{ item.title }}</v-list-item-title>
@@ -118,7 +121,9 @@
             color="red lighten-1"
             :timeout="2700">
             Form Invalid
-            <v-btn color="white" text @click="form_invalid_snack = false"> Close </v-btn>
+            <template v-slot:action="{ attrs }">
+            <v-btn color="white" v-bind="attrs" text @click="form_invalid_snack = false"> Close </v-btn>
+            </template>
         </v-snackbar>
         <v-snackbar
             top
@@ -126,7 +131,9 @@
             color="red lighten-1"
             :timeout="2700">
             Sth is wrong
-            <v-btn color="white" text @click="failure_snack = false"> Close </v-btn>
+            <template v-slot:action="{ attrs }">
+            <v-btn color="white" v-bind="attrs" text @click="failure_snack = false"> Close </v-btn>
+            </template>
         </v-snackbar>
         <v-snackbar
             top
@@ -134,7 +141,9 @@
             color="teal darken-1"
             :timeout="2700">
             Review Submitted
-            <v-btn color="cyan accent-1" text @click="success_snack = false"> Close </v-btn>
+            <template v-slot:action="{ attrs }">
+            <v-btn color="cyan accent-1" v-bind="attrs" text @click="success_snack = false"> Close </v-btn>
+            </template>
         </v-snackbar>
         <v-dialog v-model="submitReviewDialog" scrollable min-width="350px" max-width="600px">
             <v-card>
@@ -241,6 +250,7 @@
 <script>
 import axios from 'axios'
 import SearchCourse from './SearchCourse'
+import { general_urls, brand_pic } from '../utils'
 axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 axios.defaults.xsrfCookieName = "csrftoken";
 
@@ -257,6 +267,9 @@ export default{
     },
     data: function () {
         return {
+            // Urls
+            brand_pic:brand_pic,
+            general_urls:general_urls,
             // Review
             submit_review_form_valid:true,
             submitReviewDialog:false,
@@ -316,17 +329,8 @@ export default{
                 { title:"Live Comments", icon:"fas fa-comment" },
             ],
             urls:{
-                home_url:"",
-                brand_pic:"",
                 profile:"",
                 update_profile:"",
-                logout:"",
-                my_courses:"",
-                courses_url:"",
-                match_url:"",
-                comment_url:"",
-                market_url:"",
-                skills_url:"",
             },
             nav_drawer_items:[
                 [{
@@ -462,11 +466,14 @@ export default{
         },
         navAsideMethod(item){
             if(item.text == "HoosMyProfessor"){
-                this.goToHref(this.urls.courses_url);
+                this.goToHref(this.general_urls.courses_url);
             }
             else if(item.text == "Match"){
-                this.goToHref(this.urls.match_url);
+                this.goToHref(this.general_urls.match_url);
             }
+        },
+        openSubmitReviewDialog(){
+            this.submitReviewDialog = true;
         },
         navMethod(item){
             if(item.title=="Profile"){
@@ -475,29 +482,29 @@ export default{
             else if(item.title=="Edit Profile"){
                 this.goToHref(this.urls.update_profile);
             }
-            else if(item.title=="Log Out"){
-                this.goToHref(this.urls.logout);
-            }
             else if(item.title=="My Courses"){
-                this.goToHref(this.urls.my_courses);
+                this.goToHref(this.general_urls.my_courses_url);
             }
             else if(item.title=="My Reviews"){
-                this.goToHref("/courses/reviews/");
+                this.goToHref(this.general_urls.review_url);
+            }
+            else if(item.title=="Log Out"){
+                this.goToHref(this.general_urls.logout);
             }
             else if(item.title=="Match"){
-                this.goToHref(this.urls.match_url);
+                this.goToHref(this.general_urls.match_url);
             }
             else if(item.title=="Market"){
-                this.goToHref(this.urls.market_url);
+                this.goToHref(this.general_urls.market_url);
             }
             else if(item.title=="Live Comments"){
-                this.goToHref(this.urls.comment_url);
+                this.goToHref(this.general_urls.comment_url);
             }
             else if(item.title=="Home"){
                 this.goToHref("/courses/");
             }
             else if(item.title=="Departments"){
-                this.goToHref("/courses/departments/");
+                this.goToHref(this.general_urls.department_url);
             }
             else if(item.title=="Plannable"){
                 this.goToHref(this.plannableFinalURL);
@@ -507,7 +514,7 @@ export default{
             }
         },
         get_basic_info(){
-            axios.get('/courses/ajax/get_basic_info/',{params: {}}).then(response => {
+            axios.get('/courses/api/get_basic_info/',{params: {}}).then(response => {
                 this.urls = response.data.all_info;
                 this.loaded = true;
             });

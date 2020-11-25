@@ -3,7 +3,7 @@
     <custom-header 
         @submit-review="getCourse"
         :headerUpdate="header_update"></custom-header>
-    <v-content>
+    <v-main>
         <v-container v-if="!loaded" fluid fill-height>
             <v-layout 
                 align-center
@@ -172,7 +172,7 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
-    </v-content>
+    </v-main>
   </v-app>
 </template>
 

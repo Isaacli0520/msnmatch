@@ -1,18 +1,22 @@
 <template>
     <v-app>
         <custom-header
+            ref="custom_header"
             :searchBool="false"></custom-header>
-        <v-content>
+        <v-main>
             <v-container fluid grid-list-xl class="courses-main">
+                <v-row>
+                <v-col xs="12" sm="12" md="8" lg="8" xl="6" offset-md="2" offset-lg="2" offset-xl="3">
                 <v-col>
                     <v-flex xs12 sm12 md12 lg12 xl12>
                         <div class="headline-div-center">
-                            <span class="cus-headline-title-text">HOOS MY PROFESSOR</span>
+                            <div class="cus-headline-title-text">HOOS MY PROFESSOR</div>
+                            <div class="cus-subheadline-title-text">Reviews, Ratings & More</div>
                         </div>
                     </v-flex>
                     <v-row row wrap>
                         <v-spacer></v-spacer>
-                        <v-flex d-flex xs10 sm10 md8 lg8 xl8>
+                        <v-flex d-flex xs10 sm10 md10 lg10 xl10>
                             <search-course class="custom-search"
                                 :dense="false"
                                 background_color="white"></search-course>
@@ -22,6 +26,30 @@
                     <v-layout class="spacer-layout"></v-layout>
                     <v-spacer></v-spacer>
                 </v-col>
+                <v-row>
+                    <template v-for="(func, index) in main_functions">
+                        <v-col :key="index" cols="3">
+                            <v-card
+                                @click.native="navFunctions(func)"
+                                class="fill-height"
+                                :ripple="false"
+                                hover>
+                                <v-card-text>
+                                    <v-layout class="align-center justify-center">
+                                    <div style="padding: 8px;"><v-icon
+                                        x-large
+                                        color="teal darken-2"
+                                        >{{func.icon}}</v-icon></div>
+                                    </v-layout>
+                                </v-card-text>
+                                <v-divider></v-divider>
+                                <v-card-actions class="justify-center">
+                                    <span class="function-subtext">{{func.title}}</span>
+                                </v-card-actions>
+                            </v-card>
+                        </v-col>
+                    </template>
+                </v-row>
                 <!-- <v-layout wrap>
                     <v-flex child-flex d-flex xs12 sm12 md12 lg12 xl12>
                         <v-card
@@ -90,7 +118,7 @@
                     </v-flex>
                 </v-layout> -->
                 <template v-if="top_reviews.length > 0">
-                    <v-layout row wrap>
+                    <v-layout mt-2 row wrap>
                         <v-flex> 
                             <div class="headline-div">
                             <span class="cus-headline-text">Interesting Reviews</span>
@@ -109,6 +137,7 @@
                                 <v-card
                                     class="fill-height"
                                     outlined
+                                    :ripple="false"
                                     elevation="3"
                                     :href="'/courses/' + review.course_pk + '/' + review.instructor_pk ">
                                     <v-card-title>
@@ -205,8 +234,10 @@
                         </template>
                     </v-layout>
                 </template>
+                    </v-col>
+                </v-row>
             </v-container>
-        </v-content>
+        </v-main>
     </v-app>
 </template>
 
@@ -214,6 +245,7 @@
 import axios from 'axios'
 import CustomHeader from '../components/CustomHeader'
 import SearchCourse from '../components/SearchCourse'
+import { general_urls } from '../utils'
 
   export default {
     data() {
@@ -226,6 +258,24 @@ import SearchCourse from '../components/SearchCourse'
                 "Taken":[],
             },
             top_reviews:[],
+            main_functions:{
+                "my_courses":{
+                    "title":"My Courses",
+                    "icon":"fas fa-user-circle",
+                },
+                "my_reviews":{
+                    "title":"My Reviews",
+                    "icon":"fas fa-book",
+                },
+                "submit_review":{
+                    "title":"Submit a Review",
+                    "icon":"fas fa-pen",
+                },
+                "departments":{
+                    "title":"Departments",
+                    "icon":"fas fa-list-ol",
+                },
+            },
             // user_info_get:false,
             // recommendation_loaded:false,
             // year:1,
@@ -272,6 +322,20 @@ import SearchCourse from '../components/SearchCourse'
     computed:{
     },
     methods: {
+        navFunctions(func){
+            if(func.title == "My Courses"){
+                this.goToHref(general_urls.my_courses_url);
+            }
+            else if(func.title == "My Reviews"){
+                this.goToHref(general_urls.review_url);
+            }
+            else if(func.title == "Submit a Review"){
+                this.$refs.custom_header.openSubmitReviewDialog();
+            }
+            else if(func.title == "Departments"){
+                this.goToHref(general_urls.department_url);
+            }
+        },
         getCurrentSemester(){
             axios.get('/courses/ajax/get_current_semester/',{params: { }}).then(response => {
                 this.semester = response.data.semester;
@@ -309,8 +373,8 @@ import SearchCourse from '../components/SearchCourse'
         // },
     },
     mounted(){
-        this.getTrendingCourses();
         this.getTopReviews();
+        this.getTrendingCourses();
         // this.getMajorOptions();
         this.getCurrentSemester();
     },
@@ -359,7 +423,7 @@ import SearchCourse from '../components/SearchCourse'
     }
 
     .spacer-layout{
-        padding: 10px 5px 50px 5px;
+        padding: 10px 5px 15px 5px;
     }
 
     .headline-div-center{
@@ -417,6 +481,23 @@ import SearchCourse from '../components/SearchCourse'
         max-height: 248px;
     }
 
+    .function-subtext{
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-weight: 300;
+        font-size: 1.05em;
+        letter-spacing: 0.04em;
+    }
+
+    .cus-subheadline-title-text{
+        font-family: "Roboto", sans-serif;
+        font-size: 1.4em;
+        font-weight: 300;
+        letter-spacing: 0.06em;
+        color:rgb(0, 0, 0);
+        padding: 7px 12px 7px 3px;
+        line-height: 1.0;
+    }
+
     .cus-headline-title-text{
         font-family: "Roboto", sans-serif;
         font-size: 2.3em;
@@ -424,7 +505,6 @@ import SearchCourse from '../components/SearchCourse'
         letter-spacing: 0.06em;
         color:rgb(0, 0, 0);
         padding: 7px 12px 7px 3px;
-        border-radius: 5px;
         line-height: 1.0;
     }
 
