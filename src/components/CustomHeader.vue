@@ -44,7 +44,7 @@
             elevation="1">
             <v-app-bar-nav-icon  @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
             <v-img max-height="38" max-width="38" :src="brand_pic" alt=""></v-img>
-            <v-toolbar-items v-if="$vuetify.breakpoint.mdAndUp">
+            <template v-if="$vuetify.breakpoint.mdAndUp">
                 <v-btn 
                     :href="general_urls.courses_url"
                     text>HoosMyProfessor</v-btn>
@@ -56,7 +56,7 @@
                 <!-- <v-btn 
                     :href="general_urls.market_url"
                     text>Market</v-btn> -->
-            </v-toolbar-items>
+            </template>
             <search-course
                 v-if="searchBool"></search-course>
             <v-spacer v-if="!searchBool"></v-spacer>
@@ -97,7 +97,7 @@
                         icon
                         v-bind="attrs"
                         v-on="on">
-                        <v-icon>fas fa-user-circle</v-icon>
+                        <v-icon>mdi-account-circle-outline</v-icon>
                     </v-btn>
                 </template>
                 <v-list dense rounded>
@@ -250,7 +250,7 @@
 <script>
 import axios from 'axios'
 import SearchCourse from './SearchCourse'
-import { general_urls, brand_pic } from '../utils'
+import { general_urls, general_icons, brand_pic } from '../utils'
 axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 axios.defaults.xsrfCookieName = "csrftoken";
 
@@ -318,15 +318,16 @@ export default{
                 '',
             ],
             user_items:[
-                { title:"Profile", icon:"fas fa-user" },
-                { title:"Edit Profile", icon:"fas fa-user-edit" },
-                { title:"My Courses", icon:"fas fa-list-ol" },
-                { title:"Log Out", icon:"fas fa-sign-out-alt"},
+                { title:"Profile", icon:general_icons.profile },
+                { title:"Edit Profile", icon:general_icons.edit_profile},
+                { title:"My Courses", icon:general_icons.my_courses },
+                { title:"My Reviews", icon:general_icons.my_reviews },
+                { title:"Log Out", icon:general_icons.logout},
             ],
             app_items:[
-                { title:"Match", icon:"fas fa-user-friends" },
-                { title:"Market", icon:"fas fa-search-dollar" },
-                { title:"Live Comments", icon:"fas fa-comment" },
+                { title:"Match", icon:general_icons.match },
+                { title:"Market", icon:general_icons.market },
+                { title:"Live Comments", icon:general_icons.live_comments },
             ],
             urls:{
                 profile:"",
@@ -335,37 +336,37 @@ export default{
             nav_drawer_items:[
                 [{
                     "title":"My Courses",
-                    "icon":"fas fa-user-circle",
+                    "icon":general_icons.my_courses,
                     "href":"",
                     "target":"",
                 },
                 {
                     "title":"My Reviews",
-                    "icon":"fas fa-book",
+                    "icon":general_icons.my_reviews,
                     "href":"/courses/reviews/",
                     "target":"",
                 },
                 {
                     "title":"Submit a Review",
-                    "icon":"fas fa-pen",
+                    "icon":general_icons.submit_review,
                     "href":"",
                     "target":"",
                 },],
                 [{
                     "title":"Home",
-                    "icon":"fas fa-home",
+                    "icon":general_icons.home,
                     "href":"/courses/",
                     "target":"",
                 },
                 {
                     "title":"Departments",
-                    "icon":"fas fa-list-ol",
+                    "icon":general_icons.departments,
                     "href":"/courses/departments/",
                     "target":"",
                 },
                 {
                     "title":"Plannable",
-                    "icon":"fas fa-paper-plane",
+                    "icon":general_icons.plannable,
                     "href":"https://plannable.org",
                     "target":"_blank",
                 },]

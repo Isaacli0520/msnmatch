@@ -88,15 +88,15 @@
             absolute
             color="transparent"
             >
-            <!-- <v-app-bar-nav-icon  @click.stop="drawer = !drawer"></v-app-bar-nav-icon> -->
-            <v-btn
+            <v-app-bar-nav-icon  @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
+            <!-- <v-btn
                 @click.stop="drawer = !drawer"
                 text
                 small>
                 <v-icon small>
                     fas fa-bars
                 </v-icon>
-            </v-btn>
+            </v-btn> -->
             <v-img class="ml-2" max-height="38" max-width="38" :src="urls.brand_pic" alt=""></v-img>
             <v-toolbar-items v-if="$vuetify.breakpoint.mdAndUp">
                 <v-btn 
@@ -160,7 +160,7 @@
                         icon
                         color="black"
                         v-on="on">
-                        <v-icon>fas fa-user-circle</v-icon>
+                        <v-icon>mdi-account-circle-outline</v-icon>
                     </v-btn>
                 </template>
                 <v-list dense rounded>
@@ -235,6 +235,7 @@
 
 <script>
 import axios from 'axios'
+import { general_urls, general_icons, brand_pic } from "../utils"
 axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 axios.defaults.xsrfCookieName = "csrftoken";
 
@@ -247,6 +248,10 @@ export default{
     },
     data: function () {
         return {
+            // general
+            brand_pic:brand_pic,
+            general_urls:general_urls,
+
             reportBugDialog:false,
             reportBugBtnLoading:false,
             success_snack:false,
@@ -270,14 +275,14 @@ export default{
                 v => (v && v.length <= 55) || 'Title must be less than 55 characters',
             ],
             user_items:[
-                { title:"Profile", icon:"fas fa-user" },
-                { title:"Edit Profile", icon:"fas fa-user-edit" },
-                { title:"Log Out", icon:"fas fa-sign-out-alt"},
+                { title:"Profile", icon:general_icons.profile },
+                { title:"Edit Profile", icon:general_icons.edit_profile},
+                { title:"Log Out", icon:general_icons.logout},
             ],
             app_items:[
-                { title:"Market", icon:"fas fa-search-dollar" },
-                { title:"HoosMyProfessor", icon:"fas fa-graduation-cap" },
-                { title:"Live Comments", icon:"fas fa-comment" },
+                { title:"Market", icon:general_icons.market },
+                { title:"HoosMyProfessor", icon:general_icons.courses},
+                { title:"Live Comments", icon:general_icons.live_comments },
             ],
             urls:{
                 home_url:"",
@@ -296,31 +301,31 @@ export default{
             side_bar_items:[
                 [{
                     "title":"Add Tags",
-                    "icon":"fas fa-heart",
+                    "icon":general_icons.add_tags,
                     "href":"/skills/",
                     "target":"",
                 },
                 {
                     "title":"Edit Profile",
-                    "icon":"fas fa-user-edit",
+                    "icon":general_icons.edit_profile,
                     "href":"/skills/",
                     "target":"",
                 }],
                 [{
                     "title":"Match",
-                    "icon":"fas fa-home",
+                    "icon":general_icons.match,
                     "href":"/match/",
                     "target":"",
                 },
                 {
                     "title":"Market",
-                    "icon":"fas fa-search-dollar",
+                    "icon":general_icons.market,
                     "href":"/market/",
                     "target":"",
                 },
                 {
                     "title":"HoosMyProfessor",
-                    "icon":"fas fa-graduation-cap",
+                    "icon":general_icons.courses,
                     "href":"/courses/",
                     "target":"",
                 }]
@@ -378,7 +383,7 @@ export default{
             }
         },
         get_basic_info(){
-            axios.get('/courses/ajax/get_basic_info/',{params: {}}).then(response => {
+            axios.get('/courses/api/get_basic_info/',{params: {}}).then(response => {
                 this.urls = response.data.all_info;
                 this.loaded = true;
             });

@@ -35,7 +35,7 @@
                 <v-flex>
                     <div class="instructor-name">
                         <v-btn color="teal darken-1" outlined x-large :href="' /courses/instructors/' + instructor.instructor_pk + '/' ">
-                            <v-icon class="instructor-icon" color="black" medium left>fas fa-user-tie</v-icon>{{instructor.name}}
+                            <v-icon class="instructor-icon" color="black" left>mdi-account-tie</v-icon>{{instructor.name}}
                         </v-btn>
                     </div>
                 </v-flex>
@@ -77,7 +77,7 @@
                             v-for="(user_taking, index) in users_taking"
                             :key="index + '-taking-user'  " 
                             :href=" '/users/'+user_taking.username+'/' ">
-                                <v-icon left color="white">account_circle</v-icon>
+                                <v-icon left color="white">mdi-account-outline</v-icon>
                                 {{ user_taking.name }}
                             </v-chip>
                         </v-card-text>
@@ -113,8 +113,8 @@
             <v-layout> <!-- Review Div Title -->
                 <v-flex justify-center align-self-center class="instructor-name">
                         <span class="review-title">Reviews</span>
-                        <v-btn @click="reviewDialog = true;" color="teal darken-3" fab large dark>
-                            <v-icon>edit</v-icon>
+                        <v-btn @click="reviewDialog = true;" color="teal darken-3" fab dark>
+                            <v-icon>mdi-pencil-plus-outline</v-icon>
                         </v-btn>
                 </v-flex>
                 <v-spacer></v-spacer>

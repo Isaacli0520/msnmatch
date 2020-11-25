@@ -130,6 +130,7 @@
                                 <v-chip
                                     class="ma-1"
                                     outlined
+                                    label
                                     color="deep-purple accent-4"
                                     @click="goToHref('/courses/'+course.course_pk+'/'+instructor.pk+'/')"
                                     >
@@ -140,6 +141,7 @@
                                     @click="openDialogTake(instructor)"
                                     color="deep-purple accent-4" 
                                     outlined
+                                    label
                                     >
                                     Planning/Taken
                                 </v-chip>
@@ -429,14 +431,6 @@ axios.defaults.xsrfCookieName = "csrftoken";
         font-weight: 500;
     }
 
-    /* .v-breadcrumbs li{
-        font-size:20px !important;
-    }
-
-    .cus-breadcrumbs{
-        padding-left: 4px !important;
-    } */
-
     .taking{
         background-color: rgb(11, 105, 92);
         padding: 5px 6px 6px 6px;
@@ -563,7 +557,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
         }
 
         .v-breadcrumbs li{
-            font-size:14px !important;
+            /* font-size:14px !important; */
         }
     }
 

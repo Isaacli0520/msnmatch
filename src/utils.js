@@ -15,10 +15,24 @@ export var general_urls = {
     department_url:"/courses/departments/",
     logout_url:"/logout/"
 };
-// var home_url ="/";
-// var courses_url = "/courses/";
-// var match_url = "/match/";
-// var comment_url = "/comments/send/";
-// var market_url = "/market/";
-// var skills_url = "/skills/";
-// var roommate_url = "/roommate/";
+
+// general icons
+export var general_icons = {
+    // misc
+    my_courses:"mdi-format-list-text",
+    my_reviews:"mdi-book-open-page-variant-outline",
+    submit_review:"mdi-pencil-plus-outline",
+    departments:"mdi-format-list-numbered",
+    add_tags:"mdi-heart-outline",
+    // user
+    profile:"mdi-account-details-outline",
+    edit_profile:"mdi-clipboard-edit-outline",
+    logout:"mdi-logout",
+    // main
+    home:"mdi-home-outline",
+    courses:"mdi-message-text-outline",
+    match:"mdi-account-multiple",
+    market:"mdi-shopping-outline",
+    live_comments:"mdi-chat-processing-outline",
+    plannable:"mdi-navigation-outline",
+};

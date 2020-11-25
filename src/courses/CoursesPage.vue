@@ -7,28 +7,25 @@
             <v-container fluid grid-list-xl class="courses-main">
                 <v-row>
                 <v-col xs="12" sm="12" md="8" lg="8" xl="6" offset-md="2" offset-lg="2" offset-xl="3">
-                <v-col>
-                    <v-flex xs12 sm12 md12 lg12 xl12>
-                        <div class="headline-div-center">
-                            <div class="cus-headline-title-text">HOOS MY PROFESSOR</div>
-                            <div class="cus-subheadline-title-text">Reviews, Ratings & More</div>
-                        </div>
-                    </v-flex>
-                    <v-row row wrap>
-                        <v-spacer></v-spacer>
-                        <v-flex d-flex xs10 sm10 md10 lg10 xl10>
-                            <search-course class="custom-search"
-                                :dense="false"
-                                background_color="white"></search-course>
-                        </v-flex>
-                        <v-spacer></v-spacer>
-                    </v-row>
-                    <v-layout class="spacer-layout"></v-layout>
+                <v-row>
+                    <div class="headline-div-center">
+                        <div class="cus-headline-title-text">HOOS MY PROFESSOR</div>
+                        <div class="cus-subheadline-title-text">Reviews, Ratings & More</div>
+                    </div>
+                </v-row>
+                <v-row row wrap>
                     <v-spacer></v-spacer>
-                </v-col>
+                    <v-flex d-flex xs10 sm10 md10 lg10 xl10>
+                        <search-course class="custom-search"
+                            :dense="false"
+                            background_color="white"></search-course>
+                    </v-flex>
+                    <v-spacer></v-spacer>
+                </v-row>
+                <v-row class="spacer-layout"></v-row>
                 <v-row>
                     <template v-for="(func, index) in main_functions">
-                        <v-col :key="index" cols="3">
+                        <v-col :key="index" sm="3" md="3" lg="3" xl="3" cols="6">
                             <v-card
                                 @click.native="navFunctions(func)"
                                 class="fill-height"
@@ -121,7 +118,11 @@
                     <v-layout mt-2 row wrap>
                         <v-flex> 
                             <div class="headline-div">
-                            <span class="cus-headline-text">Interesting Reviews</span>
+                                <span class="cus-headline-text">Interesting Reviews</span>
+                                <v-btn class="mb-2" color="teal darken-2" icon outlined
+                                    :loading="topReviewsLoading" @click="getTopReviews()">
+                                    <v-icon>mdi-refresh</v-icon>
+                                </v-btn>
                             </div>
                         </v-flex>
                         <v-spacer></v-spacer>
@@ -148,17 +149,18 @@
                                         <div class="review-text">{{ review.text }}</div>
                                     </v-card-text>
                                     <v-divider></v-divider>
-                                    <v-card-actions>
-                                        <v-row>
-                                            <v-spacer></v-spacer>
+                                    <v-card-actions style="flex-flow:row wrap !important;">
+                                            <v-spacer v-if="$vuetify.breakpoint.smAndUp"></v-spacer>
                                             <v-chip
-                                                class="ma-1" color="#336699" outlined small text-color="#336699">
+                                                class="ma-1" color="#336699" label outlined small text-color="#336699">
                                                 {{review.semester}}
                                             </v-chip>
                                             <v-chip
-                                                class="ma-1" color="teal darken-2" outlined small text-color="teal darken-2">
-                                                <span style="margin-top:2px;" class="caption mr-1">Instructor:</span>
+                                                class="ma-1" style="padding: 0px 5px 0px 9px !important;" color="teal darken-2"
+                                                label outlined small text-color="teal darken-2">
+                                                <span class="caption mr-1">Instructor:</span>
                                                 <v-rating
+                                                    style="margin-bottom:2px !important;"
                                                     v-model="review.rating_instructor"
                                                     color="yellow darken-2"
                                                     background-color="teal darken-2"
@@ -169,9 +171,11 @@
                                                 </v-rating>
                                             </v-chip>
                                             <v-chip
-                                                class="ma-1 mr-3" color="teal darken-2" outlined small text-color="teal darken-2">
-                                                <span style="margin-top:2px;" class="caption mr-1">Course:</span>
+                                                class="ma-1 mr-3" style="padding: 0px 5px 0px 9px !important;" color="teal darken-2"
+                                                label outlined small text-color="teal darken-2">
+                                                <span class="caption mr-1">Course:</span>
                                                 <v-rating
+                                                    style="margin-bottom:2px !important;"
                                                     v-model="review.rating_course"
                                                     color="yellow darken-2"
                                                     background-color="teal darken-2"
@@ -181,7 +185,6 @@
                                                     half-increments>
                                                 </v-rating>
                                             </v-chip>
-                                        </v-row>
                                     </v-card-actions>
                                 </v-card>
                             </v-col>
@@ -245,11 +248,12 @@
 import axios from 'axios'
 import CustomHeader from '../components/CustomHeader'
 import SearchCourse from '../components/SearchCourse'
-import { general_urls } from '../utils'
+import { general_urls, general_icons } from '../utils'
 
   export default {
     data() {
         return {
+            topReviewsLoading:true,
             loaded:{
                 "Taken":false,
             },
@@ -261,19 +265,19 @@ import { general_urls } from '../utils'
             main_functions:{
                 "my_courses":{
                     "title":"My Courses",
-                    "icon":"fas fa-user-circle",
+                    "icon":general_icons.my_courses,
                 },
                 "my_reviews":{
                     "title":"My Reviews",
-                    "icon":"fas fa-book",
+                    "icon":general_icons.my_reviews,
                 },
                 "submit_review":{
                     "title":"Submit a Review",
-                    "icon":"fas fa-pen",
+                    "icon":general_icons.submit_review,
                 },
                 "departments":{
                     "title":"Departments",
-                    "icon":"fas fa-list-ol",
+                    "icon":general_icons.departments,
                 },
             },
             // user_info_get:false,
@@ -351,8 +355,10 @@ import { general_urls } from '../utils'
             });
         },
         getTopReviews(){
+            this.topReviewsLoading = true;
             axios.get('/courses/api/get_top_reviews/',{params: {}}).then(response => {
                 this.top_reviews = response.data.reviews;
+                this.topReviewsLoading = false;
             });
         },
         // getRecommendations(){
