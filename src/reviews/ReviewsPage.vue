@@ -2,25 +2,20 @@
     <v-app>
         <custom-header
             @submit-review="getReviews"></custom-header>
-        <v-content>
+        <v-main>
             <v-container fluid grid-list-lg>
-                <v-layout>
-                    <v-flex>
+                <v-row dense>
+                    <v-col>
                         <custom-breadcrumb :items="navItems"></custom-breadcrumb>
-                    </v-flex>
-                </v-layout>
-                <v-layout mb-3>
-                    <v-flex> 
-                        <div>
-                            <span class="cus-headline-text">My Reviews</span>
-                        </div>
-                    </v-flex>
-                    <v-spacer></v-spacer>
-                </v-layout>
-                <v-container v-if="!reviews_load" fluid fill-height>
-                    <v-layout 
-                        align-center
-                        justify-center>
+                    </v-col>
+                </v-row>
+                <v-row dense>
+                    <v-col>
+                        <span class="cus-headline-text">My Reviews</span>
+                    </v-col>
+                </v-row>
+                <v-row v-if="!reviews_load">
+                    <v-col>
                         <div class="text-center">
                             <v-progress-circular
                             :size="60"
@@ -29,64 +24,25 @@
                             color="teal lighten-1">
                             </v-progress-circular>
                         </div>
-                    </v-layout>
-                </v-container>
-                <v-layout v-if="reviews_load" wrap>
-                    <v-flex d-flex child-flex xs12 sm12 md12 lg12 xl12>
-                        <v-layout row wrap v-if="reviews.length > 0">
-                            <v-flex 
-                                child-flex d-flex
-                                xs12 sm12 md12 lg12 xl12
-                                :key="index_review + '-review' " 
-                                v-for="(review, index_review) in reviews">
-                                <v-card>
-                                    <v-card-title>
-                                        <span class="review-headline-number">{{review.course.mnemonic}}{{review.course.number}}</span>
-                                        <span class="review-headline-text">{{review.course.title}}</span>
-                                    </v-card-title>
-                                    <v-divider></v-divider>
-                                    <v-card-text>
-                                        <div class="review-text">
-                                            {{review.text}}
-                                        </div>
-                                    </v-card-text>
-                                    <v-card-actions style="padding:4px !important;">
-                                        <v-layout style="margin:2px !important;">
-                                            <v-spacer></v-spacer>
-                                        <div>
-                                            <v-chip
-                                                class="ma-1" color="teal lighten-2" label small text-color="white">
-                                                {{review.semester}}
-                                            </v-chip>
-                                            <v-chip
-                                                class="ma-1" color="teal lighten-2" label small text-color="white">
-                                                Course: {{ review.rating_course ? review.rating_course : 'N/A' }}
-                                            </v-chip>
-                                            <v-chip
-                                                class="ma-1" color="teal lighten-2" label small text-color="white">
-                                                Instructor: {{review.rating_instructor ? review.rating_instructor : 'N/A'}}
-                                            </v-chip>
-
-                                            <v-chip
-                                                class="ma-1"
-                                                outlined
-                                                color="red"
-                                                @click="editReview(review)"
-                                                label 
-                                                small>
-                                                Edit
-                                            </v-chip>
-                                        </div>
-                                        </v-layout>
-                                    </v-card-actions>
-                                </v-card>
-                            </v-flex>
-                        </v-layout>
-                        <span class="grey--text" v-else>You have no reviews :(</span>
-                    </v-flex>
-                </v-layout>
+                    </v-col>
+                </v-row>
+                <template v-else>
+                    <v-row v-if=" reviews_load && reviews.length > 0">
+                        <v-col
+                            cols=12 sm=12 md=6 lg=6 xl=4
+                            :key="index_review + '-review' " 
+                            v-for="(review, index_review) in reviews">
+                            <review-card :review="review" :editable="true"></review-card>
+                        </v-col>
+                    </v-row>
+                    <v-row v-else>
+                        <v-col>
+                            <span class="grey--text" >You have no reviews :(</span>
+                        </v-col>
+                    </v-row>
+                </template>
             </v-container>
-        </v-content>
+        </v-main>
         <v-dialog v-model="reviewDialog" persistent max-width="600px">
             <v-card>
                 <v-card-title>
@@ -196,8 +152,7 @@
 
 <script>
 import axios from 'axios'
-import CustomHeader from '../components/CustomHeader'
-import CustomBreadcrumb from '../components/CustomBreadcrumb'
+import { CustomHeader, CustomBreadcrumb, ReviewCard } from '../components'
 axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 axios.defaults.xsrfCookieName = "csrftoken";
 
@@ -236,6 +191,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
     components:{
       CustomHeader,
       CustomBreadcrumb,
+      ReviewCard,
     },
     watch: {
     },

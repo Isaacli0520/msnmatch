@@ -1,4 +1,5 @@
 const BundleTracker = require("webpack-bundle-tracker");
+const VuetifyLoaderPlugin = require('vuetify-loader/lib/plugin')
 // const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 
@@ -151,21 +152,17 @@ module.exports = {
 		},
 	},
 
-	// configureWebpack: {
-	// 	plugins: [
-	// 		new BundleAnalyzerPlugin({
-	// 			generateStatsFile:true,
-	// 		})
-	// 	]
-	// },
-
 	chainWebpack: config => {
 		["vue-modules", "vue", "normal-modules", "normal"].forEach((match) => {
 			config.module.rule('sass').oneOf(match).use('sass-loader')
 			.tap(opt => Object.assign(opt, { data: `@import 'src/sass/main.scss'` }))
 		})
+		
 		config.optimization
 			.splitChunks(false)
+
+		config.plugin('VuetifyLoaderPlugin').tap(args => [{
+		}])
 
 		config
 			.plugin('BundleTracker')

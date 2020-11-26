@@ -99,28 +99,11 @@ def get_current_semester(request):
 def get_basic_info(request):
 	if request.user.is_authenticated:
 		info = {
-			"home_url":reverse('home'),
-			"courses_url": reverse('courses'),
-			"comment_url": reverse('comments:comments_send'),
-			"brand_pic": settings.STATIC_URL + "css/images/brand_compressed.png",
 			"profile": reverse('profile', args=[request.user.username]),
 			"update_profile":reverse('update_profile', args=[request.user.username]),
-			"my_courses":reverse('my_courses'),
-			"logout":reverse('logout'),
-			"market_url":reverse('market:market'),
-			"match_url":reverse('match'),
-			"skills_url":reverse('skills:skills'),
-			"rm_url":reverse('roommate_match'),
 		}
 	else:
 		info = {
-			"home_url":reverse('home'),
-			"courses_url": reverse('courses'),
-			"market_url":reverse('market:market'),
-			"comment_url": reverse('comments:comments_send'),
-			"brand_pic": settings.STATIC_URL + "css/images/brand_compressed.png",
-			"match_url":reverse('match'),
-			"rm_url":reverse('roommate_match'),
 		}
 	return JsonResponse({
 		"all_info":info,
@@ -154,7 +137,7 @@ def get_top_reviews(request):
 	reviews_prob = [review.length * 1.0 / tot for review in reviews]
 	K = 10
 	reviews = np.random.choice(reviews, K if K < len(reviews_prob) else len(reviews_prob), False, reviews_prob)
-	reviews = [get_detailed_json_of_course_user(review) for review in reviews]
+	reviews = [get_json_of_review(review) for review in reviews]
 	# print("---------------get top reviews time--------------", time.time() - time_start)
 	return JsonResponse({
 		"reviews":reviews,
@@ -204,22 +187,6 @@ def get_reviews(request):
 	return JsonResponse({
 		"reviews":[get_json_of_review(review) for review in reviews_arr]
 	})
-
-def get_json_of_review(review):
-	return {
-		"course":{
-			"mnemonic":review.course.mnemonic,
-			"number":review.course.number,
-			"title":review.course.title,
-			"course_pk":review.course.pk,
-		},
-		"semester":review.course_instructor.semester,
-		"text":review.text,
-		"rating_instructor":review.rating_instructor,
-		"rating_course":review.rating_course,
-		"instructor_pk":review.instructor.pk,
-		"course_instructor_pk":review.course_instructor.pk,
-	}
 
 @login_required
 def get_list_of_plannable_profiles(request):
@@ -710,15 +677,36 @@ def get_detailed_json_of_course_instructor(course, instructor, user):
 		"course_users":course_users,
 	}
 
+def get_json_of_review(review):
+	return {
+		"course":{
+			"mnemonic":review.course.mnemonic,
+			"number":review.course.number,
+			"title":review.course.title,
+			"pk":review.course.pk,
+		},
+		"instructor":{
+			"pk":review.instructor.pk,
+			"name":review.instructor.__str__(),
+		},
+		"semester":review.course_instructor.semester,
+		"take":review.take,
+		"text":review.text,
+		"rating_instructor":review.rating_instructor,
+		"rating_course":review.rating_course,
+		"instructor_pk":review.instructor.pk,
+		"course_instructor_pk":review.course_instructor.pk,
+	}
+
 def get_detailed_json_of_course_user(course_user):
 	return {
+		"course_pk":course_user.course.pk,
+		"mnemonic":course_user.course.mnemonic,
+		"number":course_user.course.number,
+		"title":course_user.course.title,
 		"course_user_pk":course_user.pk,
-		"instructor_pk":course_user.course_instructor.instructor.pk,
-		"instructor_name":course_user.course_instructor.instructor.__str__(),
-		"course_pk":course_user.course_instructor.course.pk,
-		"mnemonic":course_user.course_instructor.course.mnemonic,
-		"number":course_user.course_instructor.course.number,
-		"title":course_user.course_instructor.course.title,
+		"instructor_pk":course_user.instructor.pk,
+		"instructor_name":course_user.instructor.__str__(),
 		"course_instructor_pk":course_user.course_instructor.pk,
 		"user_pk":course_user.user.pk,
 		"username":course_user.user.username,

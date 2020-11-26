@@ -135,58 +135,7 @@
                                 md="12"
                                 lg="12"
                                 xl="12">
-                                <v-card
-                                    class="fill-height"
-                                    outlined
-                                    :ripple="false"
-                                    elevation="3"
-                                    :href="'/courses/' + review.course_pk + '/' + review.instructor_pk ">
-                                    <v-card-title>
-                                        <span class="review-headline-number">{{review.mnemonic}}{{review.number}}</span>
-                                        <span class="review-headline-text">{{review.title}}</span></v-card-title>
-                                    <v-card-subtitle class="review-instructor-name">{{review.instructor_name}}</v-card-subtitle>
-                                    <v-card-text style="color:#000;padding-left: 18px !important;">
-                                        <div class="review-text">{{ review.text }}</div>
-                                    </v-card-text>
-                                    <v-divider></v-divider>
-                                    <v-card-actions style="flex-flow:row wrap !important;">
-                                            <v-spacer v-if="$vuetify.breakpoint.smAndUp"></v-spacer>
-                                            <v-chip
-                                                class="ma-1" color="#336699" label outlined small text-color="#336699">
-                                                {{review.semester}}
-                                            </v-chip>
-                                            <v-chip
-                                                class="ma-1" style="padding: 0px 5px 0px 9px !important;" color="teal darken-2"
-                                                label outlined small text-color="teal darken-2">
-                                                <span class="caption mr-1">Instructor:</span>
-                                                <v-rating
-                                                    style="margin-bottom:2px !important;"
-                                                    v-model="review.rating_instructor"
-                                                    color="yellow darken-2"
-                                                    background-color="teal darken-2"
-                                                    readonly
-                                                    dense
-                                                    small
-                                                    half-increments>
-                                                </v-rating>
-                                            </v-chip>
-                                            <v-chip
-                                                class="ma-1 mr-3" style="padding: 0px 5px 0px 9px !important;" color="teal darken-2"
-                                                label outlined small text-color="teal darken-2">
-                                                <span class="caption mr-1">Course:</span>
-                                                <v-rating
-                                                    style="margin-bottom:2px !important;"
-                                                    v-model="review.rating_course"
-                                                    color="yellow darken-2"
-                                                    background-color="teal darken-2"
-                                                    readonly
-                                                    dense
-                                                    small
-                                                    half-increments>
-                                                </v-rating>
-                                            </v-chip>
-                                    </v-card-actions>
-                                </v-card>
+                                <review-card :review="review" :editable="false"></review-card>
                             </v-col>
                         </template>
                     </v-row>
@@ -246,8 +195,7 @@
 
 <script>
 import axios from 'axios'
-import CustomHeader from '../components/CustomHeader'
-import SearchCourse from '../components/SearchCourse'
+import { CustomHeader, SearchCourse, ReviewCard } from '../components'
 import { general_urls, general_icons } from '../utils'
 
   export default {
@@ -302,6 +250,7 @@ import { general_urls, general_icons } from '../utils'
     components:{
         CustomHeader,
         SearchCourse,
+        ReviewCard,
     },
     watch: {
         // year(){
@@ -388,46 +337,6 @@ import { general_urls, general_icons } from '../utils'
 </script>
 
 <style scoped>
-    .review-text{
-        font-size: 16px;
-        color:rgb(0, 0, 0);
-        font-family: "Roboto", sans-serif;
-        word-wrap:break-word;
-        white-space: pre-line;
-    }
-
-    .review-instructor-name{
-        color:#000;
-        padding: 6px 16px 8px 18px !important;
-        font-size:1.1em !important;
-        border: black;
-    }
-
-    .review-headline-number{
-        font-family: "Roboto", sans-serif;
-        font-size: 1.3em;
-        font-weight: 500;
-        background-color: rgb(13, 124, 109);
-        color:#fff;
-        padding: 1px 7px 1px 7px;
-        border-radius: 5px 0px 0px 5px;
-        line-height: 1.4;
-        box-decoration-break: clone;
-    }
-
-    .review-headline-text{
-        font-family: "Roboto", sans-serif;
-        font-size: 1.3em;
-        font-weight: 300;
-        background-color: rgb(240, 240, 240);
-        color:rgb(0, 0, 0);
-        padding: 1px 7px 1px 7px;
-        border-radius: 0px 5px 5px 0px;
-        line-height: 1.4;
-        box-decoration-break: clone;
-
-    }
-
     .spacer-layout{
         padding: 10px 5px 15px 5px;
     }
@@ -543,17 +452,6 @@ import { general_urls, general_icons } from '../utils'
 
 
     @media (min-width: 10px) and (max-width: 767px) {
-        .review-headline-instructor{
-            font-size: 0.8em
-        }
-
-        .review-headline-text{
-            font-size: 0.8em
-        }
-
-        .review-headline-number{
-            font-size: 0.8em;
-        }
 
         .cus-headline-title-text{
             font-size:1.7em;

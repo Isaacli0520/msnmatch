@@ -42,7 +42,7 @@ class CustomCourseInstructorAdmin(admin.ModelAdmin):
     autocomplete_fields = ['course','instructor',]
 
 class CustomCourseUserAdmin(admin.ModelAdmin):
-    list_display = ['course','user', 'instructor','take', 'text']
+    list_display = ['course','user', 'instructor','take', 'text', 'date']
     list_filter = ('take',)
     actions = [export_comments]
 

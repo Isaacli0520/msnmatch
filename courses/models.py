@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from msnmatch.utils import cmp_semester
 from msnmatch import settings
+from datetime import datetime
+from django.utils import timezone
 
 class Bug(models.Model):
 	title = models.CharField(max_length=55, default='')
@@ -73,8 +75,10 @@ class CourseUser(models.Model):
 	rating_instructor = models.FloatField(null=True, blank=True)
 	rating_course = models.FloatField(null=True, blank=True)
 	section = models.CharField(max_length=255, blank=True)
+	date = models.DateTimeField(default=timezone.now, blank=True)
 
 	def save(self, *args, **kwargs):
+		self.date = timezone.now()
 		if cmp_semester(self.course_instructor.semester, settings.CURRENT_SEMESTER) >= 0:
 			self.take = "taking"
 		else:
