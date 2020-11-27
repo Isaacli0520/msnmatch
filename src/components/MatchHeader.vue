@@ -100,23 +100,23 @@
             <v-img class="ml-2" max-height="38" max-width="38" :src="urls.brand_pic" alt=""></v-img>
             <v-toolbar-items v-if="$vuetify.breakpoint.mdAndUp">
                 <v-btn 
-                    :href="urls.match_url"
+                    :href="general_urls.match_url"
                     text>Match</v-btn>
                 <!-- <v-divider inset vertical></v-divider> -->
                 <v-btn 
-                    :href="urls.skills_url"
+                    :href="general_urls.skills_url"
                     text>Tags</v-btn>
                 <v-btn 
-                    :href="urls.rm_url"
+                    :href="general_urls.roommate_url"
                     text>Roommate</v-btn>
                 <!-- <v-divider inset vertical></v-divider> -->
                 <v-btn 
-                    :href="urls.courses_url"
+                    :href="general_urls.courses_url"
                     text>HoosMyProfessor</v-btn>
                 <!-- <v-divider inset vertical></v-divider> -->
-                <v-btn 
-                    :href="urls.market_url"
-                    text>Market</v-btn>
+                <!-- <v-btn 
+                    :href="general_urls.market_url"
+                    text>Market</v-btn> -->
                 
             </v-toolbar-items>
             <v-spacer></v-spacer>
@@ -350,10 +350,10 @@ export default{
     methods:{
         navAsideMethod(item){
             if(item.text == "HoosMyProfessor"){
-                this.goToHref(this.urls.courses_url);
+                this.goToHref(this.general_urls.courses_url);
             }
             else if(item.text == "Match"){
-                this.goToHref(this.urls.match_url);
+                this.goToHref(this.general_urls.match_url);
             }
         },
         navMethod(item){
@@ -364,22 +364,22 @@ export default{
                 this.goToHref(this.urls.update_profile)
             }
             else if(item.title=="Log Out"){
-                this.goToHref(this.urls.logout)
+                this.goToHref(this.general_urls.logout)
             }
             else if(item.title=="Match"){
-                this.goToHref(this.urls.match_url)
+                this.goToHref(this.general_urls.match_url)
             }
             else if(item.title=="Add Tags"){
                 this.goToHref('/skills/')
             }
             else if(item.title=="Market"){
-                this.goToHref(this.urls.market_url)
+                this.goToHref(this.general_urls.market_url)
             }
             else if(item.title=="Live Comments"){
-                this.goToHref(this.urls.comment_url)
+                this.goToHref(this.general_urls.comment_url)
             }
             else if(item.title == "HoosMyProfessor"){
-                this.goToHref(this.urls.courses_url);
+                this.goToHref(this.general_urls.courses_url);
             }
         },
         get_basic_info(){
