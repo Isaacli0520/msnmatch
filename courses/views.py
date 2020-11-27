@@ -133,7 +133,8 @@ def get_roll_result(request):
 	while len(result) != tot_winners and num_try < MAX_TRY:
 		num_try += 1
 		result = []
-		lottery = [random.randint(0, total_num - 1) for i in range(tot_winners)]
+		lottery = sorted([random.randint(0, total_num - 1) for i in range(tot_winners)])
+		print("lotteryL",lottery)
 		pointer = 0
 		left, right = 0, users[0]["reviews"]
 		for i, user in enumerate(users):
@@ -190,7 +191,7 @@ def get_top_review_users(request):
 	print("DEBUG:", dt)
 	users = []
 	for user in User.objects.all():
-		user_review_num = user.courseuser_set.annotate(length=Length("text")).filter(length__gt=0, date__gt=dt).count()
+		user_review_num = user.courseuser_set.annotate(length=Length("text")).filter(length__gt=15, date__gt=dt).count()
 		if user_review_num > 0:
 			users.append({
 				"pk":user.pk,
@@ -198,7 +199,7 @@ def get_top_review_users(request):
 				"name":user.first_name + " " + user.last_name,
 				"reviews":user_review_num,
 			})
-	users = sorted(users, key=lambda x:x["reviews"], reverse=True)[:30]
+	users = sorted(users, key=lambda x:x["reviews"], reverse=True)
 	return JsonResponse({
 		"review_users":users,
 	})
