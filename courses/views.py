@@ -117,7 +117,7 @@ def get_roll_result(request):
 	dt = datetime.datetime.strptime(date, '%Y-%m-%d')
 	users = []
 	for user in User.objects.all():
-		user_review_num = user.courseuser_set.annotate(length=Length("text")).filter(length__gt=15, date__gt=dt).count()
+		user_review_num = user.courseuser_set.annotate(length=Length("text")).filter(length__gt=0, date__gt=dt).count()
 		if user_review_num > 0 and user.username != "admin":
 			users.append({
 				"pk":user.pk,
@@ -136,15 +136,16 @@ def get_roll_result(request):
 		lottery = sorted([random.randint(0, total_num - 1) for i in range(tot_winners)])
 		print("lotteryL",lottery)
 		pointer = 0
-		left, right = 0, users[0]["reviews"]
+		left, right = 0, users[0]["reviews"] - 1
 		for i, user in enumerate(users):
+			print(left, right, lottery[pointer])
 			if lottery[pointer] >= left and lottery[pointer] <= right:
 				result.append(user)
-				if i == len(users) - 1 or pointer >= tot_winners - 1:
-					break
 				pointer += 1
-				left = right + 1
-				right = right + users[i + 1]["reviews"]
+			if i == len(users) - 1 or pointer >= tot_winners:
+				break
+			left = right + 1
+			right = right + users[i + 1]["reviews"]
 	return JsonResponse({
 		"users":result
 	})
