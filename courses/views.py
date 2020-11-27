@@ -3,6 +3,7 @@ import time
 import json
 import random
 import numpy as np
+import datetime
 
 from django.shortcuts import render
 from django.urls import reverse_lazy, reverse
@@ -110,6 +111,44 @@ def get_basic_info(request):
 	})
 
 @login_required
+def get_roll_result(request):
+	date = request.GET.get("date")
+	tot_winners = int(request.GET.get("tot_winners"))
+	dt = datetime.datetime.strptime(date, '%Y-%m-%d')
+	users = []
+	for user in User.objects.all():
+		user_review_num = user.courseuser_set.annotate(length=Length("text")).filter(length__gt=0, date__gt=dt).count()
+		if user_review_num > 0:
+			users.append({
+				"pk":user.pk,
+				"username":user.username,
+				"name":user.first_name + " " + user.last_name,
+				"reviews":user_review_num,
+			})
+	random.shuffle(users)
+	total_num = sum([u["reviews"] for u in users])
+	print("DEBUG TOTAL:", total_num)
+	num_try, MAX_TRY = 0, 100
+	result = []
+	while len(result) != tot_winners and num_try < MAX_TRY:
+		num_try += 1
+		result = []
+		lottery = [random.randint(0, total_num - 1) for i in range(tot_winners)]
+		pointer = 0
+		left, right = 0, users[0]["reviews"]
+		for i, user in enumerate(users):
+			if lottery[pointer] >= left and lottery[pointer] <= right:
+				result.append(user)
+				if i == len(users) - 1 or pointer >= tot_winners - 1:
+					break
+				pointer += 1
+				left = right + 1
+				right = right + users[i + 1]["reviews"]
+	return JsonResponse({
+		"users":result
+	})
+
+@login_required
 def report_bug(request):
 	if request.method == "POST":
 		post = json.loads(request.body.decode('utf-8'))
@@ -146,9 +185,12 @@ def get_top_reviews(request):
 
 @login_required
 def get_top_review_users(request):
+	date = request.GET.get("date")
+	dt = datetime.datetime.strptime(date, '%Y-%m-%d')
+	print("DEBUG:", dt)
 	users = []
 	for user in User.objects.all():
-		user_review_num = user.courseuser_set.annotate(length=Length("text")).filter(length__gt=0).count()
+		user_review_num = user.courseuser_set.annotate(length=Length("text")).filter(length__gt=0, date__gt=dt).count()
 		if user_review_num > 0:
 			users.append({
 				"pk":user.pk,
@@ -432,6 +474,7 @@ def get_trending_courses(request):
 				"description":cs.description,
 				"taking":cs.num_taking,
 				"taken":cs.num_taken,
+				"last_taught":cs.last_taught,
 			})
 
 	# time_end = time.time()

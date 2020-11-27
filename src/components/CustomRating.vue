@@ -77,7 +77,7 @@
     };
 </script>
 
-<style>
+<style scoped lang="css">
 
     .rating-action{
         color:rgb(145, 145, 145);

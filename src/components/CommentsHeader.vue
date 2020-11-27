@@ -197,7 +197,7 @@ export default{
 </script>
 
 
-<style lang="css">
+<style scoped lang="css">
 
     .theme--light.v-text-field--solo-inverted.v-text-field--solo.v-input--is-focused > .v-input__control > .v-input__slot .v-label, .theme--light.v-text-field--solo-inverted.v-text-field--solo.v-input--is-focused > .v-input__control > .v-input__slot input {
         color: #000000 !important;

@@ -65,7 +65,7 @@ export default{
 </script>
 
 
-<style lang="css">
+<style scoped lang="css">
     .v-card__title{
         font-family: "Roboto", sans-serif !important;
         font-weight: 700 !important;

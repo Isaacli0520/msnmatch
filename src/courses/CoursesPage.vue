@@ -156,31 +156,29 @@
                                     outlined
                                     elevation="3"
                                     :href="'/courses/' + course.course_pk + '/' ">
-                                    <v-card-title>{{course.mnemonic}}{{course.number}} {{ course.title }}</v-card-title>
+                                    <v-card-title>
+                                        <span class="course-number">{{course.mnemonic}}{{course.number}}</span>
+                                        <span class="course-name">{{course.title}}</span>
+                                    </v-card-title>
                                     <v-card-text>
-                                        <div>
-                                            <!-- <v-chip
-                                                class="ma-1" color="teal lighten-2" label small text-color="white">
-                                                Rating: {{course.rating_course}}
-                                            </v-chip> -->
-                                            <v-chip
-                                                class="ma-1" color="teal lighten-2" label small text-color="white">
-                                                Taking: {{course.taking}}
-                                            </v-chip>
-                                            <v-chip
-                                                class="ma-1" color="teal lighten-2" label small text-color="white">
-                                                Taken: {{course.taken}}
-                                            </v-chip>
-                                            <!-- <v-chip
-                                                v-if=" taking_or_taken(course) != '' "
-                                                class="ma-1" color="orange darken-1" label small text-color="white">
-                                                {{taking_or_taken(course)}}
-                                            </v-chip> -->
-                                        </div>
-                                        <v-flex d-flex>
-                                            {{ course.description }}
-                                        </v-flex>
+                                        {{ course.description }}
                                     </v-card-text>
+                                    <v-divider></v-divider>
+                                    <v-card-actions style="flex-flow:row wrap !important;">
+                                        <v-spacer v-if="$vuetify.breakpoint.smAndUp"></v-spacer>
+                                        <v-chip
+                                            class="ma-1" color="teal darken-2" label outlined small>
+                                            Last Taught: {{course.last_taught}}
+                                        </v-chip>
+                                        <v-chip
+                                            class="ma-1" color="teal darken-2" label outlined small>
+                                            Taking: {{course.taking}}
+                                        </v-chip>
+                                        <v-chip
+                                            class="ma-1" color="teal darken-2" label outlined small>
+                                            Taken: {{course.taken}}
+                                        </v-chip>
+                                    </v-card-actions>
                                 </v-card>
                             </v-flex>
                         </template>
@@ -197,6 +195,9 @@
 import axios from 'axios'
 import { CustomHeader, SearchCourse, ReviewCard } from '../components'
 import { general_urls, general_icons } from '../utils'
+// import CustomHeader from '../components/CustomHeader'
+// import SearchCourse from '../components/SearchCourse'
+// import ReviewCard from '../components/ReviewCard'
 
   export default {
     data() {
@@ -403,6 +404,31 @@ import { general_urls, general_icons } from '../utils'
         letter-spacing: 0.04em;
     }
 
+    .course-number{
+        font-family: "Roboto", sans-serif;
+        font-size: 1.1em;
+        font-weight: 500;
+        background-color: rgb(13, 124, 109);
+        color:#fff;
+        padding: 1px 7px 1px 7px;
+        border-radius: 5px 0px 0px 5px;
+        line-height: 1.4;
+        box-decoration-break: clone;
+    }
+
+    .course-name{
+        font-family: "Roboto", sans-serif;
+        font-size: 1.1em;
+        font-weight: 300;
+        background-color: rgb(240, 240, 240);
+        color:rgb(0, 0, 0);
+        padding: 1px 7px 1px 7px;
+        border-radius: 0px 5px 5px 0px;
+        line-height: 1.4;
+        box-decoration-break: clone;
+
+    }
+
     .cus-subheadline-title-text{
         font-family: "Roboto", sans-serif;
         font-size: 1.4em;
@@ -453,8 +479,12 @@ import { general_urls, general_icons } from '../utils'
 
     @media (min-width: 10px) and (max-width: 767px) {
 
-        .cus-headline-title-text{
-            font-size:1.7em;
+        .course-name{
+            font-size: 0.95em
+        }
+
+        .course-number{
+            font-size: 0.95em;
         }
 
         .main-title{

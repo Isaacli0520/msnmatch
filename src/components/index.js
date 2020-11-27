@@ -17,3 +17,10 @@ export {default as UserCard} from './UserCard';
 export {default as UserCardMin} from './UserCardMin';
 export {default as UserDialog} from './UserDialog';
 export {default as UserRankList} from './UserRankList';
+
+// const files = require.context('.', false, /\.vue$/)
+// const modules = {}
+// files.keys().forEach((key) => {
+//   modules[ key.replace(/(\.\/|\.vue)/g, '') ] = files(key).default
+// })
+// export default modules

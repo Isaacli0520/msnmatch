@@ -1,7 +1,6 @@
 <template>
     <v-app>
-        <custom-header
-            @submit-review="getReviews"></custom-header>
+        <custom-header @submit-review="getReviews"></custom-header>
         <v-main>
             <v-container fluid grid-list-lg>
                 <v-row dense>
@@ -32,7 +31,7 @@
                             cols=12 sm=12 md=6 lg=6 xl=4
                             :key="index_review + '-review' " 
                             v-for="(review, index_review) in reviews">
-                            <review-card :review="review" :editable="true"></review-card>
+                            <review-card @edit-review="editReview" :review="review" :editable="true"></review-card>
                         </v-col>
                     </v-row>
                     <v-row v-else>
@@ -129,7 +128,9 @@
             color="red lighten-1"
             :timeout="2700">
             Sth is wrong
-            <v-btn color="white" text @click="failure_snack = false"> Close </v-btn>
+            <template v-slot:action="{ attrs }">
+                <v-btn color="white" v-bind="attrs" text @click="failure_snack = false"> Close </v-btn>
+            </template>
         </v-snackbar>
         <v-snackbar
             top
@@ -137,7 +138,9 @@
             color="red lighten-1"
             :timeout="2700">
             Invalid Form
-            <v-btn color="white" text @click="form_invalid_snack = false"> Close </v-btn>
+            <template v-slot:action="{ attrs }">
+                <v-btn color="white" v-bind="attrs" text @click="form_invalid_snack = false"> Close </v-btn>
+            </template>
         </v-snackbar>
         <v-snackbar
             top
@@ -145,7 +148,9 @@
             color="teal darken-1"
             :timeout="2700">
             {{success_text}}
-            <v-btn color="cyan accent-1" text @click="success_snack = false"> Close </v-btn>
+            <template v-slot:action="{ attrs }">
+                <v-btn color="cyan accent-1" v-bind="attrs" text @click="success_snack = false"> Close </v-btn>
+            </template>
         </v-snackbar>
     </v-app>
 </template>
@@ -250,14 +255,14 @@ axios.defaults.xsrfCookieName = "csrftoken";
             });
         },
         editReview(review){
-            this.getCourseInstructors(review.course.course_pk, review.instructor_pk);
+            this.getCourseInstructors(review.course.pk, review.instructor.pk);
             this.reviewDialog = true;
             this.review_text = review.text;
             this.review_rating_instructor = review.rating_instructor;
             this.review_rating_course = review.rating_course;
             this.review_course_instructor_pk = review.course_instructor_pk;
-            this.review_course_pk = review.course.course_pk;
-            this.review_instructor_pk = review.instructor_pk;
+            this.review_course_pk = review.course.pk;
+            this.review_instructor_pk = review.instructor.pk;
         },
         deleteReview(){
             axios.post("/courses/ajax/save_take/",{

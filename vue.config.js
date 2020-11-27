@@ -1,5 +1,4 @@
 const BundleTracker = require("webpack-bundle-tracker");
-const VuetifyLoaderPlugin = require('vuetify-loader/lib/plugin')
 // const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 
@@ -157,7 +156,7 @@ module.exports = {
 			config.module.rule('sass').oneOf(match).use('sass-loader')
 			.tap(opt => Object.assign(opt, { data: `@import 'src/sass/main.scss'` }))
 		})
-		
+
 		config.optimization
 			.splitChunks(false)
 

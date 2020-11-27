@@ -151,7 +151,7 @@ export default{
 </script>
 
 
-<style lang="css">
+<style scoped lang="css">
     
     .cus-table{
          /* font-family: "Times New Roman", Times, serif !important; */

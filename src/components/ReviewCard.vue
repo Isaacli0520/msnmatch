@@ -4,7 +4,7 @@
         outlined
         :ripple="false"
         elevation="3"
-        :href="'/courses/' + review.course.pk + '/' + review.instructor.pk ">
+        :href="editable ? undefined : '/courses/' + review.course.pk + '/' + review.instructor.pk ">
         <v-card-title>
             <span class="review-headline-number">{{review.course.mnemonic}}{{review.course.number}}</span>
             <span class="review-headline-text">{{review.course.title}}</span></v-card-title>
@@ -21,7 +21,7 @@
             </v-chip>
             <v-chip
                 class="ma-1" style="padding: 0px 5px 0px 9px !important;" color="teal darken-2"
-                label outlined small text-color="teal darken-2">
+                label outlined small>
                 <span class="caption mr-1">Instructor:</span>
                 <v-rating
                     style="margin-bottom:2px !important;"
@@ -35,8 +35,8 @@
                 </v-rating>
             </v-chip>
             <v-chip
-                class="ma-1 mr-3" style="padding: 0px 5px 0px 9px !important;" color="teal darken-2"
-                label outlined small text-color="teal darken-2">
+                class="ma-1" style="padding: 0px 5px 0px 9px !important;" color="teal darken-2"
+                label outlined small>
                 <span class="caption mr-1">Course:</span>
                 <v-rating
                     style="margin-bottom:2px !important;"
@@ -48,6 +48,16 @@
                     small
                     half-increments>
                 </v-rating>
+            </v-chip>
+            <v-chip
+                v-if="editable"
+                class="ma-1"
+                outlined
+                color="red"
+                @click="editReview(review)"
+                label 
+                small>
+                Edit
             </v-chip>
         </v-card-actions>
     </v-card>
@@ -71,7 +81,7 @@ export default{
 </script>
 
 
-<style lang="css">
+<style scoped lang="css">
 
     .review-text{
         font-size: 16px;
@@ -90,7 +100,7 @@ export default{
 
     .review-headline-number{
         font-family: "Roboto", sans-serif;
-        font-size: 1.3em;
+        font-size: 1.1em;
         font-weight: 500;
         background-color: rgb(13, 124, 109);
         color:#fff;
@@ -102,7 +112,7 @@ export default{
 
     .review-headline-text{
         font-family: "Roboto", sans-serif;
-        font-size: 1.3em;
+        font-size: 1.1em;
         font-weight: 300;
         background-color: rgb(240, 240, 240);
         color:rgb(0, 0, 0);
@@ -116,15 +126,15 @@ export default{
 
     @media (min-width: 10px) and (max-width: 767px) {
         .review-headline-instructor{
-            font-size: 0.8em
+            font-size: 0.95em
         }
 
         .review-headline-text{
-            font-size: 0.8em
+            font-size: 0.95em
         }
 
         .review-headline-number{
-            font-size: 0.8em;
+            font-size: 0.95em;
         }
     }
 </style>

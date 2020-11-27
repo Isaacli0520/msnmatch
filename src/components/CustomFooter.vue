@@ -53,7 +53,7 @@
   }
 </script>
 
-<style>
+<style scoped lang="css">
     .custom-footer{
         /* padding:50px 0px 0px 0px !important; */
         background-color:#fff !important;

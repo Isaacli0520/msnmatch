@@ -200,7 +200,7 @@ export default{
 </script>
 
 
-<style lang="css">
+<style scoped lang="css">
     .title-div{
         display:block; 
         height:28px; 

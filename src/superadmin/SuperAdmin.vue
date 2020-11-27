@@ -1,11 +1,64 @@
 <template>
     <v-app>
-        <v-content>
+        <v-main>
             <v-container>
                 <div class="big-title text-center mt-3 mb-3">
                     <span>Super Cool Admin Page</span>
                 </div>
-                <v-expansion-panels multiple>
+                <v-row>
+                    <v-col cols="4">
+                        <v-card>
+                            <v-row justify="center">
+                                <v-date-picker
+                                    v-model="date"
+                                    class="ma-2"
+                                ></v-date-picker>
+                            </v-row>
+                        </v-card>
+                    </v-col>
+                    <v-col cols="4">
+                        <v-card>
+                            <v-card-title>
+                                <v-btn outlined color="teal darken-2" @click="getReviewUsers()">Get Users!</v-btn>
+                            </v-card-title>
+                            <v-card-text>
+                                <v-list two-line="">
+                                    <v-list-item :key="user.username" v-for="user in review_users">
+                                        <v-list-item-content>
+                                            <v-list-item-title v-text="user.name"></v-list-item-title>
+                                            <v-list-item-subtitle v-text="user.reviews"></v-list-item-subtitle>
+                                        </v-list-item-content>
+                                    </v-list-item>
+                                </v-list>
+                            </v-card-text>
+                        </v-card>
+                    </v-col>
+                    <v-col cols="4">
+                        <v-card>
+                            <v-card-title>
+                                <v-container>
+                                    <v-row>
+                                        <v-text-field v-model="tot_winners" label="Total Winners"></v-text-field>
+                                    </v-row>
+                                    <v-row>
+                                        <v-btn outlined color="teal darken-2" @click="getRollUsers()">Roll!</v-btn>
+                                    </v-row>
+                                </v-container>
+                            </v-card-title>
+                            <v-card-text>
+                                <v-list two-line="">
+                                    <v-list-item :key="user.username" v-for="user in roll_users">
+                                        <v-list-item-content>
+                                            <v-list-item-title v-text="user.name"></v-list-item-title>
+                                            <v-list-item-subtitle v-text="user.reviews"></v-list-item-subtitle>
+                                        </v-list-item-content>
+                                    </v-list-item>
+                                </v-list>
+                            </v-card-text>
+                        </v-card>
+                    </v-col>
+                </v-row>
+                <v-expansion-panels v-if="false" multiple>
                     <v-expansion-panel :key="user.pk" v-for="user in all_users_list">
                         <v-expansion-panel-header>
                             <div style="clear:both;display:block;">
@@ -62,7 +115,7 @@
                     </v-expansion-panel>
                 </v-expansion-panels>
             </v-container>
-        </v-content>
+        </v-main>
         <v-dialog v-model="match_dialog" scrollable min-width="200px" max-width="600px">
             <v-card>
                 <v-card-title>三思啊少女/少年</v-card-title>
@@ -110,6 +163,10 @@ export default {
     },
     data(){
         return {
+            date: '2020-11-26',
+            review_users:[],
+            roll_users:[],
+            tot_winners:1,
             matchBtnLoading:false,
             match_dialog:false,
             match_text:"",
@@ -121,7 +178,22 @@ export default {
             all_users_list:[],
         }
     },
+    watch:{
+        // date(value){
+        //     console.log("Date:", value);
+        // },
+    },
     methods:{
+        getReviewUsers(){
+            axios.get('/courses/api/get_top_review_users/',{params: {date:this.date}}).then(response => {
+                this.review_users = response.data.review_users;
+            });
+        },
+        getRollUsers(){
+            axios.get('/courses/api/get_roll_result/',{params: {date:this.date, tot_winners:this.tot_winners}}).then(response => {
+                this.roll_users = response.data.users;
+            });
+        },
         matchUser(user_1_pk, user_2_pk){
             this.match_text = "Do you really wanna match "
              + this.all_users[user_1_pk].first_name + this.all_users[user_1_pk].last_name

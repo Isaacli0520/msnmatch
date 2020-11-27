@@ -629,7 +629,7 @@ export default{
 </script>
 
 
-<style lang="css">
+<style scoped lang="css">
     .theme--light.v-app-bar.v-toolbar.v-sheet{
         background-color: white !important;
     }

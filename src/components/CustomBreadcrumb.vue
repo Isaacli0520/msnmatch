@@ -27,7 +27,7 @@
     }
 </script>
 
-<style>
+<style scoped lang="css">
     .v-breadcrumbs__item{
         padding-bottom: 10px;
     }
