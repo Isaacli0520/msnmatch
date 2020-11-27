@@ -2,31 +2,19 @@
     <v-app>
         <custom-header @submit-review="getReviews"></custom-header>
         <v-main>
-            <v-container fluid grid-list-lg>
+            <v-container fluid>
                 <v-row dense>
                     <v-col>
                         <custom-breadcrumb :items="navItems"></custom-breadcrumb>
                     </v-col>
                 </v-row>
-                <v-row dense>
+                <v-row>
                     <v-col>
                         <span class="cus-headline-text">My Reviews</span>
                     </v-col>
                 </v-row>
-                <v-row v-if="!reviews_load">
-                    <v-col>
-                        <div class="text-center">
-                            <v-progress-circular
-                            :size="60"
-                            :width="6"
-                            indeterminate
-                            color="teal lighten-1">
-                            </v-progress-circular>
-                        </div>
-                    </v-col>
-                </v-row>
-                <template v-else>
-                    <v-row v-if=" reviews_load && reviews.length > 0">
+                <template v-if="reviews_load">
+                    <v-row v-if="reviews.length > 0">
                         <v-col
                             cols=12 sm=12 md=6 lg=6 xl=4
                             :key="index_review + '-review' " 
@@ -40,6 +28,16 @@
                         </v-col>
                     </v-row>
                 </template>
+            </v-container>
+            <v-container v-if="!reviews_load" fill-height fluid>
+                <v-row justify="center">
+                    <v-progress-circular
+                        :size="60"
+                        :width="6"
+                        indeterminate
+                        color="teal lighten-1">
+                    </v-progress-circular>
+                </v-row>
             </v-container>
         </v-main>
         <v-dialog v-model="reviewDialog" persistent max-width="600px">

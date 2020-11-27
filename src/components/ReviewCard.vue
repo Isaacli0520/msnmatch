@@ -14,7 +14,7 @@
         </v-card-text>
         <v-divider></v-divider>
         <v-card-actions style="flex-flow:row wrap !important;">
-            <v-spacer v-if="$vuetify.breakpoint.smAndUp"></v-spacer>
+            <v-spacer v-if="$vuetify.breakpoint.lgAndUp"></v-spacer>
             <v-chip
                 class="ma-1" color="#336699" label outlined small text-color="#336699">
                 {{review.semester}}

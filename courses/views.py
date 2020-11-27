@@ -117,7 +117,7 @@ def get_roll_result(request):
 	dt = datetime.datetime.strptime(date, '%Y-%m-%d')
 	users = []
 	for user in User.objects.all():
-		user_review_num = user.courseuser_set.annotate(length=Length("text")).filter(length__gt=0, date__gt=dt).count()
+		user_review_num = user.courseuser_set.annotate(length=Length("text")).filter(length__gt=15, date__gt=dt).count()
 		if user_review_num > 0 and user.username != "admin":
 			users.append({
 				"pk":user.pk,
@@ -127,18 +127,15 @@ def get_roll_result(request):
 			})
 	random.shuffle(users)
 	total_num = sum([u["reviews"] for u in users])
-	print("DEBUG TOTAL:", total_num)
 	num_try, MAX_TRY = 0, 1000
 	result = []
 	while len(result) != tot_winners and num_try < MAX_TRY:
 		num_try += 1
 		result = []
 		lottery = sorted([random.randint(0, total_num - 1) for i in range(tot_winners)])
-		print("lotteryL",lottery)
 		pointer = 0
 		left, right = 0, users[0]["reviews"] - 1
 		for i, user in enumerate(users):
-			print(left, right, lottery[pointer])
 			if lottery[pointer] >= left and lottery[pointer] <= right:
 				result.append(user)
 				pointer += 1

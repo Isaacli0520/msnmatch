@@ -8,8 +8,6 @@ const vuetifyOptions = { }
 Vue.use(Vuetify);
 Vue.prototype.$message = Message;
 
-
-
 new Vue({
   render: h => h(MyCoursesPage),
   vuetify: new Vuetify(vuetifyOptions),

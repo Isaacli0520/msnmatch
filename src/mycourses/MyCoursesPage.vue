@@ -3,101 +3,93 @@
         <custom-header></custom-header>
         <v-main>
             <v-container fluid grid-list-lg>
-                <v-layout>
-                    <v-flex>
+                <v-row>
+                    <v-col>
                         <custom-breadcrumb :items="navItems"></custom-breadcrumb>
-                    </v-flex>
-                </v-layout>
-                <v-layout mb-3>
-                    <v-flex> 
-                        <div>
-                            <span class="cus-headline-text">My Courses</span>
-                        </div>
-                    </v-flex>
-                    <v-spacer></v-spacer>
-                </v-layout>
-                <v-layout wrap>
-                    <v-flex d-flex child-flex xs12 sm12 md12 lg12 xl12>
-                        <v-card>
+                    </v-col>
+                </v-row>
+                <v-row mb-3>
+                    <v-col> 
+                        <span class="cus-headline-text">My Courses</span>
+                    </v-col>
+                </v-row>
+                <v-row v-if="loaded">
+                    <v-col cols=12>
+                        <v-card elevation="3" color="#fcfcfc">
                             <v-card-title>Courses Planning</v-card-title>
                             <v-card-text>
-                                <v-layout row wrap v-if="taking_courses.length > 0">
-                                    <v-flex 
-                                        xs12 sm12 md6 lg6 xl6
+                                <v-row dense v-if="taking_courses.length > 0">
+                                    <v-col 
+                                        cols=12 sm=12 md=6 lg=6 xl=6
                                         :key="index_course + '-taking-course' " 
                                         v-for="(course, index_course) in taking_courses">
-                                        <v-list-item
-                                            :href="'/courses/'+ course.course_pk + '/' ">
-                                            <v-list-item-avatar
-                                                color="teal lighten-2">
-                                                <span style="color:#fff;">{{index_course + 1}}</span>
-                                            </v-list-item-avatar>
-                                            <v-list-item-content>
-                                                <v-list-item-title>{{course.mnemonic}}{{course.number}} {{course.title}}</v-list-item-title>
-                                            </v-list-item-content>
-                                        </v-list-item>
-                                    </v-flex>
-                                </v-layout>
+                                        <v-card hover :href="'/courses/'+ course.course_pk + '/' ">
+                                            <v-card-title>
+                                                <span class="course-number">{{course.mnemonic}}{{course.number}}</span>
+                                                <span class="course-title">{{course.title}}</span>
+                                            </v-card-title>
+                                        </v-card>
+                                    </v-col>
+                                </v-row>
                                 <span v-else>You can search courses in the search bar and add them as taking/taken.</span>
                             </v-card-text>
                         </v-card>
-                    </v-flex>
-                    <v-flex d-flex child-flex xs12 sm12 md6 lg6 xl6
+                    </v-col>
+                    <v-col cols=12 sm=12 md=6 lg=6 xl=6
                         :key="index_semester + '-semester-course' "
                         v-for="(courses, index_semester) in taken_courses_semester">
-                        <v-card>
+                        <v-card elevation="3" color="#fcfcfc">
                             <v-card-title>{{courses.semester}}</v-card-title>
                             <v-card-text>
-                                    <v-list
-                                        style="width:100%;"
+                                <v-row dense>
+                                    <v-col
+                                        cols=12
                                         :key="index_course + '-taken-course' " 
                                         v-for="(course, index_course) in courses.courses">
-                                        <v-list-item
-                                            :href="'/courses/'+ course.course_pk + '/' ">
-                                            <v-list-item-avatar
-                                                color="teal lighten-2">
-                                                <span style="color:#fff;">{{index_course + 1}}</span>
-                                            </v-list-item-avatar>
-                                            <v-list-item-content>
-                                                <v-list-item-title>{{course.mnemonic}}{{course.number}} {{course.title}}</v-list-item-title>
-                                            </v-list-item-content>
-                                        </v-list-item>
-                                    </v-list>
+                                        <v-card hover :href="'/courses/'+ course.course_pk + '/' ">
+                                            <v-card-title>
+                                                <span class="course-number">{{course.mnemonic}}{{course.number}}</span>
+                                                <span class="course-title">{{course.title}}</span>
+                                            </v-card-title>
+                                        </v-card>
+                                    </v-col>
+                                </v-row>
                             </v-card-text>
                         </v-card>
-                    </v-flex>
-                </v-layout>
+                    </v-col>
+                </v-row>
+            </v-container>
+            <v-container fill-height fluid v-if="!loaded" >
+                <v-row justify="center">
+                    <v-progress-circular
+                        :size="60"
+                        :width="6"
+                        indeterminate
+                        color="teal lighten-1">
+                    </v-progress-circular>
+                </v-row>
             </v-container>
         </v-main>
-        <!-- <custom-footer></custom-footer> -->
     </v-app>
 </template>
 
 <script>
 import axios from 'axios'
-import CustomHeader from '../components/CustomHeader'
-import CustomFooter from '../components/CustomFooter'
-import CustomBreadcrumb from '../components/CustomBreadcrumb'
+import { CustomHeader, CustomBreadcrumb } from "../components"
 
-  export default {
-	data() {
-	    return {
+export default {
+    data() {
+        return {
             taking_courses:[],
             taken_courses:[],
             taken_courses_semester:[],
             navItems:[],
-	    }
+            loaded:false,
+        }
 	},
 	components:{
         CustomHeader,
-        CustomFooter,
         CustomBreadcrumb,
-	},
-	watch: {
-
-	},
-	computed:{
-	  
 	},
 	methods: {
         sortBySemester(a, b){
@@ -127,6 +119,7 @@ import CustomBreadcrumb from '../components/CustomBreadcrumb'
                 this.taking_courses = response.data.taking_courses;
                 this.taken_courses = response.data.taken_courses;
                 this.taken_courses_semester = this.seperateSemesters(this.taken_courses);
+                this.loaded = true;
             });
         },
         seperateSemesters(courses){
@@ -163,10 +156,27 @@ import CustomBreadcrumb from '../components/CustomBreadcrumb'
         ];
         this.getMyCourses();
 	},
-  };
+};
 </script>
 
 <style>
+
+    .course-number{
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color:#ffffff;
+        padding: 3px 5px;
+        margin-right: 5px;
+        border-radius: 4px;
+        line-height: 1.3;
+        font-size: 18px;
+        background-color: #00796b;
+    }
+
+    .course-title{
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.3;
+        font-size: 18px;
+    }
 
     .v-breadcrumbs li{
         font-size:20px !important;
@@ -210,12 +220,12 @@ import CustomBreadcrumb from '../components/CustomBreadcrumb'
             
         }
 
-        .instructor-name{
-            font-size:1.7em;
+        .course-number{
+            font-size: 16px;
         }
 
-        .instructor-topic{
-            font-size:1.4em;
+        .course-title{
+            font-size: 16px;
         }
 
         .v-breadcrumbs li{
