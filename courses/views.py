@@ -4,6 +4,7 @@ import json
 import random
 import numpy as np
 import datetime
+from collections import Counter
 
 from django.shortcuts import render
 from django.urls import reverse_lazy, reverse
@@ -98,13 +99,11 @@ def get_current_semester(request):
 
 # @login_required
 def get_basic_info(request):
+	info = {}
 	if request.user.is_authenticated:
 		info = {
 			"profile": reverse('profile', args=[request.user.username]),
 			"update_profile":reverse('update_profile', args=[request.user.username]),
-		}
-	else:
-		info = {
 		}
 	return JsonResponse({
 		"all_info":info,
@@ -186,7 +185,6 @@ def get_top_reviews(request):
 def get_top_review_users(request):
 	date = request.GET.get("date")
 	dt = datetime.datetime.strptime(date, '%Y-%m-%d')
-	print("DEBUG:", dt)
 	users = []
 	for user in User.objects.all():
 		user_review_num = user.courseuser_set.annotate(length=Length("text")).filter(length__gt=15, date__gt=dt).count()
@@ -804,14 +802,13 @@ def get_instructors_of_course(course):
 		instructors = {}
 		for cs_instructor in courseInstructor_query:
 			tmp_name = cs_instructor.instructor.__str__()
-			rating_instructor, rating_instructor_counter = get_rating_of_instructor_with_course(cs_instructor.instructor, course)
+			rating_instructor, _ = get_rating_of_instructor_with_course(cs_instructor.instructor, course)
 			if tmp_name not in instructors:
 				tmp_cs_user_query = CourseUser.objects.filter(course=course, instructor=cs_instructor.instructor)
 				instructors[tmp_name] = {
 					"semesters":[],
 					"pk":cs_instructor.instructor.pk,
 					"rating_instructor":rating_instructor,
-					# "rating_instructor_counter":rating_instructor_counter,
 					"taking":tmp_cs_user_query.filter(take="taking").count(),
 					"taken":tmp_cs_user_query.filter(take="taken").count(),
 				}
@@ -832,7 +829,6 @@ def get_instructors_of_course(course):
 				"topic":topic,
 				"pk":v["pk"],
 				"rating_instructor":v["rating_instructor"],
-				# "rating_instructor_counter":v["rating_instructor_counter"],
 				"taking":v["taking"],
 				"taken":v["taken"],
 			})
@@ -849,14 +845,14 @@ def get_rating_of_instructor(instructor):
 
 def get_rating(course_user_queryset, attr_name):
 	rating_arr = []
-	counter = [0,0,0,0,0,0]
+	rating_instructor = 0
+	counter = [0] * 6
 	for cs_user in course_user_queryset:
 		tmp_user_rating = getattr(cs_user, attr_name)
 		if tmp_user_rating != None and tmp_user_rating > 0 and tmp_user_rating <= 5:
-			rating_arr.append(tmp_user_rating)
-			counter[int(tmp_user_rating)] += 1
+			rating_arr.append(int(tmp_user_rating))
 	if len(rating_arr) > 0:
 		rating_instructor = sum(rating_arr)/len(rating_arr)
-	else:
-		rating_instructor = 0
+	for k, v in Counter(rating_arr).items():
+		counter[k] = v
 	return round(rating_instructor,2), counter

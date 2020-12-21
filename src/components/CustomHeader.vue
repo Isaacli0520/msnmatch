@@ -43,9 +43,10 @@
             light
             elevation="1">
             <v-app-bar-nav-icon  @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
-            <v-img max-height="38" max-width="38" :src="brand_pic" alt=""></v-img>
+            <img style="padding-left:2px;" :src="brand_pic" width="40" height="38" alt="">
             <template v-if="$vuetify.breakpoint.mdAndUp">
-                <v-btn 
+                <v-btn
+                    style="padding-left:10px;" 
                     :href="general_urls.courses_url"
                     text>HoosMyProfessor</v-btn>
                 <v-divider inset vertical></v-divider>
