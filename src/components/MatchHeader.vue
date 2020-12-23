@@ -6,7 +6,6 @@
             temporary
             app
             v-model="drawer">
-
             <!-- :clipped="$vuetify.breakpoint.mdAndUp" -->
             <v-container v-if="!loaded || user == null || follow_users == null" fluid fill-height>
                 <v-layout 
@@ -52,7 +51,7 @@
                             </v-list-item-content>
                             <v-list-item-action>
                                 <v-btn icon small>
-                                    <v-icon small color="black lighten-1" @click="delFav(follow_user)">fas fa-trash-alt</v-icon>
+                                    <v-icon small color="black lighten-1" @click="delFav(follow_user)">mdi-delete-outline</v-icon>
                                 </v-btn>
                             </v-list-item-action>
                         </v-list-item>
@@ -83,10 +82,10 @@
         </v-navigation-drawer>
         <v-app-bar
             :clipped-left="$vuetify.breakpoint.mdAndUp"
-            flat
             app
-            absolute
-            color="transparent"
+            dense
+            light
+            elevation="1"
             >
             <v-app-bar-nav-icon  @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
             <!-- <v-btn
@@ -97,19 +96,20 @@
                     fas fa-bars
                 </v-icon>
             </v-btn> -->
-            <v-img class="ml-2" max-height="38" max-width="38" :src="urls.brand_pic" alt=""></v-img>
-            <v-toolbar-items v-if="$vuetify.breakpoint.mdAndUp">
+            <img style="margin-left:6px;" :src="brand_pic" width="40" height="38" alt="">
+            <template v-if="$vuetify.breakpoint.mdAndUp">
                 <v-btn 
                     :href="general_urls.match_url"
                     text>Match</v-btn>
-                <!-- <v-divider inset vertical></v-divider> -->
+                <v-divider inset vertical></v-divider>
                 <v-btn 
                     :href="general_urls.skills_url"
                     text>Tags</v-btn>
+                <v-divider inset vertical></v-divider>
                 <v-btn 
                     :href="general_urls.roommate_url"
                     text>Roommate</v-btn>
-                <!-- <v-divider inset vertical></v-divider> -->
+                <v-divider inset vertical></v-divider>
                 <v-btn 
                     :href="general_urls.courses_url"
                     text>HoosMyProfessor</v-btn>
@@ -117,14 +117,13 @@
                 <!-- <v-btn 
                     :href="general_urls.market_url"
                     text>Market</v-btn> -->
-                
-            </v-toolbar-items>
+            </template>
             <v-spacer></v-spacer>
             <v-btn
                 icon
                 color="black"
                 @click="reportBugDialog=true">
-                <v-icon>far fa-question-circle</v-icon>
+                <v-icon>mdi-help-circle-outline</v-icon>
             </v-btn>
             <v-menu offset-y
                 class="mx-auto"
@@ -178,22 +177,6 @@
                 </v-list>
             </v-menu>
         </v-app-bar>
-        <v-snackbar
-            top
-            v-model="success_snack"
-            color="teal darken-1"
-            :timeout="1800">
-            {{success_text}}
-            <v-btn color="cyan accent-1" text @click="success_snack = false"> Close </v-btn>
-        </v-snackbar>
-        <v-snackbar
-            top
-            v-model="failure_snack"
-            color="red lighten-1"
-            :timeout="2700">
-            {{failure_text}}
-            <v-btn color="white" text @click="failure_snack = false"> Close </v-btn>
-        </v-snackbar>
         <v-dialog v-model="reportBugDialog" max-width="600px">
             <v-card>
                 <v-card-title>
@@ -230,6 +213,26 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
+        <v-snackbar
+            top
+            v-model="success_snack"
+            color="teal darken-1"
+            :timeout="1800">
+            {{success_text}}
+            <template v-slot:action="{ attrs }">
+            <v-btn color="cyan accent-1" v-bind="attrs" text @click="success_snack = false"> Close </v-btn>
+            </template>
+        </v-snackbar>
+        <v-snackbar
+            top
+            v-model="failure_snack"
+            color="red lighten-1"
+            :timeout="2700">
+            {{failure_text}}
+            <template v-slot:action="{ attrs }">
+            <v-btn color="white" v-bind="attrs" text @click="failure_snack = false"> Close </v-btn>
+            </template>
+        </v-snackbar>
     </div>
 </template>
 
@@ -302,35 +305,24 @@ export default{
                 [{
                     "title":"Add Tags",
                     "icon":general_icons.add_tags,
-                    "href":"/skills/",
-                    "target":"",
                 },
                 {
                     "title":"Edit Profile",
                     "icon":general_icons.edit_profile,
-                    "href":"/skills/",
-                    "target":"",
                 }],
                 [{
                     "title":"Match",
                     "icon":general_icons.match,
-                    "href":"/match/",
-                    "target":"",
                 },
                 {
                     "title":"Market",
                     "icon":general_icons.market,
-                    "href":"/market/",
-                    "target":"",
                 },
                 {
                     "title":"HoosMyProfessor",
                     "icon":general_icons.courses,
-                    "href":"/courses/",
-                    "target":"",
                 }]
-                ],
-            
+            ],
             old_items: [
                 { icon: 'fas fa-book', text: 'HoosMyProfessor' },
                 { icon: 'fas fa-user', text: 'Match' },
@@ -389,12 +381,12 @@ export default{
             });
         },
         get_follow_users(){
-            axios.get('/skills/api/get_follow_list/',{params: {}}).then(response => {
+            axios.get('/users/api/get_follow_list/',{params: {}}).then(response => {
                 this.follow_users = response.data.following;
             });
         },
         get_match_header(){
-            axios.get('/skills/api/get_user_match_header/',{params: {}}).then(response => {
+            axios.get('/users/api/get_user_match_header/',{params: {}}).then(response => {
                 this.user = response.data.user;
             });
         },
@@ -402,7 +394,7 @@ export default{
             window.location.href = text;
         },
         delFav(user){
-            axios.post('/skills/api/del_fav/',{"user_pk":user.pk}).then(response => {
+            axios.post('/users/api/del_fav/',{"user_pk":user.pk}).then(response => {
                 if(response.data.success){
                     this.$emit('del-from-fav', user);
                     this.get_follow_users();
@@ -448,9 +440,10 @@ export default{
 
 
 <style scoped lang="css">
-    /* .theme--light.v-app-bar.v-toolbar.v-sheet{
+    .theme--light.v-app-bar.v-toolbar.v-sheet{
         background-color: white !important;
-    } */
+    }
+
     .theme--light.v-text-field--solo-inverted.v-text-field--solo.v-input--is-focused > .v-input__control > .v-input__slot .v-label, .theme--light.v-text-field--solo-inverted.v-text-field--solo.v-input--is-focused > .v-input__control > .v-input__slot input {
         color: #000000 !important;
     }

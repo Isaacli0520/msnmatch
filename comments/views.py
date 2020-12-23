@@ -1,12 +1,12 @@
 from django.shortcuts import render
 from django.utils.safestring import mark_safe
-import json
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from .models import Slide
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
-# from django.db.models import Q
+
+import json
+from .models import Slide
 
 @login_required
 def test(request):

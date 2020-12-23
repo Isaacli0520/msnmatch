@@ -1,6 +1,5 @@
 <template>
     <v-app>
-
         <match-header
             @del-from-fav="deleteFromFav"
             :headerUpdate="headerUpdate"></match-header>
@@ -34,13 +33,14 @@
                             <span :key="index" v-for="(tag,index) in tags"
                                 class="search-tag">
                                 <span>{{tag}}</span>
-                                <span class="search-tag-remove"><i v-on:click="del_tag(tag)" class="fas fa-times"></i></span>
+                                <span class="search-tag-remove">
+                                    <v-icon color="teal lighten-2" style="margin-bottom:2px;" small @click="del_tag(tag)">mdi-close-thick</v-icon>
+                                </span>
                             </span>
                         </div>
                     </v-row>
                     <v-row justify="center">
-                        <div class="search-form mt-1">
-                            
+                        <div class="search-form mt-1">          
                             <input 
                                 @keydown="onKeydown" 
                                 v-model="query" 
@@ -49,7 +49,7 @@
                                 type="text" 
                                 name="class" 
                                 placeholder=" &quot;Marvel&quot;, &quot;major:Math&quot;, &quot;loc:Beijing&quot; " 
-                                class=" search-input" 
+                                class="search-input" 
                                 aria-label="Search">
                         </div>
                     </v-row>
@@ -148,14 +148,20 @@
             color="teal darken-1"
             :timeout="1800">
             {{success_text}}
-        <v-btn color="cyan accent-1" text @click="success_snack = false"> Close </v-btn></v-snackbar>
+            <template v-slot:action="{ attrs }">
+            <v-btn color="cyan accent-1" v-bind="attrs" text @click="success_snack = false"> Close </v-btn>
+            </template>
+        </v-snackbar>
         <v-snackbar
             top
             v-model="failure_snack"
             color="red lighten-1"
             :timeout="2700">
             {{failure_text}}
-        <v-btn color="white" text @click="failure_snack = false"> Close </v-btn></v-snackbar>
+            <template v-slot:action="{ attrs }">
+            <v-btn color="white" v-bind="attrs" text @click="failure_snack = false"> Close </v-btn>
+            </template>
+            </v-snackbar>
     </v-app>
 </template>
 
@@ -238,7 +244,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
         },
         setRole(role){
             this.roleBtnLoading = true;
-            axios.post('/skills/api/choose_role/',{"role":role}).then(response => {
+            axios.post('/users/api/choose_role/',{"role":role}).then(response => {
                 this.roleDialog = false;
                 this.roleBtnLoading = false;
                 if(response.data.success){
@@ -288,7 +294,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
             this.userDialog = false;
         },
         getAllUsers(){
-            axios.get('/skills/api/get_all_users/',{params: {}}).then(response => {
+            axios.get('/users/api/get_all_users/',{params: {}}).then(response => {
                 this.backup_all_users = response.data.users;
                 this.users = response.data.users;
                 this.request_user = response.data.request_user;
@@ -550,7 +556,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
     }
 
     .search-tag-remove{
-        margin:2px 3px 1px 5px;
+        margin:0px 1px 0px 4px;
     }
 
     span.search-tag-remove:hover{

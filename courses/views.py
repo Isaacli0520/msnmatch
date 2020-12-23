@@ -149,7 +149,7 @@ def get_roll_result(request):
 @login_required
 def report_bug(request):
 	if request.method == "POST":
-		post = json.loads(request.body.decode('utf-8'))
+		post = json.loads(request.body)
 		title, text = post.get("title"), post.get("text")
 		if len(title) > 0 and len(text) > 0:
 			Bug.objects.create(user=request.user, title=title, text=text)

@@ -1,42 +1,20 @@
-from django.shortcuts import render
-from django.urls import reverse_lazy, reverse
-from django.views import generic
 from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from django.shortcuts import redirect, get_object_or_404
-from users.models import Profile
-from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector, TrigramSimilarity
+from django.contrib.postgres.search import TrigramSimilarity
+from django.shortcuts import render
 from django.db.models import Q, F, Count
-from django.db.models.functions import Lower, Substr, Length
-from django.http import JsonResponse
-from django.core import serializers
-from django.core.serializers.json import DjangoJSONEncoder
 
-from courses.models import CourseUser
-from django.contrib.auth.models import User
 from .models import Skill, SkillRelation
-from friendship.models import Follow
+from msnmatch.utils import _get_not_allowed, _post_not_allowed, _success_response, _error_response
 
 import collections
-import re
 import json
-import random
 import time
-import operator
-from fuzzywuzzy import fuzz, process
-from msnmatch import settings
 
 MAXIMUM_SKILLS = 4
 SKILL_TYPES = [
-	"Academic",
-	"Books",
-	"Custom",
-	"Film and TV",
-	"Game",
-	"General",
-	"Language",
-	"Music",
-	"Sport"
+	"Academic", "Books", "Custom",
+	"Film and TV", "Game", "General",
+	"Language", "Music", "Sport"
 ]
 
 @login_required
@@ -63,49 +41,12 @@ def get_skill(request):
 	try:
 		skill = Skill.objects.get(pk = skill_id)
 		users = skill.users.all()
-		return JsonResponse({
-			"success":True,
+		return _success_response({
 			"skill":skill_json(skill),
 			"users":[user_json(user, request) for user in users]
 		})
 	except:
-		return JsonResponse({
-			"success":False,
-			"message":"Skill doesn't exist."
-		})
-
-@login_required
-def get_all_and_user_skills(request):
-	return JsonResponse({
-		"all_skills":skills_as_dict(Skill.objects.all().exclude(type="Custom").exclude(users=request.user), empty_list = True),
-		"user_skills":skills_as_dict(request.user.skill_set.all(), empty_list = True),
-		})
-
-@login_required
-def get_all_users(request):
-	users = sorted(User.objects.all().exclude(username="admin").exclude(profile__role=""), key=lambda x: random.random())
-	return JsonResponse({
-		"users":[user_json(user, request) for user in users],
-		"request_user":user_json(request.user, request),
-	})
-
-@login_required
-def get_all_users_roommate(request):
-	users = sorted(User.objects.filter(profile__rm=True).exclude(username="admin").exclude(profile__role=""), key=lambda x: random.random())
-	return JsonResponse({
-		"users":[user_json(user, request) for user in users],
-		"request_user":user_json(request.user, request),
-	})
-
-@login_required
-def get_user_match_header(request):
-	return JsonResponse({
-		"user":{
-			"first_name":request.user.first_name,
-			"last_name":request.user.last_name,
-			"role":request.user.profile.role,
-		}
-	})
+		return _error_response("Skill doesn't exist.")
 
 @login_required
 def get_search_result(request):
@@ -122,7 +63,7 @@ def get_search_result(request):
 			sorted_skills = sorted_skills[:MAXIMUM_SKILLS]
 		for skill in sorted_skills:
 			skills.append(skill_json(skill))
-	return JsonResponse({
+	return _success_response({
 		"skills":skills,
 		"time":query_time
 	})
@@ -130,226 +71,45 @@ def get_search_result(request):
 @login_required
 def user_add_skill(request):
 	if request.method == "POST":
-		post = json.loads(request.body.decode('utf-8'))
-		skill_id = post.get("id")
-		skill_name = post.get("name")
-		skill = Skill.objects.filter(pk = skill_id).first()
-		if not skill:
-			skill = Skill.objects.filter(name = skill_name).first()
-			if not skill:
-				skill = Skill.objects.create(name=skill_name, intro="", type="Custom")
+		post = json.loads(request.body)
+		skill_id, skill_name = post.get("id"), post.get("name")
+		if not Skill.objects.filter(Q(pk=skill_id) | Q(name=skill_name)).first():
+			skill = Skill.objects.create(name=skill_name, intro="", type="Custom")
+		# skill = Skill.objects.filter(pk = skill_id).first()
+		# if not skill:
+		# 	skill = Skill.objects.filter(name = skill_name).first()
+		# 	if not skill:
+		# 		skill = Skill.objects.create(name=skill_name, intro="", type="Custom")
 		if SkillRelation.objects.filter(user=request.user, skill=skill).first():
-			return JsonResponse({
-				"success":False,
-				"message":"Tag already added"
-			})
+			return _error_response("User-skill relation exists")
 		SkillRelation.objects.create(user=request.user, skill=skill)
-		return JsonResponse({
-			"success":True,
+		return _success_response({
 			"id":skill.id,
 		})
-	return _get_not_allowed()
+	if request.method == "GET":
+		return _get_not_allowed()
 
 @login_required
 def user_del_skill(request):
 	if request.method == "POST":
-		post = json.loads(request.body.decode('utf-8'))
+		post = json.loads(request.body)
 		skill_id = post.get("id")
 		skill = Skill.objects.filter(pk = skill_id).first()
 		if not skill:
-			return JsonResponse({
-				"success":False,
-				"message":"Skill doesn't exist"
-			})
+			return _error_response("Skill doesn't exist")
 		skill_relation = SkillRelation.objects.filter(user=request.user, skill=skill).first()
 		if skill_relation:
 			skill_relation.delete()
 			if skill.users.count() == 0 and skill.type == "Custom":
 				skill.delete()
-			return JsonResponse({
-				"success":True
-			})
+			return _success_response()
 		else:
-			return JsonResponse({
-				"success":False,
-				"message":"You don't have this skill"
-			})
-	return _get_not_allowed()
-
-@login_required
-def choose_roommate_role(request):
-	if request.method == "POST":
-		post = json.loads(request.body.decode('utf-8'))
-		rm = post.get("rm")
-		if rm != True and rm != False:
-			return JsonResponse({
-				"success":False,
-				"message":"Unknown Rm"
-			})
-		request.user.profile.rm = rm
-		request.user.save()
-		return JsonResponse({
-			"success":True,
-			"rm":request.user.profile.rm,
-		})
-	return _get_not_allowed()
-
-
-@login_required
-def choose_role(request):
-	if request.method == "POST":
-		post = json.loads(request.body.decode('utf-8'))
-		tmp_role = post.get("role")
-		if tmp_role == "Mentor" and request.user.profile.role == "":
-			user_review_num = request.user.courseuser_set.annotate(length=Length("text")).filter(length__gt=15).count()
-			if user_review_num < 3:
-				return JsonResponse({
-					"success":False,
-					"message":"You don't have enough course comments."
-				})
-			request.user.profile.role = "Mentor"
-			request.user.save()
-		elif tmp_role == "Mentee" and request.user.profile.role == "":
-			# return JsonResponse({
-			# 	"success":False,
-			# 	"message":"Mentee registration not yet started."
-			# })
-			request.user.profile.role = "Mentee"
-			request.user.save()
-		else:
-			return JsonResponse({
-				"success":False,
-				"message":"Unknown Reason"
-			})
-		return JsonResponse({
-			"success":True,
-			"role":request.user.profile.role,
-		})
-	return _get_not_allowed()
-
-def add_fav(request):
-	if request.method != "POST":
+			return _error_response("You don't have this skill")
+	if request.method == "GET":
 		return _get_not_allowed()
-	post = json.loads(request.body.decode('utf-8'))
-	user_pk = post.get("user_pk")
-	try:
-		to_user = User.objects.get(pk=user_pk)
-	except:
-		return JsonResponse({
-			"success":False,
-			"message":"User does not exist",
-		})
-	if request.user.profile.role == '' or request.user.profile.role == to_user.profile.role:
-		return JsonResponse({
-			"success":False,
-			"message":"Role False",
-		})
-	if not Follow.objects.filter(follower=request.user, followee=to_user).exists() and Follow.objects.filter(follower=request.user).count() < 3:
-		Follow.objects.add_follower(request.user, to_user)
-		return JsonResponse({
-			"success": True,
-		})
-	return JsonResponse({
-		"success": False,
-		"message": "You either have already followed this person or you have already followed three users"
-	})
-
-	
-
-def get_follow_list(request):
-	following = Follow.objects.following(request.user)
-	# print("following", following)
-	flw_ret = []
-	for flw in following:
-		if flw.profile.picture:
-			picture_url = flw.profile.picture.url
-		else:
-			picture_url = settings.STATIC_URL + "css/images/brand.jpg"
-		new_flw = {
-			"pk": flw.pk,
-			"picture": picture_url,
-			"user_url": "/users/"+flw.username+"/",
-			"first_name": flw.first_name,
-			"last_name": flw.last_name,
-			
-		}
-		flw_ret.append(new_flw)
-	return JsonResponse({
-		"following":flw_ret,
-	})
-
-def del_fav(request):
-	if request.method != "POST":
-		return _get_not_allowed()
-	post = json.loads(request.body.decode('utf-8'))
-	user_pk = post.get("user_pk")
-	try:
-		to_user = User.objects.get(pk=user_pk)
-	except:
-		return JsonResponse({
-			"success":False,
-			"message":"User does not exist",
-		})
-	if Follow.objects.filter(follower=request.user, followee=to_user).exists():
-		Follow.objects.remove_follower(follower=request.user, followee=to_user)
-		return JsonResponse({
-			"success":True,
-		})
-	return JsonResponse({
-		"success":False,
-		"message":"Following relationship does not exist",
-	})
-
-def user_json(user, request):
-	if user.profile.picture:
-		picture_url = user.profile.picture.url
-	else:
-		picture_url = settings.STATIC_URL + "css/images/brand.jpg"
-
-	if user.profile.avatar:
-		avatar_url = user.profile.avatar.url
-	else:
-		avatar_url = settings.STATIC_URL + "css/images/brand_blur.jpg"
-
-	if user.profile.video:
-		video_url = user.profile.video.url
-	else:
-		video_url = ""
-	if user.profile.graduate_year:
-		tmp_year = 4 + settings.CURRENT_YEAR - int(user.profile.graduate_year)
-	else:
-		tmp_year = ""
-	return {
-		"pk": user.pk,
-		"username":user.username,
-		"first_name": user.first_name,
-		"last_name": user.last_name,
-		"email": user.email,
-		"bio": user.profile.bio,
-		# "birth_date": user.profile.birth_date,
-		"location": user.profile.location,
-		"year": tmp_year,
-		"sex":user.profile.sex,
-		"skills": skills_as_dict(user.skill_set.all()),
-		"role":user.profile.role,
-		"major": user.profile.major,
-		"major_two":user.profile.major_two,
-		"minor":user.profile.minor,
-		"wechat":user.profile.wechat,
-		"follow": Follow.objects.filter(follower=request.user, followee=user).exists(),
-		"video": video_url,
-		"picture": picture_url,
-		"avatar":avatar_url,
-		"rm_bio":user.profile.rm_bio,
-		"rm_schedule":user.profile.rm_schedule,
-		"rm":user.profile.rm,
-	}
 		
 def skills_as_dict(queryset, empty_list = False):
 	skills = collections.defaultdict(list)
-	# for skill in Skill.objects.all():
-	# 	if skill.type not in skills:
-	# 		skills[skill.type] = []
 	if empty_list:
 		for s_type in SKILL_TYPES:
 			skills[s_type] = []
@@ -361,13 +121,5 @@ def skill_json(skill):
 	return {
 		"id":skill.pk,
 		"name":skill.name,
-		"intro":skill.intro,
 		"type":skill.type,
-		"name":skill.name,
 	}
-
-def _get_not_allowed():
-	return JsonResponse({
-		"success":False,
-		"message":"Get request not allowed"
-	})

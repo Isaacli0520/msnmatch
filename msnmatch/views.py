@@ -6,7 +6,6 @@ from courses.models import CourseUser, Course
 from friendship.exceptions import AlreadyExistsError
 from django.contrib import messages
 from friendship.models import Friend, Follow, FriendshipRequest, Block
-from users.models import MatchingHistory
 from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector, TrigramSimilarity
 from django.db.models import Q, F, Count
 from users.models import ROLE_CHOICES
