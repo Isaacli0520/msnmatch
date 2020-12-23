@@ -30,7 +30,7 @@
                                 <tag-span v-for="skill in skills_of_type"
                                     :key="skill.id"
                                     :skill="skill"
-                                    :clickable="'delete'"
+                                    clickable="delete"
                                     @add-skill="addSkill"
                                     @del-skill="deleteSkill"
                                 />
@@ -45,10 +45,8 @@
                         :items="search_result_items"
                         :loading="isLoading"
                         :search-input.sync="search"
-                        color="black"
-                        background-color="white"
                         clearable
-                        solo-inverted
+                        solo
                         no-filter
                         hide-no-data
                         hide-selected
@@ -88,7 +86,9 @@
             color="teal darken-1"
             :timeout="800">
             {{success_message}}
-        <v-btn color="cyan accent-1" text @click="success_snack = false"> Close </v-btn>
+            <template v-slot:action="{ attrs }">
+                <v-btn color="cyan accent-1" v-bind="attrs" text @click="success_snack = false"> Close </v-btn>
+            </template>
         </v-snackbar>
         <v-snackbar
             top
@@ -96,7 +96,9 @@
             color="red darken-1"
             :timeout="1200">
             Sth is wrong
-            <v-btn color="white" text @click="failure_snack = false"> Close </v-btn>
+            <template v-slot:action="{ attrs }">
+                <v-btn color="white" v-bind="attrs" text @click="failure_snack = false"> Close </v-btn>
+            </template>
         </v-snackbar>
     </v-app>
 </template>
@@ -190,7 +192,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
 	},
 	methods: {
         getSkills(){
-            axios.get('/skills/api/get_all_and_user_skills/').then(response => {
+            axios.get('/users/api/get_all_and_user_skills/').then(response => {
                 this.all_skills = response.data.all_skills;
                 this.user_skills = response.data.user_skills;
                 this.loaded = true;

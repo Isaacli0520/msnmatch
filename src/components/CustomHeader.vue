@@ -132,7 +132,7 @@
             :timeout="2700">
             Sth is wrong
             <template v-slot:action="{ attrs }">
-            <v-btn color="white" v-bind="attrs" text @click="failure_snack = false"> Close </v-btn>
+                <v-btn color="white" v-bind="attrs" text @click="failure_snack = false"> Close </v-btn>
             </template>
         </v-snackbar>
         <v-snackbar
@@ -142,7 +142,7 @@
             :timeout="2700">
             Review Submitted
             <template v-slot:action="{ attrs }">
-            <v-btn color="cyan accent-1" v-bind="attrs" text @click="success_snack = false"> Close </v-btn>
+                <v-btn color="cyan accent-1" v-bind="attrs" text @click="success_snack = false"> Close </v-btn>
             </template>
         </v-snackbar>
         <v-dialog v-model="submitReviewDialog" scrollable min-width="350px" max-width="600px">

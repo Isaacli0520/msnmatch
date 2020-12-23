@@ -3,8 +3,7 @@
         <match-header
             @del-from-fav="deleteFromFav"
             :headerUpdate="headerUpdate"></match-header>
-        <v-content class="content-div">
-
+        <v-main class="content-div">
             <v-container 
                 class="fill-height"
                 v-if="!loaded">
@@ -103,7 +102,7 @@
                     </v-col>
                 </v-row>
             </v-container>
-        </v-content>
+        </v-main>
         <user-dialog
             v-if="d_user"
             :add_to_fav="request_user.role!='' && request_user.role != d_user.role"

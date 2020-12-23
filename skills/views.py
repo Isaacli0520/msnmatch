@@ -73,7 +73,8 @@ def user_add_skill(request):
 	if request.method == "POST":
 		post = json.loads(request.body)
 		skill_id, skill_name = post.get("id"), post.get("name")
-		if not Skill.objects.filter(Q(pk=skill_id) | Q(name=skill_name)).first():
+		skill = Skill.objects.filter(Q(pk=skill_id) | Q(name=skill_name)).first()
+		if not skill:
 			skill = Skill.objects.create(name=skill_name, intro="", type="Custom")
 		# skill = Skill.objects.filter(pk = skill_id).first()
 		# if not skill:

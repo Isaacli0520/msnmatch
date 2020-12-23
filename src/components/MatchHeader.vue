@@ -82,6 +82,7 @@
         </v-navigation-drawer>
         <v-app-bar
             :clipped-left="$vuetify.breakpoint.mdAndUp"
+            style="background-color:white;"
             app
             dense
             light
@@ -220,7 +221,7 @@
             :timeout="1800">
             {{success_text}}
             <template v-slot:action="{ attrs }">
-            <v-btn color="cyan accent-1" v-bind="attrs" text @click="success_snack = false"> Close </v-btn>
+                <v-btn color="cyan accent-1" v-bind="attrs" text @click="success_snack = false"> Close </v-btn>
             </template>
         </v-snackbar>
         <v-snackbar
@@ -230,7 +231,7 @@
             :timeout="2700">
             {{failure_text}}
             <template v-slot:action="{ attrs }">
-            <v-btn color="white" v-bind="attrs" text @click="failure_snack = false"> Close </v-btn>
+                <v-btn color="white" v-bind="attrs" text @click="failure_snack = false"> Close </v-btn>
             </template>
         </v-snackbar>
     </div>
@@ -440,9 +441,9 @@ export default{
 
 
 <style scoped lang="css">
-    .theme--light.v-app-bar.v-toolbar.v-sheet{
+    /* .theme--light.v-app-bar.v-toolbar.v-sheet{
         background-color: white !important;
-    }
+    } */
 
     .theme--light.v-text-field--solo-inverted.v-text-field--solo.v-input--is-focused > .v-input__control > .v-input__slot .v-label, .theme--light.v-text-field--solo-inverted.v-text-field--solo.v-input--is-focused > .v-input__control > .v-input__slot input {
         color: #000000 !important;
