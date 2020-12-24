@@ -4,7 +4,14 @@
         v-on="clickable!='delete' ? { click: () => add_skill(skill) } : {}">
         <span>{{skill.name}}</span>
         <span v-if="clickable=='delete' " class="skill-tag-remove">
-            <i v-on:click="del_skill(skill)" class="fas fa-times"></i>
+            <v-icon 
+                style="margin-bottom:2px;"
+                small 
+                color="white" 
+                @click="del_skill(skill)"
+                >
+                mdi-close-thick
+            </v-icon>
         </span>
     </a>
 </template>
@@ -73,7 +80,7 @@ export default{
     }
 
     .skill-tag-remove{
-        margin:2px 3px 1px 5px;
+        margin:0px 1px 0px 3px;
     }
 
     .Entertainment{

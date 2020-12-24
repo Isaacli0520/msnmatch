@@ -1,5 +1,22 @@
 from msnmatch import settings
 from hashlib import md5
+from django.http import JsonResponse
+
+def _error_response(message):
+	return JsonResponse({'message': message,'success': False})
+
+def _success_response(data = None):
+	ret_dict = {'success': True}
+	if data:
+		for k,v in data.items():
+			ret_dict[k] = v
+	return JsonResponse(ret_dict)
+
+def _post_not_allowed():
+	return _error_response("POST request not allowed")
+
+def _get_not_allowed():
+	return _error_response("GET request not allowed")
 
 def js_boolean(val):
 	if val == u"true":

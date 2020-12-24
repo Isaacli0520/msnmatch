@@ -8,7 +8,7 @@ export {default as HomeFooter} from './HomeFooter';
 export {default as MarketHeader} from './MarketHeader';
 export {default as MarketItemCard} from './MarketItemCard';
 export {default as MarketItemDialog} from './MarketItemDialog';
-export {default as MatchHeader} from './SearchCourse';
+export {default as MatchHeader} from './MatchHeader';
 export {default as ReviewCard} from './ReviewCard';
 export {default as SearchCourse} from './SearchCourse';
 export {default as SearchHome} from './SearchHome';

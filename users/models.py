@@ -34,6 +34,7 @@ GRADUATE_YEAR_CHOICES = (
 			('2022', '2022'),
 			('2023', '2023'),
 			('2024', '2024'),
+			('2025', '2025'),
 		)
 ROLE_CHOICES = (
 			('Mentee', 'Mentee'),
@@ -123,24 +124,6 @@ MAJOR_CHOICES = (
 ('Youth & Social Innovation Major', 'Youth & Social Innovation Major'),
 )
 MINOR_CHOICES = MAJOR_CHOICES
-
-
-class MatchingHistory(models.Model):
-  from_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='matching_requests_sent')
-  to_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='matching_requests_received')
-  created = models.DateTimeField(default=timezone.now)
-  finished = models.BooleanField(default=False)
-  reviewed = models.BooleanField(default=False)
-  rating = models.IntegerField(default=1)
-  comment = models.TextField(max_length=500, blank=True)
-  display_name = models.CharField(max_length=30, default="Anonymous User")
-  title = models.CharField(max_length=50, default="Match Request")
-  reason = models.TextField(max_length = 300, blank=True)
-
-class MatchRequest(models.Model):
-	friend_request = models.OneToOneField(FriendshipRequest, on_delete=models.CASCADE)
-	title = models.CharField(max_length=50, default="Match Request")
-	reason = models.TextField(max_length = 300, blank=True)
 
 def get_name(self):
 	return self.first_name + " " + self.last_name

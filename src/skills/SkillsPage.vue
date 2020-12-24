@@ -1,7 +1,7 @@
 <template>
     <v-app>
         <match-header></match-header>
-        <v-content class="content-div">
+        <v-main class="content-div">
             <v-container v-if="!loaded" fluid fill-height>
                 <v-layout 
                     align-center
@@ -30,7 +30,7 @@
                                 <tag-span v-for="skill in skills_of_type"
                                     :key="skill.id"
                                     :skill="skill"
-                                    :clickable="'delete'"
+                                    clickable="delete"
                                     @add-skill="addSkill"
                                     @del-skill="deleteSkill"
                                 />
@@ -45,10 +45,8 @@
                         :items="search_result_items"
                         :loading="isLoading"
                         :search-input.sync="search"
-                        color="black"
-                        background-color="white"
                         clearable
-                        solo-inverted
+                        solo
                         no-filter
                         hide-no-data
                         hide-selected
@@ -81,14 +79,16 @@
                     </v-col>
                 </v-row>
             </v-container>
-        </v-content>
+        </v-main>
         <v-snackbar
             top
             v-model="success_snack"
             color="teal darken-1"
             :timeout="800">
             {{success_message}}
-        <v-btn color="cyan accent-1" text @click="success_snack = false"> Close </v-btn>
+            <template v-slot:action="{ attrs }">
+                <v-btn color="cyan accent-1" v-bind="attrs" text @click="success_snack = false"> Close </v-btn>
+            </template>
         </v-snackbar>
         <v-snackbar
             top
@@ -96,15 +96,16 @@
             color="red darken-1"
             :timeout="1200">
             Sth is wrong
-            <v-btn color="white" text @click="failure_snack = false"> Close </v-btn>
+            <template v-slot:action="{ attrs }">
+                <v-btn color="white" v-bind="attrs" text @click="failure_snack = false"> Close </v-btn>
+            </template>
         </v-snackbar>
     </v-app>
 </template>
 
 <script>
 import axios from 'axios'
-import MatchHeader from '../components/MatchHeader'
-import TagSpan from '../components/TagSpan'
+import { MatchHeader, TagSpan } from '../components'
 axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 axios.defaults.xsrfCookieName = "csrftoken";
 
@@ -172,7 +173,6 @@ axios.defaults.xsrfCookieName = "csrftoken";
                     this.entries.push({
                         id:-1,
                         name:val,
-                        intro:"",
                         type:"Custom"
                     });
                 }
@@ -186,14 +186,13 @@ axios.defaults.xsrfCookieName = "csrftoken";
                 const skill_name = entry.name.length > this.skillNameLimit
                     ? entry.name.slice(0, this.skillNameLimit) + '...'
                     : entry.name;
-
-                return { text:skill_name, value:this.lastTime + entry.id, id:entry.id, intro:entry.intro,name:skill_name,  type:entry.type};
+                return { text:skill_name, value:this.lastTime + entry.id, id:entry.id, name:skill_name, type:entry.type};
             })
         },
 	},
 	methods: {
         getSkills(){
-            axios.get('/skills/api/get_all_and_user_skills/').then(response => {
+            axios.get('/users/api/get_all_and_user_skills/').then(response => {
                 this.all_skills = response.data.all_skills;
                 this.user_skills = response.data.user_skills;
                 this.loaded = true;
@@ -245,10 +244,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
 
 <style>
     .content-div{
-        /* background-color:#fdfff9; */
-        /* f0f5e5 */
         position: relative;
-        /* background: url('../assets/static/css/images/cloud_new_09.jpg') no-repeat; */
         background: url('../assets/static/css/images/cloud_bg_new_02.jpg') no-repeat;
         background-attachment: fixed;
         background-position: center center;

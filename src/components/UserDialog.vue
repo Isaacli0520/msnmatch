@@ -100,7 +100,9 @@
             color="teal darken-1"
             :timeout="1800">
             {{success_text}}
-            <v-btn color="cyan accent-1" text @click="success_snack = false"> Close </v-btn>
+            <template v-slot:action="{ attrs }">
+                <v-btn color="cyan accent-1" v-bind="attrs" text @click="success_snack = false"> Close </v-btn>
+            </template>
         </v-snackbar>
         <v-snackbar
             top
@@ -108,7 +110,9 @@
             color="red lighten-1"
             :timeout="2700">
             {{failure_text}}
-            <v-btn color="white" text @click="failure_snack = false"> Close </v-btn>
+            <template v-slot:action="{ attrs }">
+                <v-btn color="white" v-bind="attrs" text @click="failure_snack = false"> Close </v-btn>
+            </template>
         </v-snackbar>
     </v-dialog>
 </template>
@@ -165,7 +169,7 @@ export default{
     methods:{
         addFav(user){
             this.addFavBtnLoading = true;
-            axios.post('/skills/api/add_fav/',{"user_pk":user.pk}).then(response => {
+            axios.post('/users/api/add_fav/',{"user_pk":user.pk}).then(response => {
                 this.addFavBtnLoading = false;
                 if(response.data.success){
                     this.$emit('add-to-fav', user);
@@ -180,7 +184,7 @@ export default{
         },
         delFav(user){
             this.delFavBtnLoading = true;
-            axios.post('/skills/api/del_fav/',{"user_pk":user.pk}).then(response => {
+            axios.post('/users/api/del_fav/',{"user_pk":user.pk}).then(response => {
                 this.delFavBtnLoading = false;
                 if(response.data.success){
                     this.$emit('del-from-fav', user);
