@@ -23,6 +23,7 @@ ITEM_DESCRIPTION_TH = config("ITEM_DESCRIPTION_TH")
 # CSRF_COOKIE_SECURE = not DEBUG
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
+print("DEBUG ALLOWED HOSTS:", ALLOWED_HOSTS)
 
 DEBUG_PROPAGATE_EXCEPTIONS = config('DEBUG_PROPAGATE_EXCEPTIONS', cast=bool)
 
@@ -187,8 +188,8 @@ DATE_INPUT_FORMATS = ['%m/%d/%Y']
 CORS_ALLOW_HEADERS = list(default_headers) + [
     'Access-Control-Allow-Origin',
 ]
-print("JIUJI DBEUG:", config("CORS_ALLOWED_ORIGINS", cast=Csv()))
-CORS_ALLOWED_ORIGINS = config("CORS_ALLOWED_ORIGINS", cast=Csv())
+print("JIUJI DBEUG:", config("CORS_ALLOWED_ORIGINS", cast=lambda v: [s.strip() for s in v.split(',')]))
+CORS_ALLOWED_ORIGINS = config("CORS_ALLOWED_ORIGINS", cast=lambda v: [s.strip() for s in v.split(',')])
 CORS_ALLOW_CREDENTIALS = True
 
 # AWS_DEFAULT_ACL = None
