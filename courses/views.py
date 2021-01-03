@@ -298,7 +298,7 @@ def edit_plannable_profile(request):
 	if request.method == "POST":
 		success = False
 		post = json.loads(request.body)
-		username, credential= post["username"][1:-1], post["credential"][1:-1]
+		username, credential= post["username"], post["credential"]
 		action = post["action"]
 		user = get_object_or_404(User, username=username)
 		if credential == custom_md5(settings.SECRET_KEY + user.username, settings.SECRET_KEY):
