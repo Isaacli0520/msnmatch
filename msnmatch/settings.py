@@ -188,8 +188,8 @@ DATE_INPUT_FORMATS = ['%m/%d/%Y']
 CORS_ALLOW_HEADERS = list(default_headers) + [
     'Access-Control-Allow-Origin',
 ]
-print("JIUJI DBEUG:", config("CORS_ALLOWED_ORIGINS", cast=lambda v: [s.strip() for s in v.split(',')]))
-CORS_ALLOWED_ORIGINS = config("CORS_ALLOWED_ORIGINS", cast=lambda v: [s.strip() for s in v.split(',')])
+# print("JIUJI DBEUG:", config("CORS_ALLOWED_ORIGINS", cast=lambda v: [s.strip() for s in v.split(',')]))
+CORS_ALLOWED_ORIGINS = config("CORS_ALLOWED_ORIGINS", cast=Csv())
 CORS_ALLOW_CREDENTIALS = True
 
 # AWS_DEFAULT_ACL = None
