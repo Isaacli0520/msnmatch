@@ -4,6 +4,7 @@ import psycopg2
 import dj_database_url
 import sys
 from decouple import config, Csv
+from corsheaders.defaults import default_headers
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = 1024*1024*1024
 
@@ -183,7 +184,9 @@ DATE_INPUT_FORMATS = ['%m/%d/%Y']
 
 # Static files (CSS, JavaScript, Images)
 
-
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    'Access-Control-Allow-Origin',
+]
 CORS_ALLOWED_ORIGINS = config("CORS_ALLOWED_ORIGINS", cast=Csv())
 CORS_ALLOW_CREDENTIALS = True
 
