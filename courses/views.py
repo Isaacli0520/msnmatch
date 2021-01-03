@@ -6,26 +6,19 @@ import numpy as np
 import datetime
 from collections import Counter
 
-from django.shortcuts import render
-from django.urls import reverse_lazy, reverse
-from django.views import generic
+from django.urls import reverse
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.csrf import csrf_exempt
-from django.contrib import messages
-from django.shortcuts import redirect
 from django.contrib.auth.models import User
+from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import render, get_object_or_404
 from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector, TrigramSimilarity
 from django.db.models import Q, F, Count
 from django.db.models.functions import Lower, Substr, Length
 from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
-from django.urls import reverse
 from django.forms.models import model_to_dict
 
-from fuzzywuzzy import fuzz, process
 from msnmatch import settings
-
-from msnmatch.utils import custom_md5, cmp_semester, js_boolean
+from msnmatch.utils import custom_md5, cmp_semester, js_boolean, _get_not_allowed, _post_not_allowed, _success_response, _error_response
 from functools import cmp_to_key
 
 from users.models import MAJOR_CHOICES, PlanProfile
@@ -83,16 +76,12 @@ def department(request, department_number):
 	return render(request, 'department.html')
 
 @login_required
-def courses_admin(request):
-	return render(request, 'courses_admin.html')
-
-@login_required
 def my_courses(request):
     return render(request, "mycourses.html")
 
 @login_required
 def get_current_semester(request):
-	return JsonResponse({
+	return _success_response({
 		"year":settings.CURRENT_SEMESTER[:4],
 		"semester":settings.CURRENT_SEMESTER[4:],
 	})
@@ -105,7 +94,7 @@ def get_basic_info(request):
 			"profile": reverse('profile', args=[request.user.username]),
 			"update_profile":reverse('update_profile', args=[request.user.username]),
 		}
-	return JsonResponse({
+	return _success_response({
 		"all_info":info,
 	})
 
@@ -142,7 +131,7 @@ def get_roll_result(request):
 				break
 			left = right + 1
 			right = right + users[i + 1]["reviews"]
-	return JsonResponse({
+	return _success_response({
 		"users":result
 	})
 
@@ -153,18 +142,10 @@ def report_bug(request):
 		title, text = post.get("title"), post.get("text")
 		if len(title) > 0 and len(text) > 0:
 			Bug.objects.create(user=request.user, title=title, text=text)
-			return JsonResponse({
-				"success":True,
-			})
+			return _success_response()
 		else:
-			return JsonResponse({
-				"success":False,
-				"message":"Missing title or text field",
-			})	
-	return JsonResponse({
-		"success":False,
-		"message":"Get method not allowed"
-	})
+			return _error_response("Missing title or text field")	
+	return _error_response("Get method not allowed")
 
 @login_required
 def get_top_reviews(request):
@@ -176,7 +157,7 @@ def get_top_reviews(request):
 	reviews = np.random.choice(reviews, K if K < len(reviews_prob) else len(reviews_prob), False, reviews_prob)
 	reviews = [get_json_of_review(review) for review in reviews]
 	# print("---------------get top reviews time--------------", time.time() - time_start)
-	return JsonResponse({
+	return _success_response({
 		"reviews":reviews,
 	})
 	
@@ -196,7 +177,7 @@ def get_top_review_users(request):
 				"reviews":user_review_num,
 			})
 	users = sorted(users, key=lambda x:x["reviews"], reverse=True)
-	return JsonResponse({
+	return _success_response({
 		"review_users":users,
 	})
 
@@ -215,7 +196,7 @@ def get_course_instructors(request):
 			"topic":course_instructor.topic,
 			})
 
-	return JsonResponse({
+	return _success_response({
 		"course_instructors":course_instructor_relations,
 	})
 
@@ -223,7 +204,7 @@ def get_course_instructors(request):
 def get_reviews(request):
 	cs_users = CourseUser.objects.filter(user=request.user, take="taken")
 	reviews_arr = [cs_user for cs_user in cs_users if cs_user.text]
-	return JsonResponse({
+	return _success_response({
 		"reviews":[get_json_of_review(review) for review in reviews_arr]
 	})
 
@@ -239,7 +220,7 @@ def get_list_of_plannable_profiles(request):
 				"profile_pk":profile.pk,
 				"name":profile.name,
 			})
-	return JsonResponse({
+	return _success_response({
 		"profiles":ret_profiles,
 	})
 
@@ -263,7 +244,7 @@ def get_instructor(request):
 		if cs_instr.semester not in all_courses[tmp_course_number]["semesters"]:
 			all_courses[tmp_course_number]["semesters"].append(cs_instr.semester)
 	tmp_rating, tmp_counter = get_rating_of_instructor(instructor)
-	return JsonResponse({
+	return _success_response({
 		"name":instructor.__str__(),
 		"rating":tmp_rating,
 		"rating_counter":tmp_counter,
@@ -273,7 +254,7 @@ def get_instructor(request):
 
 @login_required
 def get_user_hmp_header(request):
-	return JsonResponse({
+	return _success_response({
 		"user":{
 			"first_name":request.user.first_name,
 			"last_name":request.user.last_name,
@@ -285,7 +266,7 @@ def get_user_hmp_header(request):
 
 @login_required
 def get_my_courses(request):
-	return JsonResponse({
+	return _success_response({
 		"taking_courses":get_take_courses(request.user, "taking"),
 		"taken_courses":get_take_courses(request.user, "taken"),
 	})
@@ -307,16 +288,15 @@ def get_take_courses(user, take):
 
 @login_required
 def get_credential(request):
-	return JsonResponse({
+	return _success_response({
 		"credential":request.user.profile.credential,
 		"username":request.user.username,
 	})
 
 @csrf_exempt
 def edit_plannable_profile(request):
-	success = False
 	if request.method == "POST":
-		print("post")
+		success = False
 		post = json.loads(request.body)
 		username, credential= post["username"][1:-1], post["credential"][1:-1]
 		action = post["action"]
@@ -334,16 +314,17 @@ def edit_plannable_profile(request):
 				tmp_profile = get_object_or_404(PlanProfile, user=user ,name=tmp_name)
 				tmp_profile.delete()
 				success = True
-	return JsonResponse({
-		"success":success,
-	})
+		return _success_response() if success else _error_response()
+	if request.method == "GET":
+		return _get_not_allowed()
 
 @csrf_exempt
 def get_plannable_profile(request):
 	ret_profile = []
 	if request.method == "POST":
 		post = json.loads(request.body)
-		username, credential= post["username"][1:-1], post["credential"][1:-1]
+		username, credential= post["username"], post["credential"]
+		print("DEBUG:", username, credential)
 		user = get_object_or_404(User, username=username)
 		if credential == custom_md5(settings.SECRET_KEY + user.username, settings.SECRET_KEY):
 			if "name" in post:
@@ -362,7 +343,8 @@ def get_plannable_profile(request):
 def save_plannable_profile(request):
 	if request.method == "POST":
 		post = json.loads(request.body)
-		username, credential, name, profile = post["username"][1:-1], post["credential"][1:-1], post["name"], post["profile"]
+		username, credential, name, profile = post["username"], post["credential"], post["name"], post["profile"]
+		print("DEBUG2:", username, credential, name, profile)
 		user = get_object_or_404(User, username=username)
 		if credential == custom_md5(settings.SECRET_KEY + user.username, settings.SECRET_KEY):
 			planProfileQueryset = PlanProfile.objects.filter(user=user, name=name)
@@ -375,18 +357,17 @@ def save_plannable_profile(request):
 			success = True
 		else:
 			success = False
-	else:
-		success = False
-	return JsonResponse({
-		"success":success,
-	})
+		return _success_response() if success else _error_response()
+	if request.method == "GET":
+		return _get_not_allowed()
+	
 
 @login_required
 def get_recommendations(request):
 	year, semester, major = request.GET.get('year'), request.GET.get('semester'), request.GET.get('major')
 	users_pk = [sth.pk for sth in User.objects.filter(profile__major=major).exclude(username="admin")]
 	if len(users_pk) == 0:
-		return JsonResponse({
+		return _success_response({
 			"rcm_courses":[],
 		})
 		
@@ -415,7 +396,7 @@ def get_recommendations(request):
 			"title":tmp_course.title,
 			"taken":num,
 			})
-	return JsonResponse({
+	return _success_response({
 		"rcm_courses":courses,
 	})
 
@@ -431,7 +412,7 @@ def get_major_options(request):
 	if request.user.profile.graduate_year:
 		year = int(settings.CURRENT_YEAR) + 4 - int(request.user.profile.graduate_year)
 
-	return JsonResponse({
+	return _success_response({
 		"major_options":majors,
 		"major":major,
 		"year":year,
@@ -476,13 +457,13 @@ def get_trending_courses(request):
 
 	# time_end = time.time()
 	# print("GET TRENDING TIME SPENT:", time_end - time_start)
-	return JsonResponse({
+	return _success_response({
 		"taken_courses":final_taken_courses[:10],
 	})
 
 @login_required
 def get_departments(request):
-	return JsonResponse({
+	return _success_response({
 		"departments":[model_to_dict(department) for department in Department.objects.all().exclude(name="")],
 	})
 
@@ -493,7 +474,7 @@ def get_department(request):
 	department = get_object_or_404(Department, pk=department_pk)
 	ret_courses = [get_detailed_json_of_course(cs, request.user, with_take=True) for cs in department.course_set.all().exclude(units="0")]
 	print("Time Spent:", time.time()-start_time)
-	return JsonResponse({
+	return _success_response({
 		"department":{
 			"name":department.name,
 			"school":department.school,
@@ -508,9 +489,7 @@ def submit_review(request):
 		text, rating_course, rating_instructor = post["text"], post["rating_course"], post["rating_instructor"]
 		course_instructor_pk =  post["course_instructor_pk"]
 		if len(text.strip()) == 0 or rating_course == 0 or rating_instructor == 0:
-			return JsonResponse({
-				"success":False,
-			})
+			return _error_response()
 		course_instructor = get_object_or_404(CourseInstructor, pk=course_instructor_pk)
 		cs_user_query = CourseUser.objects.filter(course=course_instructor.course, user=request.user)
 		if cs_user_query.first() != None:
@@ -531,12 +510,9 @@ def submit_review(request):
 				take="taken",
 				rating_course=rating_course,
 				rating_instructor=rating_instructor)
-		success = True
-	else:
-		success = False
-	return JsonResponse({
-		"success":success,
-	})
+		return _success_response()
+	if request.method == "GET":
+		return _get_not_allowed()
 
 @login_required
 def save_take(request):
@@ -549,9 +525,7 @@ def save_take(request):
 		if delete:
 			if past_query.first() != None:
 				past_query.first().delete()
-			return JsonResponse({
-				"success":True,
-			})
+			return _success_response()
 		instructor = get_object_or_404(Instructor, pk=post['instructor_pk'])
 	
 		cs_instr = get_object_or_404(CourseInstructor, pk=post["course_instructor_pk"])
@@ -561,23 +535,21 @@ def save_take(request):
 		if not delete:
 			cs_user = CourseUser.objects.create(user=request.user, course = course, instructor = instructor, course_instructor = cs_instr)
 			now_instructor_pk, now_semester, now_take = cs_user.course_instructor.instructor.pk, cs_user.course_instructor.semester, cs_user.take
-		success = True
-	else:
-		success = False
-	return JsonResponse({
-		"success":success,
-		"now":{
-			"instructor_pk":now_instructor_pk,
-			"semester":now_semester,
-			"take":now_take,
-		},
-	})
+		return _success_response({
+			"now":{
+				"instructor_pk":now_instructor_pk,
+				"semester":now_semester,
+				"take":now_take,
+			},
+		})
+	if request.method == "GET":
+		return _get_not_allowed()
 
 @login_required
 def get_course(request):
 	pk = request.GET.get("pk")
 	course = get_object_or_404(Course, pk=pk)
-	return JsonResponse({
+	return _success_response({
 		"course":get_detailed_json_of_course(course, request.user,with_take=True, with_instructors=True),
 	})
 
@@ -586,7 +558,7 @@ def get_course_instructor(request):
 	course_pk, instructor_pk = request.GET.get("course_pk"), request.GET.get("instructor_pk")
 	course = get_object_or_404(Course, pk=course_pk)
 	instructor = get_object_or_404(Instructor, pk=instructor_pk)
-	return JsonResponse(get_detailed_json_of_course_instructor(course, instructor, request.user))
+	return _success_response(get_detailed_json_of_course_instructor(course, instructor, request.user))
 
 @login_required
 def course_search_result(request):
@@ -595,10 +567,7 @@ def course_search_result(request):
 	search_course = js_boolean(request.GET.get('cs'))
 	search_instructor = js_boolean(request.GET.get('instr'))
 	if not query or not query_time:
-		return JsonResponse({
-			"success":False,
-			"message":"Query or Time not provided"
-		})
+		return _error_response("Query or Time not provided")
 	search_queryset = course_and_instructor_retrieve(query, search_course, search_instructor)
 	course_result = []
 	for query in search_queryset:
@@ -606,10 +575,12 @@ def course_search_result(request):
 			course_result.append(get_json_of_instructor(query[0]))
 		if query[1] == "course":
 			course_result.append(get_json_of_course(query[0]))
-	return JsonResponse({
+	return _success_response({
 		"course_result": course_result,
 		"time":query_time,
 	})
+
+# --------------------------- Helper Functions ---------------------------
 
 def course_and_instructor_retrieve(query, search_course, search_instructor):
 	query = query.strip().lower()

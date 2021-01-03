@@ -2,7 +2,7 @@ from msnmatch import settings
 from hashlib import md5
 from django.http import JsonResponse
 
-def _error_response(message):
+def _error_response(message = ""):
 	return JsonResponse({'message': message,'success': False})
 
 def _success_response(data = None):

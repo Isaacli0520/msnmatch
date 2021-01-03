@@ -13,7 +13,7 @@ channels
 channels_redis
 django-model-utils
 dj-database-url
-psycopg2==2.8.4
+psycopg2
 pandas
 fuzzywuzzy
 python-Levenshtein

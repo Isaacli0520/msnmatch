@@ -184,7 +184,7 @@ DATE_INPUT_FORMATS = ['%m/%d/%Y']
 # Static files (CSS, JavaScript, Images)
 
 
-CORS_ORIGIN_WHITELIST = config("CORS_ORIGIN_WHITELIST", cast=Csv())
+CORS_ALLOWED_ORIGINS = config("CORS_ALLOWED_ORIGINS", cast=Csv())
 CORS_ALLOW_CREDENTIALS = True
 
 # AWS_DEFAULT_ACL = None

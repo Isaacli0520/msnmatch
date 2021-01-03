@@ -396,8 +396,9 @@ export default{
         },
     },
     computed:{
+        // https://plannable.org
         plannableFinalURL(){
-            return "https://plannable.org" + "/?courses=" + this.plannableURL + "&username=" + this.username + "&credential=" + this.credential + "";
+            return "http://localhost:8081" + "/?courses=" + this.plannableURL + "&username=" + this.username + "&credential=" + this.credential + "";
         }
     },
     methods:{
