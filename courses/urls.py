@@ -38,7 +38,6 @@ urlpatterns = [
 
 	path('<int:course_number>/<int:instructor_number>/', views.course_instructor, name='course_instructor'),
 
-    path('api/get_list_of_plannable_profiles/', views.get_list_of_plannable_profiles, name='get_list_of_plannable_profiles'),
 	path('api/get_plannable_profile/', views.get_plannable_profile, name='get_plannable_profile'),
 	path('api/save_plannable_profile/', views.save_plannable_profile, name='save_plannable_profile'),
     path('api/edit_plannable_profile/', views.edit_plannable_profile, name="edit_plannable_profile"),

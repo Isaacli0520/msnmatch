@@ -6,7 +6,7 @@ def _error_response(message = ""):
 	return JsonResponse({'message': message,'success': False})
 
 def _success_response(data = None):
-	ret_dict = {'success': True}
+	ret_dict = {'success': True, 'message':"success"}
 	if data:
 		for k,v in data.items():
 			ret_dict[k] = v

@@ -1,6 +1,8 @@
 import re
 import time
+import os
 import json
+import hmac
 import random
 import numpy as np
 import datetime
@@ -16,12 +18,13 @@ from django.db.models import Q, F, Count
 from django.db.models.functions import Lower, Substr, Length
 from django.http import JsonResponse
 from django.forms.models import model_to_dict
+from django.utils import timezone
 
 from msnmatch import settings
 from msnmatch.utils import custom_md5, cmp_semester, js_boolean, _get_not_allowed, _post_not_allowed, _success_response, _error_response
 from functools import cmp_to_key
 
-from users.models import MAJOR_CHOICES, PlanProfile
+from users.models import MAJOR_CHOICES, PlanProfile, PlanProfileVersion, Authenticator
 from .models import Course, CourseUser, CourseInstructor, Instructor, Department, Bug
 
 mnemonics = ['AAS', 'MATH', 'ANTH', 'SWAH', 'MDST', 'ARAD', 'ARAH', 'ARTH', 'ARTS',
@@ -209,22 +212,6 @@ def get_reviews(request):
 	})
 
 @login_required
-def get_list_of_plannable_profiles(request):
-	username, credential = request.GET.get("username"), request.GET.get("credential")
-	user = get_object_or_404(User, username=username)
-	ret_profiles = []
-	if credential == custom_md5(settings.SECRET_KEY + user.username, settings.SECRET_KEY):
-		profiles_query =PlanProfile.objects.filter(user=user)
-		for profile in profiles_query:
-			ret_profiles.append({
-				"profile_pk":profile.pk,
-				"name":profile.name,
-			})
-	return _success_response({
-		"profiles":ret_profiles,
-	})
-
-@login_required
 def get_instructor(request):
 	instructor_pk = request.GET.get("instructor_pk")
 	instructor = get_object_or_404(Instructor, pk=instructor_pk)
@@ -288,76 +275,120 @@ def get_take_courses(user, take):
 
 @login_required
 def get_credential(request):
-	return _success_response({
-		"credential":request.user.profile.credential,
-		"username":request.user.username,
-	})
+	if request.method == "GET":
+		auth = Authenticator.objects.filter(username=request.user.username).first()
+		if auth == None:
+			credential = hmac.new(key = settings.SECRET_KEY.encode('utf-8'), msg = os.urandom(32), digestmod = 'sha256',).hexdigest()
+			Authenticator.objects.create(credential=credential, username=request.user.username)
+		else:
+			diff = timezone.now() - auth.date_created
+			if diff.total_seconds() > 86400:
+				auth.delete()
+				credential = hmac.new(key = settings.SECRET_KEY.encode('utf-8'), msg = os.urandom(32), digestmod = 'sha256',).hexdigest()
+				Authenticator.objects.create(credential=credential, username=request.user.username)
+			else:
+				credential = auth.credential
+		return _success_response({
+			"credential":credential,
+			"username":request.user.username,
+		})
+	if request.method == "POST":
+		return _post_not_allowed()
+
+def get_versions_of_profile(profile):
+	return [p.version for p in profile.planprofileversion_set.all()] 
 
 @csrf_exempt
 def edit_plannable_profile(request):
 	if request.method == "POST":
-		success = False
 		post = json.loads(request.body)
-		username, credential= post["username"], post["credential"]
-		action = post["action"]
+		username, credential, action = post["username"], post["credential"], post["action"]
 		user = get_object_or_404(User, username=username)
-		if credential == custom_md5(settings.SECRET_KEY + user.username, settings.SECRET_KEY):
+		if Authenticator.objects.filter(credential=credential, username=username).first() != None:
 			if action == "rename":
-				oldName, newName = post["oldName"], post["newName"]
+				oldName, newName, content = post["oldName"], post["newName"], post["profile"]
 				tmp_profile = get_object_or_404(PlanProfile, user=user ,name=oldName)
+				for p_v in tmp_profile.planprofileversion_set.all():
+					p_v.delete()
+				new_profile_version = PlanProfileVersion.objects.create(version=1, content=content, plan_profile=tmp_profile)
 				tmp_profile.name = newName
+				tmp_profile.latest = 1
 				tmp_profile.save()
-				success = True
 			elif action == "delete":
-				print("delete")
 				tmp_name = post["name"]
 				tmp_profile = get_object_or_404(PlanProfile, user=user ,name=tmp_name)
+				for p_v in tmp_profile.planprofileversion_set.all():
+					p_v.delete()
 				tmp_profile.delete()
-				success = True
-		return _success_response() if success else _error_response()
+			return _success_response()
+		else:
+			return _error_response("Authentication failed")
 	if request.method == "GET":
 		return _get_not_allowed()
 
 @csrf_exempt
 def get_plannable_profile(request):
-	ret_profile = []
 	if request.method == "POST":
 		post = json.loads(request.body)
 		username, credential= post["username"], post["credential"]
-		print("DEBUG:", username, credential)
 		user = get_object_or_404(User, username=username)
-		if credential == custom_md5(settings.SECRET_KEY + user.username, settings.SECRET_KEY):
+		if Authenticator.objects.filter(credential=credential, username=username).first() != None:
+			ret_profile = []
+			# Return a specific profile
 			if "name" in post:
 				profile = PlanProfile.objects.filter(name=post["name"], user=user).first()
-				if profile != None:
-					ret_profile.append(profile.content)
+				if profile == None:
+					return _error_response("Profile doesn't exist")
+				# Return a specific version of the profile
+				if "version" in post:
+					try:
+						version = int(post["version"])
+					except:
+						return _error_response("Version should be a number")
+					real_profile = profile.planprofileversion_set.filter(version=version).first()
+				# Return the latest version of the profile 
+				else:
+					real_profile = profile.planprofileversion_set.filter(version=profile.latest).first()
+				ret_profile.append({
+					"versions":get_versions_of_profile(profile),
+					"profile":real_profile.content,
+				})
+			# Return all profiles
 			else:
 				profiles = PlanProfile.objects.filter(user=user)
 				for profile in profiles:
-					ret_profile.append(profile.content)
-	return JsonResponse(
-		ret_profile, safe=False
-	)
+					ret_profile.append({
+						"versions":get_versions_of_profile(profile),
+						"profile":profile.planprofileversion_set.filter(version=profile.latest).first().content,
+					})
+			return JsonResponse({
+					"success":True,
+					"message":"Nice",
+					"profiles":ret_profile,
+				}, safe=False)
+		else:
+			return _error_response("Authentication failed")
+	if request.method == "GET":
+		return _get_not_allowed()
 
 @csrf_exempt
 def save_plannable_profile(request):
 	if request.method == "POST":
 		post = json.loads(request.body)
-		username, credential, name, profile = post["username"], post["credential"], post["name"], post["profile"]
-		print("DEBUG2:", username, credential, name, profile)
+		username, credential, profiles = post["username"], post["credential"], post["profiles"]
 		user = get_object_or_404(User, username=username)
-		if credential == custom_md5(settings.SECRET_KEY + user.username, settings.SECRET_KEY):
-			planProfileQueryset = PlanProfile.objects.filter(user=user, name=name)
-			if planProfileQueryset.first() != None:
-				plan_profile = planProfileQueryset.first()
-				plan_profile.content = profile
+		if Authenticator.objects.filter(credential=credential, username=username).first() != None:
+			for profile in profiles:
+				name, content = profile["name"], profile["profile"]
+				plan_profile = PlanProfile.objects.filter(user=user, name=name).first()
+				if plan_profile == None:
+					plan_profile = PlanProfile.objects.create(user=user, name=name)
+				PlanProfileVersion.objects.create(version=plan_profile.latest + 1, content=content, plan_profile=plan_profile)
+				plan_profile.latest += 1
 				plan_profile.save()
-			else:
-				plan_profile = PlanProfile.objects.create(user=user, name=name, content=profile)
-			success = True
+			return _success_response()
 		else:
-			success = False
-		return _success_response() if success else _error_response()
+			return _error_response("Authentication failed")
 	if request.method == "GET":
 		return _get_not_allowed()
 	
