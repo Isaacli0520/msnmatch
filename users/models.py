@@ -150,6 +150,7 @@ def get_plan_profile():
 
 class PlanProfileVersion(models.Model):
 	version = models.IntegerField(default=1)
+	user_agent = models.CharField(max_length=200, null=True, blank=True)
 	content = models.TextField(null=True, blank=True)
 	plan_profile = models.ForeignKey(PlanProfile, on_delete=models.CASCADE, default=get_plan_profile)
 	modified = models.DateTimeField(default=timezone.now)

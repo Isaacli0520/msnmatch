@@ -296,16 +296,20 @@ def get_credential(request):
 		return _post_not_allowed()
 
 def get_versions_of_profile(profile):
-	return [p.version for p in profile.planprofileversion_set.all()] 
+	return [{
+		"modified":int(p.modified.timestamp()*1000),
+		"userAgent":p.user_agent,
+		"version":p.version,
+	} for p in profile.planprofileversion_set.all()] 
 
 def authenticate_credential(credential, username):
 	auth = Authenticator.objects.filter(credential=credential, username=username).first()
 	if auth == None:
-		return {"success":"False", "message":"Invalid credential"}
+		return {"success":False, "message":"Invalid credential"}
 	diff = timezone.now() - auth.date_created
 	if diff.total_seconds() > 86400 * 7:
-		return {"success":"False", "message":"Credential expired"}
-	return {"success":"True", "message":"success"}
+		return {"success":False, "message":"Credential expired"}
+	return {"success":True, "message":"success"}
 
 
 @csrf_exempt
@@ -316,6 +320,7 @@ def edit_plannable_profile(request):
 		user = get_object_or_404(User, username=username)
 		auth = authenticate_credential(credential, username)
 		if auth["success"]:
+			user_agent = request.META['HTTP_USER_AGENT']
 			action = post["action"]
 			# Rename profile and delete all previous versions
 			if action == "rename":
@@ -323,13 +328,13 @@ def edit_plannable_profile(request):
 				profile = get_object_or_404(PlanProfile, user=user ,name=oldName)
 				for p_v in profile.planprofileversion_set.all():
 					p_v.delete()
-				new_profile_version = PlanProfileVersion.objects.create(version=1, content=content, plan_profile=profile)
+				new_profile_version = PlanProfileVersion.objects.create(version=1, content=content, plan_profile=profile, user_agent=user_agent)
 				profile.name = newName
 				profile.latest = 1
 				profile.save()
 			# Delete profile and corresponding versions
 			elif action == "delete":
-				if name not in post:
+				if "name" not in post:
 					return _error_response("Missing name field")
 				name = post["name"]
 				profile = get_object_or_404(PlanProfile, user=user ,name=name)
@@ -396,6 +401,7 @@ def save_plannable_profile(request):
 		user = get_object_or_404(User, username=username)
 		auth = authenticate_credential(credential, username)
 		if auth["success"]:
+			user_agent = request.META['HTTP_USER_AGENT']
 			for profile in profiles:
 				name, content = profile["name"], profile["profile"]
 				plan_profile = PlanProfile.objects.filter(user=user, name=name).first()
@@ -404,7 +410,7 @@ def save_plannable_profile(request):
 					plan_profile = PlanProfile.objects.create(user=user, name=name)
 				# Force to create a new version
 				if "new" in profile or new_flag:
-					PlanProfileVersion.objects.create(version=plan_profile.latest + 1, content=content, plan_profile=plan_profile)
+					PlanProfileVersion.objects.create(version=plan_profile.latest + 1, content=content, plan_profile=plan_profile, user_agent=user_agent)
 					plan_profile.latest += 1
 					plan_profile.save()
 				# Server decide whether to create a new version
@@ -415,11 +421,12 @@ def save_plannable_profile(request):
 					diff = timezone.now() - latest_version.modified
 					# Latest version is more than 5min old, create new version
 					if diff.total_seconds() > 300:
-						PlanProfileVersion.objects.create(version=plan_profile.latest + 1, content=content, plan_profile=plan_profile)
+						PlanProfileVersion.objects.create(version=plan_profile.latest + 1, content=content, plan_profile=plan_profile, user_agent=user_agent)
 						plan_profile.latest += 1
 						plan_profile.save()
 					# Latest version is still young, update latest version
 					else:
+						latest_version.user_agent = user_agent
 						latest_version.content = content
 						latest_version.save()
 			return _success_response()
