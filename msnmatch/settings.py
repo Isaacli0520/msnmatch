@@ -4,6 +4,7 @@ import psycopg2
 import dj_database_url
 import sys
 from decouple import config, Csv
+from corsheaders.defaults import default_headers
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = 1024*1024*1024
 
@@ -183,8 +184,11 @@ DATE_INPUT_FORMATS = ['%m/%d/%Y']
 
 # Static files (CSS, JavaScript, Images)
 
-
-CORS_ORIGIN_WHITELIST = config("CORS_ORIGIN_WHITELIST", cast=Csv())
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    'Access-Control-Allow-Origin',
+]
+# print("JIUJI DBEUG:", config("CORS_ALLOWED_ORIGINS", cast=lambda v: [s.strip() for s in v.split(',')]))
+CORS_ALLOWED_ORIGINS = config("CORS_ALLOWED_ORIGINS", cast=Csv())
 CORS_ALLOW_CREDENTIALS = True
 
 # AWS_DEFAULT_ACL = None

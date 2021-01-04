@@ -1,22 +1,25 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
-from skills.models import Skill
-from .models import PlanProfile
-import csv
 from django.http import HttpResponse
-from .models import Profile
+from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.core import serializers
+
+from skills.models import Skill
+from friendship.models import Follow
+from groups.models import Group
+from .models import Profile, PlanProfile, PlanProfileVersion, Authenticator
+
+from msnmatch.utils import custom_md5
+from msnmatch import settings
+
 from PIL import ImageFilter
 from PIL import Image
 from io import BytesIO
-import os, sys
+import csv
+import os
+import sys
 import uuid
-from django.core.files.uploadedfile import InMemoryUploadedFile
-from friendship.models import Follow
-from groups.models import Group
-from msnmatch.utils import custom_md5
-from msnmatch import settings
-from django.core import serializers
 
 def export_users_new(modeladmin, request, queryset):
     json_str = serializers.serialize('json', queryset, fields=('username','profile__sex', 'email', 'first_name', 'last_name', 'is_staff', 'profile__location','profile__major','profile__major_two','profile__minor','profile__picture'))
@@ -168,8 +171,16 @@ class CustomUserAdmin(UserAdmin):
         return super(CustomUserAdmin, self).get_inline_instances(request, obj)
 
 class PlanProfileAdmin(admin.ModelAdmin):
-    list_display = ('name',)
+    list_display = ('name', 'user', 'latest')
+
+class PlanProfileVersionAdmin(admin.ModelAdmin):
+    list_display = ('plan_profile', 'version')
+
+class AuthenticatorAdmin(admin.ModelAdmin):
+    list_display = ('username', 'credential', 'date_created')
 
 admin.site.unregister(User)
 admin.site.register(User, CustomUserAdmin)
 admin.site.register(PlanProfile, PlanProfileAdmin)
+admin.site.register(PlanProfileVersion, PlanProfileVersionAdmin)
+admin.site.register(Authenticator, AuthenticatorAdmin)

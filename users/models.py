@@ -2,22 +2,22 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from courses.models import Course
-import sys
-from PIL import Image
-from io import BytesIO
 from django.core.files.uploadedfile import InMemoryUploadedFile
-import os
-import uuid
 from django.core.files.storage import default_storage as storage
 from django.utils import timezone
 from django.core.validators import MaxValueValidator, MinValueValidator
-from friendship.models import Friend, FriendshipRequest
-from PIL import ImageFilter
-from friendship.models import Follow
 from django.contrib import admin
+
 from msnmatch import settings
 from msnmatch.utils import custom_md5
+from friendship.models import Friend, FriendshipRequest, Follow
+
+import sys
+import os
+import uuid
+import datetime
+from PIL import Image, ImageFilter
+from io import BytesIO
 
 YEAR_CHOICES = (
 			('1st year', '1st year'),
@@ -131,17 +131,35 @@ def get_name(self):
 User.add_to_class("__str__", get_name)
 
 def get_user():
-	print("hellooooooooooooo")
-	User.objects.get_or_create(id=1)
-	return 1
+	print("hellooooooooooooo user")
+	user = User.objects.get(username="admin")
+	return user
 
 class PlanProfile(models.Model):
 	name = models.CharField(max_length=255, null=True, blank=True)
-	content = models.TextField(null=True, blank=True)
 	user = models.ForeignKey(User, on_delete=models.CASCADE, default=get_user)
+	latest = models.IntegerField(default=0)
 
 	def __str__(self):
-		return self.user.first_name + " " + self.user.last_name + "----" + self.name
+		return self.name
+
+def get_plan_profile():
+	print("hellooooooooooooo plan profile")
+	PlanProfile.objects.get_or_create(id=1)
+	return 1
+
+class PlanProfileVersion(models.Model):
+	version = models.IntegerField(default=1)
+	content = models.TextField(null=True, blank=True)
+	plan_profile = models.ForeignKey(PlanProfile, on_delete=models.CASCADE, default=get_plan_profile)
+
+	def __str__(self):
+		return self.plan_profile.name + "--" + str(self.version)
+
+class Authenticator(models.Model):
+	credential = models.CharField(max_length=100, primary_key=True)
+	username = models.CharField(max_length=150)
+	date_created = models.DateTimeField(default=timezone.now)
 
 class Profile(models.Model):
 	user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -150,7 +168,7 @@ class Profile(models.Model):
 	location = models.CharField(max_length=30, blank=True)
 	birth_date = models.DateField(null=True, blank=True)
 	# year = models.CharField(max_length=255, choices=YEAR_CHOICES)
-	graduate_year = models.CharField(max_length=255, choices =GRADUATE_YEAR_CHOICES, blank=True)
+	graduate_year = models.CharField(max_length=255, choices=GRADUATE_YEAR_CHOICES, blank=True)
 	major = models.CharField(max_length=255, choices=MAJOR_CHOICES)
 	major_two = models.CharField(max_length=255, choices=MAJOR_CHOICES, blank=True)
 	minor = models.CharField(max_length=255, choices=MINOR_CHOICES, blank=True)
@@ -161,7 +179,7 @@ class Profile(models.Model):
 	role = models.CharField(max_length=255, choices=ROLE_CHOICES, blank=True)
 	wechat = models.CharField(max_length=255, blank=True)
 	matched = models.BooleanField(default=False)
-	credential = models.TextField(blank=True)
+	# Roommate Match
 	rm_bio = models.TextField(max_length=1000, blank=True)
 	rm_schedule = models.TextField(max_length=1000, blank=True)
 	rm = models.BooleanField(default=False)
@@ -176,7 +194,6 @@ class Profile(models.Model):
 		# delete old file when replacing by updating the file
 		try:
 			this = Profile.objects.get(pk=self.pk)
-			self.credential = custom_md5(settings.SECRET_KEY + self.user.username, settings.SECRET_KEY)
 			if self.picture and this.picture != self.picture:
 				# this.picture.delete(save=False)
 				tmp_picture = self.picture
