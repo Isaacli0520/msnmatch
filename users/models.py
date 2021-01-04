@@ -132,8 +132,8 @@ User.add_to_class("__str__", get_name)
 
 def get_user():
 	print("hellooooooooooooo user")
-	User.objects.get_or_create(username="default_get_1")
-	return 1
+	user = User.objects.get_or_create(username="default_get_1")
+	return user
 
 class PlanProfile(models.Model):
 	name = models.CharField(max_length=255, null=True, blank=True)
