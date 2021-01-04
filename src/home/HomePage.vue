@@ -1,6 +1,6 @@
 <template>
     <v-app>
-        <v-content>
+        <v-main>
             <v-container fluid fill-height>
                 <v-layout justify-center align-center>
                     <v-card outlined>
@@ -13,7 +13,7 @@
                     </v-card>
                 </v-layout>
             </v-container>
-        </v-content>
+        </v-main>
     </v-app>
 </template>
 

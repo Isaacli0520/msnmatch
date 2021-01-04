@@ -276,18 +276,18 @@ def get_take_courses(user, take):
 @login_required
 def get_credential(request):
 	if request.method == "GET":
-		auth = Authenticator.objects.filter(username=request.user.username).first()
-		if auth == None:
+		auths = Authenticator.objects.filter(username=request.user.username)
+		if auths.first() == None:
 			credential = hmac.new(key = settings.SECRET_KEY.encode('utf-8'), msg = os.urandom(32), digestmod = 'sha256',).hexdigest()
 			Authenticator.objects.create(credential=credential, username=request.user.username)
 		else:
-			diff = timezone.now() - auth.date_created
-			if diff.total_seconds() > 86400:
-				auth.delete()
-				credential = hmac.new(key = settings.SECRET_KEY.encode('utf-8'), msg = os.urandom(32), digestmod = 'sha256',).hexdigest()
-				Authenticator.objects.create(credential=credential, username=request.user.username)
-			else:
-				credential = auth.credential
+			credential = None
+			for auth in auths:
+				diff = timezone.now() - auth.date_created
+				if diff.total_seconds() > 86400 * 7 or credential != None:
+					auth.delete()
+				else:
+					credential = auth.credential
 		return _success_response({
 			"credential":credential,
 			"username":request.user.username,
@@ -298,31 +298,47 @@ def get_credential(request):
 def get_versions_of_profile(profile):
 	return [p.version for p in profile.planprofileversion_set.all()] 
 
+def authenticate_credential(credential, username):
+	auth = Authenticator.objects.filter(credential=credential, username=username).first()
+	if auth == None:
+		return {"success":"False", "message":"Invalid credential"}
+	diff = timezone.now() - auth.date_created
+	if diff.total_seconds() > 86400 * 7:
+		return {"success":"False", "message":"Credential expired"}
+	return {"success":"True", "message":"success"}
+
+
 @csrf_exempt
 def edit_plannable_profile(request):
 	if request.method == "POST":
 		post = json.loads(request.body)
-		username, credential, action = post["username"], post["credential"], post["action"]
+		username, credential = post["username"], post["credential"]
 		user = get_object_or_404(User, username=username)
-		if Authenticator.objects.filter(credential=credential, username=username).first() != None:
+		auth = authenticate_credential(credential, username)
+		if auth["success"]:
+			action = post["action"]
+			# Rename profile and delete all previous versions
 			if action == "rename":
 				oldName, newName, content = post["oldName"], post["newName"], post["profile"]
-				tmp_profile = get_object_or_404(PlanProfile, user=user ,name=oldName)
-				for p_v in tmp_profile.planprofileversion_set.all():
+				profile = get_object_or_404(PlanProfile, user=user ,name=oldName)
+				for p_v in profile.planprofileversion_set.all():
 					p_v.delete()
-				new_profile_version = PlanProfileVersion.objects.create(version=1, content=content, plan_profile=tmp_profile)
-				tmp_profile.name = newName
-				tmp_profile.latest = 1
-				tmp_profile.save()
+				new_profile_version = PlanProfileVersion.objects.create(version=1, content=content, plan_profile=profile)
+				profile.name = newName
+				profile.latest = 1
+				profile.save()
+			# Delete profile and corresponding versions
 			elif action == "delete":
-				tmp_name = post["name"]
-				tmp_profile = get_object_or_404(PlanProfile, user=user ,name=tmp_name)
-				for p_v in tmp_profile.planprofileversion_set.all():
+				if name not in post:
+					return _error_response("Missing name field")
+				name = post["name"]
+				profile = get_object_or_404(PlanProfile, user=user ,name=name)
+				for p_v in profile.planprofileversion_set.all():
 					p_v.delete()
-				tmp_profile.delete()
+				profile.delete()
 			return _success_response()
 		else:
-			return _error_response("Authentication failed")
+			return _error_response(auth["message"])
 	if request.method == "GET":
 		return _get_not_allowed()
 
@@ -332,7 +348,8 @@ def get_plannable_profile(request):
 		post = json.loads(request.body)
 		username, credential= post["username"], post["credential"]
 		user = get_object_or_404(User, username=username)
-		if Authenticator.objects.filter(credential=credential, username=username).first() != None:
+		auth = authenticate_credential(credential, username)
+		if auth["success"]:
 			ret_profile = []
 			# Return a specific profile
 			if "name" in post:
@@ -367,7 +384,7 @@ def get_plannable_profile(request):
 					"profiles":ret_profile,
 				}, safe=False)
 		else:
-			return _error_response("Authentication failed")
+			return _error_response(auth["message"])
 	if request.method == "GET":
 		return _get_not_allowed()
 
@@ -377,18 +394,37 @@ def save_plannable_profile(request):
 		post = json.loads(request.body)
 		username, credential, profiles = post["username"], post["credential"], post["profiles"]
 		user = get_object_or_404(User, username=username)
-		if Authenticator.objects.filter(credential=credential, username=username).first() != None:
+		auth = authenticate_credential(credential, username)
+		if auth["success"]:
 			for profile in profiles:
 				name, content = profile["name"], profile["profile"]
 				plan_profile = PlanProfile.objects.filter(user=user, name=name).first()
-				if plan_profile == None:
+				new_flag = plan_profile == None
+				if new_flag:
 					plan_profile = PlanProfile.objects.create(user=user, name=name)
-				PlanProfileVersion.objects.create(version=plan_profile.latest + 1, content=content, plan_profile=plan_profile)
-				plan_profile.latest += 1
-				plan_profile.save()
+				# Force to create a new version
+				if "new" in profile or new_flag:
+					PlanProfileVersion.objects.create(version=plan_profile.latest + 1, content=content, plan_profile=plan_profile)
+					plan_profile.latest += 1
+					plan_profile.save()
+				# Server decide whether to create a new version
+				else:
+					latest_version = plan_profile.planprofileversion_set.filter(version=plan_profile.latest).first()
+					if latest_version == None:
+						return _error_response("Dirty profile")
+					diff = timezone.now() - latest_version.modified
+					# Latest version is more than 5min old, create new version
+					if diff.total_seconds() > 300:
+						PlanProfileVersion.objects.create(version=plan_profile.latest + 1, content=content, plan_profile=plan_profile)
+						plan_profile.latest += 1
+						plan_profile.save()
+					# Latest version is still young, update latest version
+					else:
+						latest_version.content = content
+						latest_version.save()
 			return _success_response()
 		else:
-			return _error_response("Authentication failed")
+			return _error_response(auth["message"])
 	if request.method == "GET":
 		return _get_not_allowed()
 	
