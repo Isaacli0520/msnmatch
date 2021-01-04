@@ -332,6 +332,7 @@ def edit_plannable_profile(request):
 				profile.name = newName
 				profile.latest = 1
 				profile.save()
+				return _success_response({"version":get_versions_of_profile(profile)})
 			# Delete profile and corresponding versions
 			elif action == "delete":
 				if "name" not in post:
@@ -341,7 +342,9 @@ def edit_plannable_profile(request):
 				for p_v in profile.planprofileversion_set.all():
 					p_v.delete()
 				profile.delete()
-			return _success_response()
+				return _success_response()
+			else:
+				return _error_response("Action not recognized")
 		else:
 			return _error_response(auth["message"])
 	if request.method == "GET":
@@ -402,6 +405,7 @@ def save_plannable_profile(request):
 		auth = authenticate_credential(credential, username)
 		if auth["success"]:
 			user_agent = request.META['HTTP_USER_AGENT']
+			versions = []
 			for profile in profiles:
 				name, content = profile["name"], profile["profile"]
 				plan_profile = PlanProfile.objects.filter(user=user, name=name).first()
@@ -429,7 +433,8 @@ def save_plannable_profile(request):
 						latest_version.user_agent = user_agent
 						latest_version.content = content
 						latest_version.save()
-			return _success_response()
+				versions.append(get_versions_of_profile(plan_profile))
+			return _success_response({"versions":versions})
 		else:
 			return _error_response(auth["message"])
 	if request.method == "GET":
