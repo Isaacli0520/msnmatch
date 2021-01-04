@@ -131,7 +131,7 @@ def get_name(self):
 User.add_to_class("__str__", get_name)
 
 def get_user():
-	print("hellooooooooooooo")
+	print("hellooooooooooooo user")
 	User.objects.get_or_create(id=1)
 	return 1
 
@@ -144,7 +144,7 @@ class PlanProfile(models.Model):
 		return self.name
 
 def get_plan_profile():
-	print("hellooooooooooooo")
+	print("hellooooooooooooo plan profile")
 	PlanProfile.objects.get_or_create(id=1)
 	return 1
 
