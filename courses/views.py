@@ -322,7 +322,10 @@ def edit_plannable_profile(request):
 	if request.method == "POST":
 		post = json.loads(request.body)
 		username, credential = post["username"], post["credential"]
-		user = get_object_or_404(User, username=username)
+		try:
+			user = User.objects.get(username=username)
+		except:
+			return _error_response("User doesn't exist")
 		auth = authenticate_credential(credential, username)
 		if auth["success"]:
 			user_agent = request.META['HTTP_USER_AGENT']
@@ -330,10 +333,24 @@ def edit_plannable_profile(request):
 			# Rename profile and delete all previous versions
 			if action == "rename":
 				oldName, newName, content = post["oldName"], post["newName"], post["profile"]
-				profile = get_object_or_404(PlanProfile, user=user ,name=oldName)
+				try:
+					profile = PlanProfile.objects.get(user=user ,name=oldName)
+				except:
+					return _error_response("Profile doesn't exist")
+				new_profile = PlanProfile.objects.filter(user=user, name=newName).first()
+				# newName already exists, delete old profile and add new version to new profile it
+				if new_profile != None:
+					for p_v in profile.planprofileversion_set.all():
+						p_v.delete()
+					profile.delete()
+					PlanProfileVersion.objects.create(version=new_profile.latest + 1, content=content, plan_profile=new_profile, user_agent=user_agent)
+					new_profile.latest += 1
+					new_profile.save()
+					return _success_response({"versions":get_versions_of_profile(new_profile)})
+				# Delete(detach) previous versions
 				for p_v in profile.planprofileversion_set.all():
 					p_v.delete()
-				new_profile_version = PlanProfileVersion.objects.create(version=1, content=content, plan_profile=profile, user_agent=user_agent)
+				PlanProfileVersion.objects.create(version=1, content=content, plan_profile=profile, user_agent=user_agent)
 				profile.name = newName
 				profile.latest = 1
 				profile.save()
@@ -343,7 +360,10 @@ def edit_plannable_profile(request):
 				if "name" not in post:
 					return _error_response("Missing name field")
 				name = post["name"]
-				profile = get_object_or_404(PlanProfile, user=user ,name=name)
+				try:
+					profile = PlanProfile.objects.get(user=user ,name=name)
+				except:
+					return _error_response("Profile doesn't exist")
 				for p_v in profile.planprofileversion_set.all():
 					p_v.delete()
 				profile.delete()
@@ -360,7 +380,10 @@ def get_plannable_profile(request):
 	if request.method == "POST":
 		post = json.loads(request.body)
 		username, credential= post["username"], post["credential"]
-		user = get_object_or_404(User, username=username)
+		try:
+			user = User.objects.get(username=username)
+		except:
+			return _error_response("User doesn't exist")
 		auth = authenticate_credential(credential, username)
 		if auth["success"]:
 			ret_profile = []
@@ -406,7 +429,10 @@ def save_plannable_profile(request):
 	if request.method == "POST":
 		post = json.loads(request.body)
 		username, credential, profiles = post["username"], post["credential"], post["profiles"]
-		user = get_object_or_404(User, username=username)
+		try:
+			user = User.objects.get(username=username)
+		except:
+			return _error_response("User doesn't exist")
 		auth = authenticate_credential(credential, username)
 		if auth["success"]:
 			user_agent = request.META['HTTP_USER_AGENT']
