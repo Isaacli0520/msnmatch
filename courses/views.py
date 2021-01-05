@@ -307,8 +307,13 @@ def authenticate_credential(credential, username):
 	if auth == None:
 		return {"success":False, "message":"Invalid credential"}
 	diff = timezone.now() - auth.date_created
-	if diff.total_seconds() > 86400 * 7:
+	diff_sec = diff.total_seconds()
+	if diff_sec > 86400 * 7:
 		return {"success":False, "message":"Credential expired"}
+	# Less than 1 day before expiration, extend by 1 day
+	if diff_sec >= 86400 * 6 and diff_sec <= 86400 * 7:
+		auth.date_created += datetime.timedelta(days=1)
+		auth.save()
 	return {"success":True, "message":"success"}
 
 
