@@ -332,7 +332,7 @@ def edit_plannable_profile(request):
 				profile.name = newName
 				profile.latest = 1
 				profile.save()
-				return _success_response({"version":get_versions_of_profile(profile)})
+				return _success_response({"versions":get_versions_of_profile(profile)})
 			# Delete profile and corresponding versions
 			elif action == "delete":
 				if "name" not in post:
