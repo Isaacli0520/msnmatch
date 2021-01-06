@@ -61,12 +61,11 @@
 
 <script>
 import axios from 'axios'
-import CustomHeader from '../components/CustomHeader'
-import CustomBreadcrumb from '../components/CustomBreadcrumb'
+import { CustomHeader, CustomBreadcrumb } from '../components'
 axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 axios.defaults.xsrfCookieName = "csrftoken";
 
-  export default {
+export default {
     data() {
       return {
         departments:[],
@@ -119,8 +118,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
                         href: '',
                     },
                 ];
-                
-          });
+            });
         },
         goToHref(text){
             window.location.href = text;
@@ -129,7 +127,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
     mounted(){
         this.getDepartments();
     },
-  };
+};
 </script>
 
 <style>

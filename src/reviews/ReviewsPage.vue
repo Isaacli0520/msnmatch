@@ -156,10 +156,11 @@
 <script>
 import axios from 'axios'
 import { CustomHeader, CustomBreadcrumb, ReviewCard } from '../components'
+import { sortBySemester } from '../utils'
 axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 axios.defaults.xsrfCookieName = "csrftoken";
 
-  export default {
+export default {
     data() {
         return {
             // Page Basics
@@ -192,38 +193,15 @@ axios.defaults.xsrfCookieName = "csrftoken";
         }
     },
     components:{
-      CustomHeader,
-      CustomBreadcrumb,
-      ReviewCard,
-    },
-    watch: {
-    },
-    computed:{
+        CustomHeader,
+        CustomBreadcrumb,
+        ReviewCard,
     },
     methods: {
         getCurrentSemester(){
             axios.get('/courses/api/get_current_semester/',{params: {}}).then(response => {
                 this.currentSemester = response.data.year + response.data.semester;
             });
-        },
-        sortBySemester(a, b){
-            if(a.substring(0,4) != b.substring(0,4)){
-                return b.substring(0,4).toString(10) - a.substring(0,4).toString(10);
-            }
-            else{
-                if(a.substring(4) == b.substring(4)){
-                    return 0;
-                }
-                else if(a.substring(4) == "Fall"){
-                    return -1;
-                }
-                else{
-                    return 1;
-                }
-            }
-        },
-        sortBySemesterKey(a,b){
-            return this.sortBySemester(a["semester"], b["semester"]);
         },
         goToHref(text){
             window.location.href = text;
@@ -239,7 +217,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
             this.cs_instr_load = true;
             var tmp_cs_instr = [];
             axios.get('/courses/api/get_course_instructors/',{params: {course_pk:course_pk, instructor_pk:instructor_pk}}).then(response => {
-                this.course_instructors = response.data.course_instructors.sort(this.sortBySemesterKey);
+                this.course_instructors = response.data.course_instructors.sort((a, b)=>{return sortBySemester(a["semester"], b["semester"]);});
                 for(let i = 0; i < this.course_instructors.length; i++){
                     if(this.course_instructors[i].semester != this.currentSemester){
                         tmp_cs_instr.push({
@@ -325,11 +303,10 @@ axios.defaults.xsrfCookieName = "csrftoken";
         this.getCurrentSemester();
         this.getReviews();
     },
-  };
+};
 </script>
 
 <style scoped>
-
     .review-headline-number{
         font-family: "Roboto", sans-serif;
         font-size: 1.3em;
@@ -381,20 +358,6 @@ axios.defaults.xsrfCookieName = "csrftoken";
         line-height: 1.0;
     }
 
-    @media (min-width: 1025px) {
-        
-    }
-
-
-    @media (min-width: 768px) and (max-width: 1024px) {
-        
-    }
-
-    @media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
-        
-    }
-
-
     @media (min-width: 10px) and (max-width: 767px) {
         .cus-headline-number{
             font-size: 1.3em;
@@ -414,8 +377,8 @@ axios.defaults.xsrfCookieName = "csrftoken";
         }
 
         .v-breadcrumbs li{
-        font-size:14px !important;
-    }
+            font-size:14px !important;
+        }
     }
 
 </style>

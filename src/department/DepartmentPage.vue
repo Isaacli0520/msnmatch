@@ -1,20 +1,15 @@
 <template>
   <v-app>
     <custom-header></custom-header>
-    <v-content>
+    <v-main>
         <v-container v-if="!loaded" fluid fill-height>
-            <v-layout 
-                align-center
-                justify-center>
-                <div>
-                    <v-progress-circular
+            <v-row justify="center">
+                <v-progress-circular
                     :size="60"
                     :width="6"
                     indeterminate
-                    color="teal lighten-1">
-                    </v-progress-circular>
-                </div>
-            </v-layout>
+                    color="teal lighten-1"/>
+            </v-row>
         </v-container>
         <v-container v-if="loaded" fluid grid-list-lg>
             <v-layout>
@@ -73,100 +68,99 @@
                 </template>
             </v-layout>
         </v-container>
-    </v-content>
+    </v-main>
   </v-app>
 </template>
 
 <script>
 import axios from 'axios'
-import CustomHeader from '../components/CustomHeader'
-import CustomBreadcrumb from '../components/CustomBreadcrumb'
+import { CustomHeader, CustomBreadcrumb } from '../components'
 axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 axios.defaults.xsrfCookieName = "csrftoken";
 
-    export default {
-        data() {
-            return {
-                loaded: false,
-                department:{
-                    name:"",
-                    school:"",
-                },
-                courses:[],
-                currentSemester:"",
-                navItems:[],
-            }
-        },
-        components:{
-            CustomHeader,
-            CustomBreadcrumb,
-        },
-        watch: {
-        },
-        computed:{
-            department_pk: function(){
-                let url = window.location.pathname.split('/');
-                return url[url.length - 2];
+export default {
+    data() {
+        return {
+            loaded: false,
+            department:{
+                name:"",
+                school:"",
             },
+            courses:[],
+            currentSemester:"",
+            navItems:[],
+        }
+    },
+    components:{
+        CustomHeader,
+        CustomBreadcrumb,
+    },
+    watch: {
+    },
+    computed:{
+        department_pk: function(){
+            let url = window.location.pathname.split('/');
+            return url[url.length - 2];
         },
-        methods: {
-            getCurrentSemester(){
-                axios.get('/courses/api/get_current_semester/',{params: { }}).then(response => {
-                    this.currentSemester = response.data.year + response.data.semester;
-                });
-            },
-            taking_or_taken(course){
-                if(course.take.take == "taking")
-                    return "Taking"
-                else if(course.take.take == "taken")
-                    return "Taken"
-                else
-                    return ""
-            },
-            sortCourseNumber(a, b){
-                return a.number.toString(10) - b.number.toString(10);
-            },
-            getDepartment(){
-                axios.get('/courses/api/get_department/',{params: {department_pk:this.department_pk, }}).then(response => {
-                    this.courses = response.data.courses.sort(this.sortCourseNumber);
-                    for(let i = 0; i < this.courses.length - 1; i++){
-                        if(Math.floor(this.courses[i + 1].number.toString(10)/1000) - Math.floor(this.courses[i].number.toString(10)/1000) >= 1){
-                            this.courses[i]["divider"] = true;
-                        }
-                        else{
-                            this.courses[i]["divider"] = false;
-                        }
+    },
+    methods: {
+        getCurrentSemester(){
+            axios.get('/courses/api/get_current_semester/',{params: { }}).then(response => {
+                this.currentSemester = response.data.year + response.data.semester;
+            });
+        },
+        taking_or_taken(course){
+            if(course.take.take == "taking")
+                return "Taking"
+            else if(course.take.take == "taken")
+                return "Taken"
+            else
+                return ""
+        },
+        sortCourseNumber(a, b){
+            return a.number.toString(10) - b.number.toString(10);
+        },
+        getDepartment(){
+            axios.get('/courses/api/get_department/',{params: {department_pk:this.department_pk, }}).then(response => {
+                this.courses = response.data.courses.sort(this.sortCourseNumber);
+                for(let i = 0; i < this.courses.length - 1; i++){
+                    if(Math.floor(this.courses[i + 1].number.toString(10)/1000) - Math.floor(this.courses[i].number.toString(10)/1000) >= 1){
+                        this.courses[i]["divider"] = true;
                     }
-                    this.department = response.data.department;
-                    this.navItems = [
-                        {
-                            text: "Main",
-                            disabled: false,
-                            href: '/courses/',
-                        },
-                        {
-                            text: "Departments",
-                            disabled: false,
-                            href: '/courses/departments/',
-                        },
-                        {
-                            text: this.department.name,
-                            disabled: true,
-                            href:  '/courses/departments/' + this.department_pk + "/",
-                        },
-                    ];
-                    this.loaded = true;           
-                });
-            },
-            goToHref(text){
-                window.location.href = text;
-            },
+                    else{
+                        this.courses[i]["divider"] = false;
+                    }
+                }
+                this.department = response.data.department;
+                this.navItems = [
+                    {
+                        text: "Main",
+                        disabled: false,
+                        href: '/courses/',
+                    },
+                    {
+                        text: "Departments",
+                        disabled: false,
+                        href: '/courses/departments/',
+                    },
+                    {
+                        text: this.department.name,
+                        disabled: true,
+                        href:  '/courses/departments/' + this.department_pk + "/",
+                    },
+                ];
+                this.loaded = true;           
+            });
         },
-        mounted(){
-            this.getCurrentSemester();
-            this.getDepartment();
+        goToHref(text){
+            window.location.href = text;
         },
-    };
+    },
+    mounted(){
+        this.getCurrentSemester();
+        this.getDepartment();
+    },
+};
 </script>
 
 <style>

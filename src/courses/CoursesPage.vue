@@ -151,7 +151,7 @@ import axios from 'axios'
 import { CustomHeader, SearchCourse, ReviewCard, Recommendation } from '../components'
 import { general_urls, general_icons } from '../utils'
 
-  export default {
+export default {
     data() {
         return {
             topReviewsLoading:true,
@@ -241,7 +241,7 @@ import { general_urls, general_icons } from '../utils'
         this.getTopReviews();
         this.getTrendingCourses();
     },
-  };
+};
 </script>
 
 <style scoped>

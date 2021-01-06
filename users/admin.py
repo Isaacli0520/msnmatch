@@ -7,7 +7,6 @@ from django.core import serializers
 
 from skills.models import Skill
 from friendship.models import Follow
-from groups.models import Group
 from .models import Profile, PlanProfile, PlanProfileVersion, Authenticator
 
 from msnmatch.utils import custom_md5
@@ -30,9 +29,6 @@ export_users_new.short_description = 'Export users to json'
 
 class SkillRelationInline(admin.TabularInline):
     model = Skill.users.through
-
-class GroupRelationInline(admin.TabularInline):
-    model = Group.group_users.through
 
 class FollowRelationInline(admin.TabularInline):
     model = Follow
@@ -116,7 +112,7 @@ def export_users(modeladmin, request, queryset):
 export_users.short_description = 'Export to csv'
 
 class CustomUserAdmin(UserAdmin):
-    inlines = (ProfileInline, SkillRelationInline, FollowRelationInline, GroupRelationInline)
+    inlines = (ProfileInline, SkillRelationInline, FollowRelationInline)
     list_display = ('username','get_sex', 'email', 'first_name', 'last_name', 'is_staff', 'get_location' ,'get_matched', 'get_role', 'get_graduate_year','get_birth_date','get_major')
     list_filter = ('is_staff', 'profile__sex','profile__role','profile__graduate_year', 'profile__matched')
     list_select_related = ('profile', )

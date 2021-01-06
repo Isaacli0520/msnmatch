@@ -3,26 +3,21 @@
     <custom-header @submit-review="getCourseInstructor"></custom-header>
     <v-main>
         <v-container v-if="!loaded" fluid fill-height>
-            <v-layout 
-                align-center
-                justify-center>
-                <div class="text-center">
-                    <v-progress-circular
+            <v-layout align-center justify-center>
+                <v-progress-circular
                     :size="60"
                     :width="6"
                     indeterminate
-                    color="teal lighten-1">
-                    </v-progress-circular>
-                </div>
+                    color="teal lighten-1"/>
             </v-layout>
         </v-container>
-        <v-container v-if="loaded" fluid grid-list-lg>
-            <v-layout>
-                <v-flex>
+        <v-container v-else fluid grid-list-lg>
+            <v-row>
+                <v-col cols="12">
                     <custom-breadcrumb :items="navItems"></custom-breadcrumb>
-                </v-flex>
-            </v-layout>
-            <v-layout mt-2> <!-- Mnemonic and Number -->
+                </v-col>
+            </v-row>
+            <v-layout> <!-- Mnemonic and Number -->
                 <v-flex class="cus-headline-flex"> 
                     <div>
                     <span class="cus-headline-number">{{course.mnemonic}}{{course.number}}</span>
@@ -245,7 +240,7 @@
         :timeout="2700">
         Sth is wrong
         <template v-slot:action="{ attrs }">
-        <v-btn color="white" v-bind="attrs" text @click="failure_snack = false"> Close </v-btn>
+            <v-btn color="white" v-bind="attrs" text @click="failure_snack = false"> Close </v-btn>
         </template>
     </v-snackbar>
     <v-snackbar
@@ -255,7 +250,7 @@
         :timeout="2700">
         Form Invalid
         <template v-slot:action="{ attrs }">
-        <v-btn color="white" v-bind="attrs" text @click="form_invalid_snack = false"> Close </v-btn>
+            <v-btn color="white" v-bind="attrs" text @click="form_invalid_snack = false"> Close </v-btn>
         </template>
     </v-snackbar>
     <v-snackbar
@@ -265,7 +260,7 @@
         :timeout="2700">
         Review Submitted
         <template v-slot:action="{ attrs }">
-        <v-btn color="cyan accent-1" v-bind="attrs" text @click="success_snack = false"> Close </v-btn>
+            <v-btn color="cyan accent-1" v-bind="attrs" text @click="success_snack = false"> Close </v-btn>
         </template>
     </v-snackbar>
     </v-app>
@@ -273,9 +268,8 @@
 
 <script>
 import axios from 'axios'
-import CustomHeader from '../components/CustomHeader'
-import CustomRating from '../components/CustomRating'
-import CustomBreadcrumb from '../components/CustomBreadcrumb'
+import { CustomBreadcrumb, CustomHeader, CustomRating } from '../components'
+import { sortBySemester } from '../utils'
 axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 axios.defaults.xsrfCookieName = "csrftoken";
 
@@ -413,25 +407,6 @@ export default {
                 this.getCourseInstructor();
             });
         },
-        sortBySemester(a, b){
-            if(a.substring(0,4) != b.substring(0,4)){
-                return b.substring(0,4).toString(10) - a.substring(0,4).toString(10);
-            }
-            else{
-                if(a.substring(4) == b.substring(4)){
-                    return 0;
-                }
-                else if(a.substring(4) == "Fall"){
-                    return -1;
-                }
-                else{
-                    return 1;
-                }
-            }
-        },
-        sortBySemesterKey(a,b){
-            return this.sortBySemester(a["semester"], b["semester"]);
-        },
         submitReview(){
             this.$refs.review_form.validate();
             if(!this.submit_review_form_valid){
@@ -464,7 +439,7 @@ export default {
                 this.course = data.course;
                 document.title = this.course.mnemonic + this.course.number;
                 this.course_instructors = data.course_instructors;
-                this.course_instructors = this.course_instructors.sort(this.sortBySemesterKey);
+                this.course_instructors = this.course_instructors.sort((a, b)=>{return sortBySemester(a["semester"], b["semester"]);});
                 for(let i = 0; i < this.course_instructors.length; i++){
                     if(this.course_instructors[i].semester != this.currentSemester){
                         tmp_cs_instr.push({

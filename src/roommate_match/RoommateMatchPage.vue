@@ -1,10 +1,8 @@
 <template>
     <v-app>
-
         <match-header
             :headerUpdate="headerUpdate"></match-header>
-        <v-content class="content-div">
-
+        <v-main class="content-div">
             <v-container 
                 class="fill-height"
                 v-if="!loaded">
@@ -85,7 +83,7 @@
                     </v-col>
                 </v-row>
             </v-container>
-        </v-content>
+        </v-main>
         <user-dialog
             v-if="d_user"
             :edit="request_user.username == d_user.username"
@@ -133,9 +131,7 @@
 <script>
 import Vue from "vue";
 import axios from 'axios'
-import MatchHeader from '../components/MatchHeader'
-import UserDialog from '../components/UserDialog'
-import UserCard from '../components/UserCard'
+import { MatchHeader, UserCard, UserDialog } from '../components'
 axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 axios.defaults.xsrfCookieName = "csrftoken";
 
@@ -462,20 +458,6 @@ axios.defaults.xsrfCookieName = "csrftoken";
         appearance: none;
         outline: none;
     }
-
-    @media (min-width: 1025px) {
-        
-    }
-
-
-    @media (min-width: 768px) and (max-width: 1024px) {
-        
-    }
-
-    @media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
-        
-    }
-
 
     @media (min-width: 10px) and (max-width: 767px) {
         .title-text{

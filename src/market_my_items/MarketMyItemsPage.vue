@@ -3,7 +3,7 @@
         <market-header
             @accept-disclaimer="getMyItems"
             @update-items="getMyItems"></market-header>
-        <v-content>
+        <v-main>
             <v-container v-if="!loaded" fluid fill-height>
                 <v-layout 
                     align-center
@@ -185,7 +185,7 @@
                 @open-delete-dialog="openDeleteItemDialog"
                 @open-sold-dialog="openSoldItemDialog"
                 @close-dialog="itemDialog=false"></market-item-dialog>
-        </v-content>
+        </v-main>
         <v-snackbar
             top
             v-model="delete_snack"

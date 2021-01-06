@@ -1,7 +1,7 @@
 <template>
     <v-app>
         <custom-header></custom-header>
-        <v-content>
+        <v-main>
             <v-container fluid grid-list-lg>
                 <v-layout>
                     <v-flex>
@@ -77,21 +77,18 @@
                     </v-flex>
                 </v-layout>
             </v-container>
-        </v-content>
-        <!-- <custom-footer></custom-footer> -->
+        </v-main>
     </v-app>
 </template>
 
 <script>
 import axios from 'axios'
-import CustomHeader from '../components/CustomHeader'
-import CustomRating from '../components/CustomRating'
-import CustomFooter from '../components/CustomFooter'
-import CustomBreadcrumb from '../components/CustomBreadcrumb'
+import { CustomHeader, CustomRating, CustomBreadcrumb } from '../components'
+import { sortBySemester } from '../utils'
 
-  export default {
-	data() {
-	    return {
+export default {
+    data() {
+        return {
             rating_default:[5,4,3,2,1],
             taking_courses:[],
             taken_courses:[],
@@ -104,43 +101,23 @@ import CustomBreadcrumb from '../components/CustomBreadcrumb'
                 courses:[],
             },
             courses:[],
-	    }
-	},
-	components:{
+        }
+    },
+    components:{
         CustomHeader,
         CustomRating,
-        CustomFooter,
         CustomBreadcrumb,
-	},
-	watch: {
+    },
+    watch: {
 
-	},
-	computed:{
+    },
+    computed:{
         instructor_pk: function(){
             let url = window.location.pathname.split('/');
             return url[url.length - 2];
         },
-	},
-	methods: {
-        sortBySemester(a, b){
-            if(a.substring(0,4) != b.substring(0,4)){
-                return b.substring(0,4).toString(10) - a.substring(0,4).toString(10);
-            }
-            else{
-                if(a.substring(4) == b.substring(4)){
-                    return 0;
-                }
-                else if(a.substring(4) == "Fall"){
-                    return -1;
-                }
-                else{
-                    return 1;
-                }
-            }
-        },
-        sortByNumber(a, b){
-            return a.number.toString(10) - b.number.toString(10);
-        },
+    },
+    methods: {
         getSemesterColor(semester){
             if(semester.substring(4) == "Fall"){
                 return 'orange';
@@ -152,17 +129,17 @@ import CustomBreadcrumb from '../components/CustomBreadcrumb'
                 return "";
             }
         },
-		goToHref(text){
-			window.location.href = text;
+        goToHref(text){
+            window.location.href = text;
         },
         getInstructor(){
             axios.get('/courses/ajax/get_instructor/',{params: {"instructor_pk":this.instructor_pk,}}).then(response => {
                 this.instructor = response.data;
                 for(var key in this.instructor.courses){
-                    this.instructor.courses[key].semesters = this.instructor.courses[key].semesters.sort(this.sortBySemester);
+                    this.instructor.courses[key].semesters = this.instructor.courses[key].semesters.sort(sortBySemester);
                     this.courses.push(this.instructor.courses[key]);
                 }
-                this.courses = this.courses.sort(this.sortByNumber);
+                this.courses = this.courses.sort((a, b) => {return a.number.toString(10) - b.number.toString(10);});
                 this.navItems = [
                     {
                         text: "Main",
@@ -177,11 +154,11 @@ import CustomBreadcrumb from '../components/CustomBreadcrumb'
                 ];
             });
         },
-	},
-	mounted(){
+    },
+    mounted(){
         this.getInstructor();
-	},
-  };
+    },
+};
 </script>
 
 <style>
@@ -194,15 +171,15 @@ import CustomBreadcrumb from '../components/CustomBreadcrumb'
         padding-left: 4px !important;
     }
 
-	.cus-headline-text{
-		font-family: "Roboto", sans-serif;
-		font-size: 2.1em;
-		font-weight: 300;
-		color:rgb(0, 0, 0);
-		padding: 7px 12px 7px 3px;
-		border-radius: 5px;
-		line-height: 1.0;
-	}
+    .cus-headline-text{
+        font-family: "Roboto", sans-serif;
+        font-size: 2.1em;
+        font-weight: 300;
+        color:rgb(0, 0, 0);
+        padding: 7px 12px 7px 3px;
+        border-radius: 5px;
+        line-height: 1.0;
+    }
 
     @media (min-width: 1025px) {
         

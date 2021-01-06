@@ -9,7 +9,7 @@ urlpatterns = [
     path('send/',views.comments_send, name='comments_send'),
     path('filter/',views.comments_filter, name='comments_filter'),
 
-	path('<int:slide_pk>/',views.comments, name='comments'),
+    path('<int:slide_pk>/',views.comments, name='comments'),
 
     path('api/set_slide/', views.set_slide, name="set_slide"),
     path('api/create_slide/', views.create_slide, name="create_slide"),

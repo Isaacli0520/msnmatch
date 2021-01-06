@@ -1,7 +1,7 @@
 <template>
     <v-app>
         <market-header></market-header>
-        <v-content>
+        <v-main>
             <v-container v-if="!loaded" fluid fill-height>
                 <v-layout 
                     align-center
@@ -97,7 +97,7 @@
                     </v-col>
                 </v-row>
             </v-container>
-        </v-content>
+        </v-main>
     </v-app>
 </template>
 

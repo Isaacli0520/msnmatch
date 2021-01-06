@@ -65,8 +65,7 @@
                         :size="60"
                         :width="6"
                         indeterminate
-                        color="teal lighten-1">
-                    </v-progress-circular>
+                        color="teal lighten-1"/>
                 </v-row>
             </v-container>
         </v-main>
@@ -76,6 +75,7 @@
 <script>
 import axios from 'axios'
 import { CustomHeader, CustomBreadcrumb } from "../components"
+import { sortBySemester } from '../utils'
 
 export default {
     data() {
@@ -86,33 +86,14 @@ export default {
             navItems:[],
             loaded:false,
         }
-	},
-	components:{
+    },
+    components:{
         CustomHeader,
         CustomBreadcrumb,
-	},
-	methods: {
-        sortBySemester(a, b){
-            if(a.substring(0,4) != b.substring(0,4)){
-                return b.substring(0,4).toString(10) - a.substring(0,4).toString(10);
-            }
-            else{
-                if(a.substring(4) == b.substring(4)){
-                    return 0;
-                }
-                else if(a.substring(4) == "Fall"){
-                    return -1;
-                }
-                else{
-                    return 1;
-                }
-            }
-        },
-        sortBySemesterKey(a,b){
-            return this.sortBySemester(a["semester"], b["semester"]);
-        },
-		goToHref(text){
-			window.location.href = text;
+    },
+    methods: {
+        goToHref(text){
+            window.location.href = text;
         },
         getMyCourses(){
             axios.get('/courses/api/get_my_courses/',{params: {}}).then(response => {
@@ -137,11 +118,11 @@ export default {
                     "courses":tmp_taking_semester[key]
                 });
             }
-            ret_taking_courses = ret_taking_courses.sort(this.sortBySemesterKey);
+            ret_taking_courses = ret_taking_courses.sort((a, b) => {return sortBySemester(a["semester"], b["semester"]);});
             return ret_taking_courses
         },
-	},
-	mounted(){
+    },
+    mounted(){
         this.navItems = [
             {
                 text: "Main",
@@ -155,7 +136,7 @@ export default {
             },
         ];
         this.getMyCourses();
-	},
+    },
 };
 </script>
 
@@ -186,29 +167,15 @@ export default {
         padding-left: 4px !important;
     }
 
-	.cus-headline-text{
-		font-family: "Roboto", sans-serif;
-		font-size: 2.1em;
-		font-weight: 300;
-		color:rgb(0, 0, 0);
-		padding: 7px 12px 7px 3px;
-		border-radius: 5px;
-		line-height: 1.0;
-	}
-
-    @media (min-width: 1025px) {
-        
+    .cus-headline-text{
+        font-family: "Roboto", sans-serif;
+        font-size: 2.1em;
+        font-weight: 300;
+        color:rgb(0, 0, 0);
+        padding: 7px 12px 7px 3px;
+        border-radius: 5px;
+        line-height: 1.0;
     }
-
-
-    @media (min-width: 768px) and (max-width: 1024px) {
-        
-    }
-
-    @media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
-        
-    }
-
 
     @media (min-width: 10px) and (max-width: 767px) {
         .cus-headline-number{
@@ -217,7 +184,6 @@ export default {
 
         .cus-headline-text{
             font-size: 1.3em;
-            
         }
 
         .course-number{
@@ -229,8 +195,8 @@ export default {
         }
 
         .v-breadcrumbs li{
-        font-size:14px !important;
-    }
+            font-size:14px !important;
+        }
     }
 
 </style>

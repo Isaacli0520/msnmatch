@@ -109,8 +109,8 @@ import { MatchHeader, TagSpan } from '../components'
 axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 axios.defaults.xsrfCookieName = "csrftoken";
 
-  export default {
-	data() {
+export default {
+    data() {
         return {
             loaded:false,
             skillNameLimit: 40,
@@ -135,12 +135,12 @@ axios.defaults.xsrfCookieName = "csrftoken";
                 "Books":"Books",
             },
         }
-	},
-	components:{
+    },
+    components:{
         MatchHeader,
         TagSpan,
-	},
-	watch: {
+    },
+    watch: {
         selected_item(val){
             if(val != null){
                 this.addSkill(val);
@@ -179,8 +179,8 @@ axios.defaults.xsrfCookieName = "csrftoken";
                 this.isLoading = false
             });
         },
-	},
-	computed:{
+    },
+    computed:{
         search_result_items(){
             return this.entries.map(entry => {
                 const skill_name = entry.name.length > this.skillNameLimit
@@ -189,8 +189,8 @@ axios.defaults.xsrfCookieName = "csrftoken";
                 return { text:skill_name, value:this.lastTime + entry.id, id:entry.id, name:skill_name, type:entry.type};
             })
         },
-	},
-	methods: {
+    },
+    methods: {
         getSkills(){
             axios.get('/users/api/get_all_and_user_skills/').then(response => {
                 this.all_skills = response.data.all_skills;
@@ -235,11 +235,11 @@ axios.defaults.xsrfCookieName = "csrftoken";
                 }
             });
         }
-	},
-	mounted(){
+    },
+    mounted(){
         this.getSkills();
-	},
-  };
+    },
+};
 </script>
 
 <style>

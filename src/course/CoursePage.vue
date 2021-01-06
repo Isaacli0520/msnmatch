@@ -174,6 +174,16 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
+        <v-snackbar
+            top
+            v-model="success_snack"
+            color="teal darken-1"
+            :timeout="2700">
+            Updated
+            <template v-slot:action="{ attrs }">
+                <v-btn color="cyan accent-1" v-bind="attrs" text @click="success_snack = false"> Close </v-btn>
+            </template>
+        </v-snackbar>
     </v-main>
   </v-app>
 </template>
@@ -185,9 +195,10 @@ import { CustomHeader, CustomRating, CustomBreadcrumb } from '../components'
 axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 axios.defaults.xsrfCookieName = "csrftoken";
 
-  export default {
+export default {
     data() {
         return {
+            success_snack:false,
             header_update:false,
             rating_default:[5,4,3,2,1],
             tmp_num:0,
@@ -230,9 +241,6 @@ axios.defaults.xsrfCookieName = "csrftoken";
         CustomHeader,
         CustomRating,
         CustomBreadcrumb,
-    },
-    watch: {
-      
     },
     computed:{
         rating_course_counter_sum(){
@@ -335,13 +343,9 @@ axios.defaults.xsrfCookieName = "csrftoken";
                     'delete':true,
                 }
             }
-            axios.post('/courses/ajax/save_take/',
-            tmp_params,).then(response => {
+            axios.post('/courses/ajax/save_take/', tmp_params,).then(response => {
                 if(response.data.success){
-                    this.$message({
-                        message: 'Updated',
-                        type: 'success'
-                    });
+                    this.success_snack = true;
                 }
                 this.header_update = !this.header_update;
                 this.takeCourse = null;
@@ -419,7 +423,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
     mounted(){
         this.getCurrentSemester();
     },
-  };
+};
 </script>
 
 <style>
