@@ -46,10 +46,10 @@
                                 :key="index_course + '-rcm-course' " 
                                 v-for="(course, index_course) in rcm_courses">
                                 <v-card hover :href="'/courses/'+ course.course_pk + '/' ">
-                                    <v-card-title style="padding:10px;">
+                                    <v-card-title style="padding:10px;clear:both;display:block;">
                                         <span class="course-number">{{course.mnemonic}}{{course.number}}</span>
                                         <span class="course-title">{{course.title}}</span>
-                                        <span class="">{{course.taken}}</span>
+                                        <span class="course-taken">Taken: {{course.taken}}</span>
                                     </v-card-title>
                                 </v-card>
                             </v-col>
@@ -169,6 +169,18 @@ export default{
         font-size: 18px;
     }
 
+    .course-taken{
+        float: right;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.3;
+        font-size: 14px;
+        color:#ffffff;
+        padding: 6px 7px;
+        margin-right: 5px;
+        border-radius: 4px;
+        background-color: #ff5c1b;
+    }
+
     @media (min-width: 10px) and (max-width: 767px) {
         .course-number{
             font-size: 16px;
@@ -176,6 +188,10 @@ export default{
 
         .course-title{
             font-size: 16px;
+        }
+
+        .course-taken{
+            font-size: 12px;
         }
     }
 </style>
