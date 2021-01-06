@@ -35,4 +35,5 @@ export var general_icons = {
     market:"mdi-shopping-outline",
     live_comments:"mdi-chat-processing-outline",
     plannable:"mdi-navigation-outline",
+    recommendation:"mdi-thumb-up-outline",
 };

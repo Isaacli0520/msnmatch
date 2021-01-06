@@ -14,7 +14,6 @@
   },
   "dependencies": {
     "acorn": "^6.4.2",
-    "axios": "^0.19.2",
     "comment-core-library": "^0.11.1",
     "core-js": "^2.6.11",
     "css-loader": "^2.1.1",
@@ -41,6 +40,7 @@
     "@vue/cli-plugin-babel": "^3.12.1",
     "@vue/cli-plugin-eslint": "^3.12.1",
     "@vue/cli-service": "^4.5.9",
+    "axios": "^0.21.1",
     "babel-eslint": "^10.1.0",
     "babel-plugin-component": "^1.1.1",
     "eslint": "^5.16.0",

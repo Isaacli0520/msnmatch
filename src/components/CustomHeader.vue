@@ -397,7 +397,7 @@ export default{
     },
     computed:{
         plannableFinalURL(){
-            return "https://plannable.org" + "/?courses=" + this.plannableURL + "&username=" + this.username + "&credential=" + this.credential + "";
+            return "https://plannable.org" + "/?username=" + this.username + "&credential=" + this.credential + "";
         }
     },
     methods:{
@@ -436,7 +436,7 @@ export default{
             });
         },
         getCourse(){
-            axios.get('/courses/ajax/get_course/',{params: {pk:this.review_course_pk, }}).then(response => {
+            axios.get('/courses/api/get_course/',{params: {pk:this.review_course_pk, }}).then(response => {
                 this.review_course = response.data.course;
                 this.instructors = {};
                 this.instructor_options = [];
@@ -490,7 +490,7 @@ export default{
                 this.goToHref(this.general_urls.review_url);
             }
             else if(item.title=="Log Out"){
-                this.goToHref(this.general_urls.logout);
+                this.goToHref(this.general_urls.logout_url);
             }
             else if(item.title=="Match"){
                 this.goToHref(this.general_urls.match_url);
