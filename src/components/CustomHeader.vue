@@ -436,7 +436,7 @@ export default{
             });
         },
         getCourse(){
-            axios.get('/courses/ajax/get_course/',{params: {pk:this.review_course_pk, }}).then(response => {
+            axios.get('/courses/api/get_course/',{params: {pk:this.review_course_pk, }}).then(response => {
                 this.review_course = response.data.course;
                 this.instructors = {};
                 this.instructor_options = [];

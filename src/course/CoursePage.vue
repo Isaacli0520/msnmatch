@@ -181,9 +181,7 @@
 <script>
 
 import axios from 'axios'
-import CustomHeader from '../components/CustomHeader'
-import CustomRating from '../components/CustomRating'
-import CustomBreadcrumb from '../components/CustomBreadcrumb'
+import { CustomHeader, CustomRating, CustomBreadcrumb } from '../components'
 axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 axios.defaults.xsrfCookieName = "csrftoken";
 
@@ -353,7 +351,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
             this.dialogTake = false;
         },
         getCourse(){
-            axios.get('/courses/ajax/get_course/',{params: {pk:this.course_pk, }}).then(response => {
+            axios.get('/courses/api/get_course/',{params: {pk:this.course_pk, }}).then(response => {
                 this.course = response.data.course;
                 document.title = this.course.mnemonic + this.course.number;
                 this.takeItems = [];

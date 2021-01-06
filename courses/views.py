@@ -6,17 +6,17 @@ import hmac
 import random
 import numpy as np
 import datetime
-from collections import Counter
+from collections import Counter, defaultdict
 
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector, TrigramSimilarity
 from django.db.models import Q, F, Count
 from django.db.models.functions import Lower, Substr, Length
-from django.http import JsonResponse
+from django.http import JsonResponse, Http404
 from django.forms.models import model_to_dict
 from django.utils import timezone
 
@@ -26,6 +26,19 @@ from functools import cmp_to_key
 
 from users.models import MAJOR_CHOICES, PlanProfile, PlanProfileVersion, Authenticator
 from .models import Course, CourseUser, CourseInstructor, Instructor, Department, Bug
+
+courseTypes = [
+	'Clinical',
+	'Discussion',
+	'Drill',
+	'Independent Study',
+	'Laboratory',
+	'Lecture',
+	'Practicum',
+	'Seminar',
+	'Studio',
+	'Workshop',
+]
 
 mnemonics = ['AAS', 'MATH', 'ANTH', 'SWAH', 'MDST', 'ARAD', 'ARAH', 'ARTH', 'ARTS',
 'ARAB', 'ARTR', 'HEBR', 'HIND', 'MESA', 'MEST', 'PERS', 'SANS', 'SAST', 'SATR', 'URDU', 'ASTR',
@@ -48,6 +61,21 @@ mnemonics = ['AAS', 'MATH', 'ANTH', 'SWAH', 'MDST', 'ARAD', 'ARAH', 'ARTH', 'ART
 @login_required
 def courses(request):
 	return render(request, 'courses.html')
+
+@login_required
+def course_v2(request, course_number):
+	try:
+		mnemonic = re.search('(^[a-zA-Z]+)\d+$', course_number).group(1).upper()
+		number_type = course_number[len(mnemonic):]
+		if len(number_type) < 2:
+			raise Http404
+		cs_num, cs_type = number_type[:-1], int(number_type[-1])
+		if cs_type >= len(courseTypes):
+			raise Http404
+		course = get_object_or_404(Course, mnemonic=mnemonic, number=cs_num, type=courseTypes[cs_type])
+		return redirect(reverse('course', kwargs={"course_number": course.pk }))
+	except:
+		raise Http404
 
 @login_required
 def course(request, course_number):

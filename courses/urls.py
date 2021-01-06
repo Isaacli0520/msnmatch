@@ -10,7 +10,9 @@ urlpatterns = [
 	path('instructors/<int:instructor_number>/', views.instructor, name="instructor"),
 	path('<int:course_number>/', views.course, name='course'),
 	path('departments/<int:department_number>/', views.department, name="department"),
+	path('v2/<course_number>/', views.course_v2, name='course_v2'),
 
+	path('api/get_course/', views.get_course, name='get_course'),
 	path('api/get_departments/', views.get_departments, name='get_departments'),
 	path('api/get_department/', views.get_department, name='get_department'),
 	path('api/get_course_instructor/', views.get_course_instructor, name='get_course_instructor'),
@@ -28,7 +30,6 @@ urlpatterns = [
 	path('ajax/save_take/', views.save_take, name='save_take'),
 	path('ajax/course_search_result/', views.course_search_result, name='course_search_result'),
 	path('ajax/get_current_semester/', views.get_current_semester, name='get_current_semester'),
-	path('ajax/get_course/', views.get_course, name='get_course'),
 	path('ajax/get_instructor/', views.get_instructor, name='get_instructor'),
 	path('ajax/get_trending_courses/', views.get_trending_courses, name='get_trending_courses'),
 	path('ajax/get_recommendations/', views.get_recommendations, name='get_recommendations'),
