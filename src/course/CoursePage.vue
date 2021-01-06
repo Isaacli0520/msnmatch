@@ -288,7 +288,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
             }
         },
         getCurrentSemester(){
-            axios.get('/courses/ajax/get_current_semester/',{params: {}}).then(response => {
+            axios.get('/courses/api/get_current_semester/',{params: {}}).then(response => {
                 this.currentSemester = response.data.year + response.data.semester;
                 this.getCourse();
             });

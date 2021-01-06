@@ -490,7 +490,7 @@ export default{
                 this.goToHref(this.general_urls.review_url);
             }
             else if(item.title=="Log Out"){
-                this.goToHref(this.general_urls.logout);
+                this.goToHref(this.general_urls.logout_url);
             }
             else if(item.title=="Match"){
                 this.goToHref(this.general_urls.match_url);

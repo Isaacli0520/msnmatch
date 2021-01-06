@@ -6,206 +6,157 @@
         <v-main>
             <v-container fluid grid-list-xl class="courses-main">
                 <v-row>
-                <v-col xs="12" sm="12" md="8" lg="8" xl="6" offset-md="2" offset-lg="2" offset-xl="3">
-                <v-row>
-                    <div class="headline-div-center">
-                        <div class="cus-headline-title-text">HOOS MY PROFESSOR</div>
-                        <div class="cus-subheadline-title-text">Reviews, Ratings & More</div>
-                    </div>
-                </v-row>
-                <v-row row wrap>
-                    <v-spacer></v-spacer>
-                    <v-flex d-flex xs10 sm10 md10 lg10 xl10>
-                        <search-course class="custom-search"
-                            :dense="false"
-                            background_color="white"></search-course>
-                    </v-flex>
-                    <v-spacer></v-spacer>
-                </v-row>
-                <v-row class="spacer-layout"></v-row>
-                <v-row>
-                    <template v-for="(func, index) in main_functions">
-                        <v-col :key="index" sm="3" md="3" lg="3" xl="3" cols="6">
-                            <v-card
-                                @click.native="navFunctions(func)"
-                                class="fill-height"
-                                :ripple="false"
-                                hover>
-                                <v-card-text>
-                                    <v-layout class="align-center justify-center">
-                                    <div style="padding: 8px;"><v-icon
-                                        x-large
-                                        color="teal darken-2"
-                                        >{{func.icon}}</v-icon></div>
-                                    </v-layout>
-                                </v-card-text>
-                                <v-divider></v-divider>
-                                <v-card-actions class="justify-center">
-                                    <span class="function-subtext">{{func.title}}</span>
-                                </v-card-actions>
-                            </v-card>
-                        </v-col>
-                    </template>
-                </v-row>
-                <!-- <v-layout wrap>
-                    <v-flex child-flex d-flex xs12 sm12 md12 lg12 xl12>
-                        <v-card
-                            outlined
-                            elevation="3"
-                            :loading="!recommendation_loaded">
-                            <v-card-title>Recommendations</v-card-title>
-                            <v-divider></v-divider>
-                            <v-card-text>
-                                <v-layout row wrap>
-                                    <v-flex xs6 sm6 md4 lg4 xl4 d-flex>
-                                        <v-select
-                                            v-model="year"
-                                            :items="year_options"
-                                            label="Year"
-                                            hide-details
-                                            :menu-props="{ offsetY: true }"
-                                            outlined>
-                                        </v-select>
-                                    </v-flex>
-                                    <v-flex xs6 sm6 md4 lg4 xl4 d-flex>
-                                        <v-select
-                                            v-model="semester"
-                                            :items="semester_options"
-                                            label="Semester"
-                                            hide-details
-                                            :menu-props="{ offsetY: true }"
-                                            outlined>
-                                        </v-select>
-                                    </v-flex>
-                                    <v-flex xs12 sm12 md4 lg4 xl4 d-flex>
-                                        <v-select
-                                            v-model="major"
-                                            :items="major_options"
-                                            label="Major"
-                                            hide-details
-                                            :menu-props="{ offsetY: true }"
-                                            outlined>
-                                        </v-select>
-                                    </v-flex>
-                                </v-layout>
-                                    <div class="recommendation-div"
-                                        v-if="recommendation_loaded">
-                                        <template v-if="rcm_courses.length>0">
-                                            <v-list-item
-                                                style="width:100%;"
-                                                :key="index_course + '-rcm-course' " 
-                                                v-for="(course, index_course) in rcm_courses"
-                                                :href="'/courses/'+ course.course_pk + '/' ">
-                                                <v-list-item-avatar
-                                                    color="teal lighten-2">
-                                                    <span style="color:#fff;">{{index_course + 1}}</span>
-                                                </v-list-item-avatar>
-                                                <v-list-item-content two-line>
-                                                    <v-list-item-title>{{course.mnemonic}}{{course.number}} {{course.title}}</v-list-item-title>
-                                                    <v-list-item-subtitle>Taken: {{ course.taken }}</v-list-item-subtitle>
-                                                </v-list-item-content>
-                                            </v-list-item>
-                                        </template>
-                                        <div v-else>
-                                            Recommendations are not available for this setting.
-                                        </div>
-                                    </div>
-                            </v-card-text>
-                        </v-card>
-                    </v-flex>
-                </v-layout> -->
-                <template v-if="top_reviews.length > 0">
-                    <v-layout mt-2 row wrap>
-                        <v-flex> 
-                            <div class="headline-div">
-                                <span class="cus-headline-text">Interesting Reviews</span>
-                                <v-btn class="mb-2" color="teal darken-2" icon outlined
-                                    :loading="topReviewsLoading" @click="getTopReviews()">
-                                    <v-icon>mdi-refresh</v-icon>
-                                </v-btn>
+                    <v-col cols="12" sm="12" md="8" lg="8" xl="6" offset-md="2" offset-lg="2" offset-xl="3">
+                        <v-row>
+                            <div class="headline-div-center">
+                                <div class="cus-headline-title-text">HOOS MY PROFESSOR</div>
+                                <div class="cus-subheadline-title-text">Reviews, Ratings & More</div>
                             </div>
-                        </v-flex>
-                        <v-spacer></v-spacer>
-                    </v-layout>
-                    <v-row>
-                        <template v-for="(review, index) in top_reviews">
-                            <v-col :key="index"
-                                cols="12"
-                                sm="12"
-                                md="12"
-                                lg="12"
-                                xl="12">
-                                <review-card :review="review" :editable="false"></review-card>
-                            </v-col>
-                        </template>
-                    </v-row>
-                </template>
-                <template v-if="trending_courses['Taken'].length > 0">
-                    <v-layout row wrap>
-                        <v-flex> 
-                            <div class="headline-div">
-                            <span class="cus-headline-text">Popular Courses</span>
-                            </div>
-                        </v-flex>
-                        <v-spacer></v-spacer>
-                    </v-layout>
-                    <v-layout row wrap>
-                        <template v-for="(course, index) in trending_courses['Taken']">
-                            <v-flex xs12 sm12 md12 lg12 xl12 :key="index" child-flex  d-flex>
-                                <v-card
-                                    outlined
-                                    elevation="3"
-                                    :href="'/courses/' + course.course_pk + '/' ">
-                                    <v-card-title>
-                                        <span class="course-number">{{course.mnemonic}}{{course.number}}</span>
-                                        <span class="course-name">{{course.title}}</span>
-                                    </v-card-title>
-                                    <v-card-text>
-                                        {{ course.description }}
-                                    </v-card-text>
-                                    <v-divider></v-divider>
-                                    <v-card-actions style="flex-flow:row wrap !important;">
-                                        <v-spacer v-if="$vuetify.breakpoint.smAndUp"></v-spacer>
-                                        <v-chip
-                                            class="ma-1" color="teal darken-2" label outlined small>
-                                            Last Taught: {{course.last_taught}}
-                                        </v-chip>
-                                        <v-chip
-                                            class="ma-1" color="teal darken-2" label outlined small>
-                                            Taking: {{course.taking}}
-                                        </v-chip>
-                                        <v-chip
-                                            class="ma-1" color="teal darken-2" label outlined small>
-                                            Taken: {{course.taken}}
-                                        </v-chip>
-                                    </v-card-actions>
-                                </v-card>
+                        </v-row>
+                        <v-row row wrap>
+                            <v-spacer></v-spacer>
+                            <v-flex d-flex xs10 sm10 md10 lg10 xl10>
+                                <search-course class="custom-search"
+                                    :dense="false"
+                                    background_color="white"></search-course>
                             </v-flex>
+                            <v-spacer></v-spacer>
+                        </v-row>
+                        <v-row class="spacer-layout"></v-row>
+                        <v-row>
+                            <template v-for="(func, index) in main_functions">
+                                <v-col :key="index" sm="4" md="4" lg="4" xl="4" cols="6">
+                                    <v-card
+                                        @click.native="navFunctions(func)"
+                                        class="fill-height"
+                                        :ripple="false"
+                                        hover>
+                                        <v-card-text>
+                                            <v-layout class="align-center justify-center">
+                                            <div style="padding: 8px;"><v-icon
+                                                x-large
+                                                color="teal darken-2"
+                                                >{{func.icon}}</v-icon></div>
+                                            </v-layout>
+                                        </v-card-text>
+                                        <v-divider></v-divider>
+                                        <v-card-actions class="justify-center">
+                                            <span class="function-subtext">{{func.title}}</span>
+                                        </v-card-actions>
+                                    </v-card>
+                                </v-col>
+                            </template>
+                        </v-row>
+                        <!-- Interesting Reviews -->
+                        <template>
+                            <v-layout mt-2 row wrap>
+                                <v-flex> 
+                                    <div class="headline-div">
+                                        <span class="cus-headline-text">Interesting Reviews</span>
+                                        <v-btn class="mb-2" color="teal darken-2" icon outlined
+                                            :loading="topReviewsLoading" @click="getTopReviews()">
+                                            <v-icon>mdi-refresh</v-icon>
+                                        </v-btn>
+                                    </div>
+                                </v-flex>
+                                <v-spacer></v-spacer>
+                            </v-layout>
+                            <v-row v-if="!topReviewsLoading">
+                                <template v-for="(review, index) in top_reviews">
+                                    <v-col :key="index" cols="12">
+                                        <review-card :review="review" :editable="false"></review-card>
+                                    </v-col>
+                                </template>
+                            </v-row>
+                            <v-container v-else fluid>
+                                <v-layout 
+                                    style="padding:15px;"
+                                    align-center
+                                    justify-center>
+                                    <v-progress-circular
+                                        :size="60"
+                                        :width="6"
+                                        v-if="topReviewsLoading"
+                                        indeterminate
+                                        color="teal lighten-1"/>
+                                </v-layout>
+                            </v-container>
                         </template>
-                    </v-layout>
-                </template>
+                        <!-- Trending Courses -->
+                        <template>
+                            <v-layout row wrap>
+                                <v-flex> 
+                                    <div class="headline-div">
+                                    <span class="cus-headline-text">Popular Courses</span>
+                                    </div>
+                                </v-flex>
+                                <v-spacer></v-spacer>
+                            </v-layout>
+                            <v-row v-if="!trendingCoursesLoading">
+                                <v-col cols="12" v-for="(course, index) in trending_courses['Taken']" :key="index">
+                                    <v-card
+                                        outlined
+                                        elevation="3"
+                                        :href="'/courses/' + course.course_pk + '/' ">
+                                        <v-card-title>
+                                            <span class="course-number">{{course.mnemonic}}{{course.number}}</span>
+                                            <span class="course-name">{{course.title}}</span>
+                                        </v-card-title>
+                                        <v-card-text>
+                                            {{ course.description }}
+                                        </v-card-text>
+                                        <v-divider></v-divider>
+                                        <v-card-actions style="flex-flow:row wrap !important;">
+                                            <v-spacer v-if="$vuetify.breakpoint.smAndUp"></v-spacer>
+                                            <v-chip
+                                                class="ma-1" color="teal darken-2" label outlined small>
+                                                Last Taught: {{course.last_taught}}
+                                            </v-chip>
+                                            <v-chip
+                                                class="ma-1" color="teal darken-2" label outlined small>
+                                                Taking: {{course.taking}}
+                                            </v-chip>
+                                            <v-chip
+                                                class="ma-1" color="teal darken-2" label outlined small>
+                                                Taken: {{course.taken}}
+                                            </v-chip>
+                                        </v-card-actions>
+                                    </v-card>
+                                </v-col>
+                            </v-row>
+                            <v-container v-else fluid>
+                                <v-layout 
+                                    style="padding:15px;"
+                                    align-center
+                                    justify-center>
+                                    <v-progress-circular
+                                        :size="60"
+                                        :width="6"
+                                        v-if="trendingCoursesLoading"
+                                        indeterminate
+                                        color="teal lighten-1"/>
+                                </v-layout>
+                            </v-container>
+                        </template>
                     </v-col>
                 </v-row>
             </v-container>
+            <recommendation v-model="recommendationDialog"/>
         </v-main>
     </v-app>
 </template>
 
 <script>
 import axios from 'axios'
-import { CustomHeader, SearchCourse, ReviewCard } from '../components'
+import { CustomHeader, SearchCourse, ReviewCard, Recommendation } from '../components'
 import { general_urls, general_icons } from '../utils'
-// import CustomHeader from '../components/CustomHeader'
-// import SearchCourse from '../components/SearchCourse'
-// import ReviewCard from '../components/ReviewCard'
 
   export default {
     data() {
         return {
             topReviewsLoading:true,
-            loaded:{
-                "Taken":false,
-            },
+            trendingCoursesLoading:true,
+            recommendationDialog:false,
             trending_courses:{
                 "Taking":[],
                 "Taken":[],
@@ -228,52 +179,25 @@ import { general_urls, general_icons } from '../utils'
                     "title":"Departments",
                     "icon":general_icons.departments,
                 },
+                "plannable":{
+                    "title":"Plannable",
+                    "icon":general_icons.plannable,
+                },
+                "recommendation":{
+                    "title":"Recommendation",
+                    "icon":general_icons.recommendation,
+                },
             },
-            // user_info_get:false,
-            // recommendation_loaded:false,
-            // year:1,
-            // semester:"",
-            // major:null,
-            // major_options:[],
-            // year_options:[
-            //     {"text":"1","value":1,},
-            //     {"text":"2","value":2,},
-            //     {"text":"3","value":3,},
-            //     {"text":"4","value":4,},
-            // ],
-            // semester_options:[
-            //     {"text":"Fall","value":"Fall",},
-            //     {"text":"Spring","value":"Spring",},
-            // ],
-            // rcm_courses:[],
         }
     },
     components:{
         CustomHeader,
         SearchCourse,
         ReviewCard,
-    },
-    watch: {
-        // year(){
-        //     if(this.user_info_get){
-        //         this.recommendation_loaded = false;
-        //         this.getRecommendations();
-        //     }
-        // },
-        // semester(){
-        //     if(this.user_info_get){
-        //         this.recommendation_loaded = false;
-        //         this.getRecommendations();
-        //     }
-        // },
-        // major(){
-        //     if(this.user_info_get){
-        //         this.recommendation_loaded = false;
-        //         this.getRecommendations();
-        //     }
-        // },
+        Recommendation,
     },
     computed:{
+
     },
     methods: {
         navFunctions(func){
@@ -289,19 +213,20 @@ import { general_urls, general_icons } from '../utils'
             else if(func.title == "Departments"){
                 this.goToHref(general_urls.department_url);
             }
-        },
-        getCurrentSemester(){
-            axios.get('/courses/ajax/get_current_semester/',{params: { }}).then(response => {
-                this.semester = response.data.semester;
-            });
+            else if(func.title == "Plannable"){
+                this.$refs.custom_header.navMethod(func);
+            }
+            else if(func.title == "Recommendation"){
+                this.recommendationDialog = true;
+            }
         },
         goToHref(text){
             window.location.href = text;
         },
         getTrendingCourses(){
-            axios.get('/courses/ajax/get_trending_courses/',{params: {}}).then(response => {
+            axios.get('/courses/api/get_trending_courses/',{params: {}}).then(response => {
                 this.trending_courses["Taken"] = response.data.taken_courses;
-                this.loaded["Taken"] = true;
+                this.trendingCoursesLoading = false;
             });
         },
         getTopReviews(){
@@ -311,28 +236,10 @@ import { general_urls, general_icons } from '../utils'
                 this.topReviewsLoading = false;
             });
         },
-        // getRecommendations(){
-        //     axios.get('/courses/ajax/get_recommendations/',{params: {year:this.year, semester:this.semester, major:this.major}}).then(response => {
-        //         this.rcm_courses = response.data.rcm_courses;
-        //         this.recommendation_loaded = true;
-        //         this.user_info_get = true;
-        //     });
-        // },
-        // getMajorOptions(){
-        //     axios.get('/courses/ajax/get_major_options/',{params: {}}).then(response => {
-        //         this.major_options = response.data.major_options;
-        //         this.major = response.data.major == "" ? this.major_options[0].value : response.data.major;
-        //         this.semester = response.data.semester == "" ? this.semester_options[0].value : response.data.semester;
-        //         this.year = response.data.year == 0 ? this.year_options[0].value : response.data.year;
-        //         this.getRecommendations();
-        //     });
-        // },
     },
     mounted(){
         this.getTopReviews();
         this.getTrendingCourses();
-        // this.getMajorOptions();
-        this.getCurrentSemester();
     },
   };
 </script>
@@ -478,6 +385,14 @@ import { general_urls, general_icons } from '../utils'
 
 
     @media (min-width: 10px) and (max-width: 767px) {
+
+        .cus-headline-title-text{
+            font-size: 25px;
+        }
+
+        .cus-subheadline-title-text{
+            font-size: 18px;
+        }
 
         .course-name{
             font-size: 0.95em
