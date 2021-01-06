@@ -4,21 +4,16 @@
             @del-from-fav="deleteFromFav"
             :headerUpdate="headerUpdate"></match-header>
         <v-main class="content-div">
-            <v-container 
-                class="fill-height"
-                v-if="!loaded">
+            <v-container class="fill-height" v-if="!loaded">
                 <v-row justify="center" align="center">
-                    <div>
-                        <v-progress-circular
+                    <v-progress-circular
                         :size="60"
                         :width="6"
                         indeterminate
-                        color="teal lighten-1">
-                        </v-progress-circular>
-                    </div>
+                        color="teal lighten-1"/>
                 </v-row>
             </v-container>
-            <v-container v-if="loaded">
+            <v-container v-else>
                 <div class="top-part-wrapper">
                     <v-row justify="center">
                         <div style="text-align: center;">
@@ -167,14 +162,12 @@
 <script>
 import Vue from "vue";
 import axios from 'axios'
-import MatchHeader from '../components/MatchHeader'
-import UserDialog from '../components/UserDialog'
-import UserCard from '../components/UserCard'
+import { MatchHeader, UserDialog, UserCard } from "../components"
 axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 axios.defaults.xsrfCookieName = "csrftoken";
 
-  export default {
-	data() {
+export default {
+    data() {
         return {
             loaded:false,
             clicked:false,
@@ -202,26 +195,26 @@ axios.defaults.xsrfCookieName = "csrftoken";
             failure_snack:false,
             success_snack:false,
         }
-	},
-	components:{
+    },
+    components:{
         MatchHeader,
         UserCard,
         UserDialog,
-	},
-	watch: {
+    },
+    watch: {
         tags(val){
             this.user_list_filter(val);
         }
-	},
-	computed:{
+    },
+    computed:{
         d_user(){
             if(this.dialog_user_index < 0)
                 return null;
             else
                 return this.users[this.dialog_user_index];
         },
-	},
-	methods: {
+    },
+    methods: {
         addToFav(user){
             this.changeFav(user, true);
         },
@@ -476,16 +469,16 @@ axios.defaults.xsrfCookieName = "csrftoken";
         scaler(x){
             return Math.pow((x+1),(2/3.0))-Math.pow((x+1),(-1/8.0));
         },
-	},
-	mounted(){
+    },
+    mounted(){
         this.fuzz = require('fuzzball');
         this.options = {
             scorer: this.fuzz.partial_ratio,
             cutoff: 80,
         },
         this.getAllUsers();
-	},
-  };
+    },
+};
 </script>
 
 <style scoped>

@@ -1,7 +1,7 @@
 <template>
     <v-app>
         <match-header></match-header>
-        <v-content class="content-div">
+        <v-main class="content-div">
             <v-container v-if="!loaded" fluid fill-height>
                 <v-layout 
                     align-center
@@ -163,7 +163,7 @@
                     </v-col>
                 </v-row>
             </v-container>
-        </v-content>
+        </v-main>
         <v-snackbar
             top
             v-model="failure_snack"
@@ -185,12 +185,12 @@
 
 <script>
 import axios from 'axios'
-import MatchHeader from '../components/MatchHeader'
+import { MatchHeader }  from '../components'
 axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 axios.defaults.xsrfCookieName = "csrftoken";
 
-  export default {
-	data() {
+export default {
+    data() {
         return {
             loaded:false,
             failure_snack: false,
@@ -230,6 +230,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
                 {'value':'2022', 'text':'2022'},
                 {'value':'2023', 'text':'2023'},
                 {'value':'2024', 'text':'2024'},
+                {'value':'2025', 'text':'2025'},
             ],
             genders:[
                 {'value':'Female', 'text':'Female'},
@@ -315,20 +316,17 @@ axios.defaults.xsrfCookieName = "csrftoken";
                     {'value':'Women, Gender, and Sexuality', 'text':'Women, Gender, and Sexuality'},
                     {'value':'Youth & Social Innovation Major', 'text':'Youth & Social Innovation Major'},]
         }
-	},
-	components:{
+    },
+    components:{
         MatchHeader,
-	},
-	watch: {
-        
-	},
-	computed:{
+    },
+    computed:{
         username: function(){
             let url = window.location.pathname.split('/');
             return url[url.length - 3];
         },
-	},
-	methods: {
+    },
+    methods: {
         editUser(user, edit_user_image, edit_user_video){
             this.$refs.edit_form.validate();
             if(!this.edit_user_form_valid)
@@ -367,11 +365,11 @@ axios.defaults.xsrfCookieName = "csrftoken";
                 this.loaded = true;
             });
         },
-	},
-	mounted(){
+    },
+    mounted(){
         this.getProfile(this.username);
-	},
-  };
+    },
+};
 </script>
 
 <style>

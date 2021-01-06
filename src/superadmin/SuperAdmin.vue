@@ -152,7 +152,7 @@
 
 <script>
 import axios from 'axios'
-import UserCard from '../components/UserCard'
+import { UserCard } from '../components'
 axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 axios.defaults.xsrfCookieName = "csrftoken";
 
@@ -254,7 +254,7 @@ export default {
         },
     },
     mounted(){
-        axios.get('/ajax/get_all_ranked_users/',{params: {}}).then(response => {
+        axios.get('/api/get_all_ranked_users/',{params: {}}).then(response => {
             this.all_users = response.data.all_users;
             let ref = this;
             let tmp_arr = [];

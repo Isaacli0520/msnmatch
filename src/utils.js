@@ -37,3 +37,20 @@ export var general_icons = {
     plannable:"mdi-navigation-outline",
     recommendation:"mdi-thumb-up-outline",
 };
+
+export function sortBySemester(a, b){
+    if(a.substring(0,4) != b.substring(0,4)){
+        return b.substring(0,4).toString(10) - a.substring(0,4).toString(10);
+    }
+    else{
+        if(a.substring(4) == b.substring(4)){
+            return 0;
+        }
+        else if(a.substring(4) == "Fall"){
+            return -1;
+        }
+        else{
+            return 1;
+        }
+    }
+}

@@ -1,7 +1,7 @@
 <template>
     <v-app>
         <match-header></match-header>
-        <v-content>
+        <v-main>
             <v-container v-if="!loaded" fluid fill-height>
                 <v-layout 
                     align-center
@@ -48,37 +48,34 @@
                     </v-card>
                 </v-row>
             </v-container>
-        </v-content>
+        </v-main>
     </v-app>
 </template>
 
 <script>
 import axios from 'axios'
-import MatchHeader from '../components/MatchHeader'
+import { MatchHeader } from '../components'
 axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 axios.defaults.xsrfCookieName = "csrftoken";
 
-  export default {
-	data() {
+export default {
+    data() {
         return {
             loaded:false,
             users:null,
             skill:null,
         }
-	},
-	components:{
+    },
+    components:{
         MatchHeader,
-	},
-	watch: {
-        
-	},
-	computed:{
+    },
+    computed:{
         skill_pk: function(){
             let url = window.location.pathname.split('/');
             return url[url.length - 2];
         },
-	},
-	methods: {
+    },
+    methods: {
         getSkill(){
             axios.get('/skills/api/get_skill/',{params:{"id":this.skill_pk}}).then(response => {
                 if(response.data.success){
@@ -106,23 +103,23 @@ axios.defaults.xsrfCookieName = "csrftoken";
                 return "";
             }
         },
-	},
-	mounted(){
+    },
+    mounted(){
         this.getSkill();
-	},
-  };
+    },
+};
 </script>
 
 <style>
     .cus-headline-text{
-		font-family: "Roboto", sans-serif;
-		font-size: 2.1em;
-		font-weight: 300;
-		color:rgb(0, 0, 0);
-		padding: 1px 12px 7px 3px;
-		border-radius: 5px;
-		line-height: 1.0;
-	}
+        font-family: "Roboto", sans-serif;
+        font-size: 2.1em;
+        font-weight: 300;
+        color:rgb(0, 0, 0);
+        padding: 1px 12px 7px 3px;
+        border-radius: 5px;
+        line-height: 1.0;
+    }
 
     .skill-not-exist{
         font-size: 25px;
@@ -152,19 +149,6 @@ axios.defaults.xsrfCookieName = "csrftoken";
         color:#a8a8a8;
         font-family: Roboto,sans-serif !important;
     }
-
-    @media (min-width: 1025px) {
-        
-    }
-
-
-    @media (min-width: 768px) and (max-width: 1024px) {
-    }
-
-    @media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
-
-    }
-
 
     @media (min-width: 10px) and (max-width: 767px) {
         .title-text{

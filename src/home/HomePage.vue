@@ -18,9 +18,8 @@
 </template>
 
 <script>
-// import axios from 'axios'
 
-  export default {
+export default {
     data() {
       return {
           isCollapse:true,
@@ -42,10 +41,6 @@
           ]
       }
     },
-    components:{
-    },
-    computed:{
-    },
     methods: {
         goToHref(href){
             window.location.href = href;
@@ -53,16 +48,12 @@
     },
     mounted(){
     },
-  };
+};
 </script>
 
 <style>
 
 .cus-main{
-    /* top:0;
-    bottom:0;
-    left:0;
-    right:0; */
     margin: 0 auto;
     width: 100%;
     height: 100%;

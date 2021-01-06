@@ -3,7 +3,7 @@
         <market-header
             @accept-disclaimer="getSearchResult(query,category)"
             @update-items="getSearchResult(query, category)"></market-header>
-        <v-content>
+        <v-main>
             <v-container v-if="!loaded" fluid fill-height>
                 <v-layout 
                     align-center
@@ -36,32 +36,24 @@
                     </v-col>
                 </v-row>
                 <v-row dense>
-                    <v-col
-                    v-for="(item, i) in items"
-                    :key="i"
-                    cols="12"
-                    sm="6"
-                    md="4"
-                    lg="4"
-                    xl="3"
-                    >
-                    <market-item-card @open-item-dialog="openItemDialog(item)" :item="item"></market-item-card>
+                    <v-col v-for="(item, i) in items" :key="i"
+                        cols="12" sm="6" md="4" lg="4" xl="3"
+                        >
+                        <market-item-card @open-item-dialog="openItemDialog(item)" :item="item"></market-item-card>
                     </v-col>
                 </v-row>
             </v-container>
             <market-item-dialog @close-dialog="itemDialog=false" :d_item="d_item" v-model="itemDialog" ></market-item-dialog>
-        </v-content>
+        </v-main>
     </v-app>
 </template>
 
 <script>
 import axios from 'axios'
-import MarketHeader from '../components/MarketHeader'
-import MarketItemDialog from '../components/MarketItemDialog'
-import MarketItemCard from '../components/MarketItemCard' 
+import { MarketHeader, MarketItemDialog, MarketItemCard } from '../components'
 
   export default {
-	data() {
+    data() {
         return {
             loaded:false,
             itemDialog:false,
@@ -70,13 +62,13 @@ import MarketItemCard from '../components/MarketItemCard'
             sortOptions:["Latest", "Price: High to Low", "Price: Low to High"],
             d_item:null,
         }
-	},
-	components:{
+    },
+    components:{
         MarketHeader,
         MarketItemDialog,
         MarketItemCard
-	},
-	watch: {
+    },
+    watch: {
         sortMethod(val){
             if(val == "Latest"){
                 this.items.sort(function(a,b){
@@ -94,8 +86,8 @@ import MarketItemCard from '../components/MarketItemCard'
                 });
             }
         },
-	},
-	computed:{
+    },
+    computed:{
         query(){
             let url = new URL(window.location.href);
             return url.searchParams.get("q");
@@ -104,8 +96,8 @@ import MarketItemCard from '../components/MarketItemCard'
             let url = new URL(window.location.href);
             return url.searchParams.get("c");
         }
-	},
-	methods: {
+    },
+    methods: {
         openItemDialog(item){
             this.d_item = JSON.parse(JSON.stringify(item));
             this.itemDialog = true;
@@ -122,30 +114,30 @@ import MarketItemCard from '../components/MarketItemCard'
                 this.loaded = true;
             });
         }
-	},
-	mounted(){
-	},
+    },
+    mounted(){
+    },
   };
 </script>
 
 <style>
     .head-text{
         font-family: "Roboto", sans-serif !important;
-		font-weight: 300 !important;
+        font-weight: 300 !important;
         font-size:28px !important;
         margin-left: 13px;
     }
 
     .cus-headline-text{
         justify-content: center;
-		font-family: "Roboto", sans-serif;
-		font-size: 2.1em;
-		font-weight: 300;
-		color:rgb(0, 0, 0);
-		padding: 1px 12px 7px 3px;
-		border-radius: 5px;
-		line-height: 1.0;
-	}
+        font-family: "Roboto", sans-serif;
+        font-size: 2.1em;
+        font-weight: 300;
+        color:rgb(0, 0, 0);
+        padding: 1px 12px 7px 3px;
+        border-radius: 5px;
+        line-height: 1.0;
+    }
 
     @media (min-width: 1025px) {
         

@@ -1,20 +1,15 @@
 <template>
     <v-app>
         <match-header></match-header>
-        <v-content class="content-div">
+        <v-main class="content-div">
             <v-container v-if="!loaded" fluid fill-height>
-                <v-layout 
-                    align-center
-                    justify-center>
-                    <div>
-                        <v-progress-circular
+                <v-row justify="center">
+                    <v-progress-circular
                         :size="60"
                         :width="6"
                         indeterminate
-                        color="teal lighten-1">
-                        </v-progress-circular>
-                    </div>
-                </v-layout>
+                        color="teal lighten-1"/>
+                </v-row>
             </v-container>
             <v-container v-if="!user && loaded" fluid fill-height>
                 <v-layout 
@@ -149,35 +144,32 @@
                     </v-col>
                 </v-row>
             </v-container>
-        </v-content>
+        </v-main>
     </v-app>
 </template>
 
 <script>
 import axios from 'axios'
-import MatchHeader from '../components/MatchHeader'
+import { MatchHeader } from '../components'
 
-  export default {
-	data() {
+export default {
+    data() {
         return {
             loaded:false,
             user:null,
             editable:false,
         }
-	},
-	components:{
+    },
+    components:{
         MatchHeader,
-	},
-	watch: {
-        
-	},
-	computed:{
+    },
+    computed:{
         username: function(){
             let url = window.location.pathname.split('/');
             return url[url.length - 2];
         },
-	},
-	methods: {
+    },
+    methods: {
         getProfile(username){
             axios.get('/users/api/get_profile/',{params: {username:username}}).then(response => {
                 if(response.data.success){
@@ -187,11 +179,11 @@ import MatchHeader from '../components/MatchHeader'
                 this.loaded = true;
             });
         },
-	},
-	mounted(){
+    },
+    mounted(){
         this.getProfile(this.username);
-	},
-  };
+    },
+};
 </script>
 
 <style>

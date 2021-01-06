@@ -2,9 +2,10 @@
     <v-breadcrumbs class="cus-breadcrumbs" large :items="items" divider="/">
         <template v-slot:item="props">
             <v-breadcrumbs-item
-            :href="props.item.href"
-            :disabled="props.item.disabled"
-            >
+                style="padding:0px 0px 14px;"
+                :href="props.item.href"
+                :disabled="props.item.disabled"
+                >
                 <v-btn 
                     :color="props.item.disabled ? 'grey' : 'teal darken-1' "
                     rounded

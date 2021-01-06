@@ -35,22 +35,22 @@
 </template>
 
 <script>
-  export default {
+export default {
     data: () => ({
-      icons: [
-          {
-              icon:"fab fa-facebook",
-              href:"https://www.facebook.com/msnatuva",
-              target:"_blank",
-          },
-          {
-              icon:"fab fa-instagram",
-              href:"https://www.instagram.com/msnatuva",
-              target:"_blank",
-          },
-      ],
+        icons: [
+            {
+                icon:"fab fa-facebook",
+                href:"https://www.facebook.com/msnatuva",
+                target:"_blank",
+            },
+            {
+                icon:"fab fa-instagram",
+                href:"https://www.instagram.com/msnatuva",
+                target:"_blank",
+            },
+        ],
     }),
-  }
+}
 </script>
 
 <style scoped lang="css">
