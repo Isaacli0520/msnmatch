@@ -21,6 +21,7 @@ def val_required(func):
                 return _error_response("Access Token is Expired")
         except:
             return _error_response("Invalid Access Token")
+        kwargs["username"] = auth.username
         return func(request, *args, **kwargs)
     return inner
 

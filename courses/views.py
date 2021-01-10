@@ -332,14 +332,13 @@ def get_versions_of_profile(profile):
 
 @csrf_exempt
 @val_required
-def edit_plannable_profile(request):
+def edit_plannable_profile(request, username):
     if request.method == "POST":
-        post = json.loads(request.body)
-        username = post["username"]
         try:
             user = User.objects.get(username=username)
         except:
             return _error_response("User doesn't exist")
+        post = json.loads(request.body)
         user_agent = request.META['HTTP_USER_AGENT']
         action = post["action"]
         # Rename profile and delete all previous versions
@@ -387,14 +386,13 @@ def edit_plannable_profile(request):
 
 @csrf_exempt
 @val_required
-def get_plannable_profile(request):
+def get_plannable_profile(request, username):
     if request.method == "POST":
-        post = json.loads(request.body)
-        username = post["username"]
         try:
             user = User.objects.get(username=username)
         except:
             return _error_response("User doesn't exist")
+        post = json.loads(request.body)
         ret_profile = []
         # Return a specific profile
         if "name" in post:
@@ -433,14 +431,13 @@ def get_plannable_profile(request):
 
 @csrf_exempt
 @val_required
-def save_plannable_profile(request):
+def save_plannable_profile(request, username):
     if request.method == "POST":
-        post = json.loads(request.body)
-        username = post["username"]
         try:
             user = User.objects.get(username=username)
         except:
             return _error_response("User doesn't exist")
+        post = json.loads(request.body)
         user_agent = request.META['HTTP_USER_AGENT']
         profiles = post["profiles"]
         versions = []
