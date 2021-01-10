@@ -103,7 +103,6 @@ def oauth_authorize(request):
         return _error_response("Invalid Behavior")
 
 @csrf_exempt
-@val_required
 def oauth_token(request):
     if request.method == "GET":
         return _get_not_allowed()

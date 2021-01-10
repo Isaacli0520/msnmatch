@@ -21,7 +21,7 @@ from django.forms.models import model_to_dict
 from django.utils import timezone
 
 from msnmatch import settings
-from msnmatch.utils import custom_md5, cmp_semester, js_boolean, _get_not_allowed, _post_not_allowed, _success_response, _error_response
+from msnmatch.utils import custom_md5, cmp_semester, val_required, js_boolean, _get_not_allowed, _post_not_allowed, _success_response, _error_response
 from functools import cmp_to_key
 
 from users.models import MAJOR_CHOICES, PlanProfile, PlanProfileVersion, Authenticator
@@ -305,19 +305,19 @@ def get_take_courses(user, take):
 def get_credential(request):
     if request.method == "GET":
         auths = Authenticator.objects.filter(username=request.user.username)
-        if auths.first() == None:
-            credential = hmac.new(key = settings.SECRET_KEY.encode('utf-8'), msg = os.urandom(32), digestmod = 'sha256',).hexdigest()
-            Authenticator.objects.create(credential=credential, username=request.user.username)
-        else:
-            credential = None
+        access_token = None
+        if auths.first() != None:
             for auth in auths:
                 diff = timezone.now() - auth.date_created
-                if diff.total_seconds() > 86400 * 7 or credential != None:
+                if diff.total_seconds() > 86400 * 7:
                     auth.delete()
-                else:
-                    credential = auth.credential
+                elif access_token == None:
+                    access_token = auth.access_token
+        if access_token == None:
+            access_token = hmac.new(key = settings.SECRET_KEY.encode('utf-8'), msg = os.urandom(32), digestmod = 'sha256',).hexdigest()
+            Authenticator.objects.create(access_token=access_token, username=request.user.username)
         return _success_response({
-            "credential":credential,
+            "credential":access_token,
             "username":request.user.username,
         })
     if request.method == "POST":
@@ -330,22 +330,8 @@ def get_versions_of_profile(profile):
         "version":p.version,
     } for p in profile.planprofileversion_set.all()] 
 
-def authenticate_credential(credential, username):
-    auth = Authenticator.objects.filter(credential=credential, username=username).first()
-    if auth == None:
-        return {"success":False, "message":"Invalid credential"}
-    diff = timezone.now() - auth.date_created
-    diff_sec = diff.total_seconds()
-    if diff_sec > 86400 * 7:
-        return {"success":False, "message":"Credential expired"}
-    # Less than 1 day before expiration, extend by 1 day
-    if diff_sec >= 86400 * 6 and diff_sec <= 86400 * 7:
-        auth.date_created += datetime.timedelta(days=1)
-        auth.save()
-    return {"success":True, "message":"success"}
-
-
 @csrf_exempt
+@val_required
 def edit_plannable_profile(request):
     if request.method == "POST":
         post = json.loads(request.body)
@@ -404,6 +390,7 @@ def edit_plannable_profile(request):
         return _get_not_allowed()
 
 @csrf_exempt
+@val_required
 def get_plannable_profile(request):
     if request.method == "POST":
         post = json.loads(request.body)
@@ -453,6 +440,7 @@ def get_plannable_profile(request):
         return _get_not_allowed()
 
 @csrf_exempt
+@val_required
 def save_plannable_profile(request):
     if request.method == "POST":
         post = json.loads(request.body)
