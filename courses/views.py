@@ -117,16 +117,19 @@ def get_current_semester(request):
         "semester":settings.CURRENT_SEMESTER[4:],
     })
 
-# @login_required
+@login_required
 def get_basic_info(request):
-    info = {}
-    if request.user.is_authenticated:
-        info = {
-            "profile": reverse('profile', args=[request.user.username]),
-            "update_profile":reverse('update_profile', args=[request.user.username]),
-        }
+    info = {
+        "profile": reverse('profile', args=[request.user.username]),
+        "update_profile":reverse('update_profile', args=[request.user.username]),
+    }
     return _success_response({
         "all_info":info,
+        "user":{
+            "first_name":request.user.first_name,
+            "last_name":request.user.last_name,
+            "role":request.user.profile.role,
+        },
     })
 
 @login_required
