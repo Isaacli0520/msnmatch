@@ -397,7 +397,7 @@ export default{
     },
     computed:{
         plannableFinalURL(){
-            return "https://plannable.org" + "/?username=" + this.username + "&credential=" + this.credential + "";
+            return "https://plannable.org" + "/?username=" + this.username + "&code=" + this.credential + "";
         }
     },
     methods:{

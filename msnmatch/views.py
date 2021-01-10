@@ -74,7 +74,7 @@ def oauth_authorize(request):
     if request.method == "POST":
         if not request.user.is_authenticated:
             return _error_response("Unauthorized user")
-        accept, deny = request.POST.get("accept"), request.POST.get("deny")
+        allow, deny = request.POST.get("allow"), request.POST.get("deny")
         if deny and deny == "Deny":
             resp = {
                 "error":"access denied",
@@ -82,7 +82,7 @@ def oauth_authorize(request):
                 "state":state,
             }
             return redirect(redirect_uri + "?" + urlencode(resp))
-        if accept and accept == "Accept":
+        if allow and allow == "Allow":
             expire_date = timezone.now() + datetime.timedelta(minutes=10)
             # print("UTC_NOW:", (datetime.datetime.utcnow() + datetime.timedelta(minutes=10)).timestamp())
             auth = {
@@ -139,7 +139,7 @@ def oauth_token(request):
             if diff.total_seconds() > settings.ACCESS_TOKEN_EXPIRATION:
                 auth.delete()
         access_token = hmac.new(key = settings.SECRET_KEY.encode('utf-8'), msg = os.urandom(32), digestmod = 'sha256',).hexdigest()
-        Authenticator.objects.create(access_token=access_token, auth_id=auth["id"], username=request.user.username)
+        Authenticator.objects.create(access_token=access_token, auth_id=auth["id"], username=auth["username"])
         resp = JsonResponse({
             "access_token":access_token,
             "expires_in":settings.ACCESS_TOKEN_EXPIRATION,

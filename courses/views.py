@@ -335,57 +335,53 @@ def get_versions_of_profile(profile):
 def edit_plannable_profile(request):
     if request.method == "POST":
         post = json.loads(request.body)
-        username, credential = post["username"], post["credential"]
+        username = post["username"]
         try:
             user = User.objects.get(username=username)
         except:
             return _error_response("User doesn't exist")
-        auth = authenticate_credential(credential, username)
-        if auth["success"]:
-            user_agent = request.META['HTTP_USER_AGENT']
-            action = post["action"]
-            # Rename profile and delete all previous versions
-            if action == "rename":
-                oldName, newName, content = post["oldName"], post["newName"], post["profile"]
-                try:
-                    profile = PlanProfile.objects.get(user=user ,name=oldName)
-                except:
-                    return _error_response("Profile doesn't exist")
-                new_profile = PlanProfile.objects.filter(user=user, name=newName).first()
-                # newName already exists, delete old profile and add new version to new profile it
-                if new_profile != None:
-                    for p_v in profile.planprofileversion_set.all():
-                        p_v.delete()
-                    profile.delete()
-                    PlanProfileVersion.objects.create(version=new_profile.latest + 1, content=content, plan_profile=new_profile, user_agent=user_agent)
-                    new_profile.latest += 1
-                    new_profile.save()
-                    return _success_response({"versions":get_versions_of_profile(new_profile)})
-                # Delete(detach) previous versions
-                for p_v in profile.planprofileversion_set.all():
-                    p_v.delete()
-                PlanProfileVersion.objects.create(version=1, content=content, plan_profile=profile, user_agent=user_agent)
-                profile.name = newName
-                profile.latest = 1
-                profile.save()
-                return _success_response({"versions":get_versions_of_profile(profile)})
-            # Delete profile and corresponding versions
-            elif action == "delete":
-                if "name" not in post:
-                    return _error_response("Missing name field")
-                name = post["name"]
-                try:
-                    profile = PlanProfile.objects.get(user=user ,name=name)
-                except:
-                    return _error_response("Profile doesn't exist")
+        user_agent = request.META['HTTP_USER_AGENT']
+        action = post["action"]
+        # Rename profile and delete all previous versions
+        if action == "rename":
+            oldName, newName, content = post["oldName"], post["newName"], post["profile"]
+            try:
+                profile = PlanProfile.objects.get(user=user ,name=oldName)
+            except:
+                return _error_response("Profile doesn't exist")
+            new_profile = PlanProfile.objects.filter(user=user, name=newName).first()
+            # newName already exists, delete old profile and add new version to new profile it
+            if new_profile != None:
                 for p_v in profile.planprofileversion_set.all():
                     p_v.delete()
                 profile.delete()
-                return _success_response()
-            else:
-                return _error_response("Action not recognized")
+                PlanProfileVersion.objects.create(version=new_profile.latest + 1, content=content, plan_profile=new_profile, user_agent=user_agent)
+                new_profile.latest += 1
+                new_profile.save()
+                return _success_response({"versions":get_versions_of_profile(new_profile)})
+            # Delete(detach) previous versions
+            for p_v in profile.planprofileversion_set.all():
+                p_v.delete()
+            PlanProfileVersion.objects.create(version=1, content=content, plan_profile=profile, user_agent=user_agent)
+            profile.name = newName
+            profile.latest = 1
+            profile.save()
+            return _success_response({"versions":get_versions_of_profile(profile)})
+        # Delete profile and corresponding versions
+        elif action == "delete":
+            if "name" not in post:
+                return _error_response("Missing name field")
+            name = post["name"]
+            try:
+                profile = PlanProfile.objects.get(user=user ,name=name)
+            except:
+                return _error_response("Profile doesn't exist")
+            for p_v in profile.planprofileversion_set.all():
+                p_v.delete()
+            profile.delete()
+            return _success_response()
         else:
-            return _error_response(auth["message"])
+            return _error_response("Action not recognized")
     if request.method == "GET":
         return _get_not_allowed()
 
@@ -394,48 +390,44 @@ def edit_plannable_profile(request):
 def get_plannable_profile(request):
     if request.method == "POST":
         post = json.loads(request.body)
-        username, credential= post["username"], post["credential"]
+        username = post["username"]
         try:
             user = User.objects.get(username=username)
         except:
             return _error_response("User doesn't exist")
-        auth = authenticate_credential(credential, username)
-        if auth["success"]:
-            ret_profile = []
-            # Return a specific profile
-            if "name" in post:
-                profile = PlanProfile.objects.filter(name=post["name"], user=user).first()
-                if profile == None:
-                    return _error_response("Profile doesn't exist")
-                # Return a specific version of the profile
-                if "version" in post:
-                    try:
-                        version = int(post["version"])
-                    except:
-                        return _error_response("Version should be a number")
-                    real_profile = profile.planprofileversion_set.filter(version=version).first()
-                # Return the latest version of the profile 
-                else:
-                    real_profile = profile.planprofileversion_set.filter(version=profile.latest).first()
+        ret_profile = []
+        # Return a specific profile
+        if "name" in post:
+            profile = PlanProfile.objects.filter(name=post["name"], user=user).first()
+            if profile == None:
+                return _error_response("Profile doesn't exist")
+            # Return a specific version of the profile
+            if "version" in post:
+                try:
+                    version = int(post["version"])
+                except:
+                    return _error_response("Version should be a number")
+                real_profile = profile.planprofileversion_set.filter(version=version).first()
+            # Return the latest version of the profile 
+            else:
+                real_profile = profile.planprofileversion_set.filter(version=profile.latest).first()
+            ret_profile.append({
+                "versions":get_versions_of_profile(profile),
+                "profile":real_profile.content,
+            })
+        # Return all profiles
+        else:
+            profiles = PlanProfile.objects.filter(user=user)
+            for profile in profiles:
                 ret_profile.append({
                     "versions":get_versions_of_profile(profile),
-                    "profile":real_profile.content,
+                    "profile":profile.planprofileversion_set.filter(version=profile.latest).first().content,
                 })
-            # Return all profiles
-            else:
-                profiles = PlanProfile.objects.filter(user=user)
-                for profile in profiles:
-                    ret_profile.append({
-                        "versions":get_versions_of_profile(profile),
-                        "profile":profile.planprofileversion_set.filter(version=profile.latest).first().content,
-                    })
-            return JsonResponse({
-                    "success":True,
-                    "message":"Nice",
-                    "profiles":ret_profile,
-                }, safe=False)
-        else:
-            return _error_response(auth["message"])
+        return JsonResponse({
+                "success":True,
+                "message":"Nice",
+                "profiles":ret_profile,
+            }, safe=False)
     if request.method == "GET":
         return _get_not_allowed()
 
@@ -444,46 +436,43 @@ def get_plannable_profile(request):
 def save_plannable_profile(request):
     if request.method == "POST":
         post = json.loads(request.body)
-        username, credential, profiles = post["username"], post["credential"], post["profiles"]
+        username = post["username"]
         try:
             user = User.objects.get(username=username)
         except:
             return _error_response("User doesn't exist")
-        auth = authenticate_credential(credential, username)
-        if auth["success"]:
-            user_agent = request.META['HTTP_USER_AGENT']
-            versions = []
-            for profile in profiles:
-                name, content = profile["name"], profile["profile"]
-                plan_profile = PlanProfile.objects.filter(user=user, name=name).first()
-                new_flag = plan_profile == None
-                if new_flag:
-                    plan_profile = PlanProfile.objects.create(user=user, name=name)
-                # Force to create a new version
-                if "new" in profile or new_flag:
+        user_agent = request.META['HTTP_USER_AGENT']
+        profiles = post["profiles"]
+        versions = []
+        for profile in profiles:
+            name, content = profile["name"], profile["profile"]
+            plan_profile = PlanProfile.objects.filter(user=user, name=name).first()
+            new_flag = plan_profile == None
+            if new_flag:
+                plan_profile = PlanProfile.objects.create(user=user, name=name)
+            # Force to create a new version
+            if "new" in profile or new_flag:
+                PlanProfileVersion.objects.create(version=plan_profile.latest + 1, content=content, plan_profile=plan_profile, user_agent=user_agent)
+                plan_profile.latest += 1
+                plan_profile.save()
+            # Server decide whether to create a new version
+            else:
+                latest_version = plan_profile.planprofileversion_set.filter(version=plan_profile.latest).first()
+                if latest_version == None:
+                    return _error_response("Dirty profile")
+                diff = timezone.now() - latest_version.modified
+                # Latest version is more than 5min old, create new version
+                if diff.total_seconds() > 300:
                     PlanProfileVersion.objects.create(version=plan_profile.latest + 1, content=content, plan_profile=plan_profile, user_agent=user_agent)
                     plan_profile.latest += 1
                     plan_profile.save()
-                # Server decide whether to create a new version
+                # Latest version is still young, update latest version
                 else:
-                    latest_version = plan_profile.planprofileversion_set.filter(version=plan_profile.latest).first()
-                    if latest_version == None:
-                        return _error_response("Dirty profile")
-                    diff = timezone.now() - latest_version.modified
-                    # Latest version is more than 5min old, create new version
-                    if diff.total_seconds() > 300:
-                        PlanProfileVersion.objects.create(version=plan_profile.latest + 1, content=content, plan_profile=plan_profile, user_agent=user_agent)
-                        plan_profile.latest += 1
-                        plan_profile.save()
-                    # Latest version is still young, update latest version
-                    else:
-                        latest_version.user_agent = user_agent
-                        latest_version.content = content
-                        latest_version.save()
-                versions.append(get_versions_of_profile(plan_profile))
-            return _success_response({"versions":versions})
-        else:
-            return _error_response(auth["message"])
+                    latest_version.user_agent = user_agent
+                    latest_version.content = content
+                    latest_version.save()
+            versions.append(get_versions_of_profile(plan_profile))
+        return _success_response({"versions":versions})
     if request.method == "GET":
         return _get_not_allowed()
     
