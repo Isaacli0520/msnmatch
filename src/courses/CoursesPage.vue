@@ -148,7 +148,10 @@
 
 <script>
 import axios from 'axios'
-import { CustomHeader, SearchCourse, ReviewCard, Recommendation } from '../components'
+import CustomHeader from '../components/CustomHeader'
+import SearchCourse from '../components/SearchCourse'
+import ReviewCard from '../components/ReviewCard'
+import Recommendation from '../components/Recommendation'
 import { general_urls, general_icons } from '../utils'
 
 export default {

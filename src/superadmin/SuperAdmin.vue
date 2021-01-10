@@ -152,7 +152,7 @@
 
 <script>
 import axios from 'axios'
-import { UserCard } from '../components'
+import UserCard from '../components/UserCard'
 axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 axios.defaults.xsrfCookieName = "csrftoken";
 

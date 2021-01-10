@@ -1,13 +1,9 @@
 import Vue from 'vue'
 import DepartmentPage from './DepartmentPage.vue'
-import Vuetify from 'vuetify/lib'
-
-const vuetifyOptions = { }
-
-Vue.use(Vuetify);
+import vuetify from '../plugins/vuetify'
 
 new Vue({
   render: h => h(DepartmentPage),
-  vuetify: new Vuetify(vuetifyOptions),
+  vuetify: vuetify,
   components: { DepartmentPage }
 }).$mount('#department-page');

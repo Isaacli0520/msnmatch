@@ -74,7 +74,8 @@
 
 <script>
 import axios from 'axios'
-import { CustomHeader, CustomBreadcrumb } from '../components'
+import CustomHeader from '../components/CustomHeader'
+import CustomBreadcrumb from '../components/CustomBreadcrumb'
 axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 axios.defaults.xsrfCookieName = "csrftoken";
 

@@ -1,13 +1,9 @@
 import Vue from 'vue'
 import CourseInstructorPage from './CourseInstructorPage.vue'
-import Vuetify from 'vuetify/lib'
-
-const vuetifyOptions = { }
-
-Vue.use(Vuetify);
+import vuetify from '../plugins/vuetify'
 
 new Vue({
   render: h => h(CourseInstructorPage),
-  vuetify: new Vuetify(vuetifyOptions),
+  vuetify: vuetify,
   components: { CourseInstructorPage }
 }).$mount('#course-instructor-page');

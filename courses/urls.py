@@ -31,10 +31,10 @@ urlpatterns = [
 	path('api/get_top_review_users/', views.get_top_review_users, name='get_top_review_users'),
 	path('api/get_basic_info/', views.get_basic_info, name='get_basic_info'),
 	path('api/get_my_courses/', views.get_my_courses, name='get_my_courses'),
+	path('api/get_credential/', views.get_credential, name='get_credential'),
 	path('ajax/save_take/', views.save_take, name='save_take'),
 	path('ajax/course_search_result/', views.course_search_result, name='course_search_result'),
 	path('ajax/get_instructor/', views.get_instructor, name='get_instructor'),
-	path('ajax/get_credential/', views.get_credential, name='get_credential'),
 	path('ajax/get_reviews/', views.get_reviews, name='get_reviews'),
 
 	path('<int:course_number>/<int:instructor_number>/', views.course_instructor, name='course_instructor'),

@@ -1,15 +1,9 @@
 import Vue from 'vue'
 import MarketMyItemsPage from './MarketMyItemsPage.vue'
-import Vuetify from 'vuetify/lib'
-
-const vuetifyOptions = { }
-
-Vue.use(Vuetify);
-
-Vue.config.productionTip = false
+import vuetify from '../plugins/vuetify'
 
 new Vue({
     render: h => h(MarketMyItemsPage),
-    vuetify: new Vuetify(vuetifyOptions),
+    vuetify: vuetify,
     components: { MarketMyItemsPage }
   }).$mount('#market-my-items-page')

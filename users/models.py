@@ -9,7 +9,6 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.contrib import admin
 
 from msnmatch import settings
-from msnmatch.utils import custom_md5
 from friendship.models import Friend, FriendshipRequest, Follow
 
 import sys
@@ -163,8 +162,9 @@ class PlanProfileVersion(models.Model):
         super(PlanProfileVersion, self).save(*args, **kwargs)
 
 class Authenticator(models.Model):
-    credential = models.CharField(max_length=100, primary_key=True)
-    username = models.CharField(max_length=150)
+    access_token = models.CharField(max_length=100, primary_key=True)
+    auth_id = models.CharField(max_length=100, default="")
+    username = models.CharField(max_length=150, default="")
     date_created = models.DateTimeField(default=timezone.now)
 
 class Profile(models.Model):

@@ -524,12 +524,15 @@ export default{
             window.location.href = text;
         },
         getCredential(){
-            axios.get('/courses/ajax/get_credential/',{params: {}}).then(response => {
-                this.credential = response.data.credential;
-                this.username = response.data.username;
-            }).catch( err => {
-                this.credential = "";
-                this.username = "";
+            axios.get('/courses/api/get_credential/',{params: {}}).then(response => {
+                if(response.data.success){
+                    this.credential = response.data.credential;
+                    this.username = response.data.username;
+                }
+                else{
+                    this.credential = "";
+                    this.username = "";
+                }
             });
         },
         getTakingCourses(){
