@@ -18,8 +18,8 @@ from django.urls import path, include
 from django.conf import settings
 from django.contrib.auth import views as auth_views
 from django.views.generic.base import TemplateView
-from . import views
 from django.views.generic.base import RedirectView
+from . import views
 
 from django.conf.urls import (
 handler400, handler403, handler404, handler500
