@@ -140,11 +140,15 @@ def oauth_token(request):
                 auth.delete()
         access_token = hmac.new(key = settings.SECRET_KEY.encode('utf-8'), msg = os.urandom(32), digestmod = 'sha256',).hexdigest()
         Authenticator.objects.create(access_token=access_token, auth_id=auth["id"], username=request.user.username)
-        return _success_response({
+        resp = JsonResponse({
             "access_token":access_token,
             "expires_in":settings.ACCESS_TOKEN_EXPIRATION,
             "token_type":"Bearer",
         })
+        resp['Cache-Control'] = "no-store"
+        resp['Pragma'] = "no-cache"
+        resp['Access-Control-Allow-Headers'] = "Authorization"
+        return resp
 
 
 def get_all_ranked_users(request):
