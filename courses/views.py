@@ -304,6 +304,7 @@ def get_take_courses(user, take):
         })
     return final_courses
 
+# Deprecated
 @login_required
 def get_credential(request):
     if request.method == "GET":
