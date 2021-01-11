@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.utils import timezone
 
 from msnmatch import settings
@@ -63,7 +63,7 @@ def oauth_authorize(request):
         code_challenge, code_challenge_method = request.GET.get("code_challenge"), request.GET.get("code_challenge_method")
     except:
         return _error_response("Missing params")
-    if redirect_uri not in settings.AUTH_REDIRECT_URLS and not redirect_uri.startswith("file://"):
+    if redirect_uri not in settings.AUTH_REDIRECT_URLS:
         return _error_response("Invalid redirect url")
     if client_id not in settings.AUTH_CLIENT_ID:
         return _error_response("Invalid client id")
