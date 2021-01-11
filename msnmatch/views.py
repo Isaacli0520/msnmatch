@@ -63,7 +63,7 @@ def oauth_authorize(request):
         code_challenge, code_challenge_method = request.GET.get("code_challenge"), request.GET.get("code_challenge_method")
     except:
         return _error_response("Missing params")
-    if redirect_uri not in settings.AUTH_REDIRECT_URLS:
+    if redirect_uri not in settings.AUTH_REDIRECT_URLS and not redirect_uri.startswith("file://"):
         return _error_response("Invalid redirect url")
     if client_id not in settings.AUTH_CLIENT_ID:
         return _error_response("Invalid client id")
