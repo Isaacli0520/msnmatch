@@ -54,7 +54,7 @@
 
 <script>
 import axios from 'axios'
-import { MatchHeader } from '../components'
+import MatchHeader from '../components/MatchHeader'
 axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 axios.defaults.xsrfCookieName = "csrftoken";
 

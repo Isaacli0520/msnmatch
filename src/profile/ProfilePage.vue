@@ -150,7 +150,7 @@
 
 <script>
 import axios from 'axios'
-import { MatchHeader } from '../components'
+import MatchHeader from '../components/MatchHeader'
 
 export default {
     data() {

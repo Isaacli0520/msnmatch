@@ -163,7 +163,7 @@ class PlanProfileVersionAdmin(admin.ModelAdmin):
     list_display = ('plan_profile', 'version')
 
 class AuthenticatorAdmin(admin.ModelAdmin):
-    list_display = ('username', 'credential', 'date_created')
+    list_display = ('username', 'access_token', 'auth_id', 'date_created')
 
 admin.site.unregister(User)
 admin.site.register(User, CustomUserAdmin)

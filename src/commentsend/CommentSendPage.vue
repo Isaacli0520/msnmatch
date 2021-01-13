@@ -76,7 +76,6 @@
 
 <script>
 import axios from 'axios'
-
 import CommentsHeader from '../components/CommentsHeader'
 
   export default {
@@ -182,10 +181,7 @@ import CommentsHeader from '../components/CommentsHeader'
                     message_type:this.comment_type,
                     time:Date.now(),
                     size:this.sizes[this.comment_size]}));
-                this.$message({
-                    message: 'Comment Sent',
-                    type: 'success'
-                });
+                // Comment Sent Message
                 this.comment_text = "";
             }
         },

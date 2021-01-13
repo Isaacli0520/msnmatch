@@ -1,22 +1,21 @@
 <!DOCTYPE html>
 {% load static %}
 <html>
-	<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
-    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
 
-    <title>{% block title %}{% endblock %}</title>
+        <title>{% block title %}{% endblock %}</title>
 
-    {% comment %} <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.13.0/css/all.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/material-design-icons-iconfont@5.0.1/dist/material-design-icons.css" rel="stylesheet"> {% endcomment %}
-    <link href="https://cdn.jsdelivr.net/npm/@mdi/font@latest/css/materialdesignicons.min.css" rel="stylesheet">
-    <link rel="shortcut icon" href="{% static 'css/images/favicon.ico' %}">
-    
-    {% comment %} <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/axios@0.21.0/dist/axios.js"></script> {% endcomment %}
-	</head>
+        {% comment %} <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.13.0/css/all.min.css">
+        <link href="https://cdn.jsdelivr.net/npm/material-design-icons-iconfont@5.0.1/dist/material-design-icons.css" rel="stylesheet"> {% endcomment %}
+        <link href="https://cdn.jsdelivr.net/npm/@mdi/font@latest/css/materialdesignicons.min.css" rel="stylesheet">
+        <link rel="shortcut icon" href="{% static 'css/images/favicon.ico' %}">
+        
+    </head>
 <body>
-  {% block content %}
-  {% endblock %}
+    {% block content %}
+    {% endblock %}
 </body>
 </html>

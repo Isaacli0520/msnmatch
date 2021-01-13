@@ -1,13 +1,12 @@
 {
   "name": "frontend",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "heroku-postbuild": "npm run build",
-    "postinstall": "patch-package"
+    "heroku-postbuild": "npm run build"
   },
   "engines": {
     "node": "12.15.0"
@@ -17,8 +16,6 @@
     "comment-core-library": "^0.11.1",
     "core-js": "^2.6.11",
     "css-loader": "^2.1.1",
-    "deepmerge": "^4.2.2",
-    "element-ui": "^2.14.1",
     "express": "^4.17.1",
     "fibers": "^4.0.3",
     "fuzzball": "^1.3.0",
@@ -43,17 +40,17 @@
     "axios": "^0.21.1",
     "babel-eslint": "^10.1.0",
     "babel-plugin-component": "^1.1.1",
+    "deepmerge": "^4.2.2",
     "eslint": "^5.16.0",
     "eslint-plugin-vue": "^5.2.3",
     "html-loader": "^0.5.5",
     "html-webpack-plugin": "^3.2.0",
     "node-sass": "^4.14.1",
     "postcss-loader": "^3.0.0",
-    "sass": "^1.29.0",
+    "sass": "^1.32.2",
     "sass-loader": "^7.3.1",
     "stylus": "^0.54.8",
     "stylus-loader": "^3.0.1",
-    "vue-cli-plugin-element": "^1.0.1",
     "vue-template-compiler": "^2.6.12",
     "vuetify-loader": "^1.6.0",
     "webpack-bundle-analyzer": "^3.9.0",

@@ -50,7 +50,9 @@
 
 <script>
 import axios from 'axios'
-import { MarketHeader, MarketItemDialog, MarketItemCard } from '../components'
+import MarketHeader from '../components/MarketHeader'
+import MarketItemDialog from '../components/MarketItemDialog'
+import MarketItemCard from '../components/MarketItemCard'
 
   export default {
     data() {

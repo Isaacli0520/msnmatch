@@ -1,6 +1,29 @@
 from msnmatch import settings
 from hashlib import md5
+from users.models import Authenticator
 from django.http import JsonResponse
+from django.utils import timezone
+
+def val_required(func):
+    def inner(request, *args, **kwargs):
+        # print("REQUEST META", request.META)
+        auth_header = request.META.get('HTTP_AUTHORIZATION')
+        if not auth_header:
+            return _error_response("Authorization Header not found")
+        if not auth_header.startswith("Bearer "):
+            return _error_response("Invalid token type")
+        access_token = auth_header[7:]
+        try:
+            auth = Authenticator.objects.get(access_token=access_token)
+            diff = timezone.now() - auth.date_created
+            if diff.total_seconds() > settings.ACCESS_TOKEN_EXPIRATION:
+                auth.delete()
+                return _error_response("Access Token is Expired")
+        except:
+            return _error_response("Invalid Access Token")
+        kwargs["username"] = auth.username
+        return func(request, *args, **kwargs)
+    return inner
 
 def _error_response(message = ""):
     return JsonResponse({'message': message,'success': False})

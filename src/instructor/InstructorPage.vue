@@ -83,7 +83,9 @@
 
 <script>
 import axios from 'axios'
-import { CustomHeader, CustomRating, CustomBreadcrumb } from '../components'
+import CustomHeader from '../components/CustomHeader'
+import CustomRating from '../components/CustomRating'
+import CustomBreadcrumb from '../components/CustomBreadcrumb'
 import { sortBySemester } from '../utils'
 
 export default {

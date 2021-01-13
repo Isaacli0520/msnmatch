@@ -18,8 +18,8 @@ from django.urls import path, include
 from django.conf import settings
 from django.contrib.auth import views as auth_views
 from django.views.generic.base import TemplateView
-from . import views
 from django.views.generic.base import RedirectView
+from . import views
 
 from django.conf.urls import (
 handler400, handler403, handler404, handler500
@@ -29,20 +29,27 @@ handler404 = 'msnmatch.views.handler404'
 handler403 = 'msnmatch.views.handler403'
 
 urlpatterns = [
+    path('', views.home, name='home'),
     path('admin/', admin.site.urls),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
-    path('', views.home, name='home'),
+    path('login/', views.login, name='login'),
+    path('auth/', include('social_django.urls', namespace='social')),
+    path('superadmin/', views.superadmin, name="superadmin"),
+
+    # Match
     path('match/', views.match, name='match'),
     path('roommate/', views.roommate_match, name='roommate_match'),
+
+    # URLs for other apps
     path('users/', include('users.urls')),
-    path('auth/', include('social_django.urls', namespace='social')),
-    path('login/', auth_views.LoginView.as_view(), name='login'),
     path('courses/', include('courses.urls')),
     path('comments/', include('comments.urls', namespace='comments')),
     path('market/', include('market.urls', namespace='market')),
     path('skills/', include('skills.urls')),
     path('friendship/', include('friendship.urls')),
-    path('superadmin/', views.superadmin, name="superadmin"),
-    path('api/get_all_ranked_users/', views.get_all_ranked_users, name="get_all_ranked_users"),
 
+    # APIs
+    path('api/get_all_ranked_users/', views.get_all_ranked_users, name="get_all_ranked_users"),
+    path('oauth/authorize/', views.oauth_authorize, name="oauth_authorize"),
+    path('oauth/api/token/', views.oauth_token, name="oauth_token"),
 ]

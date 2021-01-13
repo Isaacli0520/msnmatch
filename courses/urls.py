@@ -34,8 +34,8 @@ urlpatterns = [
 	path('ajax/save_take/', views.save_take, name='save_take'),
 	path('ajax/course_search_result/', views.course_search_result, name='course_search_result'),
 	path('ajax/get_instructor/', views.get_instructor, name='get_instructor'),
-	path('ajax/get_credential/', views.get_credential, name='get_credential'),
 	path('ajax/get_reviews/', views.get_reviews, name='get_reviews'),
+	# path('api/get_credential/', views.get_credential, name='get_credential'),
 
 	path('<int:course_number>/<int:instructor_number>/', views.course_instructor, name='course_instructor'),
 

@@ -17,20 +17,24 @@ DEBUG = config("DEBUG",cast=bool)
 ITEM_NAME_TH = config("ITEM_NAME_TH")
 ITEM_DESCRIPTION_TH = config("ITEM_DESCRIPTION_TH")
 
-# SECURE_SSL_REDIRECT = not DEBUG
-# SECURE_PROXY_SSL_HEADER = ('X-Forwarded-Proto', 'https')
-# SESSION_COOKIE_SECURE = not DEBUG
-# CSRF_COOKIE_SECURE = not DEBUG
+ACCESS_TOKEN_EXPIRATION = config('ACCESS_TOKEN_EXPIRATION', cast=int)
+
+SECURE_SSL_REDIRECT = not DEBUG
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
 
+AUTH_CLIENT_ID = config('AUTH_CLIENT_ID', cast=Csv())
+AUTH_REDIRECT_URLS = config('AUTH_REDIRECT_URLS', cast=Csv())
+
 DEBUG_PROPAGATE_EXCEPTIONS = config('DEBUG_PROPAGATE_EXCEPTIONS', cast=bool)
 
-BUILD_VERSION = "msnmatch-alpha-0.206"
+# BUILD_VERSION = "msnmatch-alpha-0.206"
 
 CURRENT_YEAR = config('CURRENT_YEAR', cast=int)
 CURRENT_SEMESTER = config('CURRENT_SEMESTER')
-SEMESTER_ID = config('SEMESTER_ID')
 
 # Applications
 
@@ -121,7 +125,6 @@ DATABASES = {
 
 AUTHENTICATION_BACKENDS = (
     'social_core.backends.open_id.OpenIdAuth',  # for Google authentication
-    'social_core.backends.google.GoogleOpenId',
     'social_core.backends.google.GoogleOAuth2',
     'django.contrib.auth.backends.ModelBackend',)
 
@@ -147,6 +150,7 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_WHITELISTED_EMAILS = config('SOCIAL_AUTH_GOOGLE_OAUTH2
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = '/'
+# SOCIAL_AUTH_LOGIN_REDIRECT_URL = ''
 
 
 # Password validation
@@ -181,12 +185,9 @@ USE_TZ = True
 
 DATE_INPUT_FORMATS = ['%m/%d/%Y']
 
-# Static files (CSS, JavaScript, Images)
-
 CORS_ALLOW_HEADERS = list(default_headers) + [
     'Access-Control-Allow-Origin',
 ]
-# print("JIUJI DBEUG:", config("CORS_ALLOWED_ORIGINS", cast=lambda v: [s.strip() for s in v.split(',')]))
 CORS_ALLOWED_ORIGINS = config("CORS_ALLOWED_ORIGINS", cast=Csv())
 CORS_ALLOW_CREDENTIALS = True
 

@@ -300,10 +300,7 @@ export default{
             navDrawer:false,
             user:null,
             drawer: null,
-            credential:"",
-            plannableURL:"",
-            username:"",
-            taking_courses:[],
+            plannableURL:"https://plannable.org/?auth=Hoosmyprofessor",
             courseTypes:[
                 'Clinical',
                 'Discussion',
@@ -337,38 +334,26 @@ export default{
                 [{
                     "title":"My Courses",
                     "icon":general_icons.my_courses,
-                    "href":"",
-                    "target":"",
                 },
                 {
                     "title":"My Reviews",
                     "icon":general_icons.my_reviews,
-                    "href":"/courses/reviews/",
-                    "target":"",
                 },
                 {
                     "title":"Submit a Review",
                     "icon":general_icons.submit_review,
-                    "href":"",
-                    "target":"",
                 },],
                 [{
                     "title":"Home",
                     "icon":general_icons.home,
-                    "href":"/courses/",
-                    "target":"",
                 },
                 {
                     "title":"Departments",
                     "icon":general_icons.departments,
-                    "href":"/courses/departments/",
-                    "target":"",
                 },
                 {
                     "title":"Plannable",
                     "icon":general_icons.plannable,
-                    "href":"https://plannable.org",
-                    "target":"_blank",
                 },]
             ],
         }
@@ -387,18 +372,6 @@ export default{
         headerUpdate(){
             this.getTakingCourses();
         },
-        taking_courses(val){
-            var tmp_arr = [];
-            for(let i = 0; i < val.length; i++){
-                tmp_arr.push(val[i].mnemonic.toLowerCase() + val[i].number+this.courseTypes.indexOf(val[i].type).toString(10))
-            }
-            this.plannableURL = JSON.stringify(tmp_arr);
-        },
-    },
-    computed:{
-        plannableFinalURL(){
-            return "https://plannable.org" + "/?username=" + this.username + "&credential=" + this.credential + "";
-        }
     },
     methods:{
         selectCourse(course){
@@ -462,9 +435,6 @@ export default{
                 this.instructorSelectLoading = false;
             });
         },
-        sortCourseNumber(a, b){
-            return a.number.toString(10) - b.number.toString(10);
-        },
         navAsideMethod(item){
             if(item.text == "HoosMyProfessor"){
                 this.goToHref(this.general_urls.courses_url);
@@ -508,7 +478,7 @@ export default{
                 this.goToHref(this.general_urls.department_url);
             }
             else if(item.title=="Plannable"){
-                this.goToHref(this.plannableFinalURL);
+                this.goToHref(this.plannableURL);
             }
             else if(item.title=="Submit a Review"){
                 this.submitReviewDialog = true;
@@ -517,32 +487,16 @@ export default{
         get_basic_info(){
             axios.get('/courses/api/get_basic_info/',{params: {}}).then(response => {
                 this.urls = response.data.all_info;
+                this.user = response.data.user;
                 this.loaded = true;
             });
         },
         goToHref(text){
             window.location.href = text;
         },
-        getCredential(){
-            axios.get('/courses/ajax/get_credential/',{params: {}}).then(response => {
-                this.credential = response.data.credential;
-                this.username = response.data.username;
-            }).catch( err => {
-                this.credential = "";
-                this.username = "";
-            });
-        },
-        getTakingCourses(){
-            axios.get('/courses/api/get_user_hmp_header/',{params: {}}).then(response => {
-                this.user = response.data.user;
-                this.taking_courses = response.data.taking_courses;
-            });
-        },
     },
     mounted(){
-        this.getCredential();
         this.get_basic_info();
-        this.getTakingCourses();
     },
 }
 </script>

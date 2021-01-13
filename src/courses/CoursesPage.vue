@@ -15,35 +15,41 @@
                         </v-row>
                         <v-row row wrap>
                             <v-spacer></v-spacer>
-                            <v-flex d-flex xs10 sm10 md10 lg10 xl10>
+                            <v-col cols="10">
                                 <search-course class="custom-search"
                                     :dense="false"
                                     background_color="white"></search-course>
-                            </v-flex>
+                            </v-col>
                             <v-spacer></v-spacer>
                         </v-row>
                         <v-row class="spacer-layout"></v-row>
                         <v-row>
                             <template v-for="(func, index) in main_functions">
                                 <v-col :key="index" sm="4" md="4" lg="4" xl="4" cols="6">
-                                    <v-card
-                                        @click.native="navFunctions(func)"
-                                        class="fill-height"
-                                        :ripple="false"
-                                        hover>
-                                        <v-card-text>
-                                            <v-layout class="align-center justify-center">
-                                            <div style="padding: 8px;"><v-icon
-                                                x-large
-                                                color="teal darken-2"
-                                                >{{func.icon}}</v-icon></div>
-                                            </v-layout>
-                                        </v-card-text>
-                                        <v-divider></v-divider>
-                                        <v-card-actions class="justify-center">
-                                            <span class="function-subtext">{{func.title}}</span>
-                                        </v-card-actions>
-                                    </v-card>
+                                    <v-tooltip top>
+                                        <template v-slot:activator="{ on, attrs }">
+                                            <v-card
+                                                v-bind="attrs"
+                                                v-on="on"
+                                                @click.native="navFunctions(func)"
+                                                :ripple="false"
+                                                hover>
+                                                <v-card-text>
+                                                    <v-layout class="align-center justify-center">
+                                                    <div style="padding: 8px;"><v-icon
+                                                        x-large
+                                                        color="teal darken-2"
+                                                        >{{func.icon}}</v-icon></div>
+                                                    </v-layout>
+                                                </v-card-text>
+                                                <v-divider></v-divider>
+                                                <v-card-actions class="justify-center">
+                                                    <span class="function-subtext">{{func.title}}</span>
+                                                </v-card-actions>
+                                            </v-card>
+                                        </template>
+                                        <span>{{func.tip}}</span>
+                                    </v-tooltip>
                                 </v-col>
                             </template>
                         </v-row>
@@ -148,7 +154,10 @@
 
 <script>
 import axios from 'axios'
-import { CustomHeader, SearchCourse, ReviewCard, Recommendation } from '../components'
+import CustomHeader from '../components/CustomHeader'
+import SearchCourse from '../components/SearchCourse'
+import ReviewCard from '../components/ReviewCard'
+import Recommendation from '../components/Recommendation'
 import { general_urls, general_icons } from '../utils'
 
 export default {
@@ -166,26 +175,32 @@ export default {
                 "my_courses":{
                     "title":"My Courses",
                     "icon":general_icons.my_courses,
+                    "tip":"View your taken courses",
                 },
                 "my_reviews":{
                     "title":"My Reviews",
                     "icon":general_icons.my_reviews,
+                    "tip":"View your reviews",
                 },
                 "submit_review":{
                     "title":"Submit a Review",
                     "icon":general_icons.submit_review,
+                    "tip":"Submit a new review :)",
                 },
                 "departments":{
                     "title":"Departments",
                     "icon":general_icons.departments,
+                    "tip":"View courses by departments",
                 },
                 "plannable":{
                     "title":"Plannable",
                     "icon":general_icons.plannable,
+                    "tip":"Go to plannable and schedule your courses",
                 },
                 "recommendation":{
                     "title":"Recommendation",
                     "icon":general_icons.recommendation,
+                    "tip":"Provide recommendations based on other users' data",
                 },
             },
         }

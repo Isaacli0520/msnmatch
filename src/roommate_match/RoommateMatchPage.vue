@@ -131,7 +131,9 @@
 <script>
 import Vue from "vue";
 import axios from 'axios'
-import { MatchHeader, UserCard, UserDialog } from '../components'
+import MatchHeader from '../components/MatchHeader'
+import UserDialog from '../components/UserDialog'
+import UserCard from '../components/UserCard'
 axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 axios.defaults.xsrfCookieName = "csrftoken";
 

@@ -1,15 +1,9 @@
 import Vue from 'vue'
 import InstructorPage from './InstructorPage.vue'
-import Vuetify from 'vuetify/lib'
-
-const vuetifyOptions = { }
-
-Vue.use(Vuetify);
-
-Vue.config.productionTip = false
+import vuetify from '../plugins/vuetify'
 
 new Vue({
     render: h => h(InstructorPage),
-    vuetify: new Vuetify(vuetifyOptions),
+    vuetify: vuetify,
     components: { InstructorPage }
   }).$mount('#instructor-page')
