@@ -126,15 +126,15 @@ export default{
 
     @media (min-width: 10px) and (max-width: 767px) {
         .review-headline-instructor{
-            font-size: 0.95em
+            font-size: 15px;
         }
 
         .review-headline-text{
-            font-size: 0.95em
+            font-size: 15px;
         }
 
         .review-headline-number{
-            font-size: 0.95em;
+            font-size: 15px;;
         }
     }
 </style>

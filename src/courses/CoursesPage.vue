@@ -104,7 +104,7 @@
                                         outlined
                                         elevation="3"
                                         :href="'/courses/' + course.course_pk + '/' ">
-                                        <v-card-title>
+                                        <v-card-title style="padding-bottom:8px;">
                                             <span class="course-number">{{course.mnemonic}}{{course.number}}</span>
                                             <span class="course-name">{{course.title}}</span>
                                         </v-card-title>
@@ -200,7 +200,7 @@ export default {
                 "recommendation":{
                     "title":"Recommendation",
                     "icon":general_icons.recommendation,
-                    "tip":"Provide recommendations based on other users' data",
+                    "tip":"Provide recommendations based on semester and major",
                 },
             },
         }
@@ -296,24 +296,6 @@ export default {
         letter-spacing: 0.05em;
     }
 
-    .upper-div{
-        position: relative;
-        padding: 75px 0px 20px 0px;
-        color:#000000;
-        background-color: #fff;
-        width:100%;
-        /* height: 100%; */
-        position:relative;
-        /* background: url('../assets/static/css/images/cloud_new_09.jpg') no-repeat;
-        background-attachment: fixed;
-        background-position: center center;
-        background-size: cover; */
-
-        /* -webkit-box-shadow: inset 0 -3px 3px 0px rgba(0,0,0,.13), inset 0 -7px 7px 0px rgba(0,0,0,.12);
-        box-shadow: inset 0 -3px 3px 0px rgba(0,0,0,.13), inset 0 -7px 7px 0px rgba(0,0,0,.12); */
-        /* padding: 0; */
-    }
-
     .recommendation-div{
         overflow: scroll;
         max-height: 248px;
@@ -335,10 +317,10 @@ export default {
         padding: 1px 7px 1px 7px;
         border-radius: 5px 0px 0px 5px;
         line-height: 1.4;
-        box-decoration-break: clone;
     }
 
     .course-name{
+        white-space: normal;
         font-family: "Roboto", sans-serif;
         font-size: 1.1em;
         font-weight: 300;
@@ -347,7 +329,6 @@ export default {
         padding: 1px 7px 1px 7px;
         border-radius: 0px 5px 5px 0px;
         line-height: 1.4;
-        box-decoration-break: clone;
 
     }
 
@@ -410,11 +391,11 @@ export default {
         }
 
         .course-name{
-            font-size: 0.95em
+            font-size: 15px;
         }
 
         .course-number{
-            font-size: 0.95em;
+            font-size: 15px;
         }
 
         .main-title{

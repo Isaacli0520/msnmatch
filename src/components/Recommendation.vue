@@ -1,5 +1,11 @@
 <template>
-    <v-dialog :value="value" @input="$emit('input')" min-width="330px" max-width="700px">
+    <v-dialog 
+        :value="value" 
+        @input="$emit('input')"
+        scrollable 
+        transition="fade-transition"
+        min-width="330px"
+        max-width="700px">
         <v-card
             outlined
             elevation="3"
@@ -62,7 +68,7 @@
             <v-divider></v-divider>
             <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="blue darken-1" outlined @click.native="$emit('input')">Close</v-btn>
+                <v-btn class="white--text" color="blue darken-1" @click.native="$emit('input')">Close</v-btn>
             </v-card-actions>
         </v-card>
     </v-dialog>
@@ -80,6 +86,7 @@ export default{
     },
     data() {
         return {
+            init_finished:false,
             user_info_get:false,
             recommendation_loaded:false,
             year:1,
@@ -100,6 +107,13 @@ export default{
         }
     },
     watch: {
+        value(val){
+            if(val && !this.init_finished){
+                this.getCurrentSemester();
+                this.getMajorOptions();
+                this.init_finished = true;
+            }
+        },
         year(){
             if(this.user_info_get){
                 this.recommendation_loaded = false;
@@ -143,8 +157,7 @@ export default{
         },
     },
     mounted(){
-        this.getCurrentSemester();
-        this.getMajorOptions();
+        
     },
 }
 

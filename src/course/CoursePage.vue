@@ -93,8 +93,8 @@
                                     <v-chip
                                         class="ma-1"
                                         label
-                                        small
                                         text-color="white"
+                                        small
                                         color="teal darken-1">
                                         Semesters Taught:{{instructor.semesters.length}}
                                     </v-chip>
@@ -102,7 +102,7 @@
                                         class="ma-1"
                                         label
                                         small
-                                        text-color="white"
+                                        outlined
                                         color="teal darken-1">
                                         Taking:{{instructor.taking}}
                                     </v-chip>
@@ -110,7 +110,7 @@
                                         class="ma-1"
                                         label
                                         small
-                                        text-color="white"
+                                        outlined
                                         color="teal darken-1">
                                         Taken:{{instructor.taken}}
                                     </v-chip>
@@ -128,10 +128,9 @@
                             <v-divider class=""></v-divider>
                             <v-card-actions class="instructor-card-action">
                                 <v-chip
-                                    class="ma-1"
-                                    outlined
+                                    class="ma-1 white--text"
                                     label
-                                    color="deep-purple accent-4"
+                                    color="teal darken-1"
                                     @click="goToHref('/courses/'+course.course_pk+'/'+instructor.pk+'/')"
                                     >
                                     Reviews & More
@@ -139,7 +138,7 @@
                                 <v-chip
                                     class="ma-1"
                                     @click="openDialogTake(instructor)"
-                                    color="deep-purple accent-4" 
+                                    color="teal darken-1" 
                                     outlined
                                     label
                                     >
@@ -169,8 +168,8 @@
                 <v-divider></v-divider>
                 <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn color="blue darken-1" text @click="dialogTake = false">Close</v-btn>
-                    <v-btn color="blue darken-1" text @click="takeSave()">Save</v-btn>
+                    <v-btn class="white--text" color="blue darken-1" @click="takeSave()">Save</v-btn>
+                    <v-btn class="white--text" color="red darken-1" @click="dialogTake = false">Close</v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>

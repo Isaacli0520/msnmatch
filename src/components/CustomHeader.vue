@@ -39,11 +39,12 @@
         <v-app-bar
             :clipped-left="$vuetify.breakpoint.mdAndUp"
             app
-            dense
             light
+            color="white"
+            dense
             elevation="1">
             <v-app-bar-nav-icon  @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
-            <img style="margin-left:6px;" :src="brand_pic" width="40" height="38" alt="">
+            <img class="nav-img" :src="brand_pic" width="40" height="38" alt="">
             <template v-if="$vuetify.breakpoint.mdAndUp">
                 <v-btn
                     :href="general_urls.courses_url"
@@ -122,7 +123,7 @@
             :timeout="2700">
             Form Invalid
             <template v-slot:action="{ attrs }">
-            <v-btn color="white" v-bind="attrs" text @click="form_invalid_snack = false"> Close </v-btn>
+                <v-btn color="white" v-bind="attrs" text @click="form_invalid_snack = false"> Close </v-btn>
             </template>
         </v-snackbar>
         <v-snackbar
@@ -145,54 +146,53 @@
                 <v-btn color="cyan accent-1" v-bind="attrs" text @click="success_snack = false"> Close </v-btn>
             </template>
         </v-snackbar>
-        <v-dialog v-model="submitReviewDialog" scrollable min-width="350px" max-width="600px">
+        <v-dialog v-model="submitReviewDialog" transition="fade-transition" scrollable min-width="350px" max-width="600px">
             <v-card>
                 <v-card-title>Submit a Review</v-card-title>
                 <v-divider></v-divider>
-                <v-card-text>
+                <v-card-text style="padding-bottom:0px;">
                     <v-form
                         ref="review_form"
                         v-model="submit_review_form_valid">
                         <v-row>
-                            <v-col>
-                            <span>Instructor Rating:</span>
-                            <v-rating
-                                v-model="review.rating_instructor"
-                                color="yellow darken-3"
-                                background-color="grey darken-1"
-                                medium
-                                hover>
-                            </v-rating>
+                            <v-col class="pb-0">
+                                <span class="rating-label">Instructor Rating:</span>
+                                <v-rating
+                                    v-model="review.rating_instructor"
+                                    color="yellow darken-3"
+                                    background-color="grey darken-1"
+                                    medium
+                                    hover>
+                                </v-rating>
                             </v-col>
-                            <v-col>
-                            <span>Course Rating:</span>
-                            <v-rating
-                                v-model="review.rating_course"
-                                color="yellow darken-3"
-                                background-color="grey darken-1"
-                                medium
-                                hover>
-                            </v-rating>
+                            <v-col class="pb-0">
+                                <span class="rating-label">Course Rating:</span>
+                                <v-rating
+                                    v-model="review.rating_course"
+                                    color="yellow darken-3"
+                                    background-color="grey darken-1"
+                                    medium
+                                    hover>
+                                </v-rating>
                             </v-col>
                         </v-row>
                         <v-row>
                             <v-col>
                             <search-course
+                                flat
+                                light
+                                dense
                                 searchFunction="select"
                                 :searchInstructor="false"
-                                :flat="true"
-                                :light="true"
                                 background_color="white"
-                                :dense="true"
-                                @select-course="selectCourse"
-                                :outlined="true">
+                                :outlined="true"
+                                @select-course="selectCourse">
                             </search-course>
                             </v-col>
                         </v-row>
                         <v-row>
                             <v-col>
                                 <v-select
-                                    dense
                                     v-model="review_instructor_pk"
                                     :items="instructor_options"
                                     item-text="name"
@@ -202,12 +202,15 @@
                                     label="Instructor"
                                     :rules="[v => !!v || 'Instructor is required']"
                                     :menu-props="{ offsetY: true }"
-                                    outlined>
+                                    outlined
+                                    dense
+                                    hide-details>
                                 </v-select>
                             </v-col>
                             <v-col>
                                 <v-select
                                     dense
+                                    hide-details
                                     v-model="review.course_instructor_pk"
                                     :items="course_instructor_options"
                                     item-text="semester"
@@ -221,7 +224,7 @@
                             </v-col>
                         </v-row>
                         <v-row>
-                            <v-col>
+                            <v-col class="pb-0">
                                 <v-textarea
                                     v-model="review.text"
                                     label="Write Your Review"
@@ -229,7 +232,7 @@
                                     outlined
                                     required
                                     :rules="reviewTextRules"
-                                    rows="5"
+                                    rows="6"
                                     row-height="20">
                                 </v-textarea>
                             </v-col>
@@ -239,8 +242,8 @@
                 <v-divider></v-divider>
                 <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn color="green darken-1" :loading="submitReviewBtnLoading" outlined @click.prevent="submitReview(review)">Submit</v-btn>   
-                    <v-btn color="blue darken-1" outlined @click="submitReviewDialog = false">Close</v-btn> 
+                    <v-btn color="blue darken-1" class="white--text" :loading="submitReviewBtnLoading"  @click.prevent="submitReview(review)">Submit</v-btn>   
+                    <v-btn color="red darken-1" class="white--text" @click="submitReviewDialog = false">Close</v-btn> 
                 </v-card-actions>
             </v-card>
         </v-dialog>
@@ -503,17 +506,25 @@ export default{
 
 
 <style scoped lang="css">
+    .rating-label{
+        padding-left: 9px;
+        font-size: 15px;
+    }
+
+    .nav-img{
+        margin-left:6px;
+    }
+
+    @media (min-width: 10px) and (max-width: 767px) {
+        .nav-img{
+            margin-left:0px;
+            margin-right:5px;
+        }
+    }
+
     .cus-navbar-item{
         font-size: 15px !important;
         font-family: Arial, Helvetica, sans-serif !important;
-    }
-
-    .theme--light.v-app-bar.v-toolbar.v-sheet{
-        background-color: white !important;
-    }
-
-    .theme--light.v-text-field--solo-inverted.v-text-field--solo.v-input--is-focused > .v-input__control > .v-input__slot .v-label, .theme--light.v-text-field--solo-inverted.v-text-field--solo.v-input--is-focused > .v-input__control > .v-input__slot input {
-        color: #000000 !important;
     }
 
 </style>

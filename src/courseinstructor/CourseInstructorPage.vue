@@ -175,12 +175,12 @@
             <v-card-title>
                 <span class="headline">Submit a Review</span>
             </v-card-title>
-            <v-card-text>
+            <v-card-text class="pb-0">
                 <v-form
                     ref="review_form"
                     v-model="submit_review_form_valid">
                     <v-row wrap>
-                        <v-col>
+                        <v-col class="pb-0">
                             <span>Instructor Rating:</span>
                             <v-rating
                                 v-model="review_rating_instructor"
@@ -189,6 +189,8 @@
                                 medium
                                 hover>
                             </v-rating>
+                        </v-col>
+                        <v-col class="pb-0">
                             <span>Course Rating:</span>
                             <v-rating
                                 v-model="review_rating_course"
@@ -198,8 +200,11 @@
                                 hover>
                             </v-rating>
                         </v-col>
-                        <v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col class="pb-0">
                             <v-select
+                                dense
                                 v-model="review_course_instructor_pk"
                                 :items="course_instructors"
                                 item-text="text"
@@ -212,24 +217,25 @@
                         </v-col>
                     </v-row>
                     <v-row>
-                        <v-col>
+                        <v-col class="pb-0">
                             <v-textarea
                                 v-model="review_text"
                                 label="Write Your Review"
                                 auto-grow
                                 outlined
                                 :rules="reviewTextRules"
-                                rows="5"
+                                rows="6"
                                 row-height="20"
                             ></v-textarea>
                         </v-col>
                     </v-row>
                 </v-form>
             </v-card-text>
+            <v-divider></v-divider>
             <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="teal darken-1" outlined v-if="course_instructors.length > 0" :loading="submitReviewBtnLoading" @click="submitReview()">Submit</v-btn>
-                <v-btn color="red lighten-1" outlined @click="reviewDialog = false">Close</v-btn>
+                <v-btn class="white--text" color="blue darken-1" v-if="course_instructors.length > 0" :loading="submitReviewBtnLoading" @click="submitReview()">Submit</v-btn>
+                <v-btn class="white--text" color="red darken-1" @click="reviewDialog = false">Close</v-btn>
             </v-card-actions>
         </v-card>
     </v-dialog>
