@@ -486,10 +486,7 @@ export default {
 
 <style scoped>
     .content-div{
-        /* background-color:#fdfff9; */
-        /* f0f5e5 */
         position: relative;
-        /* background: url('../assets/static/css/images/cloud_new_09.jpg') no-repeat; */
         background: url('../assets/static/css/images/cloud_bg_new_02.jpg') no-repeat;
         background-attachment: fixed;
         background-position: center center;
@@ -497,17 +494,9 @@ export default {
     }
 
     .top-part-wrapper{
-        /* position: relative; */
         padding: 45px 0px 30px 0px;
         color:#000000;
         width:100%;
-        /* background: url('../assets/static/css/images/cloud_new_09.jpg') no-repeat; */
-        /* background-attachment: fixed;
-        background-position: center center;
-        background-size: cover; */
-
-        /* -webkit-box-shadow: inset 0 -2px 2px 0px rgba(0,0,0,.13), inset 0 -3px 3px 0px rgba(0,0,0,.12);
-        box-shadow: inset 0 -2px 2px 0px rgba(0,0,0,.13), inset 0 -3px 3px 0px rgba(0,0,0,.12); */
     }
 
     .checkbox-div{

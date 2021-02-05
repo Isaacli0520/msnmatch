@@ -47,7 +47,7 @@
                                             :href="'/courses/departments/'+ department.id + '/' "
                                             outlined 
                                             
-                                            color="teal darken-1">{{department.name}}</v-chip>
+                                            :color="variables.secondary_color">{{department.name}}</v-chip>
                                 </v-flex>
                             </v-layout>
                         </v-card-text>
@@ -63,17 +63,19 @@
 import axios from 'axios'
 import CustomHeader from '../components/CustomHeader'
 import CustomBreadcrumb from '../components/CustomBreadcrumb'
+import variables from '../sass/variables.scss'
 axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 axios.defaults.xsrfCookieName = "csrftoken";
 
 export default {
     data() {
-      return {
-        departments:[],
-        navItems:[],
-        departments_dict:{},
-        loaded:false,
-      }
+        return {
+            variables:variables,
+            departments:[],
+            navItems:[],
+            departments_dict:{},
+            loaded:false,
+        }
     },
     components:{
         CustomHeader,

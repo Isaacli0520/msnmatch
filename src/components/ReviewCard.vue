@@ -16,18 +16,18 @@
         <v-card-actions style="flex-flow:row wrap !important;">
             <v-spacer v-if="$vuetify.breakpoint.lgAndUp"></v-spacer>
             <v-chip
-                class="ma-1" color="#336699" label outlined small text-color="#336699">
+                class="ma-1" :color="variables.secondary_color" label outlined small :text-color="variables.secondary_color">
                 {{review.semester}}
             </v-chip>
             <v-chip
-                class="ma-1" style="padding: 0px 5px 0px 9px !important;" color="teal darken-2"
+                class="ma-1" style="padding: 0px 5px 0px 9px !important;" :color="variables.secondary_color"
                 label outlined small>
                 <span class="caption mr-1">Instructor:</span>
                 <v-rating
                     style="margin-bottom:2px !important;"
                     v-model="review.rating_instructor"
                     color="yellow darken-2"
-                    background-color="teal darken-2"
+                    :background-color="variables.secondary_color"
                     readonly
                     dense
                     small
@@ -35,14 +35,14 @@
                 </v-rating>
             </v-chip>
             <v-chip
-                class="ma-1" style="padding: 0px 5px 0px 9px !important;" color="teal darken-2"
+                class="ma-1" style="padding: 0px 5px 0px 9px !important;" :color="variables.secondary_color"
                 label outlined small>
                 <span class="caption mr-1">Course:</span>
                 <v-rating
                     style="margin-bottom:2px !important;"
                     v-model="review.rating_course"
                     color="yellow darken-2"
-                    background-color="teal darken-2"
+                    :background-color="variables.secondary_color"
                     readonly
                     dense
                     small
@@ -64,11 +64,17 @@
 </template>
 
 <script>
+import variables from '../sass/variables.scss'
 
 export default{
     props:{
         review:Object,
         editable: Boolean,
+    },
+    data(){
+        return {
+            variables:variables,
+        }
     },
     methods:{
         editReview(review){
@@ -81,8 +87,7 @@ export default{
 </script>
 
 
-<style scoped lang="css">
-
+<style scoped lang="scss">
     .review-text{
         font-size: 16px;
         color:rgb(0, 0, 0);
@@ -102,7 +107,7 @@ export default{
         font-family: "Roboto", sans-serif;
         font-size: 1.1em;
         font-weight: 500;
-        background-color: rgb(13, 124, 109);
+        background-color: $primary-color;
         color:#fff;
         padding: 1px 7px 1px 7px;
         border-radius: 5px 0px 0px 5px;
@@ -114,27 +119,25 @@ export default{
         font-family: "Roboto", sans-serif;
         font-size: 1.1em;
         font-weight: 300;
-        background-color: rgb(240, 240, 240);
-        color:rgb(0, 0, 0);
+        background-color: $course-title-bg-color;
+        color:$course-title-color;
         padding: 1px 7px 1px 7px;
         border-radius: 0px 5px 5px 0px;
         line-height: 1.4;
         box-decoration-break: clone;
-
     }
-
 
     @media (min-width: 10px) and (max-width: 767px) {
         .review-headline-instructor{
-            font-size: 0.95em
+            font-size: 15px;
         }
 
         .review-headline-text{
-            font-size: 0.95em
+            font-size: 15px;
         }
 
         .review-headline-number{
-            font-size: 0.95em;
+            font-size: 15px;;
         }
     }
 </style>

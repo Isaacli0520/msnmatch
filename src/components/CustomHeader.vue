@@ -37,83 +37,101 @@
         </v-navigation-drawer>
         <!-- APP BAR -->
         <v-app-bar
+            :class="[homepage ? 'homepage-bar' : '']"
             :clipped-left="$vuetify.breakpoint.mdAndUp"
             app
-            dense
-            light
-            elevation="1">
-            <v-app-bar-nav-icon  @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
-            <img style="margin-left:6px;" :src="brand_pic" width="40" height="38" alt="">
-            <template v-if="$vuetify.breakpoint.mdAndUp">
-                <v-btn
-                    :href="general_urls.courses_url"
-                    text>HoosMyProfessor</v-btn>
-                <v-divider inset vertical></v-divider>
-                <v-btn 
-                    :href="general_urls.match_url"
-                    text>Match</v-btn>
-                <!-- <v-divider inset vertical></v-divider> -->
-                <!-- <v-btn 
-                    :href="general_urls.market_url"
-                    text>Market</v-btn> -->
+            :dense="!homepage"
+            :color="variables.navbar_bg_color"
+            absolute
+            dark
+            :src="homepage ? '/static/css/images/usp_17_3.jpg' : undefined"
+            :height="homepage ? '280px' : undefined "
+            >
+            <div :class="[homepage ? 'cus-toolbar__content' : 'cus-toolbar__content_2']">
+                <v-app-bar-nav-icon  @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
+                <img class="nav-img" :src="brand_pic" width="40" height="38" alt="">
+                <template v-if="$vuetify.breakpoint.mdAndUp">
+                    <v-btn
+                        :href="general_urls.courses_url"
+                        text>HoosMyProfessor</v-btn>
+                    <!-- <v-divider inset vertical></v-divider> -->
+                    <v-btn 
+                        :href="general_urls.match_url"
+                        text>Match</v-btn>
+                    <!-- <v-divider inset vertical></v-divider> -->
+                    <!-- <v-btn 
+                        :href="general_urls.market_url"
+                        text>Market</v-btn> -->
+                </template>
+                <search-course
+                    style="padding-left:6px;"
+                    light
+                    background_color="white"
+                    v-if="searchBool"></search-course>
+                <v-spacer></v-spacer>
+                <!-- App Menu -->
+                <v-menu offset-y
+                    class="mx-auto"
+                    min-width="170">
+                    <template v-slot:activator="{ attrs, on }">
+                        <v-btn
+                            color="white"
+                            icon
+                            v-bind="attrs"
+                            v-on="on">
+                            <v-icon>mdi-apps</v-icon>
+                        </v-btn>
+                    </template>
+                    <v-list dense rounded>
+                        <v-list-item
+                            v-for="(item, index) in app_items"
+                            :key="index + '-app'"
+                            @click="navMethod(item)">
+                            <v-list-item-icon>
+                                <v-icon color="black" dense v-text="item.icon"></v-icon>
+                            </v-list-item-icon>
+                            <v-list-item-content>
+                                <v-list-item-title>{{ item.title }}</v-list-item-title>
+                            </v-list-item-content>
+                        </v-list-item>
+                    </v-list>
+                </v-menu>
+                <!-- User Drop Menu -->
+                <v-menu offset-y
+                    class="mx-auto"
+                    min-width="170">
+                    <template v-slot:activator="{ attrs, on }">
+                        <v-btn
+                            color="white"
+                            icon
+                            v-bind="attrs"
+                            v-on="on">
+                            <v-icon>mdi-account-circle-outline</v-icon>
+                        </v-btn>
+                    </template>
+                    <v-list dense rounded>
+                        <v-list-item
+                            v-for="(item, index) in user_items"
+                            :key="index"
+                            @click="navMethod(item)">
+                            <v-list-item-icon>
+                                <v-icon color="black" dense v-text="item.icon"></v-icon>
+                            </v-list-item-icon>
+                            <v-list-item-content>
+                                <v-list-item-title>{{ item.title }}</v-list-item-title>
+                            </v-list-item-content>
+                        </v-list-item>
+                    </v-list>
+                </v-menu>
+            </div>
+            <template v-if="homepage">
+                <div class="header-bottom-div">
+                    HOOS MY PROFESSOR
+                </div>
+                <div class="subheader-bottom-div">
+                    Reviews, Ratings & More
+                </div>
             </template>
-            <search-course
-                v-if="searchBool"></search-course>
-            <v-spacer v-if="!searchBool"></v-spacer>
-            <!-- App Menu -->
-            <v-menu offset-y
-                class="mx-auto"
-                min-width="170">
-                <template v-slot:activator="{ attrs, on }">
-                    <v-btn
-                        color="black"
-                        icon
-                        v-bind="attrs"
-                        v-on="on">
-                        <v-icon>mdi-apps</v-icon>
-                    </v-btn>
-                </template>
-                <v-list dense rounded>
-                    <v-list-item
-                        v-for="(item, index) in app_items"
-                        :key="index + '-app'"
-                        @click="navMethod(item)">
-                        <v-list-item-icon>
-                            <v-icon color="black" dense v-text="item.icon"></v-icon>
-                        </v-list-item-icon>
-                        <v-list-item-content>
-                            <v-list-item-title>{{ item.title }}</v-list-item-title>
-                        </v-list-item-content>
-                    </v-list-item>
-                </v-list>
-            </v-menu>
-            <!-- User Drop Menu -->
-            <v-menu offset-y
-                class="mx-auto"
-                min-width="170">
-                <template v-slot:activator="{ attrs, on }">
-                    <v-btn
-                        color="black"
-                        icon
-                        v-bind="attrs"
-                        v-on="on">
-                        <v-icon>mdi-account-circle-outline</v-icon>
-                    </v-btn>
-                </template>
-                <v-list dense rounded>
-                    <v-list-item
-                        v-for="(item, index) in user_items"
-                        :key="index"
-                        @click="navMethod(item)">
-                        <v-list-item-icon>
-                            <v-icon color="black" dense v-text="item.icon"></v-icon>
-                        </v-list-item-icon>
-                        <v-list-item-content>
-                            <v-list-item-title>{{ item.title }}</v-list-item-title>
-                        </v-list-item-content>
-                    </v-list-item>
-                </v-list>
-            </v-menu>
         </v-app-bar>
         <v-snackbar
             top
@@ -122,7 +140,7 @@
             :timeout="2700">
             Form Invalid
             <template v-slot:action="{ attrs }">
-            <v-btn color="white" v-bind="attrs" text @click="form_invalid_snack = false"> Close </v-btn>
+                <v-btn color="white" v-bind="attrs" text @click="form_invalid_snack = false"> Close </v-btn>
             </template>
         </v-snackbar>
         <v-snackbar
@@ -145,54 +163,53 @@
                 <v-btn color="cyan accent-1" v-bind="attrs" text @click="success_snack = false"> Close </v-btn>
             </template>
         </v-snackbar>
-        <v-dialog v-model="submitReviewDialog" scrollable min-width="350px" max-width="600px">
+        <v-dialog v-model="submitReviewDialog" transition="fade-transition" scrollable min-width="350px" max-width="600px">
             <v-card>
-                <v-card-title>Submit a Review</v-card-title>
+                <v-card-title style="font-weight:700;">Submit a Review</v-card-title>
                 <v-divider></v-divider>
-                <v-card-text>
+                <v-card-text style="padding-bottom:0px;">
                     <v-form
                         ref="review_form"
                         v-model="submit_review_form_valid">
                         <v-row>
-                            <v-col>
-                            <span>Instructor Rating:</span>
-                            <v-rating
-                                v-model="review.rating_instructor"
-                                color="yellow darken-3"
-                                background-color="grey darken-1"
-                                medium
-                                hover>
-                            </v-rating>
+                            <v-col class="pb-0">
+                                <span class="rating-label">Instructor Rating:</span>
+                                <v-rating
+                                    v-model="review.rating_instructor"
+                                    color="yellow darken-3"
+                                    background-color="grey darken-1"
+                                    medium
+                                    hover>
+                                </v-rating>
                             </v-col>
-                            <v-col>
-                            <span>Course Rating:</span>
-                            <v-rating
-                                v-model="review.rating_course"
-                                color="yellow darken-3"
-                                background-color="grey darken-1"
-                                medium
-                                hover>
-                            </v-rating>
+                            <v-col class="pb-0">
+                                <span class="rating-label">Course Rating:</span>
+                                <v-rating
+                                    v-model="review.rating_course"
+                                    color="yellow darken-3"
+                                    background-color="grey darken-1"
+                                    medium
+                                    hover>
+                                </v-rating>
                             </v-col>
                         </v-row>
                         <v-row>
                             <v-col>
                             <search-course
+                                light
+                                dense
                                 searchFunction="select"
-                                :searchInstructor="false"
-                                :flat="true"
-                                :light="true"
                                 background_color="white"
-                                :dense="true"
-                                @select-course="selectCourse"
-                                :outlined="true">
+                                :searchInstructor="false"
+                                :flat="false"
+                                :outlined="false"
+                                @select-course="selectCourse">
                             </search-course>
                             </v-col>
                         </v-row>
                         <v-row>
                             <v-col>
                                 <v-select
-                                    dense
                                     v-model="review_instructor_pk"
                                     :items="instructor_options"
                                     item-text="name"
@@ -202,12 +219,13 @@
                                     label="Instructor"
                                     :rules="[v => !!v || 'Instructor is required']"
                                     :menu-props="{ offsetY: true }"
-                                    outlined>
+                                    solo
+                                    dense
+                                    hide-details>
                                 </v-select>
                             </v-col>
                             <v-col>
                                 <v-select
-                                    dense
                                     v-model="review.course_instructor_pk"
                                     :items="course_instructor_options"
                                     item-text="semester"
@@ -216,20 +234,22 @@
                                     label="Semester"
                                     :rules="[v => !!v || 'Semester is required']"
                                     :menu-props="{ offsetY: true }"
-                                    outlined>
+                                    solo
+                                    dense
+                                    hide-details>
                                 </v-select>
                             </v-col>
                         </v-row>
                         <v-row>
-                            <v-col>
+                            <v-col class="pb-0">
                                 <v-textarea
                                     v-model="review.text"
                                     label="Write Your Review"
                                     auto-grow
-                                    outlined
+                                    solo
                                     required
                                     :rules="reviewTextRules"
-                                    rows="5"
+                                    rows="6"
                                     row-height="20">
                                 </v-textarea>
                             </v-col>
@@ -239,8 +259,8 @@
                 <v-divider></v-divider>
                 <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn color="green darken-1" :loading="submitReviewBtnLoading" outlined @click.prevent="submitReview(review)">Submit</v-btn>   
-                    <v-btn color="blue darken-1" outlined @click="submitReviewDialog = false">Close</v-btn> 
+                    <v-btn color="blue darken-1" class="white--text" :loading="submitReviewBtnLoading"  @click.prevent="submitReview(review)">Submit</v-btn>   
+                    <v-btn color="red darken-1" class="white--text" @click="submitReviewDialog = false">Close</v-btn> 
                 </v-card-actions>
             </v-card>
         </v-dialog>
@@ -251,11 +271,16 @@
 import axios from 'axios'
 import SearchCourse from './SearchCourse'
 import { general_urls, general_icons, brand_pic } from '../utils'
+import variables from '../sass/variables.scss'
 axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 axios.defaults.xsrfCookieName = "csrftoken";
 
 export default{
     props: {
+        homepage:{
+            type:Boolean,
+            default:false,
+        },
         searchBool:{
             type:Boolean,
             default:true,
@@ -267,6 +292,7 @@ export default{
     },
     data: function () {
         return {
+            variables:variables,
             // Urls
             brand_pic:brand_pic,
             general_urls:general_urls,
@@ -502,18 +528,82 @@ export default{
 </script>
 
 
-<style scoped lang="css">
+<style lang="css">
+    .header-bottom-div{
+        width: 100%;
+        position: absolute;
+        top: 120px;
+        font-size: 36px;
+        font-weight: 300;
+        font-family: "Roboto", sans-serif;
+        letter-spacing: 0.06em;
+        text-align: center;
+        color: white;
+    }
+
+    .subheader-bottom-div{
+        width: 100%;
+        position: absolute;
+        top: 175px;
+        font-size: 25px;
+        font-weight: 300;
+        font-family: "Roboto", sans-serif;
+        letter-spacing: 0.06em;
+        text-align: center;
+        color: white;
+    }
+
+    .cus-toolbar__content{
+        width: 100%;
+        display: flex;
+        position: fixed;
+        align-items: center;
+        padding: 10px 0px 0px 0px;
+    }
+
+    .cus-toolbar__content_2{
+        width: 100%;
+        display: flex;
+        position: fixed;
+        align-items: center;
+    }
+
+    .homepage-bar .v-toolbar__content{
+        align-items: normal !important;
+    }
+
+    .v-toolbar__content{
+        padding: 0px !important;
+    }
+
+    .rating-label{
+        font-weight: 700;
+        padding-left: 9px;
+        font-size: 15px;
+    }
+
+    .nav-img{
+        margin-left:6px;
+    }
+
+    @media (min-width: 10px) and (max-width: 767px) {
+        .nav-img{
+            margin-left:0px;
+        }
+
+        .header-bottom-div{
+            font-size: 27px;
+        }
+
+        .subheader-bottom-div{
+            top: 167px;
+            font-size: 18px;
+        }
+    }
+
     .cus-navbar-item{
         font-size: 15px !important;
         font-family: Arial, Helvetica, sans-serif !important;
-    }
-
-    .theme--light.v-app-bar.v-toolbar.v-sheet{
-        background-color: white !important;
-    }
-
-    .theme--light.v-text-field--solo-inverted.v-text-field--solo.v-input--is-focused > .v-input__control > .v-input__slot .v-label, .theme--light.v-text-field--solo-inverted.v-text-field--solo.v-input--is-focused > .v-input__control > .v-input__slot input {
-        color: #000000 !important;
     }
 
 </style>

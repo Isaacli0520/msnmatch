@@ -2,56 +2,25 @@
     <v-app>
         <custom-header
             ref="custom_header"
-            :searchBool="false"></custom-header>
+            :searchBool="true"
+            :homepage="true"></custom-header>
         <v-main>
             <v-container fluid grid-list-xl class="courses-main">
                 <v-row>
                     <v-col cols="12" sm="12" md="8" lg="8" xl="6" offset-md="2" offset-lg="2" offset-xl="3">
-                        <v-row>
-                            <div class="headline-div-center">
-                                <div class="cus-headline-title-text">HOOS MY PROFESSOR</div>
-                                <div class="cus-subheadline-title-text">Reviews, Ratings & More</div>
-                            </div>
-                        </v-row>
-                        <v-row row wrap>
-                            <v-spacer></v-spacer>
-                            <v-col cols="10">
-                                <search-course class="custom-search"
-                                    :dense="false"
-                                    background_color="white"></search-course>
+                        <v-row class="mb-3" dense>
+                            <v-col v-for="(func, index) in main_functions" :key="index" cols="4" sm="2" md="2" lg="2" xl="2">
+                                <div style="text-align:center;">
+                                    <v-btn
+                                        @click.native="navFunctions(func)" 
+                                        :color="variables.secondary_color"
+                                        outlined
+                                        fab>
+                                        <v-icon>{{func.icon}}</v-icon>
+                                    </v-btn>
+                                    <div class="function-subtext">{{func.title}}</div>
+                                </div>
                             </v-col>
-                            <v-spacer></v-spacer>
-                        </v-row>
-                        <v-row class="spacer-layout"></v-row>
-                        <v-row>
-                            <template v-for="(func, index) in main_functions">
-                                <v-col :key="index" sm="4" md="4" lg="4" xl="4" cols="6">
-                                    <v-tooltip top>
-                                        <template v-slot:activator="{ on, attrs }">
-                                            <v-card
-                                                v-bind="attrs"
-                                                v-on="on"
-                                                @click.native="navFunctions(func)"
-                                                :ripple="false"
-                                                hover>
-                                                <v-card-text>
-                                                    <v-layout class="align-center justify-center">
-                                                    <div style="padding: 8px;"><v-icon
-                                                        x-large
-                                                        color="teal darken-2"
-                                                        >{{func.icon}}</v-icon></div>
-                                                    </v-layout>
-                                                </v-card-text>
-                                                <v-divider></v-divider>
-                                                <v-card-actions class="justify-center">
-                                                    <span class="function-subtext">{{func.title}}</span>
-                                                </v-card-actions>
-                                            </v-card>
-                                        </template>
-                                        <span>{{func.tip}}</span>
-                                    </v-tooltip>
-                                </v-col>
-                            </template>
                         </v-row>
                         <!-- Interesting Reviews -->
                         <template>
@@ -59,7 +28,7 @@
                                 <v-flex> 
                                     <div class="headline-div">
                                         <span class="cus-headline-text">Interesting Reviews</span>
-                                        <v-btn class="mb-2" color="teal darken-2" icon outlined
+                                        <v-btn class="mb-2" :color="variables.primary_color" icon outlined
                                             :loading="topReviewsLoading" @click="getTopReviews()">
                                             <v-icon>mdi-refresh</v-icon>
                                         </v-btn>
@@ -93,7 +62,7 @@
                             <v-layout row wrap>
                                 <v-flex> 
                                     <div class="headline-div">
-                                    <span class="cus-headline-text">Popular Courses</span>
+                                        <span class="cus-headline-text">Popular Courses</span>
                                     </div>
                                 </v-flex>
                                 <v-spacer></v-spacer>
@@ -104,7 +73,7 @@
                                         outlined
                                         elevation="3"
                                         :href="'/courses/' + course.course_pk + '/' ">
-                                        <v-card-title>
+                                        <v-card-title style="padding-bottom:8px;">
                                             <span class="course-number">{{course.mnemonic}}{{course.number}}</span>
                                             <span class="course-name">{{course.title}}</span>
                                         </v-card-title>
@@ -115,15 +84,15 @@
                                         <v-card-actions style="flex-flow:row wrap !important;">
                                             <v-spacer v-if="$vuetify.breakpoint.smAndUp"></v-spacer>
                                             <v-chip
-                                                class="ma-1" color="teal darken-2" label outlined small>
+                                                class="ma-1" :color="variables.secondary_color" label outlined small>
                                                 Last Taught: {{course.last_taught}}
                                             </v-chip>
                                             <v-chip
-                                                class="ma-1" color="teal darken-2" label outlined small>
+                                                class="ma-1" :color="variables.secondary_color" label outlined small>
                                                 Taking: {{course.taking}}
                                             </v-chip>
                                             <v-chip
-                                                class="ma-1" color="teal darken-2" label outlined small>
+                                                class="ma-1" :color="variables.secondary_color" label outlined small>
                                                 Taken: {{course.taken}}
                                             </v-chip>
                                         </v-card-actions>
@@ -155,14 +124,15 @@
 <script>
 import axios from 'axios'
 import CustomHeader from '../components/CustomHeader'
-import SearchCourse from '../components/SearchCourse'
 import ReviewCard from '../components/ReviewCard'
 import Recommendation from '../components/Recommendation'
+import variables from '../sass/variables.scss'
 import { general_urls, general_icons } from '../utils'
 
 export default {
     data() {
         return {
+            variables:variables,
             topReviewsLoading:true,
             trendingCoursesLoading:true,
             recommendationDialog:false,
@@ -200,14 +170,13 @@ export default {
                 "recommendation":{
                     "title":"Recommendation",
                     "icon":general_icons.recommendation,
-                    "tip":"Provide recommendations based on other users' data",
+                    "tip":"Provide recommendations based on semester and major",
                 },
             },
         }
     },
     components:{
         CustomHeader,
-        SearchCourse,
         ReviewCard,
         Recommendation,
     },
@@ -259,59 +228,13 @@ export default {
 };
 </script>
 
-<style scoped>
-    .spacer-layout{
-        padding: 10px 5px 15px 5px;
-    }
+<style scoped lang="scss">
 
     .headline-div-center{
         width:100%;
         margin: 0 auto;
         text-align: center; 
         padding: 22px 12px 32px 12px;
-    }
-
-    .custom-search{
-        box-shadow: 0 2px 5px 0 rgba(0,0,0,.16), 0 2px 10px 0 rgba(0,0,0,.12);
-    }
-
-    .search-courses{
-        position: relative;
-        margin: auto auto 60px auto;
-        width: 80%;
-        max-width: 600px;
-    }
-
-    .main-title{
-        margin-top: 100px;
-        margin-bottom: 30px;
-        /* color:#32a49a; */
-        color:rgb(0, 0, 0);
-        font-weight: 800 !important;
-        /* font-family: Baskerville, "Baskerville Old Face", sans-serif; */
-        /* text-transform: uppercase; */
-        font-family: "Raleway", Helvetica, sans-serif;
-        /* font-family: Optima, sans-serif; */
-        font-size: 45px;
-        letter-spacing: 0.05em;
-    }
-
-    .upper-div{
-        position: relative;
-        padding: 75px 0px 20px 0px;
-        color:#000000;
-        background-color: #fff;
-        width:100%;
-        /* height: 100%; */
-        position:relative;
-        /* background: url('../assets/static/css/images/cloud_new_09.jpg') no-repeat;
-        background-attachment: fixed;
-        background-position: center center;
-        background-size: cover; */
-
-        /* -webkit-box-shadow: inset 0 -3px 3px 0px rgba(0,0,0,.13), inset 0 -7px 7px 0px rgba(0,0,0,.12);
-        box-shadow: inset 0 -3px 3px 0px rgba(0,0,0,.13), inset 0 -7px 7px 0px rgba(0,0,0,.12); */
-        /* padding: 0; */
     }
 
     .recommendation-div{
@@ -322,53 +245,32 @@ export default {
     .function-subtext{
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         font-weight: 300;
-        font-size: 1.05em;
+        font-size: 13px;
         letter-spacing: 0.04em;
+        padding-top: 10px;
     }
 
     .course-number{
         font-family: "Roboto", sans-serif;
         font-size: 1.1em;
         font-weight: 500;
-        background-color: rgb(13, 124, 109);
+        background-color: $primary-color;
         color:#fff;
         padding: 1px 7px 1px 7px;
         border-radius: 5px 0px 0px 5px;
         line-height: 1.4;
-        box-decoration-break: clone;
     }
 
     .course-name{
+        white-space: normal;
         font-family: "Roboto", sans-serif;
         font-size: 1.1em;
         font-weight: 300;
-        background-color: rgb(240, 240, 240);
-        color:rgb(0, 0, 0);
+        background-color:$course-title-bg-color;
+        color:$course-title-color;
         padding: 1px 7px 1px 7px;
         border-radius: 0px 5px 5px 0px;
         line-height: 1.4;
-        box-decoration-break: clone;
-
-    }
-
-    .cus-subheadline-title-text{
-        font-family: "Roboto", sans-serif;
-        font-size: 1.4em;
-        font-weight: 300;
-        letter-spacing: 0.06em;
-        color:rgb(0, 0, 0);
-        padding: 7px 12px 7px 3px;
-        line-height: 1.0;
-    }
-
-    .cus-headline-title-text{
-        font-family: "Roboto", sans-serif;
-        font-size: 2.3em;
-        font-weight: 300;
-        letter-spacing: 0.06em;
-        color:rgb(0, 0, 0);
-        padding: 7px 12px 7px 3px;
-        line-height: 1.0;
     }
 
     .cus-headline-text{
@@ -381,8 +283,13 @@ export default {
         line-height: 1.0;
     }
 
+    .custom-exp-header{
+        font-family: "Roboto", sans-serif !important;
+        font-size: 1.8em !important;
+        font-weight: 300 !important;
+    }
+
     @media (min-width: 1025px) {
-        
     }
 
 
@@ -390,12 +297,6 @@ export default {
     }
 
     @media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
-        .main-title{
-            font-size: 45px;
-        }
-        .search-courses{
-            margin: auto auto 45px auto;
-        }
     }
 
 
@@ -410,24 +311,16 @@ export default {
         }
 
         .course-name{
-            font-size: 0.95em
+            font-size: 15px;
         }
 
         .course-number{
-            font-size: 0.95em;
+            font-size: 15px;
         }
 
-        .main-title{
-            font-size: 28px;
-            margin-top: 60px;
-            margin-bottom: 20px;
-        }
         .recommendation-div{
             overflow: scroll;
             max-height: 300px;
-        }
-        .search-courses{
-            margin: auto auto 30px auto;
         }
         
     }

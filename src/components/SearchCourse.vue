@@ -1,6 +1,5 @@
 <template>
     <v-autocomplete
-        class="custom-auto"
         v-model="selected_item"
         :items="search_result_items"
         :loading="isLoading"
@@ -164,7 +163,4 @@ export default {
 </script>
 
 <style scoped>
-    .custom-auto{
-        margin-right: 5px !important; 
-    }
 </style>

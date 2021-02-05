@@ -1,0 +1,25 @@
+// src/sass/main.scss
+@import '~vuetify/src/styles/styles.sass';
+
+// The variables you want to modify
+// $font-size-root: 14px;
+// For updating SASS lists
+// $material-light: map-merge($material-light, ( cards: blue ));
+$btn-border-radius: 3px;
+
+
+$material-light: map-merge($material-light, (  background : #fefefe ));
+
+$primary-color: #e46262;
+$secondary-color: #ea7376;
+$course-title-color: #ea7376;
+$course-title-bg-color: #fff4f4;
+$navbar-bg-color: #ff9292;
+
+:export{
+    primary_color:$primary-color;
+    secondary_color:$secondary-color;
+    course_title_color:$course-title-color;
+    course_title_bg_color:$course-title-bg-color;
+    navbar_bg_color: $navbar-bg-color;
+}
