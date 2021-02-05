@@ -20,14 +20,14 @@
                 {{review.semester}}
             </v-chip>
             <v-chip
-                class="ma-1" style="padding: 0px 5px 0px 9px !important;" :color="variables.primary_color"
+                class="ma-1" style="padding: 0px 5px 0px 9px !important;" :color="variables.secondary_color"
                 label outlined small>
                 <span class="caption mr-1">Instructor:</span>
                 <v-rating
                     style="margin-bottom:2px !important;"
                     v-model="review.rating_instructor"
                     color="yellow darken-2"
-                    :background-color="variables.primary_color"
+                    :background-color="variables.secondary_color"
                     readonly
                     dense
                     small
@@ -35,14 +35,14 @@
                 </v-rating>
             </v-chip>
             <v-chip
-                class="ma-1" style="padding: 0px 5px 0px 9px !important;" :color="variables.primary_color"
+                class="ma-1" style="padding: 0px 5px 0px 9px !important;" :color="variables.secondary_color"
                 label outlined small>
                 <span class="caption mr-1">Course:</span>
                 <v-rating
                     style="margin-bottom:2px !important;"
                     v-model="review.rating_course"
                     color="yellow darken-2"
-                    :background-color="variables.primary_color"
+                    :background-color="variables.secondary_color"
                     readonly
                     dense
                     small
@@ -88,7 +88,6 @@ export default{
 
 
 <style scoped lang="scss">
-
     .review-text{
         font-size: 16px;
         color:rgb(0, 0, 0);
@@ -126,7 +125,6 @@ export default{
         border-radius: 0px 5px 5px 0px;
         line-height: 1.4;
         box-decoration-break: clone;
-
     }
 
     @media (min-width: 10px) and (max-width: 767px) {

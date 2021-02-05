@@ -44,7 +44,7 @@
             :color="variables.navbar_bg_color"
             absolute
             dark
-            :src="homepage ? '/static/css/images/usp_17.jpg' : undefined"
+            :src="homepage ? '/static/css/images/usp_17_3.jpg' : undefined"
             :height="homepage ? '280px' : undefined "
             >
             <div :class="[homepage ? 'cus-toolbar__content' : 'cus-toolbar__content_2']">
@@ -165,7 +165,7 @@
         </v-snackbar>
         <v-dialog v-model="submitReviewDialog" transition="fade-transition" scrollable min-width="350px" max-width="600px">
             <v-card>
-                <v-card-title>Submit a Review</v-card-title>
+                <v-card-title style="font-weight:700;">Submit a Review</v-card-title>
                 <v-divider></v-divider>
                 <v-card-text style="padding-bottom:0px;">
                     <v-form
@@ -196,13 +196,13 @@
                         <v-row>
                             <v-col>
                             <search-course
-                                flat
                                 light
                                 dense
                                 searchFunction="select"
-                                :searchInstructor="false"
                                 background_color="white"
-                                :outlined="true"
+                                :searchInstructor="false"
+                                :flat="false"
+                                :outlined="false"
                                 @select-course="selectCourse">
                             </search-course>
                             </v-col>
@@ -219,15 +219,13 @@
                                     label="Instructor"
                                     :rules="[v => !!v || 'Instructor is required']"
                                     :menu-props="{ offsetY: true }"
-                                    outlined
+                                    solo
                                     dense
                                     hide-details>
                                 </v-select>
                             </v-col>
                             <v-col>
                                 <v-select
-                                    dense
-                                    hide-details
                                     v-model="review.course_instructor_pk"
                                     :items="course_instructor_options"
                                     item-text="semester"
@@ -236,7 +234,9 @@
                                     label="Semester"
                                     :rules="[v => !!v || 'Semester is required']"
                                     :menu-props="{ offsetY: true }"
-                                    outlined>
+                                    solo
+                                    dense
+                                    hide-details>
                                 </v-select>
                             </v-col>
                         </v-row>
@@ -246,7 +246,7 @@
                                     v-model="review.text"
                                     label="Write Your Review"
                                     auto-grow
-                                    outlined
+                                    solo
                                     required
                                     :rules="reviewTextRules"
                                     rows="6"
@@ -577,6 +577,7 @@ export default{
     }
 
     .rating-label{
+        font-weight: 700;
         padding-left: 9px;
         font-size: 15px;
     }

@@ -5,75 +5,21 @@
             :searchBool="true"
             :homepage="true"></custom-header>
         <v-main>
-            <!-- <div class="top-bg-div"></div> -->
             <v-container fluid grid-list-xl class="courses-main">
                 <v-row>
                     <v-col cols="12" sm="12" md="8" lg="8" xl="6" offset-md="2" offset-lg="2" offset-xl="3">
-                        <v-row dense>
-                            <v-col v-for="(func, index) in main_functions" :key="index" cols="6" sm="2" md="2" lg="2" xl="2">
-                                <v-tooltip top>
-                                    <template v-slot:activator="{ on, attrs }">
-                                        <div style="text-align:center;">
-                                            <v-btn 
-                                                v-bind="attrs"
-                                                v-on="on"
-                                                @click.native="navFunctions(func)" 
-                                                :color="variables.primary_color"
-                                                outlined
-                                                fab>
-                                                <v-icon>{{func.icon}}</v-icon>
-                                            </v-btn>
-                                            <div class="function-subtext">{{func.title}}</div>
-                                        </div>
-                                    </template>
-                                    <span>{{func.tip}}</span>
-                                </v-tooltip>
-                            </v-col>
-                        </v-row>
-                        <!-- 冷门课程 -->
-                        <v-row>
-                            <v-col cols="12">
-                            <v-expansion-panels>
-                                <v-expansion-panel>
-                                    <v-expansion-panel-header
-                                        class="custom-exp-header"
-                                        >小众好课推荐</v-expansion-panel-header>
-                                    <v-expansion-panel-content>
-                                        <v-row v-if="!topReviewsLoading">
-                                            <v-col cols="12" :key="index" v-for="(course, index) in trending_courses['Taken']">
-                                                <v-card
-                                                    outlined
-                                                    elevation="3"
-                                                    :href="'/courses/' + course.course_pk + '/' ">
-                                                    <v-card-title style="padding-bottom:8px;">
-                                                        <span class="course-number">{{course.mnemonic}}{{course.number}}</span>
-                                                        <span class="course-name">{{course.title}}</span>
-                                                    </v-card-title>
-                                                    <v-card-text>
-                                                        {{ course.description }}
-                                                    </v-card-text>
-                                                    <v-divider></v-divider>
-                                                    <v-card-actions style="flex-flow:row wrap !important;">
-                                                        <v-spacer v-if="$vuetify.breakpoint.smAndUp"></v-spacer>
-                                                        <v-chip
-                                                            class="ma-1" color="teal darken-2" label outlined small>
-                                                            Last Taught: {{course.last_taught}}
-                                                        </v-chip>
-                                                        <v-chip
-                                                            class="ma-1" color="teal darken-2" label outlined small>
-                                                            Taking: {{course.taking}}
-                                                        </v-chip>
-                                                        <v-chip
-                                                            class="ma-1" color="teal darken-2" label outlined small>
-                                                            Taken: {{course.taken}}
-                                                        </v-chip>
-                                                    </v-card-actions>
-                                                </v-card>
-                                            </v-col>
-                                        </v-row>
-                                    </v-expansion-panel-content>
-                                </v-expansion-panel>
-                            </v-expansion-panels>
+                        <v-row class="mb-3" dense>
+                            <v-col v-for="(func, index) in main_functions" :key="index" cols="4" sm="2" md="2" lg="2" xl="2">
+                                <div style="text-align:center;">
+                                    <v-btn
+                                        @click.native="navFunctions(func)" 
+                                        :color="variables.secondary_color"
+                                        outlined
+                                        fab>
+                                        <v-icon>{{func.icon}}</v-icon>
+                                    </v-btn>
+                                    <div class="function-subtext">{{func.title}}</div>
+                                </div>
                             </v-col>
                         </v-row>
                         <!-- Interesting Reviews -->
@@ -112,7 +58,7 @@
                             </v-container>
                         </template>
                         <!-- Trending Courses -->
-                        <template v-if="false">
+                        <template>
                             <v-layout row wrap>
                                 <v-flex> 
                                     <div class="headline-div">
@@ -138,15 +84,15 @@
                                         <v-card-actions style="flex-flow:row wrap !important;">
                                             <v-spacer v-if="$vuetify.breakpoint.smAndUp"></v-spacer>
                                             <v-chip
-                                                class="ma-1" color="teal darken-2" label outlined small>
+                                                class="ma-1" :color="variables.secondary_color" label outlined small>
                                                 Last Taught: {{course.last_taught}}
                                             </v-chip>
                                             <v-chip
-                                                class="ma-1" color="teal darken-2" label outlined small>
+                                                class="ma-1" :color="variables.secondary_color" label outlined small>
                                                 Taking: {{course.taking}}
                                             </v-chip>
                                             <v-chip
-                                                class="ma-1" color="teal darken-2" label outlined small>
+                                                class="ma-1" :color="variables.secondary_color" label outlined small>
                                                 Taken: {{course.taken}}
                                             </v-chip>
                                         </v-card-actions>
@@ -282,15 +228,7 @@ export default {
 };
 </script>
 
-<style scoped>
-    .top-bg-div{
-        height: 200px;
-        width: 100%;
-        background: url('../assets/static/css/images/unsplash_1.jpg') no-repeat;
-        background-attachment: fixed;
-        background-position: center center;
-        background-size: cover;
-    }
+<style scoped lang="scss">
 
     .headline-div-center{
         width:100%;
@@ -316,7 +254,7 @@ export default {
         font-family: "Roboto", sans-serif;
         font-size: 1.1em;
         font-weight: 500;
-        background-color: #EF9A9A;
+        background-color: $primary-color;
         color:#fff;
         padding: 1px 7px 1px 7px;
         border-radius: 5px 0px 0px 5px;
@@ -328,8 +266,8 @@ export default {
         font-family: "Roboto", sans-serif;
         font-size: 1.1em;
         font-weight: 300;
-        background-color: #fff4f4;
-        color:#ea7376;
+        background-color:$course-title-bg-color;
+        color:$course-title-color;
         padding: 1px 7px 1px 7px;
         border-radius: 0px 5px 5px 0px;
         line-height: 1.4;

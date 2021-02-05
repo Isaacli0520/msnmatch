@@ -363,10 +363,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
 
 <style scoped>
     .content-div{
-        /* background-color:#fdfff9; */
-        /* f0f5e5 */
         position: relative;
-        /* background: url('../assets/static/css/images/cloud_new_09.jpg') no-repeat; */
         background: url('../assets/static/css/images/cloud_bg_new_02.jpg') no-repeat;
         background-attachment: fixed;
         background-position: center center;

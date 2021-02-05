@@ -10,11 +10,11 @@ $btn-border-radius: 3px;
 
 $material-light: map-merge($material-light, (  background : #fefefe ));
 
-$primary-color: #EF9A9A;
+$primary-color: #e46262;
 $secondary-color: #ea7376;
 $course-title-color: #ea7376;
 $course-title-bg-color: #fff4f4;
-$navbar-bg-color: #faafaf;
+$navbar-bg-color: #ff9292;
 
 :export{
     primary_color:$primary-color;
