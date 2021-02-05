@@ -9,29 +9,22 @@
             <v-container fluid grid-list-xl class="courses-main">
                 <v-row>
                     <v-col cols="12" sm="12" md="8" lg="8" xl="6" offset-md="2" offset-lg="2" offset-xl="3">
-                        <v-row>
-                            <v-col class="cus-col" v-for="(func, index) in main_functions" :key="index" sm="3" md="3" lg="3" xl="3" cols="6">
+                        <v-row dense>
+                            <v-col v-for="(func, index) in main_functions" :key="index" cols="6" sm="2" md="2" lg="2" xl="2">
                                 <v-tooltip top>
                                     <template v-slot:activator="{ on, attrs }">
-                                        <v-card
-                                            v-bind="attrs"
-                                            v-on="on"
-                                            @click.native="navFunctions(func)"
-                                            :ripple="false"
-                                            hover>
-                                            <v-card-text>
-                                                <v-layout class="align-center justify-center">
-                                                <div style="padding: 8px;"><v-icon
-                                                    x-large
-                                                    color="teal darken-2"
-                                                    >{{func.icon}}</v-icon></div>
-                                                </v-layout>
-                                            </v-card-text>
-                                            <v-divider></v-divider>
-                                            <v-card-actions class="justify-center">
-                                                <span class="function-subtext">{{func.title}}</span>
-                                            </v-card-actions>
-                                        </v-card>
+                                        <div style="text-align:center;">
+                                            <v-btn 
+                                                v-bind="attrs"
+                                                v-on="on"
+                                                @click.native="navFunctions(func)" 
+                                                :color="variables.primary_color"
+                                                outlined
+                                                fab>
+                                                <v-icon>{{func.icon}}</v-icon>
+                                            </v-btn>
+                                            <div class="function-subtext">{{func.title}}</div>
+                                        </div>
                                     </template>
                                     <span>{{func.tip}}</span>
                                 </v-tooltip>
@@ -89,7 +82,7 @@
                                 <v-flex> 
                                     <div class="headline-div">
                                         <span class="cus-headline-text">Interesting Reviews</span>
-                                        <v-btn class="mb-2" color="teal darken-2" icon outlined
+                                        <v-btn class="mb-2" :color="variables.primary_color" icon outlined
                                             :loading="topReviewsLoading" @click="getTopReviews()">
                                             <v-icon>mdi-refresh</v-icon>
                                         </v-btn>
@@ -187,11 +180,13 @@ import axios from 'axios'
 import CustomHeader from '../components/CustomHeader'
 import ReviewCard from '../components/ReviewCard'
 import Recommendation from '../components/Recommendation'
+import variables from '../sass/variables.scss'
 import { general_urls, general_icons } from '../utils'
 
 export default {
     data() {
         return {
+            variables:variables,
             topReviewsLoading:true,
             trendingCoursesLoading:true,
             recommendationDialog:false,
@@ -309,22 +304,19 @@ export default {
         max-height: 248px;
     }
 
-    .cus-col{
-        padding:6px !important;
-    }
-
     .function-subtext{
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         font-weight: 300;
-        font-size: 1.05em;
+        font-size: 13px;
         letter-spacing: 0.04em;
+        padding-top: 10px;
     }
 
     .course-number{
         font-family: "Roboto", sans-serif;
         font-size: 1.1em;
         font-weight: 500;
-        background-color: rgb(13, 124, 109);
+        background-color: #EF9A9A;
         color:#fff;
         padding: 1px 7px 1px 7px;
         border-radius: 5px 0px 0px 5px;
@@ -336,12 +328,11 @@ export default {
         font-family: "Roboto", sans-serif;
         font-size: 1.1em;
         font-weight: 300;
-        background-color: rgb(240, 240, 240);
-        color:rgb(0, 0, 0);
+        background-color: #fff4f4;
+        color:#ea7376;
         padding: 1px 7px 1px 7px;
         border-radius: 0px 5px 5px 0px;
         line-height: 1.4;
-
     }
 
     .cus-headline-text{

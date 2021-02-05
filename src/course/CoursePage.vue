@@ -14,7 +14,7 @@
                     :width="6"
                     v-if="!loaded"
                     indeterminate
-                    color="teal lighten-1">
+                    :color="variables.primary_color">
                     </v-progress-circular>
                 </div>
             </v-layout>
@@ -95,7 +95,7 @@
                                         label
                                         text-color="white"
                                         small
-                                        color="teal darken-1">
+                                        :color="variables.secondary_color">
                                         Semesters Taught:{{instructor.semesters.length}}
                                     </v-chip>
                                     <v-chip
@@ -103,7 +103,7 @@
                                         label
                                         small
                                         outlined
-                                        color="teal darken-1">
+                                        :color="variables.secondary_color">
                                         Taking:{{instructor.taking}}
                                     </v-chip>
                                     <v-chip
@@ -111,7 +111,7 @@
                                         label
                                         small
                                         outlined
-                                        color="teal darken-1">
+                                        :color="variables.secondary_color">
                                         Taken:{{instructor.taken}}
                                     </v-chip>
                                 </div>
@@ -130,7 +130,7 @@
                                 <v-chip
                                     class="ma-1 white--text"
                                     label
-                                    color="teal darken-1"
+                                    :color="variables.secondary_color"
                                     @click="goToHref('/courses/'+course.course_pk+'/'+instructor.pk+'/')"
                                     >
                                     Reviews & More
@@ -138,7 +138,7 @@
                                 <v-chip
                                     class="ma-1"
                                     @click="openDialogTake(instructor)"
-                                    color="teal darken-1" 
+                                    :color="variables.secondary_color" 
                                     outlined
                                     label
                                     >
@@ -193,12 +193,14 @@ import axios from 'axios'
 import CustomHeader from '../components/CustomHeader'
 import CustomRating from '../components/CustomRating'
 import CustomBreadcrumb from '../components/CustomBreadcrumb'
+import variables from '../sass/variables.scss'
 axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 axios.defaults.xsrfCookieName = "csrftoken";
 
 export default {
     data() {
         return {
+            variables:variables,
             success_snack:false,
             header_update:false,
             rating_default:[5,4,3,2,1],
@@ -427,7 +429,7 @@ export default {
 };
 </script>
 
-<style>
+<style lang="scss">
     .instructor-name{
         font-family: "Roboto", sans-serif;
         font-size: 1.6em;
@@ -456,20 +458,6 @@ export default {
         font-weight: 500;
     }
 
-    .instructor-topic{
-        font-family: "Roboto", sans-serif;
-        font-size: 1.7em;
-        font-weight: 500;
-        margin: 0px 0px 4px 0px;
-        color: rgb(255, 255, 255);
-        background-color: rgb(11, 105, 92);
-        color:#fff;
-        padding: 5px 8px 5px 8px;
-        border-radius: 5px 5px 5px 5px;
-        line-height: 1.6;
-        box-decoration-break: clone;
-    }
-
     .instructor-banner{
         font-family: "Roboto", sans-serif;
         font-size: 1.6em;
@@ -494,7 +482,7 @@ export default {
         font-family: "Roboto", sans-serif;
         font-size: 2.1em;
         font-weight: 500;
-        background-color: rgb(11, 105, 92);
+        background-color: $primary-color;
         color:#fff;
         padding: 7px 12px 7px 12px;
         border-radius: 5px 0px 0px 5px;
@@ -506,13 +494,12 @@ export default {
         font-family: "Roboto", sans-serif;
         font-size: 2.1em;
         font-weight: 300;
-        background-color: rgb(226, 225, 225);
-        color:rgb(0, 0, 0);
+        background-color: $course-title-bg-color;
+        color:$course-title-color;
         padding: 7px 12px 7px 12px;
         border-radius: 0px 5px 5px 0px;
         line-height: 2.0;
         box-decoration-break: clone;
-
     }
 
     .cus-main{
@@ -553,14 +540,6 @@ export default {
 
         .instructor-banner{
             font-size: 1.3em;
-        }
-
-        .instructor-topic{
-            font-size:1.4em;
-        }
-
-        .v-breadcrumbs li{
-            /* font-size:14px !important; */
         }
     }
 

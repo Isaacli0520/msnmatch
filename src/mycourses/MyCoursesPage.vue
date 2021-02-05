@@ -141,23 +141,24 @@ export default {
 };
 </script>
 
-<style>
+<style lang="scss">
 
     .course-number{
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         color:#ffffff;
         padding: 3px 5px;
-        margin-right: 5px;
+        margin-right: 7px;
         border-radius: 4px;
         line-height: 1.3;
         font-size: 18px;
-        background-color: #00796b;
+        background-color: $primary-color;
     }
 
     .course-title{
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         line-height: 1.3;
         font-size: 18px;
+        letter-spacing: 0.03em;
     }
 
     .v-breadcrumbs li{

@@ -8,7 +8,7 @@
                     :size="60"
                     :width="6"
                     indeterminate
-                    color="teal lighten-1"/>
+                    :color="variables.primary_color"/>
             </v-layout>
         </v-container>
         <v-container v-else fluid grid-list-lg>
@@ -29,7 +29,7 @@
             <v-layout> <!-- Instructor Name -->
                 <v-flex>
                     <div class="instructor-name">
-                        <v-btn color="teal darken-1" outlined x-large :href="' /courses/instructors/' + instructor.instructor_pk + '/' ">
+                        <v-btn :color="variables.secondary_color" outlined x-large :href="' /courses/instructors/' + instructor.instructor_pk + '/' ">
                             <v-icon class="instructor-icon" color="black" left>mdi-account-tie</v-icon>{{instructor.name}}
                         </v-btn>
                     </div>
@@ -66,7 +66,7 @@
                         <v-card-title>Users Planning on Taking {{course.mnemonic}} {{course.number}}</v-card-title>
                         <v-card-text v-if="users_taking.length > 0">
                             <v-chip 
-                            color="teal darken-1"
+                            :color="variables.primary_color"
                             text-color="white"
                             class="ma-1"
                             v-for="(user_taking, index) in users_taking"
@@ -88,7 +88,7 @@
                         <v-card-title>Users Who Have Taken {{course.mnemonic}} {{course.number}}</v-card-title>
                         <v-card-text v-if="users_taken.length > 0">
                             <v-chip 
-                            color="teal darken-1"
+                            :color="variables.primary_color"
                             text-color="white"
                             class="ma-1"
                             v-for="(user_taken, index) in users_taken"
@@ -108,7 +108,7 @@
             <v-layout> <!-- Review Div Title -->
                 <v-flex justify-center align-self-center class="instructor-name">
                         <span class="review-title">Reviews</span>
-                        <v-btn @click="reviewDialog = true;" color="teal darken-3" fab dark>
+                        <v-btn @click="reviewDialog = true;" :color="variables.primary_color" fab dark>
                             <v-icon>mdi-pencil-plus-outline</v-icon>
                         </v-btn>
                 </v-flex>
@@ -127,16 +127,16 @@
                             <v-row>
                                 <v-spacer></v-spacer>
                                 <v-chip
-                                    class="ma-1" color="#336699" outlined small text-color="#336699">
+                                    class="ma-1" :color="variables.secondary_color" outlined small :text-color="variables.secondary_color">
                                     {{user.semester}}
                                 </v-chip>
                                 <v-chip
-                                    class="ma-1" color="teal darken-2" outlined small text-color="teal darken-2">
+                                    class="ma-1" :color="variables.secondary_color" outlined small :text-color="variables.secondary_color">
                                     <span style="margin-top:2px;" class="caption mr-1">Instructor:</span>
                                     <v-rating
                                         v-model="user.rating_instructor"
                                         color="yellow darken-2"
-                                        background-color="teal darken-2"
+                                        :background-color="variables.secondary_color"
                                         readonly
                                         dense
                                         small
@@ -144,12 +144,12 @@
                                     </v-rating>
                                 </v-chip>
                                 <v-chip
-                                    class="ma-1 mr-3" color="teal darken-2" outlined small text-color="teal darken-2">
+                                    class="ma-1 mr-3" :color="variables.secondary_color" outlined small :text-color="variables.secondary_color">
                                     <span style="margin-top:2px;" class="caption mr-1">Course:</span>
                                     <v-rating
                                         v-model="user.rating_course"
                                         color="yellow darken-2"
-                                        background-color="teal darken-2"
+                                        :background-color="variables.secondary_color"
                                         readonly
                                         dense
                                         small
@@ -278,12 +278,14 @@ import CustomHeader from '../components/CustomHeader'
 import CustomRating from '../components/CustomRating'
 import CustomBreadcrumb from '../components/CustomBreadcrumb'
 import { sortBySemester } from '../utils'
+import variables from '../sass/variables.scss'
 axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 axios.defaults.xsrfCookieName = "csrftoken";
 
 export default {
     data() {
         return {
+            variables:variables,
             loaded:false,
             submitReviewBtnLoading:false,
             submit_review_form_valid:true,
@@ -499,7 +501,7 @@ export default {
 };
 </script>
 
-<style>
+<style lang="scss">
     .v-breadcrumbs li{
         font-size:20px !important;
     }
@@ -523,25 +525,11 @@ export default {
     }
 
     .review-title{
-        margin: 0px 12px 0px 0px;
+        margin: 0px 12px 0px 3px;
     }
 
     .instructor-icon{
         padding-right: 5px;
-    }
-
-    .instructor-topic{
-        font-family: "Roboto", sans-serif;
-        font-size: 1.7em;
-        font-weight: 500;
-        margin: 0px 0px 4px 0px;
-        color: rgb(255, 255, 255);
-        background-color: rgb(11, 105, 92);
-        color:#fff;
-        padding: 5px 8px 5px 8px;
-        border-radius: 5px 5px 5px 5px;
-        line-height: 1.6;
-        box-decoration-break: clone;
     }
 
     .semester-div{
@@ -563,7 +551,7 @@ export default {
         font-family: "Roboto", sans-serif;
         font-size: 2.1em;
         font-weight: 500;
-        background-color: rgb(11, 105, 92);
+        background-color: $primary-color;
         color:#fff;
         padding: 7px 12px 7px 12px;
         border-radius: 5px 0px 0px 5px;
@@ -575,13 +563,12 @@ export default {
         font-family: "Roboto", sans-serif;
         font-size: 2.1em;
         font-weight: 300;
-        background-color: rgb(226, 225, 225);
-        color:rgb(0, 0, 0);
+        background-color: $course-title-bg-color;
+        color:$course-title-color;
         padding: 7px 12px 7px 12px;
         border-radius: 0px 5px 5px 0px;
         line-height: 2.0;
         box-decoration-break: clone;
-
     }
 
     .cus-main{
@@ -596,7 +583,6 @@ export default {
         
     }
 
-
     @media (min-width: 768px) and (max-width: 1024px) {
         
     }
@@ -604,7 +590,6 @@ export default {
     @media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
         
     }
-
 
     @media (min-width: 10px) and (max-width: 767px) {
         .cus-headline-number{
@@ -620,23 +605,10 @@ export default {
             font-size:1.7em;
         }
 
-        .instructor-topic{
-            font-size:1.4em;
-        }
-
         .v-breadcrumbs li{
             font-size:14px !important;
         }
     }
-
-
-    /* @media (min-width: 320px) and (max-width: 480px) {
-
-    }
-
-    @media (min-width: 10px) and (max-width: 319px) {
-        
-    } */
     
 
 </style>

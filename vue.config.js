@@ -146,7 +146,7 @@ module.exports = {
     css: {
         loaderOptions: {
             sass: {
-                data: `@import "~@/sass/main.scss"`,
+                data: `@import "~@/sass/variables.scss";`,
             },
         },
     },
@@ -154,7 +154,7 @@ module.exports = {
     chainWebpack: config => {
         ["vue-modules", "vue", "normal-modules", "normal"].forEach((match) => {
             config.module.rule('sass').oneOf(match).use('sass-loader')
-            .tap(opt => Object.assign(opt, { data: `@import 'src/sass/main.scss'` }))
+            .tap(opt => Object.assign(opt, { data: `@import 'src/sass/variables.scss'` }))
         })
 
         config.optimization

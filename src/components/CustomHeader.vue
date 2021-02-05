@@ -41,10 +41,9 @@
             :clipped-left="$vuetify.breakpoint.mdAndUp"
             app
             :dense="!homepage"
-            color="#fefefe"
+            :color="variables.navbar_bg_color"
             absolute
-            :dark="homepage"
-            :light="!homepage"
+            dark
             :src="homepage ? '/static/css/images/usp_17.jpg' : undefined"
             :height="homepage ? '280px' : undefined "
             >
@@ -66,8 +65,8 @@
                 </template>
                 <search-course
                     style="padding-left:6px;"
-                    :light="homepage ? true : false"
-                    :background_color="homepage ? 'white' : 'grey lighten-3'"
+                    light
+                    background_color="white"
                     v-if="searchBool"></search-course>
                 <v-spacer></v-spacer>
                 <!-- App Menu -->
@@ -76,7 +75,7 @@
                     min-width="170">
                     <template v-slot:activator="{ attrs, on }">
                         <v-btn
-                            :color="homepage ? 'white' : 'black'"
+                            color="white"
                             icon
                             v-bind="attrs"
                             v-on="on">
@@ -103,7 +102,7 @@
                     min-width="170">
                     <template v-slot:activator="{ attrs, on }">
                         <v-btn
-                            :color="homepage ? 'white' : 'black'"
+                            color="white"
                             icon
                             v-bind="attrs"
                             v-on="on">
@@ -125,12 +124,14 @@
                     </v-list>
                 </v-menu>
             </div>
-            <div class="header-bottom-div">
-                HOOS MY PROFESSOR
-            </div>
-            <div class="subheader-bottom-div">
-                Reviews, Ratings & More
-            </div>
+            <template v-if="homepage">
+                <div class="header-bottom-div">
+                    HOOS MY PROFESSOR
+                </div>
+                <div class="subheader-bottom-div">
+                    Reviews, Ratings & More
+                </div>
+            </template>
         </v-app-bar>
         <v-snackbar
             top
@@ -270,6 +271,7 @@
 import axios from 'axios'
 import SearchCourse from './SearchCourse'
 import { general_urls, general_icons, brand_pic } from '../utils'
+import variables from '../sass/variables.scss'
 axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 axios.defaults.xsrfCookieName = "csrftoken";
 
@@ -290,6 +292,7 @@ export default{
     },
     data: function () {
         return {
+            variables:variables,
             // Urls
             brand_pic:brand_pic,
             general_urls:general_urls,
@@ -585,6 +588,15 @@ export default{
     @media (min-width: 10px) and (max-width: 767px) {
         .nav-img{
             margin-left:0px;
+        }
+
+        .header-bottom-div{
+            font-size: 27px;
+        }
+
+        .subheader-bottom-div{
+            top: 167px;
+            font-size: 18px;
         }
     }
 

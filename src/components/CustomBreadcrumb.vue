@@ -7,7 +7,7 @@
                 :disabled="props.item.disabled"
                 >
                 <v-btn 
-                    :color="props.item.disabled ? 'grey' : 'teal darken-1' "
+                    :color="props.item.disabled ? 'grey' : variables.primary_color "
                     rounded
                     outlined>
                 {{ props.item.text }}
@@ -18,14 +18,16 @@
 </template>
 
 <script>
-    export default {
-        props: {
-            items: Array,
-        },
-        data: () => ({
+import variables from '../sass/variables.scss'
 
-        }),
-    }
+export default {
+    props: {
+        items: Array,
+    },
+    data: () => ({
+        variables: variables,
+    }),
+}
 </script>
 
 <style scoped lang="css">
