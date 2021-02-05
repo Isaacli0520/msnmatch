@@ -37,84 +37,100 @@
         </v-navigation-drawer>
         <!-- APP BAR -->
         <v-app-bar
+            :class="[homepage ? 'homepage-bar' : '']"
             :clipped-left="$vuetify.breakpoint.mdAndUp"
             app
-            light
-            color="white"
-            dense
-            elevation="1">
-            <v-app-bar-nav-icon  @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
-            <img class="nav-img" :src="brand_pic" width="40" height="38" alt="">
-            <template v-if="$vuetify.breakpoint.mdAndUp">
-                <v-btn
-                    :href="general_urls.courses_url"
-                    text>HoosMyProfessor</v-btn>
-                <v-divider inset vertical></v-divider>
-                <v-btn 
-                    :href="general_urls.match_url"
-                    text>Match</v-btn>
-                <!-- <v-divider inset vertical></v-divider> -->
-                <!-- <v-btn 
-                    :href="general_urls.market_url"
-                    text>Market</v-btn> -->
-            </template>
-            <search-course
-                v-if="searchBool"></search-course>
-            <v-spacer v-if="!searchBool"></v-spacer>
-            <!-- App Menu -->
-            <v-menu offset-y
-                class="mx-auto"
-                min-width="170">
-                <template v-slot:activator="{ attrs, on }">
+            :dense="!homepage"
+            color="#fefefe"
+            absolute
+            :dark="homepage"
+            :light="!homepage"
+            :src="homepage ? '/static/css/images/usp_17.jpg' : undefined"
+            :height="homepage ? '280px' : undefined "
+            >
+            <div :class="[homepage ? 'cus-toolbar__content' : 'cus-toolbar__content_2']">
+                <v-app-bar-nav-icon  @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
+                <img class="nav-img" :src="brand_pic" width="40" height="38" alt="">
+                <template v-if="$vuetify.breakpoint.mdAndUp">
                     <v-btn
-                        color="black"
-                        icon
-                        v-bind="attrs"
-                        v-on="on">
-                        <v-icon>mdi-apps</v-icon>
-                    </v-btn>
+                        :href="general_urls.courses_url"
+                        text>HoosMyProfessor</v-btn>
+                    <!-- <v-divider inset vertical></v-divider> -->
+                    <v-btn 
+                        :href="general_urls.match_url"
+                        text>Match</v-btn>
+                    <!-- <v-divider inset vertical></v-divider> -->
+                    <!-- <v-btn 
+                        :href="general_urls.market_url"
+                        text>Market</v-btn> -->
                 </template>
-                <v-list dense rounded>
-                    <v-list-item
-                        v-for="(item, index) in app_items"
-                        :key="index + '-app'"
-                        @click="navMethod(item)">
-                        <v-list-item-icon>
-                            <v-icon color="black" dense v-text="item.icon"></v-icon>
-                        </v-list-item-icon>
-                        <v-list-item-content>
-                            <v-list-item-title>{{ item.title }}</v-list-item-title>
-                        </v-list-item-content>
-                    </v-list-item>
-                </v-list>
-            </v-menu>
-            <!-- User Drop Menu -->
-            <v-menu offset-y
-                class="mx-auto"
-                min-width="170">
-                <template v-slot:activator="{ attrs, on }">
-                    <v-btn
-                        color="black"
-                        icon
-                        v-bind="attrs"
-                        v-on="on">
-                        <v-icon>mdi-account-circle-outline</v-icon>
-                    </v-btn>
-                </template>
-                <v-list dense rounded>
-                    <v-list-item
-                        v-for="(item, index) in user_items"
-                        :key="index"
-                        @click="navMethod(item)">
-                        <v-list-item-icon>
-                            <v-icon color="black" dense v-text="item.icon"></v-icon>
-                        </v-list-item-icon>
-                        <v-list-item-content>
-                            <v-list-item-title>{{ item.title }}</v-list-item-title>
-                        </v-list-item-content>
-                    </v-list-item>
-                </v-list>
-            </v-menu>
+                <search-course
+                    style="padding-left:6px;"
+                    :light="homepage ? true : false"
+                    :background_color="homepage ? 'white' : 'grey lighten-3'"
+                    v-if="searchBool"></search-course>
+                <v-spacer></v-spacer>
+                <!-- App Menu -->
+                <v-menu offset-y
+                    class="mx-auto"
+                    min-width="170">
+                    <template v-slot:activator="{ attrs, on }">
+                        <v-btn
+                            :color="homepage ? 'white' : 'black'"
+                            icon
+                            v-bind="attrs"
+                            v-on="on">
+                            <v-icon>mdi-apps</v-icon>
+                        </v-btn>
+                    </template>
+                    <v-list dense rounded>
+                        <v-list-item
+                            v-for="(item, index) in app_items"
+                            :key="index + '-app'"
+                            @click="navMethod(item)">
+                            <v-list-item-icon>
+                                <v-icon color="black" dense v-text="item.icon"></v-icon>
+                            </v-list-item-icon>
+                            <v-list-item-content>
+                                <v-list-item-title>{{ item.title }}</v-list-item-title>
+                            </v-list-item-content>
+                        </v-list-item>
+                    </v-list>
+                </v-menu>
+                <!-- User Drop Menu -->
+                <v-menu offset-y
+                    class="mx-auto"
+                    min-width="170">
+                    <template v-slot:activator="{ attrs, on }">
+                        <v-btn
+                            :color="homepage ? 'white' : 'black'"
+                            icon
+                            v-bind="attrs"
+                            v-on="on">
+                            <v-icon>mdi-account-circle-outline</v-icon>
+                        </v-btn>
+                    </template>
+                    <v-list dense rounded>
+                        <v-list-item
+                            v-for="(item, index) in user_items"
+                            :key="index"
+                            @click="navMethod(item)">
+                            <v-list-item-icon>
+                                <v-icon color="black" dense v-text="item.icon"></v-icon>
+                            </v-list-item-icon>
+                            <v-list-item-content>
+                                <v-list-item-title>{{ item.title }}</v-list-item-title>
+                            </v-list-item-content>
+                        </v-list-item>
+                    </v-list>
+                </v-menu>
+            </div>
+            <div class="header-bottom-div">
+                HOOS MY PROFESSOR
+            </div>
+            <div class="subheader-bottom-div">
+                Reviews, Ratings & More
+            </div>
         </v-app-bar>
         <v-snackbar
             top
@@ -259,6 +275,10 @@ axios.defaults.xsrfCookieName = "csrftoken";
 
 export default{
     props: {
+        homepage:{
+            type:Boolean,
+            default:false,
+        },
         searchBool:{
             type:Boolean,
             default:true,
@@ -505,7 +525,54 @@ export default{
 </script>
 
 
-<style scoped lang="css">
+<style lang="css">
+    .header-bottom-div{
+        width: 100%;
+        position: absolute;
+        top: 120px;
+        font-size: 36px;
+        font-weight: 300;
+        font-family: "Roboto", sans-serif;
+        letter-spacing: 0.06em;
+        text-align: center;
+        color: white;
+    }
+
+    .subheader-bottom-div{
+        width: 100%;
+        position: absolute;
+        top: 175px;
+        font-size: 25px;
+        font-weight: 300;
+        font-family: "Roboto", sans-serif;
+        letter-spacing: 0.06em;
+        text-align: center;
+        color: white;
+    }
+
+    .cus-toolbar__content{
+        width: 100%;
+        display: flex;
+        position: fixed;
+        align-items: center;
+        padding: 10px 0px 0px 0px;
+    }
+
+    .cus-toolbar__content_2{
+        width: 100%;
+        display: flex;
+        position: fixed;
+        align-items: center;
+    }
+
+    .homepage-bar .v-toolbar__content{
+        align-items: normal !important;
+    }
+
+    .v-toolbar__content{
+        padding: 0px !important;
+    }
+
     .rating-label{
         padding-left: 9px;
         font-size: 15px;
@@ -518,7 +585,6 @@ export default{
     @media (min-width: 10px) and (max-width: 767px) {
         .nav-img{
             margin-left:0px;
-            margin-right:5px;
         }
     }
 
