@@ -17,7 +17,6 @@
                 <div class="top-part-wrapper">
                     <v-row justify="center">
                         <div style="text-align: center;">
-                            <!-- <h1 class="title-text">MSN Mentor-Mentee Match</h1> -->
                             <h1 class="title-text">Mentee-Mentor Match</h1>
                             <!-- <h4 class="subtitle-text">Search for existing tags or add your own tags</h4> -->
                         </div>
@@ -55,7 +54,7 @@
                     </v-row>
                     <v-row justify="center" v-if="request_user.role == '' ">
                         <div style="text-align:center; margin-top:13px;">
-                            <!-- <v-btn style="margin-right: 10px;" outlined color="teal lighten-1" @click="openRoleDialog('Mentor')">Be A Mentor</v-btn> -->
+                            <v-btn style="margin-right: 10px;" outlined color="teal lighten-1" @click="openRoleDialog('Mentor')">Be A Mentor</v-btn>
                             <v-btn outlined color="teal lighten-1" @click="openRoleDialog('Mentee')">Be A Mentee</v-btn>
                         </div>
                     </v-row>
@@ -76,7 +75,7 @@
                     </v-row>
                     <v-row justify="center">
                         <div v-if="request_user.role == '' " style="text-align:center;">
-                            <small class="muted-text">*Note that you have to be a mentor/mentee to appear in the user list and perform any actions</small>
+                            <small class="muted-text">*Note that you have to be a mentor/mentee to appear in the user list</small>
                         </div>
                     </v-row>
                 </div>
@@ -106,35 +105,40 @@
             @add-to-fav="addToFav"
             @del-from-fav="deleteFromFav"
             v-model="userDialog"></user-dialog>
-        <v-dialog v-model="roleDialog" scrollable min-width="200px" max-width="600px">
-            <v-card>
-                <v-card-title>Be a {{dialogRole}}</v-card-title>
-                <v-divider></v-divider>
-                <v-card-text v-if="dialogRole=='Mentor'" style="color:black;margin-top:21px; font-size:16px;font-weight:500;">
-                    <p style="font-size:19x;font-weight:600;">成为Mentor需要做到什么？</p>
-                    <p>1.第一时间联系你的Mentee，让TA感受到夏村大家庭的温暖和友好，并尽量在国内就开始与新生进行线上线下的交流。</p>
-                    <p>2.能够耐心地解决新生的问题，主动向新生分享自己的资源和经历。</p>
-                    <p>3.给予新生支持，鼓励新生尝试新的事物，融入美国校园，并积极带领新手感受夏村的生活</p>
-                    <p>4.帮助一起建设MSN Hoos My Professor网站，分享学术方面的经历，从而帮助建立新生选课的指南。</p>
-                    <p style="font-size:19x;font-weight:600;">Be a Mentor</p>
-                    <p>如果你觉得自己可以做到以上几点</p>
-                    <p>且已经累计填写过<strong style="color:red;">3条多于15字的Hoos My Professor课程评价</strong></p>
-                    <p>那么点击Yes即可成为Mentor!</p>
-                    <p>Do you really want to be a <strong>{{dialogRole}}</strong>?</p>
-                    <p style="font-size:14px; margin-bottom:0px !important;" class="muted-text">*Note that your role can only be changed by the mentor program chair once you've made your choice.</p>
-                </v-card-text>
-                <v-card-text v-if="dialogRole=='Mentee'" style="color:black;margin-top:21px; font-size:16px;font-weight:500;">
-                    <p style="font-size:19x;font-weight:600;">你是否要成为Mentee？</p>
-                    <p>点击Yes即可成为Mentee!</p>
-                    <p style="font-size:14px; margin-bottom:0px !important;" class="muted-text">*Note that your role can only be changed by the mentor program chair once you've made your choice.</p>
-                </v-card-text>
-                <v-divider></v-divider>
-                <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn color="green darken-1" :loading="roleBtnLoading" outlined @click="setRole(dialogRole)">Yes</v-btn>
-                    <v-btn color="red lighten-1" outlined @click="roleDialog = false">No</v-btn>
-                </v-card-actions>
-            </v-card>
+        <v-dialog v-if="loaded" v-model="roleDialog" scrollable min-width="350px" max-width="800px">
+            <v-stepper v-model="current_step">
+                <v-stepper-header>
+                    <v-stepper-step :complete="current_step > 1" step="1">
+                        Basic Info
+                    </v-stepper-step>
+                    <v-stepper-step :complete="current_step > 2" step="2">
+                        Add Tags
+                    </v-stepper-step>
+                    <v-stepper-step :complete="current_step > 3" step="3">
+                        Be a Mentor!
+                    </v-stepper-step>
+                </v-stepper-header>
+                <v-stepper-items>
+                    <v-stepper-content step="1">
+                        <v-card class="stepper-card" height="450px">
+                            <profile-edit :username="request_user.username" @edit-success="editSuccess" @enable-snack="enableSnack" />
+                        </v-card>
+                        <v-btn color="primary" @click="current_step=2">Continue</v-btn>
+                    </v-stepper-content>
+                    <v-stepper-content step="2">
+                        <v-card class="stepper-card" height="450px">
+
+                        </v-card>
+                        <v-btn color="primary" @click="current_step=3">Continue</v-btn>
+                    </v-stepper-content>
+                    <v-stepper-content step="3">
+                        <v-card class="stepper-card" height="450px">
+
+                        </v-card>
+                        <v-btn color="primary" @click="current_step=1">Continue</v-btn>
+                    </v-stepper-content>
+                </v-stepper-items>
+            </v-stepper>
         </v-dialog>
         <v-snackbar
             top
@@ -143,7 +147,7 @@
             :timeout="1800">
             {{success_text}}
             <template v-slot:action="{ attrs }">
-            <v-btn color="cyan accent-1" v-bind="attrs" text @click="success_snack = false"> Close </v-btn>
+                <v-btn color="cyan accent-1" v-bind="attrs" text @click="success_snack = false"> Close </v-btn>
             </template>
         </v-snackbar>
         <v-snackbar
@@ -153,9 +157,19 @@
             :timeout="2700">
             {{failure_text}}
             <template v-slot:action="{ attrs }">
-            <v-btn color="white" v-bind="attrs" text @click="failure_snack = false"> Close </v-btn>
+                <v-btn color="white" v-bind="attrs" text @click="failure_snack = false"> Close </v-btn>
             </template>
-            </v-snackbar>
+        </v-snackbar>
+        <v-snackbar
+            top
+            v-model="video_snack"
+            color="purple lighten-1"
+            :timeout="3200">
+            Video may take longer to upload. Be patient :)
+            <template v-slot:action="{ attrs }">
+                <v-btn color="white" v-bind="attrs" text @click="video_snack = false"> Close </v-btn>
+            </template>
+        </v-snackbar>
     </v-app>
 </template>
 
@@ -165,6 +179,7 @@ import axios from 'axios'
 import MatchHeader from '../components/MatchHeader'
 import UserDialog from '../components/UserDialog'
 import UserCard from '../components/UserCard'
+import ProfileEdit from '../components/ProfileEdit'
 // import { MatchHeader, UserDialog, UserCard } from "../components"
 axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 axios.defaults.xsrfCookieName = "csrftoken";
@@ -197,12 +212,16 @@ export default {
             success_text:"",
             failure_snack:false,
             success_snack:false,
+            video_snack:false,
+            // Stepper
+            current_step:1,
         }
     },
     components:{
         MatchHeader,
         UserCard,
         UserDialog,
+        ProfileEdit,
     },
     watch: {
         tags(val){
@@ -218,6 +237,17 @@ export default {
         },
     },
     methods: {
+        enableSnack(snack){
+            if(snack == "video_snack")
+                this.video_snack = true;
+            else if(snack == "failure_snack"){
+                this.failure_text = "Sth is wrong";
+                this.failure_snack = true;
+            }
+        },
+        editSuccess(){
+            this.current_step = 2;
+        },
         addToFav(user){
             this.changeFav(user, true);
         },
@@ -485,6 +515,11 @@ export default {
 </script>
 
 <style scoped>
+    .stepper-card{
+        margin-bottom: 6px;
+        overflow: scroll;
+    }
+
     .content-div{
         position: relative;
         background: url('../assets/static/css/images/cloud_bg_new_02.jpg') no-repeat;
