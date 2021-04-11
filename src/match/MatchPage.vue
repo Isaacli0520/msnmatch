@@ -120,7 +120,7 @@
                 </v-stepper-header>
                 <v-stepper-items>
                     <v-stepper-content step="1">
-                        <v-card class="stepper-card" height="450px">
+                        <v-card class="stepper-card">
                             <profile-edit 
                                 editBtnName="Edit & Continue"
                                 :username="request_user.username" 
@@ -130,7 +130,7 @@
                         <v-btn class="stepper-continue-btn" @click="roleDialog=false;">Cancel</v-btn>
                     </v-stepper-content>
                     <v-stepper-content step="2">
-                        <v-card class="stepper-card" height="450px">
+                        <v-card class="stepper-card">
                             <v-card-title>Add Your Interests</v-card-title>
                             <v-divider/>
                             <div class="ma-4">
@@ -166,7 +166,7 @@
                         <v-btn class="stepper-continue-btn" @click="roleDialog=false;">Cancel</v-btn>
                     </v-stepper-content>
                     <v-stepper-content step="3">
-                        <v-card class="stepper-card" height="450px">
+                        <v-card class="stepper-card">
                             <div v-if="dialogRole == 'Mentor'" class="ma-4">
                                 <p style="font-size:19x;font-weight:600;">成为Mentor需要做到什么？</p>
                                 <p>1.第一时间联系你的Mentee，让TA感受到夏村大家庭的温暖和友好，并尽量在国内就开始与新生进行线上线下的交流。</p>
@@ -656,6 +656,7 @@ export default {
 </script>
 
 <style scoped>
+
     .stepper-tags-text{
         /* text-align: center; */
         font-weight: 500 !important;
@@ -664,7 +665,7 @@ export default {
     }
 
     .stepper-continue-btn{
-        margin: 10px 5px 3px 0px;
+        margin: 10px 5px 2px 3px;
         float: right;
     }
 
@@ -688,6 +689,8 @@ export default {
     .stepper-card{
         margin: 5px;
         overflow: scroll;
+        min-height: 300px;
+        max-height: 450px;
     }
 
     .content-div{
@@ -786,6 +789,10 @@ export default {
         outline: none;
     }
 
+    .v-stepper__content{
+        padding: 16px;
+    }
+
     @media (min-width: 1025px) {
         
     }
@@ -801,6 +808,19 @@ export default {
 
 
     @media (min-width: 10px) and (max-width: 767px) {
+        .stepper-card{
+            margin: 2px;
+            max-height: 380px;
+        }
+
+        .v-stepper__content{
+            padding: 12px;
+        }
+
+        .stepper-continue-btn{
+            margin: 10px 2px 1px 4px;
+        }
+
         .title-text{
             font-size:35px !important;
         }

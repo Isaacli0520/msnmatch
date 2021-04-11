@@ -141,7 +141,7 @@
             <v-divider></v-divider>
             <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="green darken-1" outlined :disabled="!submitBtnEnable" :loading="editUserBtnLoading" @click.prevent="editUser(edit_user, edit_user_image, edit_user_video)">{{editBtnName}}</v-btn>
+                <v-btn color="primary" :disabled="!submitBtnEnable" :loading="editUserBtnLoading" @click.prevent="editUser(edit_user, edit_user_image, edit_user_video)">{{editBtnName}}</v-btn>
             </v-card-actions>
         </v-card>
     </div>
