@@ -54,7 +54,7 @@
                     </v-row>
                     <v-row justify="center" v-if="request_user.role == '' ">
                         <div style="text-align:center; margin-top:13px;">
-                            <v-btn style="margin-right: 10px;" outlined color="teal lighten-1" @click="openRoleDialog('Mentor')">Be A Mentor</v-btn>
+                            <v-btn style="margin-right: 10px;" outlined color="teal lighten-1" :loading="mentorBtnLoading" @click="openRoleDialog('Mentor')">Be A Mentor</v-btn>
                             <v-btn outlined color="teal lighten-1" @click="openRoleDialog('Mentee')">Be A Mentee</v-btn>
                         </div>
                     </v-row>
@@ -115,27 +115,77 @@
                         Add Tags
                     </v-stepper-step>
                     <v-stepper-step :complete="current_step > 3" step="3">
-                        Be a Mentor!
+                        Be a {{dialogRole}}!
                     </v-stepper-step>
                 </v-stepper-header>
                 <v-stepper-items>
                     <v-stepper-content step="1">
                         <v-card class="stepper-card" height="450px">
-                            <profile-edit :username="request_user.username" @edit-success="editSuccess" @enable-snack="enableSnack" />
+                            <profile-edit 
+                                editBtnName="Edit & Continue"
+                                :username="request_user.username" 
+                                @edit-success="editSuccess" 
+                                @enable-snack="enableSnack" />
                         </v-card>
-                        <v-btn color="primary" @click="current_step=2">Continue</v-btn>
+                        <v-btn class="stepper-continue-btn" @click="roleDialog=false;">Cancel</v-btn>
                     </v-stepper-content>
                     <v-stepper-content step="2">
                         <v-card class="stepper-card" height="450px">
-
+                            <v-card-title>Add Your Interests</v-card-title>
+                            <v-divider/>
+                            <div class="ma-4">
+                                <h4 class="stepper-tags-text">Add your interests by clicking on the tags below.</h4>
+                                <h4 class="stepper-tags-text">You can always add more tags on the Tags page.</h4>
+                                <h2 class="mt-3 your-tags">Your Tags</h2>
+                                <div class="skill-tags mb-3">
+                                    <template v-for="(skills_of_type, skills_type_name) in user_skills">
+                                        <tag-span v-for="skill in skills_of_type"
+                                            :key="skill.id"
+                                            :skill="skill"
+                                            clickable="delete"
+                                            @add-skill="addSkill"
+                                            @del-skill="deleteSkill"
+                                        />
+                                    </template>
+                                </div>
+                                <div :key="skills_type_name" v-for="(skills_of_type, skills_type_name) in all_skills">
+                                    <h3 class="skill-type-text">{{skill_type_names[skills_type_name]}}</h3>
+                                    <div class="skill-tags">
+                                        <tag-span v-for="skill in skills_of_type"
+                                            :key="skill.skill_pk"
+                                            :skill="skill"
+                                            :clickable="'add'"
+                                            @add-skill="addSkill"
+                                            @del-skill="deleteSkill"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
                         </v-card>
-                        <v-btn color="primary" @click="current_step=3">Continue</v-btn>
+                        <v-btn class="stepper-continue-btn" color="primary" :disabled="user_skills_count < 3" @click="current_step=3">Continue</v-btn>
+                        <v-btn class="stepper-continue-btn" @click="roleDialog=false;">Cancel</v-btn>
                     </v-stepper-content>
                     <v-stepper-content step="3">
                         <v-card class="stepper-card" height="450px">
-
+                            <div v-if="dialogRole == 'Mentor'" class="ma-4">
+                                <p style="font-size:19x;font-weight:600;">成为Mentor需要做到什么？</p>
+                                <p>1.第一时间联系你的Mentee，让TA感受到夏村大家庭的温暖和友好，并尽量在国内就开始与新生进行线上线下的交流。</p>
+                                <p>2.能够耐心地解决新生的问题，主动向新生分享自己的资源和经历。</p>
+                                <p>3.给予新生支持，鼓励新生尝试新的事物，融入美国校园，并积极带领新手感受夏村的生活</p>
+                                <p>4.帮助一起建设MSN Hoos My Professor网站，分享学术方面的经历，从而帮助建立新生选课的指南。</p>
+                                <p style="font-size:19x;font-weight:600;">Be a Mentor</p>
+                                <p>如果你觉得自己可以做到以上几点</p>
+                                <p>那么点击Yes即可成为Mentor!</p>
+                                <p>Do you really want to be a <strong>{{dialogRole}}</strong>?</p>
+                            </div>
+                            <div v-else class="ma-4">
+                                <p style="font-size:19x;font-weight:600;">你是否要成为Mentee？</p>
+                                <p>点击Yes即可成为Mentee!</p>
+                                <p style="font-size:14px; margin-bottom:0px !important;" class="muted-text">*Note that your role can only be changed by the mentor program chair once you've made your choice.</p>
+                            </div>
                         </v-card>
-                        <v-btn color="primary" @click="current_step=1">Continue</v-btn>
+                        <v-btn class="stepper-continue-btn" color="primary" :loading="roleBtnLoading" @click="setRole(dialogRole)">Yes</v-btn>
+                        <v-btn class="stepper-continue-btn" @click="roleDialog=false;">Cancel</v-btn>
                     </v-stepper-content>
                 </v-stepper-items>
             </v-stepper>
@@ -180,6 +230,7 @@ import MatchHeader from '../components/MatchHeader'
 import UserDialog from '../components/UserDialog'
 import UserCard from '../components/UserCard'
 import ProfileEdit from '../components/ProfileEdit'
+import TagSpan from '../components/TagSpan'
 // import { MatchHeader, UserDialog, UserCard } from "../components"
 axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 axios.defaults.xsrfCookieName = "csrftoken";
@@ -200,6 +251,7 @@ export default {
             backup_all_users: [],
             // Dialog
             dialogRole:"Mentor",
+            mentorBtnLoading:false,
             roleBtnLoading:false,
             userDialog:false,
             roleDialog:false,
@@ -215,6 +267,19 @@ export default {
             video_snack:false,
             // Stepper
             current_step:1,
+            // Tags
+            all_skills:{},
+            user_skills:{},
+            skill_type_names:{
+                "Game":"Game",
+                "Academic":"Academic Interests",
+                "Film and TV":"Film and TV",
+                "Sport":"Sport",
+                "Music":"Music",
+                "Language":"Language",
+                "General":"General",
+                "Books":"Books",
+            },
         }
     },
     components:{
@@ -222,6 +287,7 @@ export default {
         UserCard,
         UserDialog,
         ProfileEdit,
+        TagSpan,
     },
     watch: {
         tags(val){
@@ -235,8 +301,59 @@ export default {
             else
                 return this.users[this.dialog_user_index];
         },
+        user_skills_count(){
+            if(Object.keys(this.user_skills).length == 0)
+                return 0
+            return Object.values(this.user_skills).map(arr => arr.length).reduce((a, b) => a + b);
+        },
     },
     methods: {
+        getSkills(){
+            axios.get('/users/api/get_all_and_user_skills/').then(response => {
+                this.all_skills = response.data.all_skills;
+                this.user_skills = response.data.user_skills;
+                this.loaded = true;
+            });
+        },
+        addSkill(skill){
+            axios.post("/skills/api/user_add_skill/", {
+                "id":skill.id,
+                "name":skill.name,
+            }).then(response => {
+                if(response.data.success){
+                    let tmp_skill = JSON.parse(JSON.stringify(skill));
+                    tmp_skill.id = response.data.id;
+                    let all_skill_pos = this.all_skills[skill.type].map(function(e) { return e.id; }).indexOf(tmp_skill.id);
+                    this.user_skills[tmp_skill.type].splice(-1, 0, tmp_skill);
+                    if(all_skill_pos != -1)
+                        this.all_skills[tmp_skill.type].splice(all_skill_pos, 1);
+                    // this.success_text = "Tag Added"
+                    // this.success_snack = true;
+                }else{
+                    this.failure_text = "Sth is wrong";
+                    this.failure_snack = true;
+                }
+            });
+        },
+        deleteSkill(skill){
+            axios.post("/skills/api/user_del_skill/", {
+                "id":skill.id,
+            }).then(response => {
+                if(response.data.success){
+                    let user_skill_pos = this.user_skills[skill.type].map(function(e) { return e.id; }).indexOf(skill.id);
+                    if(user_skill_pos != -1)
+                        this.user_skills[skill.type].splice(user_skill_pos, 1);
+                    if (skill.type != "Custom"){
+                        this.all_skills[skill.type].push(skill);
+                    }
+                    // this.success_text = "Tag Deleted"
+                    // this.success_snack = true;
+                }else{
+                    this.failure_text = "Sth is wrong";
+                    this.failure_snack = true;
+                }
+            });
+        },
         enableSnack(snack){
             if(snack == "video_snack")
                 this.video_snack = true;
@@ -289,9 +406,33 @@ export default {
             });
             
         },
+        checkMentorRequirements(){
+            return axios.get('/users/api/check_mentor_requirements/',{params: {}}).then(response => {
+                this.mentorBtnLoading = false;
+                console.log("INSIDE");
+                return response.data.valid;
+            });
+        },
         openRoleDialog(role){
-            this.dialogRole = role;
-            this.roleDialog = true;
+            if(role == "Mentor"){
+                this.mentorBtnLoading = true;
+                this.checkMentorRequirements().then(valid =>{
+                    if(!valid){
+                        this.failure_text = "你大概是没填够三条大于15字的HoosMyProfessor课程评价";
+                        this.failure_snack = true;
+                    }
+                    else{
+                        this.dialogRole = role;
+                        this.roleDialog = true;
+                        this.getSkills();
+                    }
+                });
+            }
+            else{
+                this.dialogRole = role;
+                this.roleDialog = true;
+                this.getSkills();
+            }
         },
         add_tag(tag){
             this.tags.push(tag);
@@ -515,8 +656,37 @@ export default {
 </script>
 
 <style scoped>
+    .stepper-tags-text{
+        /* text-align: center; */
+        font-weight: 500 !important;
+        color:#7e7e7e;
+        font-family: Roboto,sans-serif !important;
+    }
+
+    .stepper-continue-btn{
+        margin: 10px 5px 3px 0px;
+        float: right;
+    }
+
+    .your-tags{
+        color: #8f39ff;
+        font-family: Palatino, URW Palladio L, serif;
+    }
+
+    .skill-type-text{
+        color: #32a49a;
+        font-family: Palatino, URW Palladio L, serif;
+    }
+
+    .skill-tags{
+        display: flex;
+        flex-flow: row wrap;
+        width:100%;
+        margin: 5px 0px 20px 0px;
+    }
+
     .stepper-card{
-        margin-bottom: 6px;
+        margin: 5px;
         overflow: scroll;
     }
 

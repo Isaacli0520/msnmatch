@@ -2,11 +2,18 @@
     <v-app>
         <match-header></match-header>
         <v-main class="content-div">
-            <profile-edit 
-                :username="username"
-                @enable-snack="enableSnack"
-                @edit-success="editSuccess"
-                />
+            <v-container v-if="!loaded" fluid fill-height>
+                <v-row>
+                    <v-col offset="0" offset-sm="0" offset-md="2" offset-lg="3" offset-xl="4" 
+                        cols="12" sm="12" md="8" lg="6" xl="4">
+                        <profile-edit 
+                            :username="username"
+                            @enable-snack="enableSnack"
+                            @edit-success="editSuccess"
+                            />
+                    </v-col>
+                </v-row>
+            </v-container>
         </v-main>
         <v-snackbar
             top

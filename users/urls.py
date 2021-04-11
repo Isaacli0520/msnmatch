@@ -8,6 +8,7 @@ urlpatterns = [
 
     path('api/match_user/', views.match_user,name="match_user"),
     path('api/edit_user/',views.edit_user, name='edit_user'),
+    path('api/check_mentor_requirements/', views.check_mentor_requirements, name="check_mentor_requirements"),
     path('api/choose_role/', views.choose_role, name="choose_role"),
     path('api/choose_roommate_role/', views.choose_roommate_role, name="choose_roommate_role"),
     path('api/add_fav/', views.add_fav, name="add_fav"),

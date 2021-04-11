@@ -1,157 +1,149 @@
 <template>
     <div>
-        <v-container v-if="!loaded" fluid fill-height>
-            <v-layout 
-                align-center
-                justify-center>
-                <div>
-                    <v-progress-circular
-                    :size="60"
-                    :width="6"
-                    indeterminate
-                    color="teal lighten-1">
-                    </v-progress-circular>
-                </div>
-            </v-layout>
-        </v-container>
-        <v-container v-if="edit_user && loaded" fluid grid-list-lg>
-            <v-row>
-                <v-col offset="0" offset-sm="0" offset-md="2" offset-lg="3" offset-xl="4" 
-                    cols="12" sm="12" md="8" lg="6" xl="4">
-                    <v-card>
-                        <v-card-title>Edit Your Profile</v-card-title>
-                        <v-divider></v-divider>
-                        <v-card-text>
-                            <v-form
-                                method="post"
-                                ref="edit_form"
-                                v-model="edit_user_form_valid">
+        <v-layout 
+            v-if="!loaded"
+            align-center
+            justify-center>
+            <div v-if="!loaded">
+                <v-progress-circular
+                :size="60"
+                :width="6"
+                indeterminate
+                color="teal lighten-1">
+                </v-progress-circular>
+            </div>
+        </v-layout>
+        <v-card v-if="edit_user && loaded">
+            <v-card-title>Edit Your Profile</v-card-title>
+            <v-divider></v-divider>
+            <v-card-text>
+                <v-form
+                    method="post"
+                    ref="edit_form"
+                    v-model="edit_user_form_valid">
 
-                                <v-text-field
-                                v-model="edit_user.first_name"
-                                :rules="firstnameRules"
-                                label="First Name"
-                                required
-                                ></v-text-field>
+                    <v-text-field
+                    v-model="edit_user.first_name"
+                    :rules="firstnameRules"
+                    label="First Name"
+                    required
+                    ></v-text-field>
 
-                                <v-text-field
-                                v-model="edit_user.last_name"
-                                :rules="lastnameRules"
-                                label="Last Name"
-                                required
-                                ></v-text-field>
+                    <v-text-field
+                    v-model="edit_user.last_name"
+                    :rules="lastnameRules"
+                    label="Last Name"
+                    required
+                    ></v-text-field>
 
-                                <v-text-field
-                                v-model="edit_user.location"
-                                :rules="locationRules"
-                                label="Location"
-                                ></v-text-field>
+                    <v-text-field
+                    v-model="edit_user.location"
+                    :rules="locationRules"
+                    label="Location"
+                    ></v-text-field>
 
-                                <v-select
-                                v-model="edit_user.sex"
-                                :items="genders"
-                                label="Gender"
-                                ></v-select>
+                    <v-select
+                    v-model="edit_user.sex"
+                    :items="genders"
+                    label="Gender"
+                    ></v-select>
 
-                                <v-select
-                                v-model="edit_user.graduate_year"
-                                :items="graduate_years"
-                                :rules="[v => !!v || 'Graduate Year is required']"
-                                label="Graduate Year"
-                                required
-                                ></v-select>
+                    <v-select
+                    v-model="edit_user.graduate_year"
+                    :items="graduate_years"
+                    :rules="[v => !!v || 'Graduate Year is required']"
+                    label="Graduate Year"
+                    required
+                    ></v-select>
 
-                                <v-select
-                                v-model="edit_user.major"
-                                :items="majors"
-                                :rules="[v => !!v || 'Major is required (or intended major)']"
-                                label="Major"
-                                required
-                                ></v-select>
+                    <v-select
+                    v-model="edit_user.major"
+                    :items="majors"
+                    :rules="[v => !!v || 'Major is required (or intended major)']"
+                    label="Major"
+                    required
+                    ></v-select>
 
-                                <v-select
-                                v-model="edit_user.major_two"
-                                :items="majors"
-                                label="Second Major"
-                                ></v-select>
+                    <v-select
+                    v-model="edit_user.major_two"
+                    :items="majors"
+                    label="Second Major"
+                    ></v-select>
 
-                                <v-select
-                                v-model="edit_user.minor"
-                                :items="majors"
-                                label="Minor"
-                                ></v-select>
+                    <v-select
+                    v-model="edit_user.minor"
+                    :items="majors"
+                    label="Minor"
+                    ></v-select>
 
-                                <v-text-field
-                                v-model="edit_user.wechat"
-                                :rules="wechatRules"
-                                label="WeChat ID"
-                                ></v-text-field>
+                    <v-text-field
+                    v-model="edit_user.wechat"
+                    :rules="wechatRules"
+                    label="WeChat ID"
+                    ></v-text-field>
 
-                                <v-textarea
-                                v-model="edit_user.bio"
-                                label="Bio"
-                                outlined
-                                :rules="bioRules"
-                                required
-                                :counter="1000"
-                                rows="4"
-                                row-height="20"
-                                ></v-textarea>
+                    <v-textarea
+                    v-model="edit_user.bio"
+                    label="Bio"
+                    outlined
+                    :rules="bioRules"
+                    required
+                    :counter="1000"
+                    rows="4"
+                    row-height="20"
+                    ></v-textarea>
 
-                                <v-file-input 
-                                v-model="edit_user_image"
-                                outlined 
-                                dense
-                                accept="image/*"
-                                label="Upload an image"
-                                ></v-file-input>
+                    <v-file-input 
+                    v-model="edit_user_image"
+                    outlined 
+                    dense
+                    accept="image/*"
+                    label="Upload an image"
+                    ></v-file-input>
 
-                                <v-file-input 
-                                v-model="edit_user_video"
-                                outlined
-                                dense
-                                accept="video/mp4,video/x-m4v,video/*"
-                                label="Upload a video"
-                                ></v-file-input>
+                    <v-file-input 
+                    v-model="edit_user_video"
+                    outlined
+                    dense
+                    accept="video/mp4,video/x-m4v,video/*"
+                    label="Upload a video"
+                    ></v-file-input>
 
-                            <div style="font-size: 1.25rem;
-                                        font-weight: 500;
-                                        color:rgb(0,0,0,1);
-                                        letter-spacing: 0.0125em;
-                                        line-height: 2rem;
-                                        padding:0px 0px 5px 0px">For Roommate Match</div>
-                                <v-textarea
-                                v-model="edit_user.rm_bio"
-                                label="Roommate Bio"
-                                outlined
-                                :rules="rmBioRules"
-                                required
-                                :counter="1000"
-                                rows="3"
-                                row-height="20"
-                                ></v-textarea>
+                <div style="font-size: 1.25rem;
+                            font-weight: 500;
+                            color:rgb(0,0,0,1);
+                            letter-spacing: 0.0125em;
+                            line-height: 2rem;
+                            padding:0px 0px 5px 0px">For Roommate Match</div>
+                    <v-textarea
+                    v-model="edit_user.rm_bio"
+                    label="Roommate Bio"
+                    outlined
+                    :rules="rmBioRules"
+                    required
+                    :counter="1000"
+                    rows="3"
+                    row-height="20"
+                    ></v-textarea>
 
-                                <v-textarea
-                                v-model="edit_user.rm_schedule"
-                                label="找室友之作息安排"
-                                outlined
-                                :rules="rmBioRules"
-                                required
-                                :counter="1000"
-                                rows="3"
-                                row-height="20"
-                                ></v-textarea>
-                            </v-form>
-                        </v-card-text>
-                        <v-divider></v-divider>
-                        <v-card-actions>
-                            <v-spacer></v-spacer>
-                            <v-btn color="green darken-1" outlined :disabled="!submitBtnEnable" :loading="editUserBtnLoading" @click.prevent="editUser(edit_user, edit_user_image, edit_user_video)">Edit</v-btn>
-                        </v-card-actions>
-                    </v-card>
-                </v-col>
-            </v-row>
-        </v-container>
+                    <v-textarea
+                    v-model="edit_user.rm_schedule"
+                    label="找室友之作息安排"
+                    outlined
+                    :rules="rmBioRules"
+                    required
+                    :counter="1000"
+                    rows="3"
+                    row-height="20"
+                    ></v-textarea>
+                </v-form>
+            </v-card-text>
+            <v-divider></v-divider>
+            <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="green darken-1" outlined :disabled="!submitBtnEnable" :loading="editUserBtnLoading" @click.prevent="editUser(edit_user, edit_user_image, edit_user_video)">{{editBtnName}}</v-btn>
+            </v-card-actions>
+        </v-card>
     </div>
 </template>
 
@@ -162,6 +154,10 @@ axios.defaults.xsrfCookieName = "csrftoken";
 
 export default {
     props: {
+        editBtnName:{
+            type:String,
+            default:"Edit",
+        },
         username:{
             type:String,
             default:"",

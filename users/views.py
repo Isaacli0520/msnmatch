@@ -4,6 +4,7 @@ from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector, TrigramSimilarity
 from django.db.models import Q
+from django.db.models.functions import Length
 
 import json
 import random
@@ -132,6 +133,16 @@ def choose_roommate_role(request):
         return _get_not_allowed()
 
 @login_required
+def check_mentor_requirements(request):
+    if request.method == "GET":
+        user_review_num = request.user.courseuser_set.annotate(length=Length("text")).filter(length__gt=15).count()
+        if user_review_num < 3:
+            return _success_response({"valid":False})
+        return _success_response({"valid":True}) 
+    if request.method == "POST":
+        return _post_not_allowed()
+
+@login_required
 def choose_role(request):
     if request.method == "POST":
         post = json.loads(request.body)
@@ -229,6 +240,7 @@ def user_json(user, request, personal_profile = False):
         "bio": user.profile.bio,
         "location": user.profile.location,
         "year": year,
+        "graduate_year": user.profile.graduate_year,
         "sex":user.profile.sex,
         "role":user.profile.role,
         "major": user.profile.major,
