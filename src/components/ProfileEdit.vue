@@ -25,14 +25,14 @@
                     <v-text-field
                     v-model="edit_user.first_name"
                     :rules="firstnameRules"
-                    label="First Name"
+                    label="First Name*"
                     required
                     ></v-text-field>
 
                     <v-text-field
                     v-model="edit_user.last_name"
                     :rules="lastnameRules"
-                    label="Last Name"
+                    label="Last Name*"
                     required
                     ></v-text-field>
 
@@ -52,7 +52,7 @@
                     v-model="edit_user.graduate_year"
                     :items="graduate_years"
                     :rules="[v => !!v || 'Graduate Year is required']"
-                    label="Graduate Year"
+                    label="Graduate Year*"
                     required
                     ></v-select>
 
@@ -60,7 +60,7 @@
                     v-model="edit_user.major"
                     :items="majors"
                     :rules="[v => !!v || 'Major is required (or intended major)']"
-                    label="Major"
+                    label="Major*"
                     required
                     ></v-select>
 
@@ -84,7 +84,7 @@
 
                     <v-textarea
                     v-model="edit_user.bio"
-                    label="Bio"
+                    label="Bio*"
                     outlined
                     :rules="bioRules"
                     required

@@ -17,7 +17,7 @@
                 <div class="top-part-wrapper">
                     <v-row justify="center">
                         <div style="text-align: center;">
-                            <h1 class="title-text">Mentee-Mentor Match</h1>
+                            <h1 class="title-text">MATCH</h1>
                             <!-- <h4 class="subtitle-text">Search for existing tags or add your own tags</h4> -->
                         </div>
                     </v-row>
@@ -82,13 +82,8 @@
                 <!-- <v-divider style="margin-left:13px;margin-right:13px;"></v-divider> -->
                 <v-row>
                     <v-col
-                        v-for="(user, i) in users"
-                        :key="i"
-                        cols="12"
-                        sm="6"
-                        md="4"
-                        lg="4"
-                        xl="3">
+                        v-for="(user, i) in users" :key="i"
+                        cols="12" sm="6" md="4" lg="4" xl="3">
                         <user-card
                             class="fill-height"
                             :user_index="i"
@@ -135,6 +130,7 @@
                             <v-divider/>
                             <div class="ma-4">
                                 <h4 class="stepper-tags-text">Add your interests by clicking on the tags below.</h4>
+                                <h4 class="stepper-tags-text">You must add at least 3 tags to continue.</h4>
                                 <h4 class="stepper-tags-text">You can always add more tags on the Tags page.</h4>
                                 <h2 class="mt-3 your-tags">Your Tags</h2>
                                 <div class="skill-tags mb-3">
@@ -655,7 +651,15 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
+
+    /* Magic for improving fps on MAC chrome */
+    .v-image__image{
+        /* transform:translatez(0) !important;
+        -webkit-transform:translatez(0) !important; */
+        transform: translate3d(0,0,0);
+        -webkit-transform: translate3d(0,0,0);
+    }
 
     .stepper-tags-text{
         /* text-align: center; */
@@ -721,8 +725,9 @@ export default {
     .title-text{
         color:#32a49a; 
         font-size:45px;
-        font-weight: 500 !important;
-        font-family: Times, serif !important;
+        letter-spacing: 0.06em;
+        font-weight: 300 !important;
+        font-family: "Roboto", sans-serif;
     }
 
     .all-buttons{

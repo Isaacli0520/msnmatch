@@ -85,8 +85,8 @@
             style="background-color:white;"
             app
             dense
+            flat
             light
-            elevation="1"
             >
             <v-app-bar-nav-icon  @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
             <!-- <v-btn
