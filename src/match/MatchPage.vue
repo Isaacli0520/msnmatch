@@ -405,7 +405,6 @@ export default {
         checkMentorRequirements(){
             return axios.get('/users/api/check_mentor_requirements/',{params: {}}).then(response => {
                 this.mentorBtnLoading = false;
-                console.log("INSIDE");
                 return response.data.valid;
             });
         },
@@ -414,7 +413,7 @@ export default {
                 this.mentorBtnLoading = true;
                 this.checkMentorRequirements().then(valid =>{
                     if(!valid){
-                        this.failure_text = "你大概是没填够三条大于15字的HoosMyProfessor课程评价";
+                        this.failure_text = "你本学期大概是没填够三条大于15字的HoosMyProfessor课程评价";
                         this.failure_snack = true;
                     }
                     else{
@@ -540,7 +539,7 @@ export default {
                     }
                     else if(["major"].indexOf(field_tag) != -1){
                         let tmp_cutoff = ref.options.cutoff;
-                        ref.options.cutoff = 70;
+                        ref.options.cutoff = 90;
                         tmp_all_users = ref.fuzzy_search(tmp_all_users, ['major', 'major_two', 'minor'], field_query);
                         ref.options.cutoff = tmp_cutoff;
                     }

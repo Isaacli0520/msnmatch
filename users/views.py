@@ -8,6 +8,7 @@ from django.db.models.functions import Length
 
 import json
 import random
+import datetime
 
 from friendship.models import Friend, Follow
 from skills.models import Skill
@@ -135,7 +136,8 @@ def choose_roommate_role(request):
 @login_required
 def check_mentor_requirements(request):
     if request.method == "GET":
-        user_review_num = request.user.courseuser_set.annotate(length=Length("text")).filter(length__gt=15).count()
+        dt = datetime.datetime.strptime(settings.HMP_CHECK_TIME, '%Y-%m-%d')
+        user_review_num = request.user.courseuser_set.annotate(length=Length("text")).filter(length__gt=15, date__gt=dt).count()
         if user_review_num < 3:
             return _success_response({"valid":False})
         return _success_response({"valid":True}) 
@@ -148,7 +150,8 @@ def choose_role(request):
         post = json.loads(request.body)
         tmp_role = post.get("role")
         if tmp_role == "Mentor" and request.user.profile.role == "":
-            user_review_num = request.user.courseuser_set.annotate(length=Length("text")).filter(length__gt=15).count()
+            dt = datetime.datetime.strptime(settings.HMP_CHECK_TIME, '%Y-%m-%d')
+            user_review_num = request.user.courseuser_set.annotate(length=Length("text")).filter(length__gt=15, date__gt=dt).count()
             if user_review_num < 3:
                 return _error_response("You don't have enough course comments.")
             request.user.profile.role = "Mentor"

@@ -1,6 +1,7 @@
 <template>
     <div>
         <v-layout 
+            style="min-height:300px;"
             v-if="!loaded"
             align-center
             justify-center>

@@ -12,6 +12,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 SECRET_KEY = config('SECRET_KEY')
 
+HMP_CHECK_TIME = config("HMP_CHECK_TIME")
+
 DEBUG = config("DEBUG",cast=bool)
 
 ITEM_NAME_TH = config("ITEM_NAME_TH")
