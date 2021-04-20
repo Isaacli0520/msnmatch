@@ -320,7 +320,7 @@ export default {
             }).then(response => {
                 this.editUserBtnLoading = false;
                 if(response.data.success){
-                    this.submitBtnEnable = false;
+                    // this.submitBtnEnable = false;
                     this.$emit("edit-success", this.username);
                 }else{
                     this.$emit("enable-snack", "failure_snack");

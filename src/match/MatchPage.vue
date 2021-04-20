@@ -159,6 +159,7 @@
                             </div>
                         </v-card>
                         <v-btn class="stepper-continue-btn" color="primary" :disabled="user_skills_count < 3" @click="current_step=3">Continue</v-btn>
+                        <v-btn class="stepper-continue-btn" color="light-blue darken-1" dark @click="current_step = current_step - 1">Back</v-btn>
                         <v-btn class="stepper-continue-btn" @click="roleDialog=false;">Cancel</v-btn>
                     </v-stepper-content>
                     <v-stepper-content step="3">
@@ -181,6 +182,7 @@
                             </div>
                         </v-card>
                         <v-btn class="stepper-continue-btn" color="primary" :loading="roleBtnLoading" @click="setRole(dialogRole)">Yes</v-btn>
+                        <v-btn class="stepper-continue-btn" color="light-blue darken-1" dark @click="current_step = current_step - 1">Back</v-btn>
                         <v-btn class="stepper-continue-btn" @click="roleDialog=false;">Cancel</v-btn>
                     </v-stepper-content>
                 </v-stepper-items>
@@ -424,9 +426,11 @@ export default {
                 });
             }
             else{
-                this.dialogRole = role;
-                this.roleDialog = true;
-                this.getSkills();
+                this.failure_text = "别调皮，还没开呢！";
+                this.failure_snack = true;
+                // this.dialogRole = role;
+                // this.roleDialog = true;
+                // this.getSkills();
             }
         },
         add_tag(tag){
