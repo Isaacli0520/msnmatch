@@ -14,6 +14,7 @@ urlpatterns = [
     path('api/add_fav/', views.add_fav, name="add_fav"),
     path('api/del_fav/', views.del_fav, name="del_fav"),
 
+    path('api/get_match_header/', views.get_match_header, name="get_match_header"),
     path('api/get_profile/',views.get_profile, name='get_profile'),
     path('api/get_user_match_header/', views.get_user_match_header, name="get_user_match_header"),
     path('api/get_all_users/', views.get_all_users, name="get_all_users"),

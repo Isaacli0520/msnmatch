@@ -335,7 +335,6 @@ export default{
     watch:{
         headerUpdate(){
             this.get_match_header();
-            this.get_follow_users();
         }
     },
     computed:{
@@ -375,20 +374,17 @@ export default{
                 this.goToHref(this.general_urls.courses_url);
             }
         },
-        get_basic_info(){
-            axios.get('/courses/api/get_basic_info/',{params: {}}).then(response => {
-                this.urls = response.data.all_info;
-                this.loaded = true;
-            });
-        },
         get_follow_users(){
             axios.get('/users/api/get_follow_list/',{params: {}}).then(response => {
                 this.follow_users = response.data.following;
             });
         },
         get_match_header(){
-            axios.get('/users/api/get_user_match_header/',{params: {}}).then(response => {
+            axios.get('/users/api/get_match_header/',{params: {}}).then(response => {
                 this.user = response.data.user;
+                this.follow_users = response.data.following;
+                this.urls = response.data.profile_urls;
+                this.loaded = true;
             });
         },
         goToHref(text){
@@ -432,9 +428,7 @@ export default{
         }
     },
     mounted(){
-        this.get_basic_info();
         this.get_match_header();
-        this.get_follow_users();
     },
 }
 </script>

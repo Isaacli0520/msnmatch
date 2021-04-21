@@ -9,6 +9,7 @@ from django.db.models.functions import Length
 import json
 import random
 import datetime
+import time
 
 from friendship.models import Friend, Follow
 from skills.models import Skill
@@ -30,6 +31,36 @@ def update_profile(request, username):
     return render(request, 'profile_edit.html')
 
 @login_required
+def get_match_header(request):
+    following = Follow.objects.following(request.user)
+    flw_ret = []
+    for flw in following:
+        if flw.profile.picture:
+            picture_url = flw.profile.picture.url
+        else:
+            picture_url = settings.STATIC_URL + "css/images/brand.jpg"
+        new_flw = {
+            "pk": flw.pk,
+            "picture": picture_url,
+            "user_url": "/users/"+flw.username+"/",
+            "first_name": flw.first_name,
+            "last_name": flw.last_name,
+        }
+        flw_ret.append(new_flw)
+    return _success_response({
+        "user":{
+            "first_name":request.user.first_name,
+            "last_name":request.user.last_name,
+            "role":request.user.profile.role,
+        },
+        "profile_urls":{
+            "profile": reverse('profile', args=[request.user.username]),
+            "update_profile":reverse('update_profile', args=[request.user.username]),
+        },
+        "following":flw_ret,
+    })
+
+@login_required
 def get_user_match_header(request):
     return _success_response({
         "user":{
@@ -48,11 +79,14 @@ def get_all_and_user_skills(request):
 
 @login_required
 def get_all_users(request):
+    start_time = time.time()
     users = sorted(User.objects.all().exclude(username="admin").exclude(profile__role=""), key=lambda x: random.random())
-    return _success_response({
+    resp = {
         "users":[user_json(user, request) for user in users],
         "request_user":user_json(request.user, request),
-    })
+    }
+    print("DEBUG GET ALL USERS TIME:", time.time() - start_time)
+    return _success_response(resp)
 
 @login_required
 def get_all_users_roommate(request):
