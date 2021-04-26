@@ -426,11 +426,9 @@ export default {
                 });
             }
             else{
-                this.failure_text = "别调皮，还没开呢！";
-                this.failure_snack = true;
-                // this.dialogRole = role;
-                // this.roleDialog = true;
-                // this.getSkills();
+                this.dialogRole = role;
+                this.roleDialog = true;
+                this.getSkills();
             }
         },
         add_tag(tag){
