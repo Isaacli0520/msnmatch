@@ -17,8 +17,7 @@
                 <div class="top-part-wrapper">
                     <v-row justify="center">
                         <div style="text-align: center;">
-                            <!-- <h1 class="title-text">MSN Mentor-Mentee Match</h1> -->
-                            <h1 class="title-text">Mentee-Mentor Match</h1>
+                            <h1 class="title-text">MATCH</h1>
                             <!-- <h4 class="subtitle-text">Search for existing tags or add your own tags</h4> -->
                         </div>
                     </v-row>
@@ -55,7 +54,7 @@
                     </v-row>
                     <v-row justify="center" v-if="request_user.role == '' ">
                         <div style="text-align:center; margin-top:13px;">
-                            <!-- <v-btn style="margin-right: 10px;" outlined color="teal lighten-1" @click="openRoleDialog('Mentor')">Be A Mentor</v-btn> -->
+                            <v-btn style="margin-right: 10px;" outlined color="teal lighten-1" :loading="mentorBtnLoading" @click="openRoleDialog('Mentor')">Be A Mentor</v-btn>
                             <v-btn outlined color="teal lighten-1" @click="openRoleDialog('Mentee')">Be A Mentee</v-btn>
                         </div>
                     </v-row>
@@ -76,20 +75,15 @@
                     </v-row>
                     <v-row justify="center">
                         <div v-if="request_user.role == '' " style="text-align:center;">
-                            <small class="muted-text">*Note that you have to be a mentor/mentee to appear in the user list and perform any actions</small>
+                            <small class="muted-text">*Note that you have to be a mentor/mentee to appear in the user list</small>
                         </div>
                     </v-row>
                 </div>
                 <!-- <v-divider style="margin-left:13px;margin-right:13px;"></v-divider> -->
                 <v-row>
                     <v-col
-                        v-for="(user, i) in users"
-                        :key="i"
-                        cols="12"
-                        sm="6"
-                        md="4"
-                        lg="4"
-                        xl="3">
+                        v-for="(user, i) in users" :key="i"
+                        cols="12" sm="6" md="4" lg="4" xl="3">
                         <user-card
                             class="fill-height"
                             :user_index="i"
@@ -106,35 +100,93 @@
             @add-to-fav="addToFav"
             @del-from-fav="deleteFromFav"
             v-model="userDialog"></user-dialog>
-        <v-dialog v-model="roleDialog" scrollable min-width="200px" max-width="600px">
-            <v-card>
-                <v-card-title>Be a {{dialogRole}}</v-card-title>
-                <v-divider></v-divider>
-                <v-card-text v-if="dialogRole=='Mentor'" style="color:black;margin-top:21px; font-size:16px;font-weight:500;">
-                    <p style="font-size:19x;font-weight:600;">成为Mentor需要做到什么？</p>
-                    <p>1.第一时间联系你的Mentee，让TA感受到夏村大家庭的温暖和友好，并尽量在国内就开始与新生进行线上线下的交流。</p>
-                    <p>2.能够耐心地解决新生的问题，主动向新生分享自己的资源和经历。</p>
-                    <p>3.给予新生支持，鼓励新生尝试新的事物，融入美国校园，并积极带领新手感受夏村的生活</p>
-                    <p>4.帮助一起建设MSN Hoos My Professor网站，分享学术方面的经历，从而帮助建立新生选课的指南。</p>
-                    <p style="font-size:19x;font-weight:600;">Be a Mentor</p>
-                    <p>如果你觉得自己可以做到以上几点</p>
-                    <p>且已经累计填写过<strong style="color:red;">3条多于15字的Hoos My Professor课程评价</strong></p>
-                    <p>那么点击Yes即可成为Mentor!</p>
-                    <p>Do you really want to be a <strong>{{dialogRole}}</strong>?</p>
-                    <p style="font-size:14px; margin-bottom:0px !important;" class="muted-text">*Note that your role can only be changed by the mentor program chair once you've made your choice.</p>
-                </v-card-text>
-                <v-card-text v-if="dialogRole=='Mentee'" style="color:black;margin-top:21px; font-size:16px;font-weight:500;">
-                    <p style="font-size:19x;font-weight:600;">你是否要成为Mentee？</p>
-                    <p>点击Yes即可成为Mentee!</p>
-                    <p style="font-size:14px; margin-bottom:0px !important;" class="muted-text">*Note that your role can only be changed by the mentor program chair once you've made your choice.</p>
-                </v-card-text>
-                <v-divider></v-divider>
-                <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn color="green darken-1" :loading="roleBtnLoading" outlined @click="setRole(dialogRole)">Yes</v-btn>
-                    <v-btn color="red lighten-1" outlined @click="roleDialog = false">No</v-btn>
-                </v-card-actions>
-            </v-card>
+        <v-dialog v-if="loaded" v-model="roleDialog" scrollable min-width="350px" max-width="800px">
+            <v-stepper v-model="current_step">
+                <v-stepper-header>
+                    <v-stepper-step :complete="current_step > 1" step="1">
+                        Basic Info
+                    </v-stepper-step>
+                    <v-stepper-step :complete="current_step > 2" step="2">
+                        Add Tags
+                    </v-stepper-step>
+                    <v-stepper-step :complete="current_step > 3" step="3">
+                        Be a {{dialogRole}}!
+                    </v-stepper-step>
+                </v-stepper-header>
+                <v-stepper-items>
+                    <v-stepper-content step="1">
+                        <v-card class="stepper-card">
+                            <profile-edit 
+                                editBtnName="Edit & Continue"
+                                :username="request_user.username" 
+                                @edit-success="editSuccess" 
+                                @enable-snack="enableSnack" />
+                        </v-card>
+                        <v-btn class="stepper-continue-btn" @click="roleDialog=false;">Cancel</v-btn>
+                    </v-stepper-content>
+                    <v-stepper-content step="2">
+                        <v-card class="stepper-card">
+                            <v-card-title>Add Your Interests</v-card-title>
+                            <v-divider/>
+                            <div class="ma-4">
+                                <h4 class="stepper-tags-text">Add your interests by clicking on the tags below.</h4>
+                                <h4 class="stepper-tags-text">You must add at least 3 tags to continue.</h4>
+                                <h4 class="stepper-tags-text">You can always add more tags on the Tags page.</h4>
+                                <h2 class="mt-3 your-tags">Your Tags</h2>
+                                <div class="skill-tags mb-3">
+                                    <template v-for="(skills_of_type, skills_type_name) in user_skills">
+                                        <tag-span v-for="skill in skills_of_type"
+                                            :key="skill.id"
+                                            :skill="skill"
+                                            clickable="delete"
+                                            @add-skill="addSkill"
+                                            @del-skill="deleteSkill"
+                                        />
+                                    </template>
+                                </div>
+                                <div :key="skills_type_name" v-for="(skills_of_type, skills_type_name) in all_skills">
+                                    <h3 class="skill-type-text">{{skill_type_names[skills_type_name]}}</h3>
+                                    <div class="skill-tags">
+                                        <tag-span v-for="skill in skills_of_type"
+                                            :key="skill.skill_pk"
+                                            :skill="skill"
+                                            :clickable="'add'"
+                                            @add-skill="addSkill"
+                                            @del-skill="deleteSkill"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </v-card>
+                        <v-btn class="stepper-continue-btn" color="primary" :disabled="user_skills_count < 3" @click="current_step=3">Continue</v-btn>
+                        <v-btn class="stepper-continue-btn" color="light-blue darken-1" dark @click="current_step = current_step - 1">Back</v-btn>
+                        <v-btn class="stepper-continue-btn" @click="roleDialog=false;">Cancel</v-btn>
+                    </v-stepper-content>
+                    <v-stepper-content step="3">
+                        <v-card class="stepper-card">
+                            <div v-if="dialogRole == 'Mentor'" class="ma-4">
+                                <p style="font-size:19x;font-weight:600;">成为Mentor需要做到什么？</p>
+                                <p>1.第一时间联系你的Mentee，让TA感受到夏村大家庭的温暖和友好，并尽量在国内就开始与新生进行线上线下的交流。</p>
+                                <p>2.能够耐心地解决新生的问题，主动向新生分享自己的资源和经历。</p>
+                                <p>3.给予新生支持，鼓励新生尝试新的事物，融入美国校园，并积极带领新手感受夏村的生活</p>
+                                <p>4.帮助一起建设MSN Hoos My Professor网站，分享学术方面的经历，从而帮助建立新生选课的指南。</p>
+                                <p style="font-size:19x;font-weight:600;">Be a Mentor</p>
+                                <p>如果你觉得自己可以做到以上几点</p>
+                                <p>那么点击Yes即可成为Mentor!</p>
+                                <p>Do you really want to be a <strong>{{dialogRole}}</strong>?</p>
+                            </div>
+                            <div v-else class="ma-4">
+                                <p style="font-size:19x;font-weight:600;">你是否要成为Mentee？</p>
+                                <p>点击Yes即可成为Mentee!</p>
+                                <p style="font-size:14px; margin-bottom:0px !important;" class="muted-text">*Note that your role can only be changed by the mentor program chair once you've made your choice.</p>
+                            </div>
+                        </v-card>
+                        <v-btn class="stepper-continue-btn" color="primary" :loading="roleBtnLoading" @click="setRole(dialogRole)">Yes</v-btn>
+                        <v-btn class="stepper-continue-btn" color="light-blue darken-1" dark @click="current_step = current_step - 1">Back</v-btn>
+                        <v-btn class="stepper-continue-btn" @click="roleDialog=false;">Cancel</v-btn>
+                    </v-stepper-content>
+                </v-stepper-items>
+            </v-stepper>
         </v-dialog>
         <v-snackbar
             top
@@ -143,7 +195,7 @@
             :timeout="1800">
             {{success_text}}
             <template v-slot:action="{ attrs }">
-            <v-btn color="cyan accent-1" v-bind="attrs" text @click="success_snack = false"> Close </v-btn>
+                <v-btn color="cyan accent-1" v-bind="attrs" text @click="success_snack = false"> Close </v-btn>
             </template>
         </v-snackbar>
         <v-snackbar
@@ -153,9 +205,19 @@
             :timeout="2700">
             {{failure_text}}
             <template v-slot:action="{ attrs }">
-            <v-btn color="white" v-bind="attrs" text @click="failure_snack = false"> Close </v-btn>
+                <v-btn color="white" v-bind="attrs" text @click="failure_snack = false"> Close </v-btn>
             </template>
-            </v-snackbar>
+        </v-snackbar>
+        <v-snackbar
+            top
+            v-model="video_snack"
+            color="purple lighten-1"
+            :timeout="3200">
+            Video may take longer to upload. Be patient :)
+            <template v-slot:action="{ attrs }">
+                <v-btn color="white" v-bind="attrs" text @click="video_snack = false"> Close </v-btn>
+            </template>
+        </v-snackbar>
     </v-app>
 </template>
 
@@ -165,6 +227,8 @@ import axios from 'axios'
 import MatchHeader from '../components/MatchHeader'
 import UserDialog from '../components/UserDialog'
 import UserCard from '../components/UserCard'
+import ProfileEdit from '../components/ProfileEdit'
+import TagSpan from '../components/TagSpan'
 // import { MatchHeader, UserDialog, UserCard } from "../components"
 axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 axios.defaults.xsrfCookieName = "csrftoken";
@@ -185,6 +249,7 @@ export default {
             backup_all_users: [],
             // Dialog
             dialogRole:"Mentor",
+            mentorBtnLoading:false,
             roleBtnLoading:false,
             userDialog:false,
             roleDialog:false,
@@ -197,12 +262,30 @@ export default {
             success_text:"",
             failure_snack:false,
             success_snack:false,
+            video_snack:false,
+            // Stepper
+            current_step:1,
+            // Tags
+            all_skills:{},
+            user_skills:{},
+            skill_type_names:{
+                "Game":"Game",
+                "Academic":"Academic Interests",
+                "Film and TV":"Film and TV",
+                "Sport":"Sport",
+                "Music":"Music",
+                "Language":"Language",
+                "General":"General",
+                "Books":"Books",
+            },
         }
     },
     components:{
         MatchHeader,
         UserCard,
         UserDialog,
+        ProfileEdit,
+        TagSpan,
     },
     watch: {
         tags(val){
@@ -216,8 +299,70 @@ export default {
             else
                 return this.users[this.dialog_user_index];
         },
+        user_skills_count(){
+            if(Object.keys(this.user_skills).length == 0)
+                return 0
+            return Object.values(this.user_skills).map(arr => arr.length).reduce((a, b) => a + b);
+        },
     },
     methods: {
+        getSkills(){
+            axios.get('/users/api/get_all_and_user_skills/').then(response => {
+                this.all_skills = response.data.all_skills;
+                this.user_skills = response.data.user_skills;
+                this.loaded = true;
+            });
+        },
+        addSkill(skill){
+            axios.post("/skills/api/user_add_skill/", {
+                "id":skill.id,
+                "name":skill.name,
+            }).then(response => {
+                if(response.data.success){
+                    let tmp_skill = JSON.parse(JSON.stringify(skill));
+                    tmp_skill.id = response.data.id;
+                    let all_skill_pos = this.all_skills[skill.type].map(function(e) { return e.id; }).indexOf(tmp_skill.id);
+                    this.user_skills[tmp_skill.type].splice(-1, 0, tmp_skill);
+                    if(all_skill_pos != -1)
+                        this.all_skills[tmp_skill.type].splice(all_skill_pos, 1);
+                    // this.success_text = "Tag Added"
+                    // this.success_snack = true;
+                }else{
+                    this.failure_text = "Sth is wrong";
+                    this.failure_snack = true;
+                }
+            });
+        },
+        deleteSkill(skill){
+            axios.post("/skills/api/user_del_skill/", {
+                "id":skill.id,
+            }).then(response => {
+                if(response.data.success){
+                    let user_skill_pos = this.user_skills[skill.type].map(function(e) { return e.id; }).indexOf(skill.id);
+                    if(user_skill_pos != -1)
+                        this.user_skills[skill.type].splice(user_skill_pos, 1);
+                    if (skill.type != "Custom"){
+                        this.all_skills[skill.type].push(skill);
+                    }
+                    // this.success_text = "Tag Deleted"
+                    // this.success_snack = true;
+                }else{
+                    this.failure_text = "Sth is wrong";
+                    this.failure_snack = true;
+                }
+            });
+        },
+        enableSnack(snack){
+            if(snack == "video_snack")
+                this.video_snack = true;
+            else if(snack == "failure_snack"){
+                this.failure_text = "Sth is wrong";
+                this.failure_snack = true;
+            }
+        },
+        editSuccess(){
+            this.current_step = 2;
+        },
         addToFav(user){
             this.changeFav(user, true);
         },
@@ -259,9 +404,32 @@ export default {
             });
             
         },
+        checkMentorRequirements(){
+            return axios.get('/users/api/check_mentor_requirements/',{params: {}}).then(response => {
+                this.mentorBtnLoading = false;
+                return response.data.valid;
+            });
+        },
         openRoleDialog(role){
-            this.dialogRole = role;
-            this.roleDialog = true;
+            if(role == "Mentor"){
+                this.mentorBtnLoading = true;
+                this.checkMentorRequirements().then(valid =>{
+                    if(!valid){
+                        this.failure_text = "你本学期大概是没填够三条大于15字的HoosMyProfessor课程评价";
+                        this.failure_snack = true;
+                    }
+                    else{
+                        this.dialogRole = role;
+                        this.roleDialog = true;
+                        this.getSkills();
+                    }
+                });
+            }
+            else{
+                this.dialogRole = role;
+                this.roleDialog = true;
+                this.getSkills();
+            }
         },
         add_tag(tag){
             this.tags.push(tag);
@@ -373,7 +541,7 @@ export default {
                     }
                     else if(["major"].indexOf(field_tag) != -1){
                         let tmp_cutoff = ref.options.cutoff;
-                        ref.options.cutoff = 70;
+                        ref.options.cutoff = 90;
                         tmp_all_users = ref.fuzzy_search(tmp_all_users, ['major', 'major_two', 'minor'], field_query);
                         ref.options.cutoff = tmp_cutoff;
                     }
@@ -484,7 +652,52 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
+
+    /* Magic for improving fps on MAC chrome */
+    .v-image__image{
+        /* transform:translatez(0) !important;
+        -webkit-transform:translatez(0) !important; */
+        transform: translate3d(0,0,0);
+        -webkit-transform: translate3d(0,0,0);
+    }
+
+    .stepper-tags-text{
+        /* text-align: center; */
+        font-weight: 500 !important;
+        color:#7e7e7e;
+        font-family: Roboto,sans-serif !important;
+    }
+
+    .stepper-continue-btn{
+        margin: 10px 5px 2px 3px;
+        float: right;
+    }
+
+    .your-tags{
+        color: #8f39ff;
+        font-family: Palatino, URW Palladio L, serif;
+    }
+
+    .skill-type-text{
+        color: #32a49a;
+        font-family: Palatino, URW Palladio L, serif;
+    }
+
+    .skill-tags{
+        display: flex;
+        flex-flow: row wrap;
+        width:100%;
+        margin: 5px 0px 20px 0px;
+    }
+
+    .stepper-card{
+        margin: 5px;
+        overflow: scroll;
+        min-height: 300px;
+        max-height: 450px;
+    }
+
     .content-div{
         position: relative;
         background: url('../assets/static/css/images/cloud_bg_new_02.jpg') no-repeat;
@@ -513,8 +726,9 @@ export default {
     .title-text{
         color:#32a49a; 
         font-size:45px;
-        font-weight: 500 !important;
-        font-family: Times, serif !important;
+        letter-spacing: 0.06em;
+        font-weight: 300 !important;
+        font-family: "Roboto", sans-serif;
     }
 
     .all-buttons{
@@ -581,6 +795,10 @@ export default {
         outline: none;
     }
 
+    .v-stepper__content{
+        padding: 16px;
+    }
+
     @media (min-width: 1025px) {
         
     }
@@ -596,6 +814,19 @@ export default {
 
 
     @media (min-width: 10px) and (max-width: 767px) {
+        .stepper-card{
+            margin: 2px;
+            max-height: 380px;
+        }
+
+        .v-stepper__content{
+            padding: 12px;
+        }
+
+        .stepper-continue-btn{
+            margin: 10px 2px 1px 4px;
+        }
+
         .title-text{
             font-size:35px !important;
         }

@@ -12,6 +12,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 SECRET_KEY = config('SECRET_KEY')
 
+HMP_CHECK_TIME = config("HMP_CHECK_TIME")
+
 DEBUG = config("DEBUG",cast=bool)
 
 ITEM_NAME_TH = config("ITEM_NAME_TH")
@@ -191,7 +193,7 @@ CORS_ALLOW_HEADERS = list(default_headers) + [
 CORS_ALLOWED_ORIGINS = config("CORS_ALLOWED_ORIGINS", cast=Csv())
 CORS_ALLOW_CREDENTIALS = True
 
-# AWS_DEFAULT_ACL = None
+AWS_DEFAULT_ACL = "public-read"
 
 AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')

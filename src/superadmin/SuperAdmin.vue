@@ -5,7 +5,7 @@
                 <div class="big-title text-center mt-3 mb-3">
                     <span>Super Cool Admin Page</span>
                 </div>
-                <v-row>
+                <v-row v-if="false">
                     <v-col cols="4">
                         <v-card>
                             <v-row justify="center">
@@ -58,7 +58,7 @@
                         </v-card>
                     </v-col>
                 </v-row>
-                <v-expansion-panels v-if="false" multiple>
+                <v-expansion-panels multiple>
                     <v-expansion-panel :key="user.pk" v-for="user in all_users_list">
                         <v-expansion-panel-header>
                             <div style="clear:both;display:block;">

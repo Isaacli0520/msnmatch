@@ -4,9 +4,12 @@ from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector, TrigramSimilarity
 from django.db.models import Q
+from django.db.models.functions import Length
 
 import json
 import random
+import datetime
+import time
 
 from friendship.models import Friend, Follow
 from skills.models import Skill
@@ -28,6 +31,36 @@ def update_profile(request, username):
     return render(request, 'profile_edit.html')
 
 @login_required
+def get_match_header(request):
+    following = Follow.objects.following(request.user)
+    flw_ret = []
+    for flw in following:
+        if flw.profile.picture:
+            picture_url = flw.profile.picture.url
+        else:
+            picture_url = settings.STATIC_URL + "css/images/brand.jpg"
+        new_flw = {
+            "pk": flw.pk,
+            "picture": picture_url,
+            "user_url": "/users/"+flw.username+"/",
+            "first_name": flw.first_name,
+            "last_name": flw.last_name,
+        }
+        flw_ret.append(new_flw)
+    return _success_response({
+        "user":{
+            "first_name":request.user.first_name,
+            "last_name":request.user.last_name,
+            "role":request.user.profile.role,
+        },
+        "profile_urls":{
+            "profile": reverse('profile', args=[request.user.username]),
+            "update_profile":reverse('update_profile', args=[request.user.username]),
+        },
+        "following":flw_ret,
+    })
+
+@login_required
 def get_user_match_header(request):
     return _success_response({
         "user":{
@@ -46,11 +79,14 @@ def get_all_and_user_skills(request):
 
 @login_required
 def get_all_users(request):
+    start_time = time.time()
     users = sorted(User.objects.all().exclude(username="admin").exclude(profile__role=""), key=lambda x: random.random())
-    return _success_response({
+    resp = {
         "users":[user_json(user, request) for user in users],
         "request_user":user_json(request.user, request),
-    })
+    }
+    print("DEBUG GET ALL USERS TIME:", time.time() - start_time)
+    return _success_response(resp)
 
 @login_required
 def get_all_users_roommate(request):
@@ -132,12 +168,24 @@ def choose_roommate_role(request):
         return _get_not_allowed()
 
 @login_required
+def check_mentor_requirements(request):
+    if request.method == "GET":
+        dt = datetime.datetime.strptime(settings.HMP_CHECK_TIME, '%Y-%m-%d')
+        user_review_num = request.user.courseuser_set.annotate(length=Length("text")).filter(length__gt=15, date__gt=dt).count()
+        if user_review_num < 3:
+            return _success_response({"valid":False})
+        return _success_response({"valid":True}) 
+    if request.method == "POST":
+        return _post_not_allowed()
+
+@login_required
 def choose_role(request):
     if request.method == "POST":
         post = json.loads(request.body)
         tmp_role = post.get("role")
         if tmp_role == "Mentor" and request.user.profile.role == "":
-            user_review_num = request.user.courseuser_set.annotate(length=Length("text")).filter(length__gt=15).count()
+            dt = datetime.datetime.strptime(settings.HMP_CHECK_TIME, '%Y-%m-%d')
+            user_review_num = request.user.courseuser_set.annotate(length=Length("text")).filter(length__gt=15, date__gt=dt).count()
             if user_review_num < 3:
                 return _error_response("You don't have enough course comments.")
             request.user.profile.role = "Mentor"
@@ -229,6 +277,7 @@ def user_json(user, request, personal_profile = False):
         "bio": user.profile.bio,
         "location": user.profile.location,
         "year": year,
+        "graduate_year": user.profile.graduate_year,
         "sex":user.profile.sex,
         "role":user.profile.role,
         "major": user.profile.major,

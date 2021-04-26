@@ -236,7 +236,7 @@ def get_course_instructors(request):
 
 @login_required
 def get_reviews(request):
-    cs_users = CourseUser.objects.filter(user=request.user, take="taken")
+    cs_users = CourseUser.objects.filter(user=request.user)
     reviews_arr = [cs_user for cs_user in cs_users if cs_user.text]
     return _success_response({
         "reviews":[get_json_of_review(review) for review in reviews_arr]

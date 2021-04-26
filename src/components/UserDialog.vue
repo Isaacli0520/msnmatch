@@ -88,10 +88,10 @@
             <v-divider></v-divider>
             <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="purple darken-1" outlined :loading="addFavBtnLoading" v-if="add_to_fav && !user.follow" @click="addFav(user)">Add to Favorite</v-btn>
-                <v-btn color="purple darken-1" outlined :loading="delFavBtnLoading" v-if="add_to_fav && user.follow" @click="delFav(user)">Remove from Favorite</v-btn>
-                <v-btn color="purple darken-1" outlined v-if="edit" :href="'/users/'+user.username+'/edit/'">Edit</v-btn>
-                <v-btn color="blue darken-1" outlined @click.native="$emit('input')">Close</v-btn>
+                <v-btn color="purple darken-1" dark :loading="addFavBtnLoading" v-if="add_to_fav && !user.follow" @click="addFav(user)">Add to Favorite</v-btn>
+                <v-btn color="purple darken-1" dark :loading="delFavBtnLoading" v-if="add_to_fav && user.follow" @click="delFav(user)">Remove from Favorite</v-btn>
+                <v-btn color="purple darken-1" dark v-if="edit" :href="'/users/'+user.username+'/edit/'">Edit</v-btn>
+                <v-btn color="primary"  @click.native="$emit('input')">Close</v-btn>
             </v-card-actions>
         </v-card>
         <v-snackbar

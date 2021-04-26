@@ -187,7 +187,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
 	methods: {
         setRoommateRole(rm){
             this.roleBtnLoading = true;
-            axios.post('/skills/api/choose_roommate_role/',{"rm":rm}).then(response => {
+            axios.post('/users/api/choose_roommate_role/',{"rm":rm}).then(response => {
                 this.roleDialog = false;
                 this.roleBtnLoading = false;
                 if(response.data.success){
@@ -232,7 +232,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
             this.userDialog = false;
         },
         getAllUsers(){
-            axios.get('/skills/api/get_all_users_roommate/',{params: {}}).then(response => {
+            axios.get('/users/api/get_all_users_roommate/',{params: {}}).then(response => {
                 this.backup_all_users = response.data.users;
                 this.users = response.data.users;
                 this.request_user = response.data.request_user;
