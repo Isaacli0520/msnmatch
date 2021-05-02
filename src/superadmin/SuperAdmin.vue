@@ -197,7 +197,7 @@ export default {
         matchUser(user_1_pk, user_2_pk){
             this.match_text = "Do you really wanna match "
              + this.all_users[user_1_pk].first_name + this.all_users[user_1_pk].last_name
-             + " with " + + this.all_users[user_2_pk].first_name + this.all_users[user_2_pk].last_name
+             + " with " + this.all_users[user_2_pk].first_name + this.all_users[user_2_pk].last_name
              + "?";
             this.user_1_pk = user_1_pk;
             this.user_2_pk = user_2_pk;

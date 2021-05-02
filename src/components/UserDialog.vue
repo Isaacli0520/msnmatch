@@ -63,7 +63,7 @@
                             </tr>
                             <tr v-if="user.bio">
                                 <td style="vertical-align:top;" class="field-title">Bio</td>
-                                <td>{{user.bio}}</td>
+                                <td style="word-break:break-word;">{{user.bio}}</td>
                             </tr>
                             <tr v-if="rm">
                                 <td style="vertical-align:top;" class="field-title">Roommate Bio</td>

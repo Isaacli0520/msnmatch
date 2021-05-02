@@ -375,6 +375,7 @@ export default {
                 {"values":"Global Studies in Education Minor", "text":"Global Studies in Education Minor"},
                 {"values":"Health and Wellbeing Minor", "text":"Health and Wellbeing Minor"},
                 {"values":"Minor in Data Science", "text":"Minor in Data Science"},
+                {"values":"Minor in Data Analytics", "text":"Minor in Data Analytics"},
                 {"values":"Public Policy and Leadership Minor", "text":"Public Policy and Leadership Minor"},
             ],
                 // {'value':'Accelerated B.A./Master of Public Policy (MPP) Program', 'text':'Accelerated B.A./Master of Public Policy (MPP) Program'},
