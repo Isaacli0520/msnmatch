@@ -6,7 +6,7 @@
         :ripple="false"
         @click=openUserDialog>
         <v-img 
-            aspect-ratio="1.5"
+            aspect-ratio="1.33333333"
             contain
             :src="user.picture">
         </v-img>
@@ -15,9 +15,10 @@
         <!-- <v-card-title>{{user.first_name + " " + user.last_name}}</v-card-title> -->
         <div style="padding-top: 10px; padding-bottom:0px;">
             <div class="title-div">
-                <span class="cus-title" style="float:left;">{{user.first_name + " " + user.last_name}}</span>
-                <span v-if="user.follow" class="role-title fav-title" style="float:right;">Fav</span>
-                <span v-if="display_role" :class="['role-title', user.role=='Mentor' ? 'mentor-title':'', user.role=='Mentee' ? 'mentee-title':'']" style="float:right;">{{user.role}}</span>
+                <span class="cus-title" style="float:left;">{{full_name}}</span>
+                <span v-if="user.video.length" class="card-tag video-tag">Video</span>
+                <span v-if="user.follow" class="card-tag fav-tag">Fav</span>
+                <span v-if="display_role" :class="['card-tag', user.role=='Mentor' ? 'mentor-tag':'', user.role=='Mentee' ? 'mentee-tag':'']">{{user.role}}</span>
             </div>
         </div>
         <div class="major-div">
@@ -54,12 +55,22 @@ export default{
     watch:{
     },
     computed:{
-        
+        full_name(){
+            if(this.isChinese(this.user.first_name) && this.isChinese(this.user.last_name)){
+                return this.user.last_name + this.user.first_name;
+            }
+            else{
+                return this.user.first_name + " " + this.user.last_name
+            }
+        },
     },
     methods:{
         openUserDialog(){
             this.$emit('open-user-dialog', this.user_index);
         },
+        isChinese(str){
+            return /[\u3400-\u9FBF]/.test(str);
+        }
     },
     mounted(){
     },
@@ -84,7 +95,8 @@ export default{
         letter-spacing: 0.0125em;
     }
 
-    .role-title{
+    .card-tag{
+        float: right;
         font-family: "Roboto", sans-serif !important;
         font-weight: 700 !important;
         align-items: center;
@@ -95,16 +107,19 @@ export default{
         color: white;
         border-radius: 5px;
     }
+    .video-tag{
+        background-color: rgb(185, 37, 214);
+    }
 
-    .fav-title{
+    .fav-tag{
         background-color: rgb(255, 78, 55);
     }
 
-    .mentee-title{
+    .mentee-tag{
         background-color: rgb(61, 199, 80);
     }
 
-    .mentor-title{
+    .mentor-tag{
         background-color: rgb(65, 194, 211);
     }
 
