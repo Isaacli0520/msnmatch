@@ -16,7 +16,7 @@
         <div style="padding-top: 10px; padding-bottom:0px;">
             <div class="title-div">
                 <span class="cus-title" style="float:left;">{{full_name}}</span>
-                <span v-if="user.video.length" class="card-tag video-tag">Video</span>
+                <span v-if="user.video && user.video.length" class="card-tag video-tag">Video</span>
                 <span v-if="user.follow" class="card-tag fav-tag">Fav</span>
                 <span v-if="display_role" :class="['card-tag', user.role=='Mentor' ? 'mentor-tag':'', user.role=='Mentee' ? 'mentee-tag':'']">{{user.role}}</span>
             </div>
