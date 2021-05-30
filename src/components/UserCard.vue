@@ -16,8 +16,9 @@
         <div style="padding-top: 10px; padding-bottom:0px;">
             <div class="title-div">
                 <span class="cus-title" style="float:left;">{{full_name}}</span>
+                <span v-if="'matched' in user && user.matched" class="card-tag match-tag">Matched</span>
                 <span v-if="user.video && user.video.length" class="card-tag video-tag">Video</span>
-                <span v-if="user.follow" class="card-tag fav-tag">Fav</span>
+                <span v-if="!superadmin && user.follow" class="card-tag fav-tag">Fav</span>
                 <span v-if="display_role" :class="['card-tag', user.role=='Mentor' ? 'mentor-tag':'', user.role=='Mentee' ? 'mentee-tag':'']">{{user.role}}</span>
             </div>
         </div>
@@ -33,6 +34,10 @@
 
 export default{
     props: {
+        superadmin:{
+            type:Boolean,
+            default:false,
+        },
         user:{
             type:Object,
             default:null,
@@ -107,6 +112,11 @@ export default{
         color: white;
         border-radius: 5px;
     }
+
+    .match-tag{
+        background-color: #ffc13c;
+    }
+
     .video-tag{
         background-color: rgb(185, 37, 214);
     }
