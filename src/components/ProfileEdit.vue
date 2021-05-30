@@ -77,11 +77,11 @@
                     label="Minor"
                     ></v-select>
 
-                    <v-text-field
+                    <!-- <v-text-field
                     v-model="edit_user.wechat"
                     :rules="wechatRules"
                     label="WeChat ID"
-                    ></v-text-field>
+                    ></v-text-field> -->
 
                     <v-textarea
                     v-model="edit_user.bio"

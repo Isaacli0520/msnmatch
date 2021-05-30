@@ -107,10 +107,10 @@
                                         <col class="right-td" />
                                     </colgroup>
                                     <tbody>
-                                        <tr v-if="user.wechat">
+                                        <!-- <tr v-if="user.wechat">
                                             <td>WeChat ID</td>
                                             <td>{{ user.wechat }}</td>
-                                        </tr>
+                                        </tr> -->
                                         <tr>
                                             <td>Email</td>
                                             <td>{{ user.email }}</td>

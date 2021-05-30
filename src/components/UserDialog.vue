@@ -45,10 +45,10 @@
                                 <td class="field-title">Role</td>
                                 <td>{{user.role}}</td>
                             </tr>
-                            <tr v-if="user.wechat">
+                            <!-- <tr v-if="user.wechat">
                                 <td class="field-title">WeChat ID</td>
                                 <td>{{user.wechat}}</td>
-                            </tr>
+                            </tr> -->
                             <!-- <tr v-if="user.birth_date">
                                 <td class="field-title">Birth Date</td>
                                 <td>{{user.birth_date}}</td>
