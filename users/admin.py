@@ -102,11 +102,11 @@ def export_users(modeladmin, request, queryset):
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="users_list.csv"'
     writer = csv.writer(response)
-    writer.writerow(['username','sex', 'matched', 'email', 'first_name', 'last_name', 'is_staff', 'location', 'role','year','birth_date','major','skills'])
-    all_users = queryset.values_list('username','profile__sex', 'profile__matched', 'email', 'first_name', 'last_name', 'is_staff', 'profile__location', 'profile__role','profile__year','profile__birth_date','profile__major')
+    writer.writerow(['username','sex', 'wechat_id', 'email', 'first_name', 'last_name', 'location', 'role','graduate_year','major',])
+    all_users = queryset.values_list('username','profile__sex', 'profile__wechat', 'email', 'first_name', 'last_name', 'profile__location', 'profile__role','profile__graduate_year','profile__major')
     for user in all_users:
         # print(user)
-        writer.writerow(list(user) + [" ".join([skr.skill_name for skr in User.objects.get(username=user[0]).skill_set.all()])])
+        writer.writerow(list(user))
         # writer.writerow(user)
     return response
 export_users.short_description = 'Export to csv'
