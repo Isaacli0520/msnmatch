@@ -86,6 +86,7 @@
                                             <user-card
                                                 class="fill-height"
                                                 @open-user-dialog="matchUser(us_pk, user.pk)"
+                                                :superadmin="true"
                                                 :user="all_users[us_pk]"></user-card>
                                         </v-col>
                                     </v-row>
@@ -106,6 +107,7 @@
                                             <user-card
                                                 class="fill-height"
                                                 @open-user-dialog="matchUser(us_pk, user.pk)"
+                                                :superadmin="true"
                                                 :user="all_users[us_pk]"></user-card>
                                         </v-col>
                                     </v-row>
@@ -145,7 +147,9 @@
             color="teal darken-1"
             :timeout="2700">
             Users matched
-            <v-btn color="cyan accent-1" text @click="success_snack = false"> Close </v-btn>
+            <template v-slot:action="{ attrs }">
+                <v-btn color="cyan accent-1" v-bind="attrs" text @click="success_snack = false"> Close </v-btn>
+            </template>
         </v-snackbar>
     </v-app>
 </template>
@@ -196,8 +200,8 @@ export default {
         },
         matchUser(user_1_pk, user_2_pk){
             this.match_text = "Do you really wanna match "
-             + this.all_users[user_1_pk].first_name + this.all_users[user_1_pk].last_name
-             + " with " + + this.all_users[user_2_pk].first_name + this.all_users[user_2_pk].last_name
+             + this.all_users[user_1_pk].first_name + " " + this.all_users[user_1_pk].last_name
+             + " with " + this.all_users[user_2_pk].first_name + " " + this.all_users[user_2_pk].last_name
              + "?";
             this.user_1_pk = user_1_pk;
             this.user_2_pk = user_2_pk;

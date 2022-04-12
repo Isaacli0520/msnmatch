@@ -131,6 +131,7 @@ MINORS = [
     "Global Studies in Education Minor",
     "Health and Wellbeing Minor",
     "Minor in Data Science",
+    "Minor in Data Analytics",
     "Public Policy and Leadership Minor",
 ]
 
