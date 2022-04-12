@@ -22,6 +22,7 @@ type_dict = {
 	"WKS":"Workshop",
 }
 semester_ids = {
+	"2016Spring":"1162",
 	"2016Fall":"1168",
 	"2017Spring":"1172",
 	"2017Fall":"1178",
@@ -34,7 +35,16 @@ semester_ids = {
 	"2021Spring":"1212",
 	"2021Fall":"1218",
 	"2022Spring":"1222",
+	"2022Fall":"1228"
 }
+
+start_year = 2016
+start_id = 1162
+def calc_semester_id(semester):
+	if re.match(r'2[0-9]{3}(Spring|Fall)$', semester) is None:
+		return None
+	year, season = int(semester[:4]), semester[4:]
+	return start_id + (year - start_year) * 10 + 6 * int(season=="Fall")
 
 
 class Command(BaseCommand):
@@ -43,10 +53,13 @@ class Command(BaseCommand):
 
 	def handle(self, *args, **kwargs):
 		semester = kwargs["semester_id"]
-		if semester not in semester_ids:
-			print("Wrong semester")
+		# if semester not in semester_ids:
+		# 	print("Wrong semester")
+		# 	return
+		semester_id = calc_semester_id(semester)
+		if semester_id is None:
+			print("Wrong Semester")
 			return
-		semester_id = semester_ids[semester]
 		new_data = {
 			"Semester": semester_id,
             "Group": 'CS',
