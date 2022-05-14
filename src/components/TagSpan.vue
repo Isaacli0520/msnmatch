@@ -132,4 +132,9 @@ export default{
         color:#ffffff;
         background-color: #e7544f;
     }
+
+    .MBTI{
+        color:#ffffff;
+        background-color: #ff6a50;
+    }
 </style>
