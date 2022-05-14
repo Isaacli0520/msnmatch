@@ -225,7 +225,7 @@ User.add_to_class("__str__", get_name)
 
 def get_user():
     print("hellooooooooooooo user")
-    user = User.objects.get(username="admin")
+    user = User.objects.get_or_create(username="default")
     return user
 
 class PlanProfile(models.Model):

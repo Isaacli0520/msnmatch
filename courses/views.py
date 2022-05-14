@@ -185,6 +185,8 @@ def report_bug(request):
 def get_top_reviews(request):
     # time_start = time.time()
     reviews = CourseUser.objects.annotate(length=Length("text")).filter(Q(length__gt=45) & Q(take="taken"))
+    if reviews.count() == 0:
+        return _success_response({"reviews":[]})
     tot = sum([review.length for review in reviews])
     reviews_prob = [review.length * 1.0 / tot for review in reviews]
     K = 10

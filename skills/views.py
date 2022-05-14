@@ -14,7 +14,7 @@ MAXIMUM_SKILLS = 4
 SKILL_TYPES = [
     "Academic", "Books", "Custom",
     "Film and TV", "Game", "General",
-    "Language", "Music", "Sport"
+    "Language", "Music", "Sport", "MBTI"
 ]
 
 @login_required
