@@ -23,7 +23,7 @@ A new version will be available this semester.
 ## Live Comments
 Designed for "IF YOU ARE THE ONE 2020", and can also be used for future activities. 
 - Use of existing Comments Library
-  - CommentCoreLibrary (//github.com/jabbany/CommentCoreLibrary) - Licensed under the MIT license
+  - [CommentCoreLibrary](https://github.com/jabbany/CommentCoreLibrary) - Licensed under the MIT license
 - Integrated with Google Slide with iframe
 - Live comments and questions with WebSocket
 - Manual filtering of comments and questions
