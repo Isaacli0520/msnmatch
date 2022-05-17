@@ -277,6 +277,7 @@ export default {
                 "Language":"Language",
                 "General":"General",
                 "Books":"Books",
+                "MBTI":"MBTI",
             },
         }
     },
