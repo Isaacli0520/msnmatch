@@ -10,9 +10,9 @@
             </div>
             <v-card-text>
                 <div class="skill-tags">
-                    <template v-for="(skills_of_type, skills_type_name) in user.skills">
-                        <tag-span v-for="skill in skills_of_type"
-                            :key="skills_type_name + skill.id"
+                    <template v-for="(skills_of_type, index) in user.skills">
+                        <tag-span v-for="skill in skills_of_type.skills"
+                            :key="index + '-' + skill.id"
                             :skill="skill"
                             :clickable="'href'"
                         />

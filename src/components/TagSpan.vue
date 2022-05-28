@@ -83,58 +83,53 @@ export default{
         margin:0px 1px 0px 3px;
     }
 
-    .Entertainment{
+    .MBTI{
         color:#ffffff;
-        background-color: #f1b9a6e7;
-    }
-        
-    .Sport{
-        color:#ffffff;
-        background-color: #80b6e2;
-    }
-        
-    .Game{
-        color:#ffffff;
-        background-color: #8a1ae6;
-    }
-
-    .Film{
-        color:#ffffff;
-        background-color:#4cb41b;
-    }
-
-    .Music{
-        color:#ffffff;
-        background-color:#96db15;
-    }
-
-    .General{
-        color:#ffffff;
-        background-color:#88999c;
-    }
-
-    .Language{
-        color:#ffffff;
-        background-color: #af51db;
-    }
-
-    .Books{
-        color:#ffffff;
-        background-color:#ff9900;
+        background-color: #ff6b6b;
     }
 
     .Academic{
         color:#ffffff;
-        background-color:#5bd4b6;
+        background-color:#f06595;
+    }
+
+    .Books{
+        color:#ffffff;
+        background-color:#cc5de8;
+    }
+
+    .Film{
+        color:#ffffff;
+        background-color:#9775fa;
+    }
+        
+    .Game{
+        color:#ffffff;
+        background-color: #748ffc;
+    }
+
+    .Language{
+        color:#ffffff;
+        background-color:#74c0fc;
+    }
+
+    .Music{
+        color:#ffffff;
+        background-color: #20c997;
+    }
+
+    .Sport{
+        color:#ffffff;
+        background-color: #51cf66;
+    }
+
+    .General{
+        color:#ffffff;
+        background-color: #fab005;
     }
 
     .Custom{
         color:#ffffff;
-        background-color: #e7544f;
-    }
-
-    .MBTI{
-        color:#ffffff;
-        background-color: #ff6a50;
+        background-color: #ff922b;
     }
 </style>

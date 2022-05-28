@@ -59,11 +59,11 @@
                         </div>
                     </v-row>
                     <v-row justify="center" v-if="request_user.role != '' ">
-                        <div style="text-align:center; margin-top:13px;">
+                        <div style="text-align:center; margin-top:13px; margin-bottom:16px;">
                             <v-btn outlined color="teal lighten-1" @click="get_users_by_sim();clicked=true;">Click Me!</v-btn>
                         </div>
                     </v-row>
-                    <v-row justify="center" style="margin-top:7px;">
+                    <v-row justify="center">
                         <div v-if="clicked" style="text-align:center;">
                             <small class="muted-text">*这就是个随便写的算法大家开心就好😁</small>
                         </div>
@@ -74,7 +74,7 @@
                         </div>
                     </v-row>
                     <v-row justify="center">
-                        <div v-if="request_user.role == '' " style="text-align:center;">
+                        <div v-if="request_user.role == '' " style="margin-top:20px;text-align:center;">
                             <small class="muted-text">*Note that you have to be a mentor/mentee to appear in the user list</small>
                         </div>
                     </v-row>
@@ -134,8 +134,8 @@
                                 <h4 class="stepper-tags-text">You can always add more tags on the Tags page.</h4>
                                 <h2 class="mt-3 your-tags">Your Tags</h2>
                                 <div class="skill-tags mb-3">
-                                    <template v-for="(skills_of_type, skills_type_name) in user_skills">
-                                        <tag-span v-for="skill in skills_of_type"
+                                    <template v-for="(skills_of_type, index) in user_skills">
+                                        <tag-span v-for="skill in skills_of_type.skills"
                                             :key="skill.id"
                                             :skill="skill"
                                             clickable="delete"
@@ -144,11 +144,11 @@
                                         />
                                     </template>
                                 </div>
-                                <div :key="skills_type_name" v-for="(skills_of_type, skills_type_name) in all_skills">
-                                    <h3 class="skill-type-text">{{skill_type_names[skills_type_name]}}</h3>
+                                <div :key="index" v-for="(skills_of_type, index) in all_skills">
+                                    <h3 class="skill-type-text">{{skill_type_names[skills_of_type.type]}}</h3>
                                     <div class="skill-tags">
-                                        <tag-span v-for="skill in skills_of_type"
-                                            :key="skill.skill_pk"
+                                        <tag-span v-for="skill in skills_of_type.skills"
+                                            :key="skill.id"
                                             :skill="skill"
                                             :clickable="'add'"
                                             @add-skill="addSkill"
@@ -266,8 +266,8 @@ export default {
             // Stepper
             current_step:1,
             // Tags
-            all_skills:{},
-            user_skills:{},
+            all_skills:[],
+            user_skills:[],
             skill_type_names:{
                 "Game":"Game",
                 "Academic":"Academic Interests",
@@ -322,10 +322,15 @@ export default {
                 if(response.data.success){
                     let tmp_skill = JSON.parse(JSON.stringify(skill));
                     tmp_skill.id = response.data.id;
-                    let all_skill_pos = this.all_skills[skill.type].map(function(e) { return e.id; }).indexOf(tmp_skill.id);
-                    this.user_skills[tmp_skill.type].splice(-1, 0, tmp_skill);
+
+                    let skills_of_type = this.all_skills.filter((item) => item.type === skill.type)
+                    if (skills_of_type.length === 0) return
+                    skills_of_type = skills_of_type[0]
+
+                    let all_skill_pos = this.all_skills[skills_of_type.index].skills.map((item) => item.id).indexOf(tmp_skill.id);
+                    this.user_skills[skills_of_type.index].skills.splice(-1, 0, tmp_skill);
                     if(all_skill_pos != -1)
-                        this.all_skills[tmp_skill.type].splice(all_skill_pos, 1);
+                        this.all_skills[skills_of_type.index].skills.splice(all_skill_pos, 1);
                     // this.success_text = "Tag Added"
                     // this.success_snack = true;
                 }else{
@@ -339,11 +344,14 @@ export default {
                 "id":skill.id,
             }).then(response => {
                 if(response.data.success){
-                    let user_skill_pos = this.user_skills[skill.type].map(function(e) { return e.id; }).indexOf(skill.id);
+                    let skills_of_type = this.user_skills.filter((item) => item.type === skill.type)
+                    if (skills_of_type.length === 0) return
+                    skills_of_type = skills_of_type[0]
+                    let user_skill_pos = this.user_skills[skills_of_type.index].skills.map((item) => item.id).indexOf(skill.id);
                     if(user_skill_pos != -1)
-                        this.user_skills[skill.type].splice(user_skill_pos, 1);
+                        this.user_skills[skills_of_type.index].skills.splice(user_skill_pos, 1);
                     if (skill.type != "Custom"){
-                        this.all_skills[skill.type].push(skill);
+                        this.all_skills[skills_of_type.index].skills.push(skill);
                     }
                     // this.success_text = "Tag Deleted"
                     // this.success_snack = true;
@@ -699,12 +707,18 @@ export default {
         max-height: 450px;
     }
 
-    .content-div{
-        position: relative;
-        background: url('../assets/static/css/images/cloud_bg_new_02.jpg') no-repeat;
-        background-attachment: fixed;
-        background-position: center center;
+    .content-div::before{
+        content: ' ';
+        position: fixed;
+        background: url('../assets/static/css/images/cloud_bg_new_02.jpg') no-repeat center center;
+        /* background-attachment: fixed; */
+        /* background-position: center center; */
         background-size: cover;
+        will-change: transform;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
     }
 
     .top-part-wrapper{
