@@ -500,13 +500,7 @@ export default {
             var return_all_users = [];
             for(let i = 0;i < tmp_all_users.length; i++){
                 let tmp_skills = tmp_all_users[i].skills;
-                let tmp_skill_arr = [];
-                for (const [ key, value ] of Object.entries(tmp_skills)) {
-                    tmp_skill_arr = tmp_skill_arr.concat(value);
-                }
-                tmp_skill_arr = tmp_skill_arr.map(function(x){
-                    return x.name;
-                })
+                let tmp_skill_arr = tmp_skills.flatMap((skills_of_type) => skills_of_type.skills.map((skill) => skill.name));
                 if(tmp_skill_arr.length > 0){
                     let score_result = this.fuzz.extract(field_query, tmp_skill_arr, this.options);
                     if(score_result.length > 0){
@@ -584,12 +578,8 @@ export default {
             ref.users = tmp_all_users;
         },
         get_users_by_sim(){
-            let req_user = this.backup_all_users.filter(obj => {
-                return obj.pk == this.request_user.pk;
-            })[0];
-            let other_users = this.users.filter(obj => {
-                return obj.pk != this.request_user.pk;
-            });
+            let req_user = this.backup_all_users.filter(obj =>  obj.pk == this.request_user.pk)[0];
+            let other_users = this.users.filter(obj => obj.pk != this.request_user.pk);
             for(let i = 0; i < other_users.length; i++){
                 other_users[i]["score"] = parseFloat((this.similarity_between(req_user, other_users[i])*100).toFixed(2));
             }
@@ -607,26 +597,20 @@ export default {
             let a_length = 0;
             let b_length = 0;
             let sims = [];
-            for (const [ key, value ] of Object.entries(a_skills)) {
-                total_length += this.scaler(value.length);
-                a_length += value.length;
+            for (const skills_of_type of a_skills) {
+                total_length += this.scaler(skills_of_type.skills.length);
+                a_length += skills_of_type.skills.length;
             }
-            for (const [ key, value ] of Object.entries(b_skills)) {
-                b_length += value.length;
-            }
-            for (const [ key, value ] of Object.entries(a_skills)) {
-                if(key in b_skills){
-                    let a_tmp_names = value.map(obj => { return obj.name });
-                    let b_tmp_names = b_skills[key].map(obj => { return obj.name });
+            b_length = b_skills.reduce((x, y) => x + y.skills.length, 0)
+            for (let i = 0; i < a_skills.length; i++) {
+                if(a_skills[i].skills.length > 0 && b_skills[i].skills.length > 0){
+                    let a_tmp_names = a_skills[i].skills.map(obj => obj.name);
+                    let b_tmp_names = b_skills[i].skills.map(obj => obj.name);
                     let tmp_skill_list = Array.from(new Set(a_tmp_names.concat(b_tmp_names)));
-                    let a_vec = tmp_skill_list.map( obj =>{
-                        return a_tmp_names.indexOf(obj) != -1 ? 1 : 0;
-                    })
-                    let b_vec = tmp_skill_list.map( obj =>{
-                        return b_tmp_names.indexOf(obj) != -1 ? 1 : 0;
-                    })
-                    let cosine_scaler = 1-(Math.abs(value.length/a_length - b_skills[key].length/b_length) + Math.abs(value.length - b_skills[key].length)/tmp_skill_list.length)/2;
-                    sims.push(this.cosine_sim(a_vec, b_vec) * (cosine_scaler) * this.scaler(value.length)/total_length);
+                    let a_vec = tmp_skill_list.map(obj => a_tmp_names.indexOf(obj) !== -1 ? 1 : 0)
+                    let b_vec = tmp_skill_list.map(obj =>  b_tmp_names.indexOf(obj) !== -1 ? 1 : 0)
+                    let cosine_scaler = 1-(Math.abs(a_tmp_names.length/a_length - b_tmp_names.length/b_length) + Math.abs(a_tmp_names.length - b_tmp_names.length)/tmp_skill_list.length)/2;
+                    sims.push(this.cosine_sim(a_vec, b_vec) * (cosine_scaler) * this.scaler(a_tmp_names.length)/total_length);
                 }
             }
             return sims.reduce(function(a,b){ return a + b; }, 0);

@@ -106,10 +106,10 @@
                 <v-btn 
                     :href="general_urls.skills_url"
                     text>Tags</v-btn>
-                <v-divider inset vertical></v-divider>
+                <!-- <v-divider inset vertical></v-divider>
                 <v-btn 
                     :href="general_urls.roommate_url"
-                    text>Roommate</v-btn>
+                    text>Roommate</v-btn> -->
                 <v-divider inset vertical></v-divider>
                 <v-btn 
                     :href="general_urls.courses_url"

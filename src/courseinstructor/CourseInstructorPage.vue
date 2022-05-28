@@ -12,56 +12,42 @@
             </v-layout>
         </v-container>
         <v-container v-else fluid grid-list-lg>
+            <custom-breadcrumb :items="navItems"></custom-breadcrumb>
             <v-row>
-                <v-col cols="12">
-                    <custom-breadcrumb :items="navItems"></custom-breadcrumb>
+                <v-col>
+                    <div class="cus-headline-flex"> <!-- Mnemonic and Number -->
+                        <span class="cus-headline-number">{{course.mnemonic}}{{course.number}}</span>
+                        <span class="cus-headline-text">{{course.title}}</span>
+                    </div>
                 </v-col>
             </v-row>
-            <v-layout> <!-- Mnemonic and Number -->
-                <v-flex class="cus-headline-flex"> 
-                    <div>
-                    <span class="cus-headline-number">{{course.mnemonic}}{{course.number}}</span>
-                    <span class="cus-headline-text">{{course.title}}</span>
-                    </div>
-                </v-flex>
-                <v-spacer></v-spacer>
-            </v-layout>
-            <v-layout> <!-- Instructor Name -->
-                <v-flex>
-                    <div class="instructor-name">
+            <v-row style="margin-top:0px">
+                <v-col>
+                    <div class="instructor-name"> <!-- Instructor Name -->
                         <v-btn :color="variables.secondary_color" outlined x-large :href="' /courses/instructors/' + instructor.instructor_pk + '/' ">
                             <v-icon class="instructor-icon" color="black" left>mdi-account-tie</v-icon>{{instructor.name}}
                         </v-btn>
                     </div>
-                </v-flex>
-                <v-spacer></v-spacer>
-            </v-layout>
-            <!-- <v-layout>
-                <v-flex child-flex d-flex>
-                    <v-card>
-                        <v-card-title>Prerequisite</v-card-title>
-                        <v-card-text v-if="course.prerequisite">{{course.prerequisite.substring(13).trim()}}</v-card-text>
-                        <v-card-text v-else>No prereq is specified for this course(Please check on SIS)</v-card-text>
-                    </v-card>
-                </v-flex>
-            </v-layout> -->
-            <v-layout wrap> <!-- Prereq and Rate -->
-                <v-flex xl7 lg7 md6 sm12 xs12 d-flex child-flex>
-                    <v-card>
+                </v-col>
+            </v-row>
+            <v-row style="margin-top:0px"> <!-- Description and Rate -->
+                <v-col sm="12" md="7">
+                    <v-card class="fill-height">
                         <v-card-title>Description</v-card-title>
                         <v-card-text>{{course.description}}</v-card-text>
                     </v-card>
-                </v-flex>
-                <v-flex xl5 lg5 md6 sm12 xs12 d-flex child-flex>
+                </v-col>
+                <v-col sm="12" md="5">
                     <custom-rating
+                        class="fill-height"
                         :rating="instructor.rating_instructor"
                         :counter="instructor.rating_instructor_counter"
                         :actiontext="instructor.rating_instructor_users_count + ' users have reviewed this instructor' ">
                     </custom-rating>
-                </v-flex>
-            </v-layout>
-            <v-layout> <!-- Users Taking -->
-                <v-flex>
+                </v-col>
+            </v-row>
+            <v-row>
+                <v-col> <!-- Users Taking -->
                     <v-card>
                         <v-card-title>Users Planning on Taking {{course.mnemonic}} {{course.number}}</v-card-title>
                         <v-card-text v-if="users_taking.length > 0">
@@ -80,42 +66,21 @@
                             No user is planning on taking this class
                         </v-card-text>
                     </v-card>
-                </v-flex>
-            </v-layout>
-            <v-layout v-if="taken_users_enable">
-                <v-flex>
-                    <v-card>
-                        <v-card-title>Users Who Have Taken {{course.mnemonic}} {{course.number}}</v-card-title>
-                        <v-card-text v-if="users_taken.length > 0">
-                            <v-chip 
-                            :color="variables.primary_color"
-                            text-color="white"
-                            class="ma-1"
-                            v-for="(user_taken, index) in users_taken"
-                            :key="index +'-taken-user' " 
-                            :href=" '/users/'+user_taken.username+'/' "
-                            >
-                                <v-icon left color="white">account_circle</v-icon>
-                                {{ user_taken.name }}
-                            </v-chip>
-                        </v-card-text>
-                        <v-card-text v-else>
-                            No user has taken this class
-                        </v-card-text>
-                    </v-card>
-                </v-flex>
-            </v-layout>
-            <v-layout> <!-- Review Div Title -->
-                <v-flex justify-center align-self-center class="instructor-name">
-                        <span class="review-title">Reviews</span>
-                        <v-btn @click="reviewDialog = true;" :color="variables.primary_color" fab dark>
-                            <v-icon>mdi-pencil-plus-outline</v-icon>
-                        </v-btn>
-                </v-flex>
-                <v-spacer></v-spacer>
-            </v-layout>
-            <v-layout row wrap>  <!-- Reviews -->
-                <v-flex :key="user.course_user_pk + '-review' " v-for="user in users_with_review">
+                </v-col>
+            </v-row>
+            <v-row> <!-- Reviews -->
+                <v-col cols="12" sm="12" md="8" lg="8" xl="6" offset-md="2" offset-lg="2" offset-xl="3">
+                <v-row> <!-- Review Div Title -->
+                    <v-col class="mt-3 instructor-name">
+                            <span class="review-title">Reviews</span>
+                            <v-btn @click="reviewDialog = true;" :color="variables.primary_color" fab dark>
+                                <v-icon>mdi-pencil-plus-outline</v-icon>
+                            </v-btn>
+                    </v-col>
+                    <v-spacer></v-spacer>
+                </v-row>
+                <v-row> 
+                <v-col cols="12" :key="user.course_user_pk + '-review' " v-for="user in users_with_review">
                     <v-card>
                         <v-card-text>
                             <div class="review-text">
@@ -124,50 +89,50 @@
                         </v-card-text>
                         <v-divider></v-divider>
                         <v-card-actions>
-                            <v-row>
-                                <v-spacer></v-spacer>
-                                <v-chip
-                                    class="ma-1" :color="variables.secondary_color" outlined small :text-color="variables.secondary_color">
-                                    {{user.semester}}
-                                </v-chip>
-                                <v-chip
-                                    class="ma-1" :color="variables.secondary_color" outlined small :text-color="variables.secondary_color">
-                                    <span style="margin-top:2px;" class="caption mr-1">Instructor:</span>
-                                    <v-rating
-                                        v-model="user.rating_instructor"
-                                        color="yellow darken-2"
-                                        :background-color="variables.secondary_color"
-                                        readonly
-                                        dense
-                                        small
-                                        half-increments>
-                                    </v-rating>
-                                </v-chip>
-                                <v-chip
-                                    class="ma-1 mr-3" :color="variables.secondary_color" outlined small :text-color="variables.secondary_color">
-                                    <span style="margin-top:2px;" class="caption mr-1">Course:</span>
-                                    <v-rating
-                                        v-model="user.rating_course"
-                                        color="yellow darken-2"
-                                        :background-color="variables.secondary_color"
-                                        readonly
-                                        dense
-                                        small
-                                        half-increments>
-                                    </v-rating>
-                                </v-chip>
-                            </v-row>
+                            <v-spacer></v-spacer>
+                            <v-chip
+                                class="ma-1" :color="variables.secondary_color" outlined small :text-color="variables.secondary_color">
+                                {{user.semester}}
+                            </v-chip>
+                            <v-chip
+                                class="ma-1" :color="variables.secondary_color" outlined small :text-color="variables.secondary_color">
+                                <span style="margin-top:2px;" class="caption mr-1">Instructor:</span>
+                                <v-rating
+                                    v-model="user.rating_instructor"
+                                    color="yellow darken-2"
+                                    :background-color="variables.secondary_color"
+                                    readonly
+                                    dense
+                                    small
+                                    half-increments>
+                                </v-rating>
+                            </v-chip>
+                            <v-chip
+                                class="ma-1 mr-3" :color="variables.secondary_color" outlined small :text-color="variables.secondary_color">
+                                <span style="margin-top:2px;" class="caption mr-1">Course:</span>
+                                <v-rating
+                                    v-model="user.rating_course"
+                                    color="yellow darken-2"
+                                    :background-color="variables.secondary_color"
+                                    readonly
+                                    dense
+                                    small
+                                    half-increments>
+                                </v-rating>
+                            </v-chip>
                         </v-card-actions>
                     </v-card>
-                </v-flex>
-                <v-flex v-if="users_with_review.length == 0">
+                </v-col>
+                <v-col cols="12" v-if="users_with_review.length == 0">
                     <v-card>
                         <v-card-text>
                             There is no review for this course.
                         </v-card-text>
                     </v-card>
-                </v-flex>
-            </v-layout>
+                </v-col>
+                </v-row>
+                </v-col>
+            </v-row>
         </v-container>
     </v-main>
     <v-dialog v-model="reviewDialog" max-width="600px">

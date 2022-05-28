@@ -292,7 +292,7 @@ def user_json(user, request, personal_profile = False):
         "rm":user.profile.rm,
     }
     if not personal_profile:
-        user_dict["skills"] = skills_as_dict(user.skill_set.all())
+        user_dict["skills"] = skills_as_dict(user.skill_set.all(), empty_list=True)
         user_dict["follow"] = Follow.objects.filter(follower=request.user, followee=user).exists()
     return user_dict
 
