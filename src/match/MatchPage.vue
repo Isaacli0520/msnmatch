@@ -651,8 +651,8 @@ export default {
     .v-image__image{
         /* transform:translatez(0) !important;
         -webkit-transform:translatez(0) !important; */
-        transform: translate3d(0,0,0);
-        -webkit-transform: translate3d(0,0,0);
+        /* transform: translate3d(0,0,0);
+        -webkit-transform: translate3d(0,0,0); */
     }
 
     .stepper-tags-text{
