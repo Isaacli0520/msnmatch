@@ -259,7 +259,7 @@
                 <v-divider></v-divider>
                 <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn color="indigo" outlined :loading="submitReviewBtnLoading"  @click.prevent="submitReview(review)">Outlined Button</v-btn>   
+                    <v-btn color="indigo" outlined :loading="submitReviewBtnLoading"  @click.prevent="submitReview(review)">Submit</v-btn>   
                     <v-btn color="red darken-1" outlined @click="submitReviewDialog = false">Close</v-btn> 
                 </v-card-actions>
             </v-card>
