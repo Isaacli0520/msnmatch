@@ -73,9 +73,7 @@
                     rounded="lg"
                     elevation="4">
                     <div class="mb-2" style="font-weight:700;font-size:16px;">Bio:</div>
-                    <div class="bio-content">
-                        {{user.bio}}
-                    </div>
+                    <p class="bio-content">{{user.bio}}</p>
                 </v-sheet>
                 <div class="video-div" v-if="user.video.length">
                     <video width="100%" controls :src="user.video">
