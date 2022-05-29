@@ -244,7 +244,7 @@ export default{
         white-space: pre-wrap;
         word-break:break-word;
         font-size: 15px;
-        font-family: 'Times New Roman', Times, serif;
+        /* font-family: 'Times New Roman', Times, serif; */
     }
 
     .table-user-information{
