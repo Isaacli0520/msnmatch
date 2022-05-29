@@ -60,7 +60,8 @@
                     </v-row>
                     <v-row justify="center" v-if="request_user.role != '' ">
                         <div style="text-align:center; margin-top:13px; margin-bottom:16px;">
-                            <v-btn outlined color="teal lighten-1" @click="get_users_by_sim();clicked=true;">Click Me!</v-btn>
+                            <v-btn outlined color="teal lighten-1" v-if="!clicked" @click="get_users_by_sim();clicked=true;">Click Me!</v-btn>
+                            <v-btn outlined color="teal lighten-1" v-if="clicked" @click="resetUsers();clicked=false;">Reset</v-btn>
                         </div>
                     </v-row>
                     <v-row justify="center">
@@ -122,7 +123,7 @@
                                 @edit-success="editSuccess" 
                                 @enable-snack="enableSnack" />
                         </v-card>
-                        <v-btn class="stepper-continue-btn" @click="roleDialog=false;">Cancel</v-btn>
+                        <v-btn class="stepper-continue-btn" outlined @click="roleDialog=false;">Cancel</v-btn>
                     </v-stepper-content>
                     <v-stepper-content step="2">
                         <v-card class="stepper-card">
@@ -158,9 +159,9 @@
                                 </div>
                             </div>
                         </v-card>
-                        <v-btn class="stepper-continue-btn" color="primary" :disabled="user_skills_count < 3" @click="current_step=3">Continue</v-btn>
-                        <v-btn class="stepper-continue-btn" color="light-blue darken-1" dark @click="current_step = current_step - 1">Back</v-btn>
-                        <v-btn class="stepper-continue-btn" @click="roleDialog=false;">Cancel</v-btn>
+                        <v-btn class="stepper-continue-btn" outlined color="primary" :disabled="user_skills_count < 3" @click="current_step=3">Continue</v-btn>
+                        <v-btn class="stepper-continue-btn" outlined color="light-blue darken-1" dark @click="current_step = current_step - 1">Back</v-btn>
+                        <v-btn class="stepper-continue-btn" outlined @click="roleDialog=false;">Cancel</v-btn>
                     </v-stepper-content>
                     <v-stepper-content step="3">
                         <v-card class="stepper-card">
@@ -181,9 +182,9 @@
                                 <p style="font-size:14px; margin-bottom:0px !important;" class="muted-text">*Note that your role can only be changed by the mentor program chair once you've made your choice.</p>
                             </div>
                         </v-card>
-                        <v-btn class="stepper-continue-btn" color="primary" :loading="roleBtnLoading" @click="setRole(dialogRole)">Yes</v-btn>
-                        <v-btn class="stepper-continue-btn" color="light-blue darken-1" dark @click="current_step = current_step - 1">Back</v-btn>
-                        <v-btn class="stepper-continue-btn" @click="roleDialog=false;">Cancel</v-btn>
+                        <v-btn class="stepper-continue-btn" outlined color="primary" :loading="roleBtnLoading" @click="setRole(dialogRole)">Yes</v-btn>
+                        <v-btn class="stepper-continue-btn" outlined color="light-blue darken-1" dark @click="current_step = current_step - 1">Back</v-btn>
+                        <v-btn class="stepper-continue-btn" outlined @click="roleDialog=false;">Cancel</v-btn>
                     </v-stepper-content>
                 </v-stepper-items>
             </v-stepper>
@@ -307,6 +308,9 @@ export default {
         },
     },
     methods: {
+        resetUsers(){
+            this.users = JSON.parse(JSON.stringify(this.backup_all_users))
+        },
         getSkills(){
             axios.get('/users/api/get_all_and_user_skills/').then(response => {
                 this.all_skills = response.data.all_skills;
@@ -467,8 +471,8 @@ export default {
         },
         getAllUsers(){
             axios.get('/users/api/get_all_users/',{params: {}}).then(response => {
-                this.backup_all_users = response.data.users;
-                this.users = response.data.users;
+                this.backup_all_users = JSON.parse(JSON.stringify(response.data.users));
+                this.users = JSON.parse(JSON.stringify(response.data.users));
                 this.request_user = response.data.request_user;
                 this.loaded = true;
             });
@@ -726,8 +730,8 @@ export default {
         color:#32a49a; 
         font-size:45px;
         letter-spacing: 0.06em;
-        font-weight: 300 !important;
-        font-family: "Roboto", sans-serif;
+        font-weight: 300;
+        font-family: "Roboto Light", sans-serif;
     }
 
     .all-buttons{

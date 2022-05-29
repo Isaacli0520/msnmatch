@@ -34,6 +34,7 @@ GRADUATE_YEAR_CHOICES = (
             ('2023', '2023'),
             ('2024', '2024'),
             ('2025', '2025'),
+            ('2026', '2026'),
         )
 ROLE_CHOICES = (
             ('Mentee', 'Mentee'),
@@ -264,7 +265,7 @@ class Authenticator(models.Model):
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     sex = models.CharField(max_length=20, choices = SEX_CHOICES, blank=True)
-    bio = models.TextField(max_length=1000, blank=True)
+    bio = models.TextField(max_length=3000, blank=True)
     location = models.CharField(max_length=30, blank=True)
     birth_date = models.DateField(null=True, blank=True)
     # year = models.CharField(max_length=255, choices=YEAR_CHOICES)

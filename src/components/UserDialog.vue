@@ -19,7 +19,7 @@
                     </template>
                 </div>
                 <v-sheet
-                    class="px-3 py-3"
+                    class="px-6 py-3"
                     rounded
                     elevation="4">
                     <table class="table-user-information">
@@ -72,8 +72,8 @@
                     class="pa-6 mt-4"
                     rounded="lg"
                     elevation="4">
-                    <div class="mb-2"><h3>Bio:</h3></div>
-                    <div style="white-space: pre-wrap;word-break:break-word;">
+                    <div class="mb-2" style="font-weight:700;font-size:16px;">Bio:</div>
+                    <div class="bio-content">
                         {{user.bio}}
                     </div>
                 </v-sheet>
@@ -212,6 +212,7 @@ export default{
         line-height:28px;
         clear:both;
         padding: 0px 16px 0px 16px;
+        margin-bottom: 5px;
     }
 
     .cus-title{
@@ -239,32 +240,43 @@ export default{
         flex-flow: row wrap;
         width:100%;
         margin: 0px 0px 10px 0px;
-        }
+    }
+
+    .bio-content {
+        white-space: pre-wrap;
+        word-break:break-word;
+        font-size: 15px;
+        font-family: 'Times New Roman', Times, serif;
+    }
 
     .table-user-information{
         width: 100%;
         table-layout: fixed;
-        /* border-collapse: collapse; */
-        border: none;
+        border-collapse: collapse;
+    }
+    
+    tr td{
+        color: rgb(0, 0, 0); 
+        font-size: 15px !important;
+        padding: 12px 0px ;
+        border-bottom: 1px dashed rgb(214, 214, 214);
     }
 
     tr td:first-child{
         font-weight: 700;
-        width:30%;
-        color: rgb(16, 16, 16);
-        border: none;
+        width:35%;
     }
 
     tr td:last-child{
-        color: rgb(0, 0, 0);
         font-weight:300 !important;
-        border: none;
+        font-family: "Times New Roman", Times, serif !important;
+        text-align: right;
     }
 
-    /* table tr:last-child td{
+    table tr:last-child td{
         border: none !important;
-        padding-bottom: 0px !important;
-    } */
+        /* padding-bottom: 0px !important; */
+    }
 
     /* .v-card__text td{
         border-bottom: 1px solid rgb(216, 216, 216) !important;

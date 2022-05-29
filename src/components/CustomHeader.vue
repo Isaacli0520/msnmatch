@@ -535,7 +535,7 @@ export default{
         top: 120px;
         font-size: 36px;
         font-weight: 300;
-        font-family: "Roboto", sans-serif;
+        font-family: "Roboto Light", sans-serif;
         letter-spacing: 0.06em;
         text-align: center;
         color: white;
@@ -547,7 +547,7 @@ export default{
         top: 175px;
         font-size: 25px;
         font-weight: 300;
-        font-family: "Roboto", sans-serif;
+        font-family: "Roboto Light", sans-serif;
         letter-spacing: 0.06em;
         text-align: center;
         color: white;

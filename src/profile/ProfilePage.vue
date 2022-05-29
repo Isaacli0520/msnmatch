@@ -119,7 +119,7 @@
                                 </table>
                             </v-card-text>
                         </v-card>
-                        <v-card v-if="user.rm_schedule || user.rm_bio">
+                        <!-- <v-card v-if="user.rm_schedule || user.rm_bio">
                             <v-card-title>Roommate Match Info</v-card-title>
                             <v-divider></v-divider>
                             <v-card-text>
@@ -140,7 +140,7 @@
                                     </tbody>
                                 </table>
                             </v-card-text>
-                        </v-card>
+                        </v-card> -->
                     </v-col>
                 </v-row>
             </v-container>
