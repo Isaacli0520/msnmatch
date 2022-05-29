@@ -9,6 +9,9 @@ from msnmatch import settings
 from users.models import User, Authenticator
 from friendship.models import Follow
 from .utils import _get_not_allowed, _post_not_allowed, _success_response, _error_response, val_required
+from skills.models import Skill
+from skills.views import skill_json
+from users.views import user_json
 
 import collections
 import time
@@ -192,3 +195,16 @@ def get_all_ranked_users(request):
     return JsonResponse({
         "all_users":all_users_dict,
     })
+
+@login_required
+def get_skill(request):
+    skill_id = request.GET.get("id")
+    try:
+        skill = Skill.objects.get(pk = skill_id)
+        users = skill.users.all()
+        return _success_response({
+            "skill":skill_json(skill),
+            "users":[user_json(user, request) for user in users]
+        })
+    except:
+        return _error_response("Skill doesn't exist.")

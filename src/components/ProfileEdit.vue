@@ -510,7 +510,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 
     .cus-table{
         table-layout: fixed;

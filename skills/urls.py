@@ -8,7 +8,6 @@ urlpatterns = [
     # path('rank/', views.skill_rank, name='skill_rank'),
     path('<int:skill_pk>/', views.skill, name='skill'),
 
-    path('api/get_skill/', views.get_skill, name="get_skill"),
     path('api/get_search_result/', views.get_search_result, name="get_search_result"),
     
     path('api/user_add_skill/', views.user_add_skill, name="user_add_skill"),

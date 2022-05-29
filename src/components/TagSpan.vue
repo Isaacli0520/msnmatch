@@ -27,8 +27,8 @@ export default{
         add_skill(skill){
             if(this.clickable == "add")
                 this.$emit('add-skill', skill);
-            else if(this.clickable == "href")
-                window.location.href = "/skills/"+ skill.id.toString(10);
+            // else if(this.clickable == "href")
+            //     window.location.href = "/skills/"+ skill.id.toString(10);
         },
         del_skill(skill){
             this.$emit('del-skill', skill);

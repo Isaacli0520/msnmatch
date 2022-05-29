@@ -36,19 +36,6 @@ def skill(request, skill_pk):
 #       })
 
 @login_required
-def get_skill(request):
-    skill_id = request.GET.get("id")
-    try:
-        skill = Skill.objects.get(pk = skill_id)
-        users = skill.users.all()
-        return _success_response({
-            "skill":skill_json(skill),
-            "users":[user_json(user, request) for user in users]
-        })
-    except:
-        return _error_response("Skill doesn't exist.")
-
-@login_required
 def get_search_result(request):
     skills = []
     query_string = request.GET.get("query").strip()
