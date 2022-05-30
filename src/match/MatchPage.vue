@@ -59,11 +59,12 @@
                         </div>
                     </v-row>
                     <v-row justify="center" v-if="request_user.role != '' ">
-                        <div style="text-align:center; margin-top:13px;">
-                            <v-btn outlined color="teal lighten-1" @click="get_users_by_sim();clicked=true;">Click Me!</v-btn>
+                        <div style="text-align:center; margin-top:13px; margin-bottom:16px;">
+                            <v-btn outlined color="teal lighten-1" v-if="!clicked" @click="get_users_by_sim();clicked=true;">Click Me!</v-btn>
+                            <v-btn outlined color="teal lighten-1" v-if="clicked" @click="resetUsers();clicked=false;">Reset</v-btn>
                         </div>
                     </v-row>
-                    <v-row justify="center" style="margin-top:7px;">
+                    <v-row justify="center">
                         <div v-if="clicked" style="text-align:center;">
                             <small class="muted-text">*这就是个随便写的算法大家开心就好😁</small>
                         </div>
@@ -74,7 +75,7 @@
                         </div>
                     </v-row>
                     <v-row justify="center">
-                        <div v-if="request_user.role == '' " style="text-align:center;">
+                        <div v-if="request_user.role == '' " style="margin-top:20px;text-align:center;">
                             <small class="muted-text">*Note that you have to be a mentor/mentee to appear in the user list</small>
                         </div>
                     </v-row>
@@ -122,7 +123,7 @@
                                 @edit-success="editSuccess" 
                                 @enable-snack="enableSnack" />
                         </v-card>
-                        <v-btn class="stepper-continue-btn" @click="roleDialog=false;">Cancel</v-btn>
+                        <v-btn class="stepper-continue-btn" outlined @click="roleDialog=false;">Cancel</v-btn>
                     </v-stepper-content>
                     <v-stepper-content step="2">
                         <v-card class="stepper-card">
@@ -134,8 +135,8 @@
                                 <h4 class="stepper-tags-text">You can always add more tags on the Tags page.</h4>
                                 <h2 class="mt-3 your-tags">Your Tags</h2>
                                 <div class="skill-tags mb-3">
-                                    <template v-for="(skills_of_type, skills_type_name) in user_skills">
-                                        <tag-span v-for="skill in skills_of_type"
+                                    <template v-for="(skills_of_type, index) in user_skills">
+                                        <tag-span v-for="skill in skills_of_type.skills"
                                             :key="skill.id"
                                             :skill="skill"
                                             clickable="delete"
@@ -144,11 +145,11 @@
                                         />
                                     </template>
                                 </div>
-                                <div :key="skills_type_name" v-for="(skills_of_type, skills_type_name) in all_skills">
-                                    <h3 class="skill-type-text">{{skill_type_names[skills_type_name]}}</h3>
+                                <div :key="index" v-for="(skills_of_type, index) in all_skills">
+                                    <h3 class="skill-type-text">{{skill_type_names[skills_of_type.type]}}</h3>
                                     <div class="skill-tags">
-                                        <tag-span v-for="skill in skills_of_type"
-                                            :key="skill.skill_pk"
+                                        <tag-span v-for="skill in skills_of_type.skills"
+                                            :key="skill.id"
                                             :skill="skill"
                                             :clickable="'add'"
                                             @add-skill="addSkill"
@@ -158,9 +159,9 @@
                                 </div>
                             </div>
                         </v-card>
-                        <v-btn class="stepper-continue-btn" color="primary" :disabled="user_skills_count < 3" @click="current_step=3">Continue</v-btn>
-                        <v-btn class="stepper-continue-btn" color="light-blue darken-1" dark @click="current_step = current_step - 1">Back</v-btn>
-                        <v-btn class="stepper-continue-btn" @click="roleDialog=false;">Cancel</v-btn>
+                        <v-btn class="stepper-continue-btn" outlined color="primary" :disabled="user_skills_count < 3" @click="current_step=3">Continue</v-btn>
+                        <v-btn class="stepper-continue-btn" outlined color="light-blue darken-1" dark @click="current_step = current_step - 1">Back</v-btn>
+                        <v-btn class="stepper-continue-btn" outlined @click="roleDialog=false;">Cancel</v-btn>
                     </v-stepper-content>
                     <v-stepper-content step="3">
                         <v-card class="stepper-card">
@@ -181,9 +182,9 @@
                                 <p style="font-size:14px; margin-bottom:0px !important;" class="muted-text">*Note that your role can only be changed by the mentor program chair once you've made your choice.</p>
                             </div>
                         </v-card>
-                        <v-btn class="stepper-continue-btn" color="primary" :loading="roleBtnLoading" @click="setRole(dialogRole)">Yes</v-btn>
-                        <v-btn class="stepper-continue-btn" color="light-blue darken-1" dark @click="current_step = current_step - 1">Back</v-btn>
-                        <v-btn class="stepper-continue-btn" @click="roleDialog=false;">Cancel</v-btn>
+                        <v-btn class="stepper-continue-btn" outlined color="primary" :loading="roleBtnLoading" @click="setRole(dialogRole)">Yes</v-btn>
+                        <v-btn class="stepper-continue-btn" outlined color="light-blue darken-1" dark @click="current_step = current_step - 1">Back</v-btn>
+                        <v-btn class="stepper-continue-btn" outlined @click="roleDialog=false;">Cancel</v-btn>
                     </v-stepper-content>
                 </v-stepper-items>
             </v-stepper>
@@ -266,8 +267,8 @@ export default {
             // Stepper
             current_step:1,
             // Tags
-            all_skills:{},
-            user_skills:{},
+            all_skills:[],
+            user_skills:[],
             skill_type_names:{
                 "Game":"Game",
                 "Academic":"Academic Interests",
@@ -307,6 +308,9 @@ export default {
         },
     },
     methods: {
+        resetUsers(){
+            this.users = JSON.parse(JSON.stringify(this.backup_all_users))
+        },
         getSkills(){
             axios.get('/users/api/get_all_and_user_skills/').then(response => {
                 this.all_skills = response.data.all_skills;
@@ -322,10 +326,15 @@ export default {
                 if(response.data.success){
                     let tmp_skill = JSON.parse(JSON.stringify(skill));
                     tmp_skill.id = response.data.id;
-                    let all_skill_pos = this.all_skills[skill.type].map(function(e) { return e.id; }).indexOf(tmp_skill.id);
-                    this.user_skills[tmp_skill.type].splice(-1, 0, tmp_skill);
+
+                    let skills_of_type = this.all_skills.filter((item) => item.type === skill.type)
+                    if (skills_of_type.length === 0) return
+                    skills_of_type = skills_of_type[0]
+
+                    let all_skill_pos = this.all_skills[skills_of_type.index].skills.map((item) => item.id).indexOf(tmp_skill.id);
+                    this.user_skills[skills_of_type.index].skills.splice(-1, 0, tmp_skill);
                     if(all_skill_pos != -1)
-                        this.all_skills[tmp_skill.type].splice(all_skill_pos, 1);
+                        this.all_skills[skills_of_type.index].skills.splice(all_skill_pos, 1);
                     // this.success_text = "Tag Added"
                     // this.success_snack = true;
                 }else{
@@ -339,11 +348,14 @@ export default {
                 "id":skill.id,
             }).then(response => {
                 if(response.data.success){
-                    let user_skill_pos = this.user_skills[skill.type].map(function(e) { return e.id; }).indexOf(skill.id);
+                    let skills_of_type = this.user_skills.filter((item) => item.type === skill.type)
+                    if (skills_of_type.length === 0) return
+                    skills_of_type = skills_of_type[0]
+                    let user_skill_pos = this.user_skills[skills_of_type.index].skills.map((item) => item.id).indexOf(skill.id);
                     if(user_skill_pos != -1)
-                        this.user_skills[skill.type].splice(user_skill_pos, 1);
+                        this.user_skills[skills_of_type.index].skills.splice(user_skill_pos, 1);
                     if (skill.type != "Custom"){
-                        this.all_skills[skill.type].push(skill);
+                        this.all_skills[skills_of_type.index].skills.push(skill);
                     }
                     // this.success_text = "Tag Deleted"
                     // this.success_snack = true;
@@ -459,8 +471,8 @@ export default {
         },
         getAllUsers(){
             axios.get('/users/api/get_all_users/',{params: {}}).then(response => {
-                this.backup_all_users = response.data.users;
-                this.users = response.data.users;
+                this.backup_all_users = JSON.parse(JSON.stringify(response.data.users));
+                this.users = JSON.parse(JSON.stringify(response.data.users));
                 this.request_user = response.data.request_user;
                 this.loaded = true;
             });
@@ -492,13 +504,7 @@ export default {
             var return_all_users = [];
             for(let i = 0;i < tmp_all_users.length; i++){
                 let tmp_skills = tmp_all_users[i].skills;
-                let tmp_skill_arr = [];
-                for (const [ key, value ] of Object.entries(tmp_skills)) {
-                    tmp_skill_arr = tmp_skill_arr.concat(value);
-                }
-                tmp_skill_arr = tmp_skill_arr.map(function(x){
-                    return x.name;
-                })
+                let tmp_skill_arr = tmp_skills.flatMap((skills_of_type) => skills_of_type.skills.map((skill) => skill.name));
                 if(tmp_skill_arr.length > 0){
                     let score_result = this.fuzz.extract(field_query, tmp_skill_arr, this.options);
                     if(score_result.length > 0){
@@ -576,12 +582,8 @@ export default {
             ref.users = tmp_all_users;
         },
         get_users_by_sim(){
-            let req_user = this.backup_all_users.filter(obj => {
-                return obj.pk == this.request_user.pk;
-            })[0];
-            let other_users = this.users.filter(obj => {
-                return obj.pk != this.request_user.pk;
-            });
+            let req_user = this.backup_all_users.filter(obj =>  obj.pk == this.request_user.pk)[0];
+            let other_users = this.users.filter(obj => obj.pk != this.request_user.pk);
             for(let i = 0; i < other_users.length; i++){
                 other_users[i]["score"] = parseFloat((this.similarity_between(req_user, other_users[i])*100).toFixed(2));
             }
@@ -599,26 +601,20 @@ export default {
             let a_length = 0;
             let b_length = 0;
             let sims = [];
-            for (const [ key, value ] of Object.entries(a_skills)) {
-                total_length += this.scaler(value.length);
-                a_length += value.length;
+            for (const skills_of_type of a_skills) {
+                total_length += this.scaler(skills_of_type.skills.length);
+                a_length += skills_of_type.skills.length;
             }
-            for (const [ key, value ] of Object.entries(b_skills)) {
-                b_length += value.length;
-            }
-            for (const [ key, value ] of Object.entries(a_skills)) {
-                if(key in b_skills){
-                    let a_tmp_names = value.map(obj => { return obj.name });
-                    let b_tmp_names = b_skills[key].map(obj => { return obj.name });
+            b_length = b_skills.reduce((x, y) => x + y.skills.length, 0)
+            for (let i = 0; i < a_skills.length; i++) {
+                if(a_skills[i].skills.length > 0 && b_skills[i].skills.length > 0){
+                    let a_tmp_names = a_skills[i].skills.map(obj => obj.name);
+                    let b_tmp_names = b_skills[i].skills.map(obj => obj.name);
                     let tmp_skill_list = Array.from(new Set(a_tmp_names.concat(b_tmp_names)));
-                    let a_vec = tmp_skill_list.map( obj =>{
-                        return a_tmp_names.indexOf(obj) != -1 ? 1 : 0;
-                    })
-                    let b_vec = tmp_skill_list.map( obj =>{
-                        return b_tmp_names.indexOf(obj) != -1 ? 1 : 0;
-                    })
-                    let cosine_scaler = 1-(Math.abs(value.length/a_length - b_skills[key].length/b_length) + Math.abs(value.length - b_skills[key].length)/tmp_skill_list.length)/2;
-                    sims.push(this.cosine_sim(a_vec, b_vec) * (cosine_scaler) * this.scaler(value.length)/total_length);
+                    let a_vec = tmp_skill_list.map(obj => a_tmp_names.indexOf(obj) !== -1 ? 1 : 0)
+                    let b_vec = tmp_skill_list.map(obj =>  b_tmp_names.indexOf(obj) !== -1 ? 1 : 0)
+                    let cosine_scaler = 1-(Math.abs(a_tmp_names.length/a_length - b_tmp_names.length/b_length) + Math.abs(a_tmp_names.length - b_tmp_names.length)/tmp_skill_list.length)/2;
+                    sims.push(this.cosine_sim(a_vec, b_vec) * (cosine_scaler) * this.scaler(a_tmp_names.length)/total_length);
                 }
             }
             return sims.reduce(function(a,b){ return a + b; }, 0);
@@ -659,8 +655,8 @@ export default {
     .v-image__image{
         /* transform:translatez(0) !important;
         -webkit-transform:translatez(0) !important; */
-        transform: translate3d(0,0,0);
-        -webkit-transform: translate3d(0,0,0);
+        /* transform: translate3d(0,0,0);
+        -webkit-transform: translate3d(0,0,0); */
     }
 
     .stepper-tags-text{
@@ -699,12 +695,18 @@ export default {
         max-height: 450px;
     }
 
-    .content-div{
-        position: relative;
-        background: url('../assets/static/css/images/cloud_bg_new_02.jpg') no-repeat;
-        background-attachment: fixed;
-        background-position: center center;
+    .content-div::before{
+        content: ' ';
+        position: fixed;
+        background: url('../assets/static/css/images/cloud_bg_new_02.jpg') no-repeat center center;
+        /* background-attachment: fixed; */
+        /* background-position: center center; */
         background-size: cover;
+        will-change: transform;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
     }
 
     .top-part-wrapper{
@@ -728,8 +730,8 @@ export default {
         color:#32a49a; 
         font-size:45px;
         letter-spacing: 0.06em;
-        font-weight: 300 !important;
-        font-family: "Roboto", sans-serif;
+        font-weight: 300;
+        font-family: "Roboto Light", sans-serif;
     }
 
     .all-buttons{

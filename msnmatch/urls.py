@@ -49,6 +49,7 @@ urlpatterns = [
     path('friendship/', include('friendship.urls')),
 
     # APIs
+    path('api/get_skill/', views.get_skill, name="get_skill"),
     path('api/get_all_ranked_users/', views.get_all_ranked_users, name="get_all_ranked_users"),
     path('oauth/authorize/', views.oauth_authorize, name="oauth_authorize"),
     path('oauth/api/token/', views.oauth_token, name="oauth_token"),

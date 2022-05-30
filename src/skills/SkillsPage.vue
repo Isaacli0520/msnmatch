@@ -18,7 +18,7 @@
             </v-container>
             <v-container v-if="loaded">
                 <v-row justify="center">
-                    <div style="text-align: center;">
+                    <div style="margin-top: 20px;text-align: center;">
                         <h1 class="title-text">Add Your Interests</h1>
                         <h4 class="subtitle-text">Search for existing tags or add your own tags</h4>
                     </div>
@@ -26,8 +26,8 @@
                 <v-row justify="center">
                     <v-col cols="12" sm="12" md="8" lg="7" xl ="6"> 
                         <div class="skill-tags mb-3">
-                            <template v-for="(skills_of_type, skills_type_name) in user_skills">
-                                <tag-span v-for="skill in skills_of_type"
+                            <template v-for="(skills_of_type, _) in user_skills">
+                                <tag-span v-for="skill in skills_of_type.skills"
                                     :key="skill.id"
                                     :skill="skill"
                                     clickable="delete"
@@ -64,10 +64,10 @@
                 </v-row>
                 <v-row justify="center">
                     <v-col cols="12" sm="12" md="8" lg="7" xl ="6">
-                        <div :key="skills_type_name" v-for="(skills_of_type, skills_type_name) in all_skills">
-                            <h3 class="skill-type-text">{{skill_type_names[skills_type_name]}}</h3>
+                        <div :key="index" v-for="(skills_of_type, index) in all_skills">
+                            <h3 class="skill-type-text">{{skill_type_names[skills_of_type.type]}}</h3>
                             <div class="skill-tags">
-                                <tag-span v-for="skill in skills_of_type"
+                                <tag-span v-for="skill in skills_of_type.skills"
                                     :key="skill.skill_pk"
                                     :skill="skill"
                                     :clickable="'add'"
@@ -120,8 +120,8 @@ export default {
             lastTime: 0,
             entries:[],
             search: null,
-            all_skills:{},
-            user_skills:{},
+            all_skills:[],
+            user_skills:[],
             success_message:"",
             success_snack:false,
             failure_snack:false,
@@ -208,10 +208,15 @@ export default {
                 if(response.data.success){
                     let tmp_skill = JSON.parse(JSON.stringify(skill));
                     tmp_skill.id = response.data.id;
-                    let all_skill_pos = this.all_skills[skill.type].map(function(e) { return e.id; }).indexOf(tmp_skill.id);
-                    this.user_skills[tmp_skill.type].splice(-1, 0, tmp_skill);
+
+                    let skills_of_type = this.all_skills.filter((item) => item.type === skill.type)
+                    if (skills_of_type.length === 0) return
+                    skills_of_type = skills_of_type[0]
+
+                    let all_skill_pos = this.all_skills[skills_of_type.index].skills.map((item) => item.id).indexOf(tmp_skill.id);
+                    this.user_skills[skills_of_type.index].skills.splice(-1, 0, tmp_skill);
                     if(all_skill_pos != -1)
-                        this.all_skills[tmp_skill.type].splice(all_skill_pos, 1);
+                        this.all_skills[skills_of_type.index].skills.splice(all_skill_pos, 1);
                     this.success_message = "Tag Added"
                     this.success_snack = true;
                 }else{
@@ -224,11 +229,14 @@ export default {
                 "id":skill.id,
             }).then(response => {
                 if(response.data.success){
-                    let user_skill_pos = this.user_skills[skill.type].map(function(e) { return e.id; }).indexOf(skill.id);
+                    let skills_of_type = this.user_skills.filter((item) => item.type === skill.type)
+                    if (skills_of_type.length === 0) return
+                    skills_of_type = skills_of_type[0]
+                    let user_skill_pos = this.user_skills[skills_of_type.index].skills.map((item) => item.id).indexOf(skill.id);
                     if(user_skill_pos != -1)
-                        this.user_skills[skill.type].splice(user_skill_pos, 1);
+                        this.user_skills[skills_of_type.index].skills.splice(user_skill_pos, 1);
                     if (skill.type != "Custom"){
-                        this.all_skills[skill.type].push(skill);
+                        this.all_skills[skills_of_type.index].skills.push(skill);
                     }
                     this.success_message = "Tag Deleted"
                     this.success_snack = true;
@@ -245,12 +253,16 @@ export default {
 </script>
 
 <style>
-    .content-div{
-        position: relative;
-        background: url('../assets/static/css/images/cloud_bg_new_02.jpg') no-repeat;
-        background-attachment: fixed;
-        background-position: center center;
+    .content-div::before{
+        content: ' ';
+        position: fixed;
+        background: url('../assets/static/css/images/cloud_bg_new_02.jpg') no-repeat center center;
         background-size: cover;
+        will-change: transform;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
     }
 
     .skill-type-text{

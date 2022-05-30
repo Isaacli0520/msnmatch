@@ -12,9 +12,9 @@ import time
 
 MAXIMUM_SKILLS = 4
 SKILL_TYPES = [
-    "Academic", "Books", "Custom",
-    "Film and TV", "Game", "General",
-    "Language", "Music", "Sport", "MBTI"
+    "MBTI", "Academic", "Books", 
+    "Film and TV", "Game", "Language",
+    "Music", "Sport", "General", "Custom"
 ]
 
 @login_required
@@ -34,19 +34,6 @@ def skill(request, skill_pk):
 #   return render(request, 'skill_rank.html',{
 #       "all_skills":all_skills,
 #       })
-
-@login_required
-def get_skill(request):
-    skill_id = request.GET.get("id")
-    try:
-        skill = Skill.objects.get(pk = skill_id)
-        users = skill.users.all()
-        return _success_response({
-            "skill":skill_json(skill),
-            "users":[user_json(user, request) for user in users]
-        })
-    except:
-        return _error_response("Skill doesn't exist.")
 
 @login_required
 def get_search_result(request):
@@ -116,7 +103,8 @@ def skills_as_dict(queryset, empty_list = False):
             skills[s_type] = []
     for skill in queryset:
         skills[skill.type].append(skill_json(skill))
-    return skills
+    res = sorted([{ 'type': sk, 'skills': sks, 'index': i } for i, (sk, sks) in enumerate(skills.items())], key=lambda x:SKILL_TYPES.index(x['type']))
+    return res
 
 def skill_json(skill):
     return {

@@ -77,7 +77,7 @@ export default {
     },
     methods: {
         getSkill(){
-            axios.get('/skills/api/get_skill/',{params:{"id":this.skill_pk}}).then(response => {
+            axios.get('/api/get_skill/',{params:{"id":this.skill_pk}}).then(response => {
                 if(response.data.success){
                     this.users = response.data.users;
                     this.skill = response.data.skill;

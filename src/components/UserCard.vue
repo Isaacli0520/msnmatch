@@ -6,13 +6,10 @@
         :ripple="false"
         @click=openUserDialog>
         <v-img 
-            aspect-ratio="1.33333333"
-            contain
+            :aspect-ratio="1"
             :src="user.picture">
         </v-img>
-        <!-- <img :src="user.picture" style="width:100%;"> -->
         <v-divider></v-divider>
-        <!-- <v-card-title>{{user.first_name + " " + user.last_name}}</v-card-title> -->
         <div style="padding-top: 10px; padding-bottom:0px;">
             <div class="title-div">
                 <span class="cus-title" style="float:left;">{{full_name}}</span>

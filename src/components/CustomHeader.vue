@@ -171,7 +171,7 @@
                     <v-form
                         ref="review_form"
                         v-model="submit_review_form_valid">
-                        <v-row>
+                        <v-row class="mt-2">
                             <v-col class="pb-0">
                                 <span class="rating-label">Instructor Rating:</span>
                                 <v-rating
@@ -259,8 +259,8 @@
                 <v-divider></v-divider>
                 <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn color="blue darken-1" class="white--text" :loading="submitReviewBtnLoading"  @click.prevent="submitReview(review)">Submit</v-btn>   
-                    <v-btn color="red darken-1" class="white--text" @click="submitReviewDialog = false">Close</v-btn> 
+                    <v-btn color="indigo" outlined :loading="submitReviewBtnLoading"  @click.prevent="submitReview(review)">Submit</v-btn>   
+                    <v-btn color="red darken-1" outlined @click="submitReviewDialog = false">Close</v-btn> 
                 </v-card-actions>
             </v-card>
         </v-dialog>
@@ -535,7 +535,7 @@ export default{
         top: 120px;
         font-size: 36px;
         font-weight: 300;
-        font-family: "Roboto", sans-serif;
+        font-family: "Roboto Light", sans-serif;
         letter-spacing: 0.06em;
         text-align: center;
         color: white;
@@ -547,7 +547,7 @@ export default{
         top: 175px;
         font-size: 25px;
         font-weight: 300;
-        font-family: "Roboto", sans-serif;
+        font-family: "Roboto Light", sans-serif;
         letter-spacing: 0.06em;
         text-align: center;
         color: white;

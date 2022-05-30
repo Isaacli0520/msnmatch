@@ -8,7 +8,7 @@
             <v-container fluid grid-list-xl class="courses-main">
                 <v-row>
                     <v-col cols="12" sm="12" md="8" lg="8" xl="6" offset-md="2" offset-lg="2" offset-xl="3">
-                        <v-row class="mb-3" dense>
+                        <v-row class="mt-3 mb-3" dense>
                             <v-col v-for="(func, index) in main_functions" :key="index" cols="4" sm="2" md="2" lg="2" xl="2">
                                 <div style="text-align:center;">
                                     <v-btn
@@ -24,19 +24,17 @@
                         </v-row>
                         <!-- Interesting Reviews -->
                         <template>
-                            <v-layout mt-2 row wrap>
-                                <v-flex> 
-                                    <div class="headline-div">
-                                        <span class="cus-headline-text">Interesting Reviews</span>
-                                        <v-btn class="mb-2" :color="variables.primary_color" icon outlined
-                                            :loading="topReviewsLoading" @click="getTopReviews()">
-                                            <v-icon>mdi-refresh</v-icon>
-                                        </v-btn>
-                                    </div>
-                                </v-flex>
+                            <v-row class="mt-3">
+                                <v-col> 
+                                    <span class="cus-headline-text">Interesting Reviews</span>
+                                    <v-btn class="mb-2" :color="variables.primary_color" icon outlined
+                                        :loading="topReviewsLoading" @click="getTopReviews()">
+                                        <v-icon>mdi-refresh</v-icon>
+                                    </v-btn>
+                                </v-col>
                                 <v-spacer></v-spacer>
-                            </v-layout>
-                            <v-row v-if="!topReviewsLoading">
+                            </v-row>
+                            <v-row style="margin-top:0px" v-if="!topReviewsLoading">
                                 <template v-for="(review, index) in top_reviews">
                                     <v-col :key="index" cols="12">
                                         <review-card :review="review" :editable="false"></review-card>
@@ -44,7 +42,7 @@
                                 </template>
                             </v-row>
                             <v-container v-else fluid>
-                                <v-layout 
+                                <v-row 
                                     style="padding:15px;"
                                     align-center
                                     justify-center>
@@ -54,20 +52,18 @@
                                         v-if="topReviewsLoading"
                                         indeterminate
                                         color="teal lighten-1"/>
-                                </v-layout>
+                                </v-row>
                             </v-container>
                         </template>
                         <!-- Trending Courses -->
                         <template>
-                            <v-layout row wrap>
-                                <v-flex> 
-                                    <div class="headline-div">
-                                        <span class="cus-headline-text">Popular Courses</span>
-                                    </div>
-                                </v-flex>
+                            <v-row class="mt-3">
+                                <v-col> 
+                                    <span class="cus-headline-text">Popular Courses</span>
+                                </v-col>
                                 <v-spacer></v-spacer>
-                            </v-layout>
-                            <v-row v-if="!trendingCoursesLoading">
+                            </v-row>
+                            <v-row style="margin-top:3px" v-if="!trendingCoursesLoading">
                                 <v-col cols="12" v-for="(course, index) in trending_courses['Taken']" :key="index">
                                     <v-card
                                         outlined
@@ -234,7 +230,7 @@ export default {
         width:100%;
         margin: 0 auto;
         text-align: center; 
-        padding: 22px 12px 32px 12px;
+        padding: 22px 12px 12px 12px;
     }
 
     .recommendation-div{

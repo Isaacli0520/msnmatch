@@ -10,72 +10,71 @@
             </div>
             <v-card-text>
                 <div class="skill-tags">
-                    <template v-for="(skills_of_type, skills_type_name) in user.skills">
-                        <tag-span v-for="skill in skills_of_type"
-                            :key="skills_type_name + skill.id"
+                    <template v-for="(skills_of_type, index) in user.skills">
+                        <tag-span v-for="skill in skills_of_type.skills"
+                            :key="index + '-' + skill.id"
                             :skill="skill"
                             :clickable="'href'"
                         />
                     </template>
                 </div>
-                <div>
-                    <table class="table table-user-information">
+                <v-sheet
+                    class="px-6 py-3"
+                    rounded
+                    elevation="4">
+                    <table class="table-user-information">
                         <tbody>
                             <tr>
-                                <td class="field-title">Email</td>
+                                <td>Email</td>
                                 <td>{{user.email}}</td>
                             </tr>
                             <tr>
-                                <td class="field-title">Year</td>
+                                <td>Year</td>
                                 <td>{{user.year}}</td>
                             </tr>
                             <tr v-if="user.major">
-                                <td class="field-title">Major</td>
+                                <td>Major</td>
                                 <td>{{user.major}}</td>
                             </tr>
                             <tr v-if="user.major_two">
-                                <td class="field-title">Second Major</td>
+                                <td>Second Major</td>
                                 <td>{{user.major_two}}</td>
                             </tr>
                             <tr v-if="user.minor">
-                                <td class="field-title">Minor</td>
+                                <td>Minor</td>
                                 <td>{{user.minor}}</td>
                             </tr>
                             <tr v-if="user.role">
-                                <td class="field-title">Role</td>
+                                <td>Role</td>
                                 <td>{{user.role}}</td>
                             </tr>
                             <!-- <tr v-if="user.wechat">
-                                <td class="field-title">WeChat ID</td>
+                                <td>WeChat ID</td>
                                 <td>{{user.wechat}}</td>
                             </tr> -->
                             <!-- <tr v-if="user.birth_date">
-                                <td class="field-title">Birth Date</td>
+                                <td>Birth Date</td>
                                 <td>{{user.birth_date}}</td>
                             </tr> -->
                             <tr v-if="user.sex">
-                                <td class="field-title">Gender</td>
+                                <td>Gender</td>
                                 <td>{{user.sex}}</td>
                             </tr>
                             <tr v-if="user.location">
-                                <td class="field-title">Location</td>
+                                <td>Location</td>
                                 <td>{{user.location}}</td>
-                            </tr>
-                            <tr v-if="user.bio">
-                                <td style="vertical-align:top;" class="field-title">Bio</td>
-                                <td style="word-break:break-word;">{{user.bio}}</td>
-                            </tr>
-                            <tr v-if="rm">
-                                <td style="vertical-align:top;" class="field-title">Roommate Bio</td>
-                                <td>{{user.rm_bio}}</td>
-                            </tr>
-                            <tr v-if="rm">
-                                <td style="vertical-align:top;" class="field-title">Schedule</td>
-                                <td>{{user.rm_schedule}}</td>
                             </tr>
                         </tbody>
                     </table>
-                </div>
+                </v-sheet>
+                <v-sheet
+                    v-if="user.bio"
+                    class="pa-6 mt-4"
+                    rounded="lg"
+                    elevation="4">
+                    <div class="mb-2" style="font-weight:700;font-size:16px;">Bio:</div>
+                    <p class="bio-content">{{user.bio}}</p>
+                </v-sheet>
                 <div class="video-div" v-if="user.video.length">
                     <video width="100%" controls :src="user.video">
                         Your Browser does not support video tags lol
@@ -88,10 +87,10 @@
             <v-divider></v-divider>
             <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="purple darken-1" dark :loading="addFavBtnLoading" v-if="add_to_fav && !user.follow" @click="addFav(user)">Add to Favorite</v-btn>
-                <v-btn color="purple darken-1" dark :loading="delFavBtnLoading" v-if="add_to_fav && user.follow" @click="delFav(user)">Remove from Favorite</v-btn>
-                <v-btn color="purple darken-1" dark v-if="edit" :href="'/users/'+user.username+'/edit/'">Edit</v-btn>
-                <v-btn color="primary"  @click.native="$emit('input')">Close</v-btn>
+                <v-btn color="purple darken-1" outlined :loading="addFavBtnLoading" v-if="add_to_fav && !user.follow" @click="addFav(user)">Add to Favorite</v-btn>
+                <v-btn color="purple darken-1" outlined :loading="delFavBtnLoading" v-if="add_to_fav && user.follow" @click="delFav(user)">Remove from Favorite</v-btn>
+                <v-btn color="purple darken-1" outlined v-if="edit" :href="'/users/'+user.username+'/edit/'">Edit</v-btn>
+                <v-btn color="primary" outlined  @click.native="$emit('input')">Close</v-btn>
             </v-card-actions>
         </v-card>
         <v-snackbar
@@ -211,6 +210,7 @@ export default{
         line-height:28px;
         clear:both;
         padding: 0px 16px 0px 16px;
+        margin-bottom: 5px;
     }
 
     .cus-title{
@@ -238,41 +238,52 @@ export default{
         flex-flow: row wrap;
         width:100%;
         margin: 0px 0px 10px 0px;
-        }
+    }
+
+    .bio-content {
+        white-space: pre-wrap;
+        word-break:break-word;
+        font-size: 15px;
+        /* font-family: 'Times New Roman', Times, serif; */
+    }
 
     .table-user-information{
         width: 100%;
         table-layout: fixed;
         border-collapse: collapse;
     }
-
-    .field-title{
-        font-weight: 670;
-        width:30%;
+    
+    tr td{
+        color: rgb(0, 0, 0); 
+        font-size: 15px !important;
+        padding: 12px 0px ;
+        border-bottom: 1px dashed rgb(214, 214, 214);
     }
 
     tr td:first-child{
-        color: rgb(134, 132, 132);
+        font-weight: 700;
+        width:35%;
     }
 
     tr td:last-child{
-        color: rgb(0, 0, 0);
         font-weight:300 !important;
+        font-family: "Times New Roman", Times, serif !important;
+        text-align: right;
     }
 
     table tr:last-child td{
         border: none !important;
-        padding-bottom: 0px !important;
+        /* padding-bottom: 0px !important; */
     }
 
-    .v-card__text td{
+    /* .v-card__text td{
         border-bottom: 1px solid rgb(216, 216, 216) !important;
         word-break: break-all;
         white-space: pre-line;
         font-family: "Roboto", sans-serif !important;
         font-size: 15px !important;
         padding: 11px 12px;
-    }
+    } */
 
     .video-div{
         margin-top: 12px;
