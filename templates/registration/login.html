@@ -30,9 +30,9 @@
           <div class="card-body" style="display: block; margin: 0 auto;">
             <p class="mb-3 card-text text-center ">Please sign in with <b>UVA email</b></p>
             <div class="text-center">
-              <a href="/auth/login/microsoft-graph/{% if next %}?next={{ next }}{% endif %}">
+              {% comment %} <a href="/auth/login/microsoft-graph/{% if next %}?next={{ next }}{% endif %}">
                 <button class="btn-primary btn" >Sign in with Outlook</button>
-              </a>
+              </a> {% endcomment %}
               <a href="/auth/login/google-oauth2/{% if next %}?next={{ next }}{% endif %}">
                 <button class="mt-3 btn-primary btn" >Sign in with Gmail</button>
               </a>
