@@ -126,6 +126,7 @@ DATABASES = {
 }
 
 AUTHENTICATION_BACKENDS = (
+    'social_core.backends.microsoft.MicrosoftOAuth2',
     'social_core.backends.open_id.OpenIdAuth',  # for Google authentication
     'social_core.backends.google.GoogleOAuth2',
     'django.contrib.auth.backends.ModelBackend',)
@@ -142,6 +143,9 @@ SOCIAL_AUTH_PIPELINE = (
 )
 
 USER_FIELDS = ["first_name", "last_name", "username", "email"]
+
+SOCIAL_AUTH_MICROSOFT_GRAPH_KEY = config('SOCIAL_AUTH_MICROSOFT_GRAPH_KEY')
+SOCIAL_AUTH_MICROSOFT_GRAPH_SECRET = config('SOCIAL_AUTH_MICROSOFT_GRAPH_SECRET')
 
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = config('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY')
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = config('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET')
