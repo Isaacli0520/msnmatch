@@ -141,6 +141,11 @@ module.exports = {
             template: 'templates/match.html',
             filename: 'match.html',
         },
+        signup_page: {
+            entry: 'src/signup/main.js',
+            template: 'templates/signup.html',
+            filename: 'signup.html',
+        },
     },
 
     css: {

@@ -4,7 +4,12 @@ from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse
 from django.http import JsonResponse, HttpResponse
 from django.utils import timezone
+from django.utils.http import urlsafe_base64_decode
+from django.utils.encoding import force_str
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth import login, authenticate
 
+from .tokens import account_activation_token
 from msnmatch import settings
 from users.models import User, Authenticator
 from friendship.models import Follow
@@ -40,12 +45,45 @@ def roommate_match(request):
 def home(request):
     return render(request, 'home.html')
 
-def login(request):
+def signup(request):
+    return render(request, 'signup.html')
+
+def activate(request, uidb64, token):
+    try:  
+        uid = force_str(urlsafe_base64_decode(uidb64))  
+        user = User.objects.get(pk=uid)  
+    except(TypeError, ValueError, OverflowError, User.DoesNotExist):  
+        user = None
+    if user is not None and account_activation_token.check_token(user, token):  
+        user.is_active = True  
+        user.save()  
+        return HttpResponse('Your account has been confirmed')  
+    else:  
+        return HttpResponse('Activation link is invalid!')  
+
+def login_view(request):
     if request.user.is_authenticated:
         return redirect(reverse("home"))
     next_url = request.GET.get("next")
+    error_msg = ''
+    if request.method == "POST":
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect(next_url if next_url is not None else reverse('home'))
+            else:
+                error_msg = "Invalid username or password."
+        else:
+            error_msg = "Invalid username or password."
+    form = AuthenticationForm()
     return render(request, 'registration/login.html', {
-        "next": quote(next_url) if next_url != None else ""
+        "login_form": form,
+        "next": quote(next_url) if next_url is not None else "",
+        "error_msg": error_msg,
     })
 
 def handler404(request, exception):

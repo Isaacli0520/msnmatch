@@ -3,6 +3,11 @@ from django.urls import reverse
 from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector, TrigramSimilarity
+from django.contrib.sites.shortcuts import get_current_site
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
 from django.db.models import Q
 from django.db.models.functions import Length
 
@@ -10,14 +15,16 @@ import json
 import random
 import datetime
 import time
+import re
 
 from friendship.models import Friend, Follow
 from skills.models import Skill
 from courses.models import CourseUser, Course
 from .models import User, Profile
-from .forms import UserForm, ProfileForm, ProfileNewForm
+from .forms import UserForm, SignUpForm, ProfileNewForm
 from skills.views import skills_as_dict
 from msnmatch import settings
+from msnmatch.tokens import account_activation_token
 from msnmatch.utils import _get_not_allowed, _post_not_allowed, _success_response, _error_response
 
 @login_required
@@ -124,6 +131,35 @@ def match_user(request):
             return _success_response()
         except:
             return _error_response("User doesn't exist")
+    if request.method == "GET":
+        return _get_not_allowed()
+
+def signup_user(request):
+    if request.method == 'POST':  
+        form = SignUpForm(request.POST)  
+        if form.is_valid():
+            email = form.cleaned_data.get('email')
+            if User.objects.filter(email=email).first() is not None:
+                return _error_response("User with this email already exists")
+            if not re.match(r'^[a-z]+[0-9][a-z]+@virginia.edu$', email):
+                return _error_response("Must be UVa email")
+            # the form has to be saved in memory and not in DB
+            user = form.save(commit=False)  
+            user.is_active = False  
+            user.save() 
+            current_site_info = get_current_site(request)  
+            subject = '[MSN] Confirm your email address'
+            message = render_to_string('email_confirm.html', {  
+                'user': user,  
+                'domain': current_site_info.domain,  
+                'uid':urlsafe_base64_encode(force_bytes(user.pk)),  
+                'token':account_activation_token.make_token(user),  
+            })
+            send_mail(subject, message, settings.EMAIL_HOST_USER, [email])
+            return _success_response()
+        else:
+            errors = [' '.join(v) for v in form.errors.values()]
+            return _error_response("\n".join(errors))
     if request.method == "GET":
         return _get_not_allowed()
 

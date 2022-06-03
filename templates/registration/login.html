@@ -28,13 +28,31 @@
             Sign In
           </div>
           <div class="card-body" style="display: block; margin: 0 auto;">
-            <p class="mb-3 card-text text-center ">Please sign in with <b>UVA email</b></p>
+            {% if error_msg %}
+              <h6 id='error'style="color:red;">{{error_msg}}</h6>
+            {% endif %}
+            <form action="" method="post">
+              {% csrf_token %}
+              <table>
+                {{ login_form.as_table }}
+              </table>
+              <p style="font-size:13px;margin: 5px 0 5px 0;" class="text-muted">*Username is your computing ID</p>
+              <input style="margin-left: 5px;float:right;" id='login_submit' class="btn btn-outline-primary" type="submit" value="Sign In">
+              <a style="float:right;" href="/signup/" role="button" class="btn btn-outline-success">Sign Up</a>
+            </form>
+          </div>
+        </div>
+        <div class="card mt-3 mb-3">
+          <div style="font-size:20px;" class="card-header text-center">
+            Other Methods
+          </div>
+          <div class="card-body" style="display: block;">
             <div class="text-center">
               {% comment %} <a href="/auth/login/microsoft-graph/{% if next %}?next={{ next }}{% endif %}">
                 <button class="btn-primary btn" >Sign in with Outlook</button>
               </a> {% endcomment %}
               <a href="/auth/login/google-oauth2/{% if next %}?next={{ next }}{% endif %}">
-                <button class="mt-3 btn-primary btn" >Sign in with Gmail</button>
+                <button class="btn-outline-primary btn" >Sign in with Gmail</button>
               </a>
             </div>
           </div>

@@ -8,16 +8,21 @@ class UserForm(forms.ModelForm):
         model = User
         fields = ('first_name', 'last_name')
 
+class SignUpForm(UserCreationForm):
+    class Meta:  
+        model = User  
+        fields = ('username', 'email', 'password1', 'password2')  
+
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
         fields = ('location','bio','graduate_year','sex', 'major', 'major_two', 'minor', 'birth_date','wechat','picture', 'video')
         labels = {
             'sex':'Gender',
-        	'birth_date' : 'Birth Date',
+            'birth_date' : 'Birth Date',
             'wechat':'WeChat ID',
         }
-       	help_texts = {
+        help_texts = {
             'birth_date': 'Format: mm/dd/yyyy',
         }
 

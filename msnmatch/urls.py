@@ -30,9 +30,11 @@ handler403 = 'msnmatch.views.handler403'
 
 urlpatterns = [
     path('', views.home, name='home'),
+    path('signup/', views.signup, name='signup'),
+    path('activate/<uidb64>/<token>/', views.activate, name='activate'),  
     path('admin/', admin.site.urls),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
-    path('login/', views.login, name='login'),
+    path('login/', views.login_view, name='login'),
     path('auth/', include('social_django.urls', namespace='social')),
     path('superadmin/', views.superadmin, name="superadmin"),
 
