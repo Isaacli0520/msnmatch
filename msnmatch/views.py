@@ -45,6 +45,9 @@ def roommate_match(request):
 def home(request):
     return render(request, 'home.html')
 
+def password_reset_done(request):
+    return render(request, 'password_reset_done.html')
+
 def signup(request):
     return render(request, 'signup.html')
 
@@ -57,9 +60,9 @@ def activate(request, uidb64, token):
     if user is not None and account_activation_token.check_token(user, token):  
         user.is_active = True  
         user.save()  
-        return HttpResponse('Your account has been confirmed')  
+        return render(request, 'activate_complete.html')  
     else:  
-        return HttpResponse('Activation link is invalid!')  
+        return render(request, 'activate_invalid.html')  
 
 def login_view(request):
     if request.user.is_authenticated:

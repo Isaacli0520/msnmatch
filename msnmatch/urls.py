@@ -15,15 +15,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from django.conf import settings
 from django.contrib.auth import views as auth_views
-from django.views.generic.base import TemplateView
-from django.views.generic.base import RedirectView
 from . import views
 
-from django.conf.urls import (
-handler400, handler403, handler404, handler500
-)
+from django.conf.urls import (handler400, handler403, handler404, handler500)
 
 handler404 = 'msnmatch.views.handler404'
 handler403 = 'msnmatch.views.handler403'
@@ -31,6 +26,10 @@ handler403 = 'msnmatch.views.handler403'
 urlpatterns = [
     path('', views.home, name='home'),
     path('signup/', views.signup, name='signup'),
+    path('reset/', auth_views.PasswordResetView.as_view(), name='password_reset'),
+    path('reset/done', auth_views.PasswordResetDoneView.as_view(), name='password_reset_done'),
+    path('reset/complete', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
+    path('reset-confirm/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
     path('activate/<uidb64>/<token>/', views.activate, name='activate'),  
     path('admin/', admin.site.urls),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),

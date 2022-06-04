@@ -150,6 +150,7 @@ def signup_user(request):
             current_site_info = get_current_site(request)  
             subject = '[MSN] Confirm your email address'
             message = render_to_string('email_confirm.html', {  
+                'protocol': 'http' if settings.DEBUG else 'https',
                 'user': user,  
                 'domain': current_site_info.domain,  
                 'uid':urlsafe_base64_encode(force_bytes(user.pk)),  
