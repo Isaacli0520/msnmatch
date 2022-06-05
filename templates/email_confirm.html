@@ -1,0 +1,15 @@
+{% autoescape off %}
+  Hi {{ user.username }},
+
+  Please follow this link to confirm your email address:
+
+  {{ protocol }}://{{ domain }}{% url 'activate' uidb64=uid token=token %}
+
+  If clicking the link above doesn't work, please copy and paste the URL in a new browser
+  window instead.
+
+  If you didn't create a MSN Match account, you can ignore this email
+
+  Sincerely,
+  MSN Tech
+{% endautoescape %}

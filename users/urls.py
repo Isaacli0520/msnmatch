@@ -6,6 +6,7 @@ urlpatterns = [
     path('<username>/', views.profile, name='profile'),
     path('<username>/edit/', views.update_profile, name='update_profile'),
 
+    path('api/signup_user/', views.signup_user,name="signup_user"),
     path('api/match_user/', views.match_user,name="match_user"),
     path('api/edit_user/',views.edit_user, name='edit_user'),
     path('api/check_mentor_requirements/', views.check_mentor_requirements, name="check_mentor_requirements"),

@@ -16,6 +16,15 @@ HMP_CHECK_TIME = config("HMP_CHECK_TIME")
 
 DEBUG = config("DEBUG",cast=bool)
 
+# Emails
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_USE_TLS = True
+
+EMAIL_PORT = config('EMAIL_PORT')
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+
 ITEM_NAME_TH = config("ITEM_NAME_TH")
 ITEM_DESCRIPTION_TH = config("ITEM_DESCRIPTION_TH")
 
@@ -126,6 +135,7 @@ DATABASES = {
 }
 
 AUTHENTICATION_BACKENDS = (
+    'social_core.backends.microsoft.MicrosoftOAuth2',
     'social_core.backends.open_id.OpenIdAuth',  # for Google authentication
     'social_core.backends.google.GoogleOAuth2',
     'django.contrib.auth.backends.ModelBackend',)
@@ -142,6 +152,9 @@ SOCIAL_AUTH_PIPELINE = (
 )
 
 USER_FIELDS = ["first_name", "last_name", "username", "email"]
+
+SOCIAL_AUTH_MICROSOFT_GRAPH_KEY = config('SOCIAL_AUTH_MICROSOFT_GRAPH_KEY')
+SOCIAL_AUTH_MICROSOFT_GRAPH_SECRET = config('SOCIAL_AUTH_MICROSOFT_GRAPH_SECRET')
 
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = config('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY')
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = config('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET')
