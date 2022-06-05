@@ -210,6 +210,11 @@ def get_all_ranked_users(request):
         else:
             avatar_url = settings.STATIC_URL + "css/images/brand_blur.jpg"
 
+        if user.profile.graduate_year:
+            year = str(4 + settings.CURRENT_YEAR - int(user.profile.graduate_year))
+        else:
+            year = ''
+
         all_users_dict[user.pk] = {
             "pk":user.pk,
             "user_url": "/users/"+user.username+"/",
@@ -220,7 +225,8 @@ def get_all_ranked_users(request):
             "bio": user.profile.bio,
             "birth_date": user.profile.birth_date,
             "location": user.profile.location,
-            "year": user.profile.graduate_year,
+            "year": year,
+            "graduate_year": user.profile.graduate_year,
             "major": user.profile.major,
             "matched":user.profile.matched,
             "sex":user.profile.sex,

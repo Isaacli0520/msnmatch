@@ -304,7 +304,7 @@ def user_json(user, request, personal_profile = False):
     if user.profile.video:
         video_url = user.profile.video.url
     if user.profile.graduate_year:
-        year = 4 + settings.CURRENT_YEAR - int(user.profile.graduate_year)
+        year = str(4 + settings.CURRENT_YEAR - int(user.profile.graduate_year))
     user_dict = {
         "pk": user.pk,
         "username":user.username,
