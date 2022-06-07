@@ -64,26 +64,26 @@
             </div>
           </v-row>
           <v-row justify="center" v-if="request_user.role != '' ">
-            <div style="text-align:center; margin-top:13px; margin-bottom:16px;">
+            <div style="text-align:center; margin-top:13px; margin-bottom:10px;">
               <v-btn outlined color="teal lighten-1" v-if="!clicked" @click="get_users_by_sim();clicked=true;">Click Me!</v-btn>
               <v-btn outlined color="teal lighten-1" v-if="clicked" @click="resetUsers();clicked=false;">Reset</v-btn>
             </div>
           </v-row>
           <v-row justify="center">
             <div v-if="clicked" style="text-align:center;">
-              <small class="muted-text">*这就是个随便写的算法大家开心就好😁</small>
+              <small class="muted-text">*The scores are calculated based on mutual tags with some normalization</small>
             </div>
           </v-row>
           <v-row justify="center">
             <div v-if="clicked" style="text-align:center;">
-              <small class="muted-text">*以及你至少需要有一个tag</small>
+              <small class="muted-text">*They are just for fun😁</small>
             </div>
           </v-row>
-          <v-row justify="center">
-            <div v-if="request_user.role == '' " style="margin-top:20px;text-align:center;">
+          <!-- <v-row justify="center">
+            <div v-if="request_user.role == '' " style="text-align:center;">
               <small class="muted-text">*Note that you have to be a mentor/mentee to appear in the user list</small>
             </div>
-          </v-row>
+          </v-row> -->
         </div>
         <!-- <v-divider style="margin-left:13px;margin-right:13px;"></v-divider> -->
         <v-row>
@@ -182,8 +182,8 @@
                 <p>Do you really want to be a <strong>{{dialogRole}}</strong>?</p>
               </div>
               <div v-else class="ma-4">
-                <p style="font-size:19x;font-weight:600;">你是否要成为Mentee？</p>
-                <p>点击Yes即可成为Mentee!</p>
+                <p style="font-size:19px;font-weight:600;">Do you really want to be a Mentee?</p>
+                <p>Click <strong>YES</strong> to become a Mentee!</p>
                 <p style="font-size:14px; margin-bottom:0px !important;" class="muted-text">*Note that your role can only be changed by the mentor program chair once you've made your choice.</p>
               </div>
             </v-card>

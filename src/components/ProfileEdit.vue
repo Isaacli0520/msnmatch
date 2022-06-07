@@ -83,6 +83,12 @@
                     label="WeChat ID"
                     ></v-text-field> -->
 
+                    <div class="mb-3">
+                        Your Bio allows you to convey more and different information about yourself 
+                        than tags and pictures. So please spend more time writing it and let others
+                        know you better.
+                    </div>
+
                     <v-textarea
                         v-model="edit_user.bio"
                         label="Bio*"
