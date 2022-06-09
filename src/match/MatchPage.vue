@@ -212,7 +212,10 @@
             {{ skills_of_type.type }}
           </v-tab>
         </v-tabs>
-        <v-tabs-items v-model="tag_tab">
+        <v-tabs-items
+          style="overflow:scroll;"
+          v-model="tag_tab"
+          >
           <v-tab-item
             v-for="(skills_of_type, _big_skill_idx) in all_users_skills"
             :key="_big_skill_idx" 
@@ -237,14 +240,14 @@
                   class="tag-percent__value"
                   rounded
                   dark
-                  :value="100 * skill.count / skills_of_type.total"
+                  :value="100 * skill.count / skills_of_type.max"
                   :color="variables[skills_of_type.type.split(' ').join('-')+'-color']"
                   height="25"
                   style="margin-top:5px;"
                 >
                   <template v-slot>
                     <div style="width:100%;">
-                    <div :style="`text-align:center;width:${100*skill.count / skills_of_type.total}%;`">{{ skill.count }}</div>
+                    <div :style="`text-align:center;width:${100*skill.count / skills_of_type.max}%;`">{{ skill.count }}</div>
                     </div>
                   </template>
                 </v-progress-linear>
@@ -404,7 +407,7 @@ export default {
       }
       for (const skills_of_type of skills) {
         skills[skills_of_type.index].skills = Object.values(skills_of_type.skills).sort((a, b) => b.count - a.count)
-        skills[skills_of_type.index].total = skills[skills_of_type.index].skills.reduce((prev, curr) => prev + curr.count, 0)
+        skills[skills_of_type.index].max = Math.max(...skills[skills_of_type.index].skills.map((skill) => skill.count))
       }
       return skills
     },
