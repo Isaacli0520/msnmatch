@@ -57,16 +57,17 @@
               <v-checkbox v-model="tags" hide-details class="mr-2" value="role:Mentee" label="Mentee"></v-checkbox>
             </div>
           </v-row>
-          <v-row justify="center" v-if="request_user.role == '' ">
-            <div style="text-align:center; margin-top:13px;">
-              <v-btn style="margin-right: 10px;" outlined color="teal lighten-1" :loading="mentorBtnLoading" @click="openRoleDialog('Mentor')">Be A Mentor</v-btn>
-              <v-btn outlined color="teal lighten-1" @click="openRoleDialog('Mentee')">Be A Mentee</v-btn>
-            </div>
-          </v-row>
-          <v-row justify="center" v-if="request_user.role != '' ">
+          <v-row justify="center">
             <div style="text-align:center; margin-top:13px; margin-bottom:10px;">
-              <v-btn outlined color="teal lighten-1" v-if="!clicked" @click="get_users_by_sim();clicked=true;">Click Me!</v-btn>
-              <v-btn outlined color="teal lighten-1" v-if="clicked" @click="resetUsers();clicked=false;">Reset</v-btn>
+              <template v-if="request_user.role == '' ">
+                <v-btn style="margin-right: 10px;" outlined color="teal lighten-1" :loading="mentorBtnLoading" @click="openRoleDialog('Mentor')">Be A Mentor</v-btn>
+                <v-btn outlined color="teal lighten-1" @click="openRoleDialog('Mentee')">Be A Mentee</v-btn>
+              </template>
+              <template v-else>
+                <v-btn outlined color="teal lighten-1" v-if="!clicked" @click="get_users_by_sim();clicked=true;">Click Me!</v-btn>
+                <v-btn outlined color="teal lighten-1" v-else @click="resetUsers();clicked=false;">Reset</v-btn>
+              </template>
+              <v-btn style="margin-left: 10px;" outlined color="teal lighten-1" @click="openStatsDialog();">Stats</v-btn>
             </div>
           </v-row>
           <v-row justify="center">
@@ -140,7 +141,7 @@
                 <h4 class="stepper-tags-text">You can always add more tags on the Tags page.</h4>
                 <h2 class="mt-3 your-tags">Your Tags</h2>
                 <div class="skill-tags mb-3">
-                  <template v-for="(skills_of_type, index) in user_skills">
+                  <template v-for="skills_of_type in user_skills">
                     <tag-span v-for="skill in skills_of_type.skills"
                       :key="skill.id"
                       :skill="skill"
@@ -194,6 +195,76 @@
         </v-stepper-items>
       </v-stepper>
     </v-dialog>
+    <v-dialog v-model="statsDialog" scrollable min-width="350px" max-width="800px">
+      <v-card>
+        <v-card-title>Stats</v-card-title>
+        <v-divider></v-divider>
+        <v-tabs
+          v-model="tag_tab"
+          color="teal darken-1"
+          show-arrows
+          grow
+        >
+          <v-tab
+            v-for="(skills_of_type, _big_skill_idx) in all_users_skills"
+            :key="_big_skill_idx"
+          >
+            {{ skills_of_type.type }}
+          </v-tab>
+        </v-tabs>
+        <v-tabs-items v-model="tag_tab">
+          <v-tab-item
+            v-for="(skills_of_type, _big_skill_idx) in all_users_skills"
+            :key="_big_skill_idx" 
+          >
+            <v-sheet
+              color="white"
+              style="padding:10px 20px;"
+              elevation="1"
+            >
+              <div class="tag-percent"
+                :key="_skill_idx"
+                v-for="(skill, _skill_idx) in skills_of_type.skills">
+                <label  class="tag-percent__label">
+                  <span 
+                    :style="`background-color:${variables[skills_of_type.type.split(' ').join('-')+'-color']}`" 
+                    class="tag-percent__span"
+                  >
+                    {{skill.name}}
+                  </span>
+                </label>
+                <v-progress-linear
+                  class="tag-percent__value"
+                  rounded
+                  dark
+                  :value="100 * skill.count / skills_of_type.total"
+                  :color="variables[skills_of_type.type.split(' ').join('-')+'-color']"
+                  height="25"
+                  style="margin-top:5px;"
+                >
+                  <template v-slot>
+                    <div style="width:100%;">
+                    <div :style="`text-align:center;width:${100*skill.count / skills_of_type.total}%;`">{{ skill.count }}</div>
+                    </div>
+                  </template>
+                </v-progress-linear>
+              </div>
+            </v-sheet>
+          </v-tab-item>
+        </v-tabs-items>
+        <v-divider></v-divider>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn
+            color="red darken-1"
+            text
+            @click="statsDialog=false"
+          >
+            Close
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <v-snackbar
       top
       v-model="success_snack"
@@ -235,6 +306,7 @@ import UserDialog from '../components/UserDialog'
 import UserCard from '../components/UserCard'
 import ProfileEdit from '../components/ProfileEdit'
 import TagSpan from '../components/TagSpan'
+import variables from '../sass/variables.scss'
 // import { MatchHeader, UserDialog, UserCard } from "../components"
 axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 axios.defaults.xsrfCookieName = "csrftoken";
@@ -242,8 +314,10 @@ axios.defaults.xsrfCookieName = "csrftoken";
 export default {
   data() {
     return {
+      variables:variables,
       loaded:false,
       clicked:false,
+      tag_tab:null,
       // Header
       headerUpdate: false,
       // Search Bar
@@ -260,6 +334,7 @@ export default {
       userDialog:false,
       roleDialog:false,
       dialog_user_index:-1,
+      statsDialog:false,
       // Fuzz Search
       fuzz: null,
       options:null,
@@ -297,7 +372,10 @@ export default {
   watch: {
     tags(val){
       this.user_list_filter(val);
-    }
+    },
+    backup_all_users() {
+      console.log(this.all_users_skills);
+    },
   },
   computed:{
     d_user(){
@@ -311,8 +389,30 @@ export default {
         return 0
       return Object.values(this.user_skills).map(arr => arr.length).reduce((a, b) => a + b);
     },
+    all_users_skills() {
+      if (this.backup_all_users.length === 0) 
+        return [[]]
+      const skills = this.backup_all_users[0].skills.map((skills_of_type) => ({ ...skills_of_type, skills: {} }))
+      for (const user of this.backup_all_users) {
+        for (const skills_of_type of user.skills) {
+          for (const skill of skills_of_type.skills) {
+            if (skills[skills_of_type.index].skills[skill.id] === undefined)
+              skills[skills_of_type.index].skills[skill.id] = { ...skill, count: 0 }
+            skills[skills_of_type.index].skills[skill.id].count += 1
+          }
+        }
+      }
+      for (const skills_of_type of skills) {
+        skills[skills_of_type.index].skills = Object.values(skills_of_type.skills).sort((a, b) => b.count - a.count)
+        skills[skills_of_type.index].total = skills[skills_of_type.index].skills.reduce((prev, curr) => prev + curr.count, 0)
+      }
+      return skills
+    },
   },
   methods: {
+    openStatsDialog() {
+      this.statsDialog = true;
+    },
     resetUsers(){
       this.users = JSON.parse(JSON.stringify(this.backup_all_users))
     },
@@ -655,6 +755,33 @@ export default {
 </script>
 
 <style>
+
+  .tag-percent {
+    display: flex;
+  }
+
+  .tag-percent__span{
+    font-size: 14px;
+    padding: 2px 8px;
+    border-radius: 5px;
+    margin: 5px 7px 5px 0px;
+    font-family: Gill Sans, sans-serif;
+    color: #fff;
+  }
+
+  .tag-percent__label {
+    width: 200px;
+    display: inline-flex;
+    justify-content: flex-end;
+    align-items: flex-start;
+    flex: 0 0 auto;
+    box-sizing: border-box;
+  }
+
+  /* .tag-percent__value {
+    
+  } */
+
   .stepper-tags-text{
     font-weight: 500 !important;
     color:#7e7e7e;
