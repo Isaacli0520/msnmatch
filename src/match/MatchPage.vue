@@ -18,7 +18,6 @@
           <v-row justify="center">
             <div style="text-align: center;">
               <h1 class="title-text">MATCH</h1>
-              <!-- <h4 class="subtitle-text">Search for existing tags or add your own tags</h4> -->
             </div>
           </v-row>
           <v-row>
@@ -64,8 +63,7 @@
                 <v-btn outlined color="teal lighten-1" @click="openRoleDialog('Mentee')">Be A Mentee</v-btn>
               </template>
               <template v-else>
-                <v-btn outlined color="teal lighten-1" v-if="!clicked" @click="get_users_by_sim();clicked=true;">Click Me!</v-btn>
-                <v-btn outlined color="teal lighten-1" v-else @click="resetUsers();clicked=false;">Reset</v-btn>
+                <v-btn outlined color="teal lighten-1" @click="get_users_by_sim();clicked=true;">Click Me!</v-btn>
               </template>
               <v-btn style="margin-left: 10px;" outlined color="teal lighten-1" @click="openStatsDialog();">Stats</v-btn>
             </div>
@@ -89,24 +87,24 @@
         <!-- <v-divider style="margin-left:13px;margin-right:13px;"></v-divider> -->
         <v-row>
           <v-col
-            v-for="(user, i) in users" :key="i"
+            v-for="user_idx in user_idxs" :key="user_idx"
             cols="12" sm="6" md="4" lg="4" xl="3">
             <user-card
               class="fill-height"
-              :user_index="i"
-              :user="user" @open-user-dialog="openUserDialog"></user-card>
+              :user_index="user_idx"
+              :user="users[user_idx]" @open-user-dialog="openUserDialog"></user-card>
           </v-col>
         </v-row>
       </v-container>
+      <user-dialog
+        v-if="d_user"
+        :add_to_fav="request_user.role!='' && request_user.role != d_user.role"
+        :edit="request_user.username == d_user.username"
+        :user="d_user"
+        @add-to-fav="addToFav"
+        @del-from-fav="deleteFromFav"
+        v-model="userDialog"></user-dialog>
     </v-main>
-    <user-dialog
-      v-if="d_user"
-      :add_to_fav="request_user.role!='' && request_user.role != d_user.role"
-      :edit="request_user.username == d_user.username"
-      :user="d_user"
-      @add-to-fav="addToFav"
-      @del-from-fav="deleteFromFav"
-      v-model="userDialog"></user-dialog>
     <v-dialog v-if="loaded" v-model="roleDialog" scrollable min-width="350px" max-width="800px">
       <v-stepper v-model="current_step">
         <v-stepper-header>
@@ -329,6 +327,8 @@ export default {
       // Users
       request_user:null,
       users:[],
+      user_idxs:[],
+      backup_user_idxs: [],
       backup_all_users: [],
       // Dialog
       dialogRole:"Mentor",
@@ -376,9 +376,6 @@ export default {
     tags(val){
       this.user_list_filter(val);
     },
-    backup_all_users() {
-      console.log(this.all_users_skills);
-    },
   },
   computed:{
     d_user(){
@@ -395,8 +392,9 @@ export default {
     all_users_skills() {
       if (this.backup_all_users.length === 0) 
         return [[]]
-      const skills = this.backup_all_users[0].skills.map((skills_of_type) => ({ ...skills_of_type, skills: {} }))
-      for (const user of this.backup_all_users) {
+      const users_arr = Object.values(this.backup_all_users)
+      const skills = users_arr[0].skills.map((skills_of_type) => ({ ...skills_of_type, skills: {} }))
+      for (const user of users_arr) {
         for (const skills_of_type of user.skills) {
           for (const skill of skills_of_type.skills) {
             if (skills[skills_of_type.index].skills[skill.id] === undefined)
@@ -415,9 +413,6 @@ export default {
   methods: {
     openStatsDialog() {
       this.statsDialog = true;
-    },
-    resetUsers(){
-      this.users = JSON.parse(JSON.stringify(this.backup_all_users))
     },
     getSkills(){
       axios.get('/users/api/get_all_and_user_skills/').then(response => {
@@ -491,16 +486,8 @@ export default {
       this.changeFav(user, false);
     },
     changeFav(user, boolVal){
-      for(let i = 0;i < this.users.length;i++){
-        if(this.users[i].pk == user.pk){
-          this.users[i].follow = boolVal;
-        }
-      }
-      for(let i = 0;i < this.backup_all_users.length;i++){
-        if(this.backup_all_users[i].pk == user.pk){
-          this.backup_all_users[i].follow = boolVal;
-        }
-      }
+      this.users[user.pk].follow = boolVal;
+      this.backup_all_users[user.pk].follow = boolVal;
       this.headerUpdate = !this.headerUpdate;
     },
     setRole(role){
@@ -581,123 +568,119 @@ export default {
       axios.get('/users/api/get_all_users/',{params: {}}).then(response => {
         this.backup_all_users = JSON.parse(JSON.stringify(response.data.users));
         this.users = JSON.parse(JSON.stringify(response.data.users));
+        this.backup_user_idxs = Object.keys(this.users)
+        this.user_idxs = Object.keys(this.users)
         this.request_user = response.data.request_user;
         this.loaded = true;
       });
     },
-    fuzzy_search(tmp_all_users, key_arr, field_query){
-      if(tmp_all_users.length == 0)
+    fuzzy_search(tmp_user_idxs, key_arr, field_query){
+      if(tmp_user_idxs.length == 0)
         return [];
       var return_all_users = [];
-      for(let i = 0;i < key_arr.length; i++){
-        let result = tmp_all_users.reduce((map, obj) => {
-          map[obj.pk] = obj[key_arr[i]];
-          return map;
+      const ref = this;
+      for(let i = 0; i < key_arr.length; i++){
+        let result = tmp_user_idxs.reduce((prev, pk) => {
+          prev[pk] = ref.users[pk][key_arr[i]];
+          return prev;
         }, {});
-        // map is the resulting dictionary
+        
         let score_result = this.fuzz.extract(field_query, result, this.options);
         score_result = score_result.map((x) => x[2])
-        return_all_users = return_all_users.concat(this.backup_all_users.filter((x) =>
-          score_result.indexOf(x.pk.toString()) !== -1
-        ));
+        return_all_users = return_all_users.concat(score_result);
         // console.log(key_arr[i],"---",return_all_users);
       }
       return Array.from(new Set(return_all_users));
     },
-    fuzzy_search_skill(tmp_all_users, field_query){
-      if (tmp_all_users.length == 0)
+    fuzzy_search_skill(tmp_user_idxs, field_query){
+      if (tmp_user_idxs.length == 0)
         return [];
-      var return_all_users = [];
-      for(let i = 0;i < tmp_all_users.length; i++){
-        let tmp_skills = tmp_all_users[i].skills;
+      var return_all_users = {};
+      for(let i = 0;i < tmp_user_idxs.length; i++){
+        let tmp_skills = this.users[tmp_user_idxs[i]].skills;
         let tmp_skill_arr = tmp_skills.flatMap((skills_of_type) => skills_of_type.skills.map((skill) => skill.name));
         if(tmp_skill_arr.length > 0){
           let score_result = this.fuzz.extract(field_query, tmp_skill_arr, this.options);
           if(score_result.length > 0){
-            return_all_users[tmp_all_users[i].pk] = score_result.length;
+            return_all_users[tmp_user_idxs[i]] = score_result.length;
           }
         }
       }
       return return_all_users;
     },
     user_list_filter(tags){
-      var tmp_all_users = JSON.parse(JSON.stringify(this.backup_all_users));
+      var tmp_user_idxs = this.backup_user_idxs.slice()
       var ref = this;
       tags.forEach(function(tag) {
         let colon_index = tag.indexOf(":");
         if(colon_index != -1 && colon_index != tag.length){
           let field_tag = tag.substring(0, colon_index).toLowerCase();
           let field_query = tag.substring(colon_index + 1).toLowerCase();
-          console.log("TAG:", field_tag)
-          console.log("Query:", typeof field_query)
+          // console.log("TAG:", field_tag)
+          // console.log("Query:", typeof field_query)
           if(field_tag === "name"){
-            tmp_all_users = ref.fuzzy_search(tmp_all_users, ['first_name','last_name'], field_query);
+            tmp_user_idxs = ref.fuzzy_search(tmp_user_idxs, ['first_name','last_name'], field_query);
           }
           else if(["role"].indexOf(field_tag) != -1){
-            tmp_all_users = ref.fuzzy_search(tmp_all_users, ['role'], field_query);
+            tmp_user_idxs = ref.fuzzy_search(tmp_user_idxs, ['role'], field_query);
           }
           else if(["first_name", "first name", "first"].indexOf(field_tag) != -1){
-            tmp_all_users = ref.fuzzy_search(tmp_all_users, ['first_name'], field_query);
+            tmp_user_idxs = ref.fuzzy_search(tmp_user_idxs, ['first_name'], field_query);
           }
           else if(["last_name", "last name", "last"].indexOf(field_tag) != -1){
-            tmp_all_users = ref.fuzzy_search(tmp_all_users, ['last_name'], field_query);
+            tmp_user_idxs = ref.fuzzy_search(tmp_user_idxs, ['last_name'], field_query);
           }
           else if(["gender","sex"].indexOf(field_tag) != -1){
             let tmp_scorer = ref.options.scorer;
             ref.options.scorer = ref.fuzz.token_sort_ratio;
-            tmp_all_users = ref.fuzzy_search(tmp_all_users, ['sex'], field_query);
+            tmp_user_idxs = ref.fuzzy_search(tmp_user_idxs, ['sex'], field_query);
             ref.options.scorer = tmp_scorer;
           }
           else if(["birth date", "birth_date", "birthdate","birth","date"].indexOf(field_tag) != -1){
-            tmp_all_users = ref.fuzzy_search(tmp_all_users, ['birth_date'], field_query);
+            tmp_user_idxs = ref.fuzzy_search(tmp_user_idxs, ['birth_date'], field_query);
           }
           else if(["loc", "location"].indexOf(field_tag) != -1){
-            tmp_all_users = ref.fuzzy_search(tmp_all_users, ['location'], field_query);
+            tmp_user_idxs = ref.fuzzy_search(tmp_user_idxs, ['location'], field_query);
           }
           else if(["major"].indexOf(field_tag) != -1){
             let tmp_cutoff = ref.options.cutoff;
             ref.options.cutoff = 90;
-            tmp_all_users = ref.fuzzy_search(tmp_all_users, ['major', 'major_two', 'minor'], field_query);
+            tmp_user_idxs = ref.fuzzy_search(tmp_user_idxs, ['major', 'major_two', 'minor'], field_query);
             ref.options.cutoff = tmp_cutoff;
           }
           else if(["year"].indexOf(field_tag) != -1){
-            tmp_all_users = ref.fuzzy_search(tmp_all_users, ['year'], field_query);
+            tmp_user_idxs = ref.fuzzy_search(tmp_user_idxs, ['year'], field_query);
           }
           else if(["bio"].indexOf(field_tag) != -1){
-            tmp_all_users = ref.fuzzy_search(tmp_all_users, ['bio'], field_query);
+            tmp_user_idxs = ref.fuzzy_search(tmp_user_idxs, ['bio'], field_query);
           }
           else if(["email"].indexOf(field_tag) != -1){
-            tmp_all_users = ref.fuzzy_search(tmp_all_users, ['email'], field_query);
+            tmp_user_idxs = ref.fuzzy_search(tmp_user_idxs, ['email'], field_query);
           }
           else if(["wechat"].indexOf(field_tag) != -1){
-            tmp_all_users = ref.fuzzy_search(tmp_all_users, ['wechat'], field_query);
+            tmp_user_idxs = ref.fuzzy_search(tmp_user_idxs, ['wechat'], field_query);
           }
         }
         else{
-          let tmp_kv_users = ref.fuzzy_search_skill(tmp_all_users, tag.toLowerCase());
-          let tmp_all_users_arr = []
-          for(let i = 0;i < tmp_all_users.length; i++){
-            if(tmp_all_users[i].pk in tmp_kv_users){
-              tmp_all_users[i]["tag_num"] = tmp_kv_users[tmp_all_users[i].pk];
-              tmp_all_users_arr.push(tmp_all_users[i]);
-            }
-          }
-          tmp_all_users = tmp_all_users_arr.sort(function(a,b){
-            return a.tag_num - b.tag_num;
-          });
+          let tmp_kv_users = ref.fuzzy_search_skill(tmp_user_idxs, tag.toLowerCase());
+          tmp_user_idxs = Object.entries(tmp_kv_users)
+                .map(([key, value]) => ({ pk: key, tag_num: value }))
+                .sort((a, b) => a.tag_num - b.tag_num)
+                .map((item) => item.pk)
         }
       });
-      ref.users = tmp_all_users;
+      this.user_idxs = tmp_user_idxs;
     },
     get_users_by_sim(){
-      let req_user = this.backup_all_users.filter(obj =>  obj.pk == this.request_user.pk)[0];
-      let other_users = this.users.filter(obj => obj.pk != this.request_user.pk);
-      for(let i = 0; i < other_users.length; i++){
-        other_users[i]["score"] = parseFloat((this.similarity_between(req_user, other_users[i])*100).toFixed(2));
+      let req_user = this.users[this.request_user.pk];
+      let other_users_pks = this.user_idxs.filter(pk => pk !== this.request_user.pk);
+      for(const pk of other_users_pks){
+        this.users[pk]["score"] = parseFloat((this.similarity_between(req_user, this.users[pk])*100).toFixed(2));
       }
-      this.users = other_users.sort(function(a,b){
-        return b.score - a.score;
-      });
+      const ref = this;
+      this.user_idxs = this.user_idxs.sort((a, b) => {
+        return ref.users[b].score - ref.users[a].score
+      })
     },
     similarity_between(a, b){
       if (!("skills" in a) || !("skills" in b)){

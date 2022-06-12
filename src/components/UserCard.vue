@@ -22,7 +22,7 @@
     <div class="major-div">
       <div class="cus-subtitle" v-if="user.major">{{ user.major }}</div>
       <div class="cus-subtitle" v-if="user.major_two">{{ user.major_two }}</div>
-      <div class="cus-sim" v-if="user.score">Score:{{ user.score }}%</div>
+      <div class="cus-sim" v-if="user.score !== 0">Score:{{ user.score }}%</div>
     </div>
   </v-card>
 </template>
@@ -40,8 +40,8 @@ export default{
       default:null,
     },
     user_index:{
-      type:Number,
-      default:-1,
+      type:String,
+      default:"0",
     },
     display_role:{
       type:Boolean,
