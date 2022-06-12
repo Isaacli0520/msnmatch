@@ -564,12 +564,19 @@ export default {
     closeUserDialog(){
       this.userDialog = false;
     },
+    shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+    },
     getAllUsers(){
       axios.get('/users/api/get_all_users/',{params: {}}).then(response => {
         this.backup_all_users = JSON.parse(JSON.stringify(response.data.users));
         this.users = JSON.parse(JSON.stringify(response.data.users));
-        this.backup_user_idxs = Object.keys(this.users)
-        this.user_idxs = Object.keys(this.users)
+        this.backup_user_idxs = Object.keys(this.users);
+        this.shuffleArray(this.backup_user_idxs);
+        this.user_idxs = this.backup_user_idxs.slice()
         this.request_user = response.data.request_user;
         this.loaded = true;
       });
@@ -611,6 +618,7 @@ export default {
     user_list_filter(tags){
       var tmp_user_idxs = this.backup_user_idxs.slice()
       var ref = this;
+      let searchTag = false;
       tags.forEach(function(tag) {
         let colon_index = tag.indexOf(":");
         if(colon_index != -1 && colon_index != tag.length){
@@ -662,6 +670,7 @@ export default {
           }
         }
         else{
+          searchTag = true
           let tmp_kv_users = ref.fuzzy_search_skill(tmp_user_idxs, tag.toLowerCase());
           tmp_user_idxs = Object.entries(tmp_kv_users)
                 .map(([key, value]) => ({ pk: key, tag_num: value }))
@@ -669,6 +678,7 @@ export default {
                 .map((item) => item.pk)
         }
       });
+      if (!searchTag) this.shuffleArray(tmp_user_idxs);
       this.user_idxs = tmp_user_idxs;
     },
     get_users_by_sim(){
