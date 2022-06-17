@@ -86,13 +86,13 @@ def get_all_and_user_skills(request):
 
 @login_required
 def get_all_users(request):
-    start_time = time.time()
+    # start_time = time.time()
     users = sorted(User.objects.all().exclude(username="admin").exclude(profile__role=""), key=lambda x: random.random())
     resp = {
-        "users":[user_json(user, request) for user in users],
+        "users":{ user.pk: user_json(user, request) for user in users },
         "request_user":user_json(request.user, request),
     }
-    print("DEBUG GET ALL USERS TIME:", time.time() - start_time)
+    # print("DEBUG GET ALL USERS TIME:", time.time() - start_time)
     return _success_response(resp)
 
 @login_required
@@ -327,6 +327,7 @@ def user_json(user, request, personal_profile = False):
         "rm_bio":user.profile.rm_bio,
         "rm_schedule":user.profile.rm_schedule,
         "rm":user.profile.rm,
+        "score":0,
     }
     if not personal_profile:
         user_dict["skills"] = skills_as_dict(user.skill_set.all(), empty_list=True)

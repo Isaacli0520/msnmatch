@@ -105,10 +105,14 @@
                     lg="4"
                     xl="3">
                       <user-card
+                        v-if="us_pk in all_users"
                         class="fill-height"
                         @open-user-dialog="matchUser(us_pk, user.pk)"
                         :superadmin="true"
                         :user="all_users[us_pk]"></user-card>
+                      <v-card v-else>
+                        The user is no longer a mentee
+                      </v-card>
                     </v-col>
                   </v-row>
                 </v-card-text>
