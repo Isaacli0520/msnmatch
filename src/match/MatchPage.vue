@@ -115,6 +115,25 @@
         @del-from-fav="deleteFromFav"
         v-model="userDialog"></user-dialog>
     </v-main>
+
+    <!-- Scroll to Top Button -->
+    <v-fab-transition>
+      <v-btn
+        color="pink lighten-1"
+        v-scroll="onScroll"
+        v-show="showScrollFab"
+        fab
+        dark
+        fixed
+        bottom
+        right
+        @click="toTop"
+      >
+      <v-icon>mdi-chevron-up</v-icon>
+      </v-btn>
+    </v-fab-transition>
+
+    <!-- Stepper for role registration -->
     <v-dialog v-if="loaded" v-model="roleDialog" scrollable min-width="350px" max-width="800px">
       <v-stepper v-model="current_step">
         <v-stepper-header>
@@ -329,6 +348,7 @@ export default {
       loaded:false,
       clicked:false,
       new_ui:false,
+      showScrollFab:false,
       tag_tab:null,
       // Header
       headerUpdate: false,
@@ -422,6 +442,14 @@ export default {
     },
   },
   methods: {
+    onScroll (e) {
+      if (typeof window === 'undefined') return
+      const top = window.pageYOffset ||   e.target.scrollTop || 0
+      this.showScrollFab = top > 20
+    },
+    toTop () {
+      this.$vuetify.goTo(0)
+    },
     openStatsDialog() {
       this.statsDialog = true;
     },
