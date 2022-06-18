@@ -51,7 +51,7 @@
         </div>
       </div>
       <v-avatar
-        size="165"
+        size="170"
         rounded
         class="cus-avatar"
       >
@@ -149,7 +149,7 @@ export default{
     font-size:13px !important;
     color: rgb(117, 117, 117);
     letter-spacing: 0.007em;
-    padding: 2px 0px 0px 14px;
+    padding: 2px 8px 0px 14px;
   }
 
   .cus-title{
