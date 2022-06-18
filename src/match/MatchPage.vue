@@ -66,6 +66,15 @@
                 <v-btn outlined color="teal lighten-1" @click="get_users_by_sim();clicked=true;">Click Me!</v-btn>
               </template>
               <v-btn style="margin-left: 10px;" outlined color="teal lighten-1" @click="openStatsDialog();">Stats</v-btn>
+              <v-btn
+                style="margin-left: 10px;"
+                outlined
+                color="teal lighten-1"
+                @click="new_ui=!new_ui;"
+              >
+                {{ new_ui ? "Compact" : "Normal"}}
+                <v-icon right dark>{{ new_ui ? "mdi-grid" : "mdi-grid-large" }}</v-icon>
+              </v-btn>
             </div>
           </v-row>
           <v-row justify="center">
@@ -78,19 +87,20 @@
               <small class="muted-text">*They are just for fun😁</small>
             </div>
           </v-row>
-          <!-- <v-row justify="center">
-            <div v-if="request_user.role == '' " style="text-align:center;">
-              <small class="muted-text">*Note that you have to be a mentor/mentee to appear in the user list</small>
+          <v-row  v-if="clicked && new_ui" justify="center">
+            <div style="text-align:center;">
+              <small class="muted-text">*Scores are not displayed in compact view</small>
             </div>
-          </v-row> -->
+          </v-row>
         </div>
-        <!-- <v-divider style="margin-left:13px;margin-right:13px;"></v-divider> -->
+        <!-- Main User List -->
         <v-row>
           <v-col
             v-for="user_idx in user_idxs" :key="user_idx"
             cols="12" sm="6" md="4" lg="4" xl="3">
             <user-card
               class="fill-height"
+              :new_ui="new_ui"
               :user_index="user_idx"
               :user="users[user_idx]" @open-user-dialog="openUserDialog"></user-card>
           </v-col>
@@ -300,7 +310,7 @@
 </template>
 
 <script>
-import Vue from "vue";
+import Vue from "vue"
 import axios from 'axios'
 import MatchHeader from '../components/MatchHeader'
 import UserDialog from '../components/UserDialog'
@@ -308,7 +318,7 @@ import UserCard from '../components/UserCard'
 import ProfileEdit from '../components/ProfileEdit'
 import TagSpan from '../components/TagSpan'
 import variables from '../sass/variables.scss'
-// import { MatchHeader, UserDialog, UserCard } from "../components"
+
 axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 axios.defaults.xsrfCookieName = "csrftoken";
 
@@ -318,6 +328,7 @@ export default {
       variables:variables,
       loaded:false,
       clicked:false,
+      new_ui:false,
       tag_tab:null,
       // Header
       headerUpdate: false,

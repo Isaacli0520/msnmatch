@@ -198,7 +198,7 @@ def oauth_token(request):
 def get_all_ranked_users(request):
     all_users = User.objects.all().exclude(username="admin").exclude(profile__role="")
     all_users_dict = {}
-    start_time = time.time()
+    # start_time = time.time()
     for user in all_users:
         if user.profile.picture:
             picture_url = user.profile.picture.url
@@ -228,18 +228,18 @@ def get_all_ranked_users(request):
             "year": year,
             "graduate_year": user.profile.graduate_year,
             "major": user.profile.major,
-            "matched":user.profile.matched,
-            "sex":user.profile.sex,
-            "role":user.profile.role,
-            "major_two":user.profile.major_two,
-            "minor":user.profile.minor,
-            "wechat":user.profile.wechat,
+            "matched": user.profile.matched,
+            "sex": user.profile.sex,
+            "role": user.profile.role,
+            "major_two": user.profile.major_two,
+            "minor": user.profile.minor,
+            "wechat": user.profile.wechat,
             "follow": [flw.follower.pk for flw in Follow.objects.filter(followee=user)],
             "followee": [flw.followee.pk for flw in Follow.objects.filter(follower=user)],
-            "avatar":avatar_url,
-            "score":0,
+            "avatar": avatar_url,
+            "score": 0,
         }
-    print("Get all ranked users --- %s seconds ---" % (time.time() - start_time))
+    # print("Get all ranked users --- %s seconds ---" % (time.time() - start_time))
     return JsonResponse({
         "all_users":all_users_dict,
     })

@@ -202,7 +202,7 @@ export default{
     height:28px; 
     line-height:28px;
     clear:both;
-    padding: 0px 16px 0px 16px;
+    padding: 0px 16px 0px 24px;
     margin-bottom: 5px;
   }
 
