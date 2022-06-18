@@ -416,9 +416,7 @@ export default {
         return this.users[this.dialog_user_index];
     },
     user_skills_count(){
-      if(Object.keys(this.user_skills).length == 0)
-        return 0
-      return Object.values(this.user_skills).map(arr => arr.length).reduce((a, b) => a + b);
+      return this.user_skills.map((skills_of_type) => skills_of_type.skills.length).reduce((a, b) => a + b, 0);
     },
     all_users_skills() {
       if (this.backup_all_users.length === 0) 
