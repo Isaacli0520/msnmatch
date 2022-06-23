@@ -9,7 +9,7 @@
     "heroku-postbuild": "npm run build"
   },
   "engines": {
-    "node": "16.14.2"
+    "node": "16.13"
   },
   "dependencies": {
     "acorn": "^6.4.2",
