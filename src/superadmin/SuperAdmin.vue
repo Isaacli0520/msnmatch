@@ -68,6 +68,7 @@
               <span v-if="user.matched" class="user-tag user-matched">matched</span>
               <span v-if="user.follow.length > 0" class="user-tag user-follower">{{ user.follow.length | pluralize_follower }}</span>
               <span v-if="user.followee.length > 0" class="user-tag user-followee">{{ user.followee.length | pluralize_followee }}</span>
+              <span v-if="intersect(user.follow, user.followee).length > 0" class="user-tag user-mutual">Mutual {{ intersect(user.follow, user.followee).length }}</span>
               </div>
             </v-expansion-panel-header>
             <v-expansion-panel-content>
@@ -84,6 +85,7 @@
                     lg="4"
                     xl="3">
                       <user-card
+                        :new_ui="true"
                         class="fill-height"
                         @open-user-dialog="matchUser(us_pk, user.pk)"
                         :superadmin="true"
@@ -192,6 +194,9 @@ export default {
     // },
   },
   methods:{
+    intersect(a, b) {
+      return a.filter(Set.prototype.has, new Set(b));
+    },
     getReviewUsers(){
       axios.get('/courses/api/get_top_review_users/',{params: {date:this.date}}).then(response => {
         this.review_users = response.data.review_users;
@@ -301,20 +306,24 @@ export default {
   }
 
   .user-follower{
-    background-color: #e714dd;
+    background-color: #7a14e7;
   }
 
   .user-followee{
+    background-color: #e714dd;
+  }
+
+  .user-mutual {
     background-color: #ff237e;
   }
 
-  .Mentor{
-    background: rgba(26, 158, 235, 0.781);
+  .Mentee{
+    background: #00C853;
   }
   
-  .Mentee{
-    background: rgba(9, 194, 40, 0.781);
-  }    
+  .Mentor{
+    background: #2979FF;
+  }
 
   .big-title{
     color:#000000;
