@@ -68,7 +68,7 @@
               <span v-if="user.matched" class="user-tag user-matched">matched</span>
               <span v-if="user.follow.length > 0" class="user-tag user-follower">{{ user.follow.length | pluralize_follower }}</span>
               <span v-if="user.followee.length > 0" class="user-tag user-followee">{{ user.followee.length | pluralize_followee }}</span>
-              <span v-if="intersect(user.follow, user.followee).length > 0" class="user-tag user-mutual">Mutual {{ intersect(user.follow, user.followee).length }}</span>
+              <span v-if="intersect(user.follow, user.followee).length > 0" class="user-tag user-mutual">{{ intersect(user.follow, user.followee).length }} Mutual</span>
               </div>
             </v-expansion-panel-header>
             <v-expansion-panel-content>
