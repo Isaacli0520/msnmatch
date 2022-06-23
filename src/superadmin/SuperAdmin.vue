@@ -108,6 +108,7 @@
                     xl="3">
                       <user-card
                         v-if="us_pk in all_users"
+                        :new_ui="true"
                         class="fill-height"
                         @open-user-dialog="matchUser(us_pk, user.pk)"
                         :superadmin="true"
