@@ -16,7 +16,7 @@
     "comment-core-library": "^0.11.1",
     "core-js": "^2.6.11",
     "css-loader": "^2.1.1",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "fibers": "^4.0.3",
     "fuzzball": "^1.3.0",
     "jquery": "^3.5.1",
