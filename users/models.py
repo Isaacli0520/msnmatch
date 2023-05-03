@@ -35,6 +35,7 @@ GRADUATE_YEAR_CHOICES = (
             ('2024', '2024'),
             ('2025', '2025'),
             ('2026', '2026'),
+            ('2027','2027')
         )
 ROLE_CHOICES = (
             ('Mentee', 'Mentee'),
