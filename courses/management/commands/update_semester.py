@@ -69,7 +69,7 @@ class Command(BaseCommand):
 		}
 		headers = {'User-Agent':'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Safari/537.36'}
 		data, lines = [], []
-		with requests.post('https://louslist.org/deliverData.php', headers = headers, data=new_data, stream=True) as r:
+		with requests.post('https://louslist.org//deliverSearchData.php', headers = headers, data=new_data, stream=True) as r:
 			csv_reader = csv.reader(codecs.iterdecode(r.iter_lines(), 'utf-8'))
 			# with open("tmp_csv.csv", 'w') as wf:
 			# 	writer = csv.writer(wf)
