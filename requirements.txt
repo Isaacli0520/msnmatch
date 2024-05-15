@@ -19,3 +19,4 @@ psycopg2
 numpy
 scipy
 PyJWT
+daphne
