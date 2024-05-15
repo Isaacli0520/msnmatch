@@ -1,4 +1,4 @@
-Django==4.0.3
+Django==5.0.5
 gunicorn
 django-heroku
 django-friendship
