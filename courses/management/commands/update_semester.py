@@ -47,8 +47,8 @@ form_data = {
   "iMaxCurWaitlist":"", 
   "Request CSV Data": "Request CSV Data"
 }
-files = {k: v for k, v in form_data.items()}
-headers = {'User-Agent':'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Safari/537.36'}
+files = {k: (None, v) for k, v in form_data.items()}
+req_headers = {'User-Agent':'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Safari/537.36'}
 
 start_year = 2016
 start_id = 1162
@@ -73,7 +73,7 @@ class Command(BaseCommand):
     # get all courses of a certain semester from louslist
     lines = []
     params = {"Semester": semester_id }
-    with requests.post('https://louslist.org//deliverSearchData.php', headers=headers, params=params, files=files, stream=True) as r:
+    with requests.post('https://louslist.org//deliverSearchData.php', headers=req_headers, params=params, files=files, stream=True) as r:
       csv_reader = csv.reader(codecs.iterdecode(r.iter_lines(), 'utf-8'))
       headers = next(csv_reader) 
       print("Semester:", semester, "Semester ID:", semester_id)
