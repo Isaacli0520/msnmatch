@@ -146,6 +146,11 @@ class Command(BaseCommand):
           instr = Instructor.objects.get(first_name=tmp_first_name, last_name=tmp_last_name)
         except Instructor.DoesNotExist:
           instr = Instructor.objects.create(first_name=tmp_first_name, last_name=tmp_last_name)
+        except Instructor.MultipleObjectsReturned:
+          instrs = Instructor.objects.filter(first_name=tmp_first_name, last_name=tmp_last_name)
+          for instr_dup in instrs:
+            instr_dup.delete()
+          instr = Instructor.objects.create(first_name=tmp_first_name, last_name=tmp_last_name)
         
         try:
           cs_instr = CourseInstructor.objects.get(instructor=instr, course=course, topic=cs["Topic"], semester=cs["Semester"])
