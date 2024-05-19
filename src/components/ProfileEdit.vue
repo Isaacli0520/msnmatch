@@ -249,6 +249,7 @@ export default {
                 {"values":"Computer Engineering", "text":"Computer Engineering"},
                 {"values":"Computer Science", "text":"Computer Science"},
                 {"values":"Dance", "text":"Dance"},
+                {"values":"Data Science", "text":"Data Science"},
                 {"values":"Drama", "text":"Drama"},
                 {"values":"Early Childhood Education (BSEd)", "text":"Early Childhood Education (BSEd)"},
                 {"values":"East Asian Languages, Literatures and Culture", "text":"East Asian Languages, Literatures and Culture"},
